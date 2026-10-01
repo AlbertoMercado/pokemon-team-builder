@@ -58,4 +58,6 @@ nav:
       - Plantilla: 03-adr/0000-plantilla.md
       - "0001 · Stack tecnológico": 03-adr/0001-stack-tecnologico.md
   - Manual de usuario: 04-manual-usuario/index.md
-  - Operación: 05-operacion/index.md
+  - Operación:
+      - 05-operacion/index.md
+      - Entorno de desarrollo en macOS: 05-operacion/entorno-desarrollo-macos.md

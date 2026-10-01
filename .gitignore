@@ -227,3 +227,6 @@ test-results/
 .cache/
 *.sqlite
 *.db
+
+# macOS
+.DS_Store
