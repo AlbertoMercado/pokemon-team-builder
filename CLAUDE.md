@@ -55,7 +55,7 @@ tests/                Tests de Python (pytest + hypothesis)
 - **Idioma**: documentación, commits, issues y PR en **español**; código, identificadores,
   nombres de ficheros de código y comentarios técnicos en **inglés**.
 - **Flujo de trabajo**: GitHub Flow. `main` está protegida; todo cambio entra por PR desde una
-  rama `feat/`, `fix/`, `docs/` o `chore/`.
+  rama `feat/`, `fix/`, `docs/`, `chore/` o `test/`.
 - **Commits**: [Conventional Commits](https://www.conventionalcommits.org/es/) en español,
   p. ej. `feat(core): añadir filtro por juego objetivo (RN-03)`.
 - **Versionado**: SemVer. Mientras sea `0.x`, los cambios incompatibles suben la versión menor.
