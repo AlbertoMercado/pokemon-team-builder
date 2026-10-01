@@ -45,7 +45,7 @@ core/                 Motor de generación de equipos (filtros + puntuación), s
 api/                  API FastAPI sobre el motor y la BD
 web/                  Frontend React + Vite + TypeScript + Tailwind
 tests/                Tests de Python (pytest + hypothesis)
-.github/workflows/    CI de GitHub Actions
+.github/workflows/    CI de GitHub Actions (ci.yml: Python, Documentación, Secretos)
 ```
 
 `core/` debe mantenerse puro (sin acceso a red ni BD) para poder testearlo con hypothesis.
@@ -98,3 +98,14 @@ Mientras no haya ficheros `.py`, `mypy` termina con «There are no .py[i] files�
 código 5 («no tests ran»); es el comportamiento esperado.
 
 Actualiza esta tabla cuando un comando pendiente pase a existir.
+
+### CI
+
+`.github/workflows/ci.yml` se ejecuta en cada PR y en cada push a `main` con tres jobs:
+
+- **Python**: pre-commit (sin gitleaks ni mypy), `mypy` con el entorno del proyecto y `pytest`.
+- **Documentación**: `mkdocs build --strict`.
+- **Secretos**: gitleaks sobre todo el historial.
+
+Los tres son comprobaciones obligatorias para fusionar en `main`. Cuando exista `web/`, se añadirá
+un job para el frontend.
