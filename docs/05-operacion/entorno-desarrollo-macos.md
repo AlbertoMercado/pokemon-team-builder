@@ -46,7 +46,10 @@ git config --global user.name "Tu Nombre"
 git config --global user.email "email-de-tu-cuenta@github.com"
 git config --global init.defaultBranch main
 git config --global pull.rebase true
+git config --global fetch.prune true
 ```
+
+`fetch.prune` hace que `git fetch` y `git pull` eliminen las referencias a ramas remotas que ya no existen (GitHub borra la rama al fusionar cada PR).
 
 **Comprobación:** `git --version` y `git config --global --list`
 
