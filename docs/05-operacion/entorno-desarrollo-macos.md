@@ -210,7 +210,7 @@ Los tres comandos deben terminar sin errores. Mientras no haya tests, `pytest` t
 2. Crea una rama: `git switch -c feat/descripcion-corta` (prefijos: `feat/`, `fix/`, `docs/`, `chore/`, `test/`)
 3. Trabaja y haz commits con **Conventional Commits** (`feat: ...`, `fix: ...`, `docs: ...`)
 4. Sube la rama y abre un pull request: `git push -u origin HEAD && gh pr create`
-5. Cuando la CI esté en verde (en cuanto exista) y el PR esté revisado, haz merge a `main`.
+5. Cuando la CI esté en verde y el PR esté revisado, haz merge a `main`.
 
 La rama `main` está protegida: no se puede hacer push directo y todo cambio entra mediante pull request.
 

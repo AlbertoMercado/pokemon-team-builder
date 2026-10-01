@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: true
+
+      - name: Instalar dependencias
+        run: uv sync --locked
+
+      # gitleaks se ejecuta en su propio job (el hook solo revisa lo staged) y mypy
+      # se ejecuta abajo con el entorno del proyecto, que tiene todas las dependencias.
+      - name: pre-commit
+        run: uv run pre-commit run --all-files --show-diff-on-failure
+        env:
+          SKIP: gitleaks,mypy
+
+      - name: mypy
+        run: |
+          if git ls-files '*.py' | grep -q .; then
+            uv run mypy
+          else
+            echo "::notice::Sin ficheros .py todavía; se omite mypy."
+          fi
+
+      - name: pytest
+        run: |
+          # Código 5 = no se han encontrado tests (proyecto sin código todavía).
+          status=0
+          uv run pytest || status=$?
+          if [ "$status" -eq 5 ]; then
+            echo "::notice::Sin tests todavía."
+            exit 0
+          fi
+          exit "$status"
+
+  docs:
+    name: Documentación
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: true
+
+      - name: Instalar dependencias
+        run: uv sync --locked
+
+      - name: Construir documentación
+        run: uv run mkdocs build --strict
+
+  secrets:
+    name: Secretos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
