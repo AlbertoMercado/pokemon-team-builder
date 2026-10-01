@@ -209,7 +209,7 @@ Los tres comandos deben terminar sin errores. Mientras no haya tests, `pytest` t
 4. Sube la rama y abre un pull request: `git push -u origin HEAD && gh pr create`
 5. Cuando la CI esté en verde (en cuanto exista) y el PR esté revisado, haz merge a `main`.
 
-No se hace push directo a `main`: todo cambio entra mediante pull request.
+La rama `main` está protegida: no se puede hacer push directo y todo cambio entra mediante pull request.
 
 ### Trabajar con Claude Code
 
