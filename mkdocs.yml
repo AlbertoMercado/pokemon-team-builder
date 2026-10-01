@@ -1,0 +1,61 @@
+site_name: Pokémon Team Builder
+site_description: Documentación del generador de equipos Pokémon
+repo_url: https://github.com/AlbertoMercado/pokemon-team-builder
+repo_name: AlbertoMercado/pokemon-team-builder
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: es
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: red
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Cambiar a modo oscuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: red
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Cambiar a modo claro
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Inicio: index.md
+  - Diseño funcional (DDF): 01-ddf/index.md
+  - Diseño técnico (DDT): 02-ddt/index.md
+  - Decisiones (ADR):
+      - 03-adr/index.md
+      - Plantilla: 03-adr/0000-plantilla.md
+      - "0001 · Stack tecnológico": 03-adr/0001-stack-tecnologico.md
+  - Manual de usuario: 04-manual-usuario/index.md
+  - Operación: 05-operacion/index.md
