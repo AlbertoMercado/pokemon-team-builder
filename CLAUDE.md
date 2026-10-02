@@ -74,6 +74,8 @@ tests e issues.**
   regla en su nombre o docstring.
 - Issues, PR y commits que implementan o modifican una regla citan su `RN-XX`.
 - No implementar una regla de negocio que no esté documentada en el DDF: primero se documenta.
+- Con el mismo criterio de identificadores estables, los requisitos funcionales se numeran
+  `RF-XX` y las decisiones funcionales pendientes `CA-XX` (cuestiones abiertas del DDF).
 
 ## Comandos habituales
 

@@ -3,7 +3,8 @@
 Aplicación personal y sin ánimo de lucro que, a partir de una lista de Pokémon favoritos y un
 juego objetivo, genera un equipo de 6 según reglas configurables:
 
-- **Reglas duras**: filtros que descartan candidatos (p. ej., disponibilidad en el juego).
+- **Reglas duras**: filtros que descartan candidatos (p. ej., que el Pokémon exista en el juego
+  objetivo).
 - **Reglas blandas**: criterios con peso que puntúan cada equipo candidato.
 
 ```mermaid

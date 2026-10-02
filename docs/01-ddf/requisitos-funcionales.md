@@ -1,0 +1,199 @@
+# Requisitos funcionales
+
+Prioridades según [MoSCoW](index.md#convenciones). La clasificación inicial sigue la idea de
+partida:
+
+- Las funcionalidades **principales** son **Must**.
+- Las de **apoyo** son **Should**.
+- Las **deseadas** son **Could**.
+
+Hay una excepción: la carga de datos (RF-11) se ha subido a **Must**, empezando con un conjunto
+pequeño de datos ([CA-02](cuestiones-abiertas.md#resueltas)).
+
+## Resumen
+
+| ID | Requisito | Módulo | Prioridad |
+|----|-----------|--------|-----------|
+| [RF-01](#rf-01) | Listar Pokémon | Catálogo | Should |
+| [RF-02](#rf-02) | Consultar la ficha de un Pokémon | Catálogo | Should |
+| [RF-03](#rf-03) | Añadir o quitar favoritos desde el catálogo | Catálogo | Should |
+| [RF-04](#rf-04) | Gestionar la lista de favoritos | Favoritos | Must |
+| [RF-05](#rf-05) | Seleccionar el juego objetivo | Reglas | Must |
+| [RF-06](#rf-06) | Configurar las reglas duras | Reglas | Must |
+| [RF-07](#rf-07) | Configurar las reglas blandas y sus pesos | Reglas | Must |
+| [RF-08](#rf-08) | Generar equipos | Generación | Must |
+| [RF-09](#rf-09) | Explicar el equipo generado | Generación | Should |
+| [RF-10](#rf-10) | Mostrar el equipo incompleto con sugerencias | Generación | Must |
+| [RF-11](#rf-11) | Cargar y actualizar los datos | Datos | Must |
+| [RF-12](#rf-12) | Registrar un equipo en el Hall of Fame | Hall of Fame | Could |
+| [RF-13](#rf-13) | Consultar el Hall of Fame | Hall of Fame | Could |
+| [RF-14](#rf-14) | Cargar reglas definidas por el usuario | Reglas | Could |
+
+## Catálogo
+
+### RF-01 · Listar Pokémon { #rf-01 }
+
+- **Prioridad**: Should
+- **Descripción**: el usuario ve el listado de Pokémon disponibles en la aplicación, con el
+  número de la Pokédex nacional, el nombre y el tipo o tipos de cada uno.
+- **Criterios de aceptación**:
+    - Se puede buscar por nombre.
+    - Se puede filtrar por tipo.
+    - Cada Pokémon indica si está en favoritos.
+    - Las formas regionales aparecen como entradas propias e identificadas claramente
+      (p. ej., «Vulpix» y «Vulpix de Alola») ([RN-05](reglas-negocio.md#rn-05)).
+
+### RF-02 · Consultar la ficha de un Pokémon { #rf-02 }
+
+- **Prioridad**: Should
+- **Descripción**: desde el listado se accede a una ficha con los datos básicos del Pokémon.
+- **Criterios de aceptación**: la ficha muestra al menos:
+    - Número y nombre.
+    - Tipo o tipos, los actuales. En la generación de equipos se usan los del juego objetivo
+      ([RN-10](reglas-negocio.md#rn-10)).
+    - Línea evolutiva completa.
+    - Mecanismo de cada evolución.
+
+### RF-03 · Añadir o quitar favoritos desde el catálogo { #rf-03 }
+
+- **Prioridad**: Should
+- **Descripción**: el usuario añade un Pokémon a favoritos, o lo quita, directamente desde el
+  listado y desde la ficha. Lo que se añade es esa forma y esa evolución concretas: la evolución
+  hasta la que se quiere llegar ([RN-05](reglas-negocio.md#rn-05),
+  [RN-09](reglas-negocio.md#rn-09)).
+- **Criterios de aceptación**: el cambio se refleja al momento en el listado, en la ficha y en
+  la lista de favoritos.
+
+## Favoritos
+
+### RF-04 · Gestionar la lista de favoritos { #rf-04 }
+
+- **Prioridad**: Must
+- **Descripción**: el usuario consulta su lista de favoritos y puede quitar Pokémon de ella.
+  Hay una única lista de favoritos, común a todos los juegos. A partir de ella se generan los
+  equipos ([RN-02](reglas-negocio.md#rn-02)). Cada favorito es la evolución hasta la que se
+  quiere llegar; sus preevoluciones van implícitas ([RN-09](reglas-negocio.md#rn-09)).
+- **Criterios de aceptación**:
+    - La lista se conserva entre sesiones.
+    - Muestra cuántos favoritos hay.
+
+## Juego objetivo y reglas
+
+### RF-05 · Seleccionar el juego objetivo { #rf-05 }
+
+- **Prioridad**: Must
+- **Descripción**: el usuario elige el juego que quiere completar.
+- **Criterios de aceptación**:
+    - Solo se ofrecen juegos de la saga principal con datos cargados.
+    - Cambiar de juego no modifica la lista de favoritos.
+
+### RF-06 · Configurar las reglas duras { #rf-06 }
+
+- **Prioridad**: Must
+- **Descripción**: el usuario activa o desactiva las reglas duras opcionales del catálogo
+  predefinido y ajusta sus parámetros, si los tienen.
+- **Criterios de aceptación**:
+    - Las [reglas estructurales](reglas-negocio.md#reglas-estructurales) siempre están
+      activas.
+    - Las reglas duras activables (p. ej., [RN-07](reglas-negocio.md#rn-07)) se pueden activar
+      y desactivar.
+    - La configuración se conserva entre sesiones.
+
+### RF-07 · Configurar las reglas blandas y sus pesos { #rf-07 }
+
+- **Prioridad**: Must
+- **Descripción**: el usuario activa o desactiva las reglas blandas del catálogo predefinido
+  (p. ej., [RN-06](reglas-negocio.md#rn-06)) y asigna un peso a cada una
+  ([RN-04](reglas-negocio.md#rn-04)).
+- **Criterios de aceptación**:
+    - Cada regla blanda muestra una descripción de lo que puntúa.
+    - La configuración se conserva entre sesiones.
+- **Nota**: la escala de pesos se define junto con el catálogo de reglas
+  ([CA-05](cuestiones-abiertas.md#aplazadas)).
+
+## Generación de equipo
+
+### RF-08 · Generar equipos { #rf-08 }
+
+- **Prioridad**: Must
+- **Descripción**: a partir de los favoritos, el juego objetivo y las reglas configuradas, la
+  aplicación propone los equipos de 6 con mayor puntuación. Primero filtra los favoritos por la
+  generación y por el juego, y después aplica el resto de reglas (ver el
+  [proceso de generación](reglas-negocio.md#proceso-de-generacion)).
+- **Criterios de aceptación**:
+    - Con los mismos datos de entrada se obtienen siempre los mismos equipos, en el mismo orden.
+    - Todos los equipos cumplen las reglas duras activas.
+    - Si varios equipos empatan con la puntuación más alta, se muestran todos
+      ([RN-04](reglas-negocio.md#rn-04)).
+
+### RF-09 · Explicar el equipo generado { #rf-09 }
+
+- **Prioridad**: Should
+- **Descripción**: junto al equipo se muestra su puntuación total y lo que aporta cada regla
+  blanda, para que el usuario entienda por qué se ha elegido y ajuste los pesos.
+- **Criterios de aceptación**: la suma de las aportaciones de cada regla coincide con la
+  puntuación total.
+
+### RF-10 · Mostrar el equipo incompleto con sugerencias { #rf-10 }
+
+- **Prioridad**: Must
+- **Descripción**: si no se pueden reunir 6 favoritos que cumplan las reglas, la aplicación
+  explica el motivo y muestra el equipo incompleto con el mayor número posible de favoritos.
+  Para los huecos libres, sugiere Pokémon que no son favoritos y que encajan con las reglas
+  activas ([RN-08](reglas-negocio.md#rn-08)).
+- **Criterios de aceptación**:
+    - El mensaje indica la causa y en qué filtro se ha descartado cada favorito. Por ejemplo:
+      «de tus 9 favoritos, 3 no existen en la 1.ª generación y 2 no existen en Pokémon
+      Amarillo».
+    - Las sugerencias se muestran separadas del equipo y ordenadas por lo que aportarían a la
+      puntuación.
+    - El usuario puede añadir una sugerencia a favoritos desde ahí.
+
+## Datos
+
+### RF-11 · Cargar y actualizar los datos { #rf-11 }
+
+- **Prioridad**: Must
+- **Descripción**: el administrador carga los datos de Pokémon, juegos y generaciones desde
+  las fuentes externas (PokeAPI, Pokémon Showdown y WikiDex), y los vuelve a cargar para
+  actualizarlos.
+- **Alcance inicial**: un conjunto de datos pequeño y controlable, por ejemplo las 2 o 3
+  primeras generaciones, para validar el algoritmo antes de ampliarlo
+  ([CA-11](cuestiones-abiertas.md#aplazadas)).
+- **Criterios de aceptación**:
+    - Se cargan las generaciones, los juegos de cada generación y qué Pokémon (por forma)
+      existen en cada juego ([RN-03](reglas-negocio.md#rn-03)).
+    - Repetir la carga no duplica datos.
+    - Se respetan los límites de uso de cada fuente.
+    - Al terminar, se informa de qué se ha cargado y de los errores, si los hay.
+
+## Hall of Fame
+
+### RF-12 · Registrar un equipo en el Hall of Fame { #rf-12 }
+
+- **Prioridad**: Could
+- **Descripción**: el usuario registra el equipo con el que ha completado un juego.
+- **Criterios de aceptación**:
+    - El registro incluye el juego, la fecha, notas opcionales y los 6 Pokémon. De cada
+      Pokémon se guardan el nombre y el tipo o tipos que tenía en ese juego
+      ([RN-10](reglas-negocio.md#rn-10)).
+    - Se puede crear a partir de un equipo generado, que el usuario puede modificar antes de
+      guardarlo.
+
+### RF-13 · Consultar el Hall of Fame { #rf-13 }
+
+- **Prioridad**: Could
+- **Descripción**: el usuario consulta los equipos registrados en su Hall of Fame.
+- **Criterios de aceptación**:
+    - Se puede filtrar por juego.
+    - Cada registro muestra el equipo, el juego y la fecha.
+
+## Reglas personalizadas
+
+### RF-14 · Cargar reglas definidas por el usuario { #rf-14 }
+
+- **Prioridad**: Could
+- **Descripción**: el usuario proporciona a la aplicación su propio conjunto de reglas, además
+  de las del catálogo predefinido.
+- **Nota**: en la primera versión, las reglas son las del catálogo predefinido del DDF. Que el
+  usuario defina reglas nuevas exige diseñar cómo se expresan; se abordará más adelante.
