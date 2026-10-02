@@ -51,7 +51,11 @@ markdown_extensions:
 
 nav:
   - Inicio: index.md
-  - Diseño funcional (DDF): 01-ddf/index.md
+  - Diseño funcional (DDF):
+      - 01-ddf/index.md
+      - Requisitos funcionales: 01-ddf/requisitos-funcionales.md
+      - Reglas de negocio: 01-ddf/reglas-negocio.md
+      - Cuestiones funcionales: 01-ddf/cuestiones-abiertas.md
   - Diseño técnico (DDT): 02-ddt/index.md
   - Decisiones (ADR):
       - 03-adr/index.md
