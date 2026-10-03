@@ -68,13 +68,32 @@ Sin restricciones entre miembros, con `N` candidatos hay `C(N, 6)` equipos: unos
 Con [RN-12](../01-ddf/reglas-negocio.md#rn-12) activa, el espacio se reduce mucho. Cada
 miembro ocupa uno o dos de los 17 o 18 tipos del juego, y la búsqueda con retroceso poda en
 cuanto dos miembros comparten tipo. Los miembros fijados por RN-13 y RN-14 reducen aún más el
-problema. Para los tamaños esperados (decenas de favoritos), la enumeración exhaustiva con
-poda es suficiente y exacta.
+problema.
+
+Medición con candidatos sintéticos (17 tipos, un 15 % de líneas compartidas, Dragonite fijado,
+3 evoluciones de Eevee y cobertura de RN-17 como conjuntos de bits), en Python puro sin
+optimizar:
+
+| Candidatos válidos | Con RN-12 | Sin RN-12 |
+|--------------------|-----------|-----------|
+| 20 | 250 equipos admisibles, < 0,01 s | 4 650 equipos, 0,01 s |
+| 40 | 22 818 equipos, 0,11 s | 168 330 equipos, 0,63 s |
+| 60 | 103 810 equipos, 0,58 s | — |
+| 120 | 2,5 millones de equipos, 19,5 s | — |
+
+Para los tamaños esperados (decenas de favoritos), la enumeración exhaustiva con poda es
+suficiente y exacta.
 
 Si RN-12 está desactivada y hay muchos favoritos, se puede añadir **ramificación y poda**
 (*branch and bound*) con una cota superior de la puntuación: por ejemplo, la cobertura de RN-17
 que darían los mejores candidatos restantes. La alternativa es formularlo como un problema de
 programación lineal entera. Se decidirá en el ADR si las pruebas lo hacen necesario.
+
+## Empates
+
+La puntuación depende sobre todo de los tipos, así que dos candidatos con los mismos tipos son
+intercambiables y los equipos empatados se multiplican. Se propone agruparlos al mostrarlos
+([CA-33](../01-ddf/cuestiones-abiertas.md#abiertas)).
 
 ## Pureza del motor
 

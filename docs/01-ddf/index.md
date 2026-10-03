@@ -8,6 +8,7 @@ las reglas de negocio (**RN-XX**).
 |---------|-------|---------|
 | 0.1 | 2026-10-02 | Versión inicial: alcance, requisitos RF-01 a RF-14 y reglas RN-01 a RN-10. |
 | 0.2 | 2026-10-03 | Forma de jugar (crianza y transferencia). Catálogo de reglas de la primera versión (RN-11 a RN-17). El *Hall of Fame* pasa a Must por el recorrido (RN-16). RN-08 y RN-10 se amplían. |
+| 0.3 | 2026-10-03 | Confirmación de los datos sin verificar por el usuario (RN-18, RF-15). |
 
 ## Propósito
 
@@ -20,7 +21,8 @@ equipo que mejor cumple esos criterios.
 La aplicación está pensada para una forma de jugar concreta, de la que parten las
 [reglas de negocio](reglas-negocio.md):
 
-1. Se genera el equipo para el juego objetivo.
+1. Se elige el juego objetivo, se confirman los datos que no se han podido cargar de forma
+   fiable ([RF-15](requisitos-funcionales.md#rf-15)) y se genera el equipo.
 2. Los 6 Pokémon se **crían en otro juego**, en su etapa inicial y a nivel 1 (o al más bajo que
    permita el juego de crianza).
 3. Se **transfieren** al juego objetivo y se recogen en el primer PC o en el primer momento en
@@ -186,6 +188,11 @@ Recorrido
 :   Los juegos completados por el usuario, en el orden en que los completó, con su equipo.
     Determina qué Pokémon quedan excluidos en el siguiente juego
     ([RN-16](reglas-negocio.md#rn-16)).
+
+Dato sin verificar
+:   Dato que no se ha podido cargar de forma fiable desde las fuentes: tiene un valor inferido
+    o está pendiente. El usuario lo confirma antes de generar el equipo, y desde ese momento
+    es responsable de él ([RN-18](reglas-negocio.md#rn-18)).
 
 ## Contenido
 

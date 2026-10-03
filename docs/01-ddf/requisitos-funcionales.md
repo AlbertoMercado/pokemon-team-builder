@@ -32,6 +32,7 @@ Hay dos excepciones:
 | [RF-12](#rf-12) | Registrar un equipo en el Hall of Fame | Hall of Fame | Must |
 | [RF-13](#rf-13) | Consultar el Hall of Fame | Hall of Fame | Must |
 | [RF-14](#rf-14) | Cargar reglas definidas por el usuario | Reglas | Could |
+| [RF-15](#rf-15) | Revisar los datos del juego objetivo | Reglas | Must |
 
 ## Catálogo
 
@@ -121,6 +122,25 @@ Hay dos excepciones:
 - **Nota**: los pesos son enteros de 0 a 10, con valores por defecto
   ([CA-05](cuestiones-abiertas.md#resueltas), [RN-04](reglas-negocio.md#rn-04)).
 
+### RF-15 · Revisar los datos del juego objetivo { #rf-15 }
+
+- **Prioridad**: Must
+- **Descripción**: tras elegir el juego objetivo y antes de generar el equipo, la aplicación
+  muestra los datos que no se han podido cargar de forma fiable y pide al usuario que los
+  confirme ([RN-18](reglas-negocio.md#rn-18)).
+- **Criterios de aceptación**:
+    - Solo se muestran los datos inferidos o pendientes que intervienen en la generación: los
+      del juego objetivo (p. ej., si tiene ciclo de día y noche, o sus combates clave) y los de
+      los favoritos que no se han descartado ya con datos automáticos (p. ej., si pueden llegar
+      al juego antes de completarlo).
+    - Los datos inferidos aparecen con la propuesta ya rellenada. El usuario la acepta o la
+      corrige, y rellena los pendientes.
+    - Las confirmaciones se guardan por juego y no se vuelven a pedir, salvo que una nueva carga
+      de datos cambie el valor propuesto.
+    - El usuario puede revisar y cambiar después lo que confirmó.
+    - Se muestra un aviso: los datos confirmados son responsabilidad del usuario y, si son
+      erróneos, el resultado puede ser inexacto.
+
 ## Generación de equipo
 
 ### RF-08 · Generar equipos { #rf-08 }
@@ -133,6 +153,8 @@ Hay dos excepciones:
 - **Criterios de aceptación**:
     - Con los mismos datos de entrada se obtienen siempre los mismos equipos, en el mismo orden.
     - Todos los equipos cumplen las reglas duras activas.
+    - Solo se puede generar cuando están confirmados los datos del juego objetivo y de los
+      favoritos que lo requieren ([RF-15](#rf-15)).
     - Si varios equipos empatan con la puntuación más alta, se muestran todos
       ([RN-04](reglas-negocio.md#rn-04)).
 
@@ -141,8 +163,10 @@ Hay dos excepciones:
 - **Prioridad**: Should
 - **Descripción**: junto al equipo se muestra su puntuación total y lo que aporta cada regla
   blanda, para que el usuario entienda por qué se ha elegido y ajuste los pesos.
-- **Criterios de aceptación**: la suma de las aportaciones de cada regla coincide con la
-  puntuación total.
+- **Criterios de aceptación**:
+    - La suma de las aportaciones de cada regla coincide con la puntuación total.
+    - Se indica qué datos usados en la generación ha confirmado el usuario
+      ([RN-18](reglas-negocio.md#rn-18)).
 
 ### RF-10 · Mostrar el equipo incompleto con sugerencias { #rf-10 }
 
@@ -160,6 +184,8 @@ Hay dos excepciones:
       sugerencias la cumplen.
     - Las sugerencias se muestran separadas del equipo y ordenadas por lo que aportarían a la
       puntuación.
+    - Las sugerencias que dependen de datos sin confirmar se marcan como «sin verificar»
+      ([RN-18](reglas-negocio.md#rn-18)).
     - El usuario puede añadir una sugerencia a favoritos desde ahí.
 
 ## Datos
@@ -181,7 +207,11 @@ Hay dos excepciones:
       evolución en cada juego, movimientos que se aprenden subiendo de nivel y los combates
       clave de cada juego con sus Pokémon. El detalle está en el
       [DDT](../02-ddt/datos-requeridos.md).
-    - Repetir la carga no duplica datos.
+    - Cada dato guarda su origen: automático, inferido o pendiente
+      ([RN-18](reglas-negocio.md#rn-18)). Cuando un dato no se puede cargar con certeza, se
+      propone un valor inferido si es posible (p. ej., que solo llegan los Pokémon de la
+      Pokédex regional).
+    - Repetir la carga no duplica datos ni borra las confirmaciones del usuario.
     - Se respetan los límites de uso de cada fuente.
     - Al terminar, se informa de qué se ha cargado y de los errores, si los hay.
 

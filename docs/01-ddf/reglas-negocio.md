@@ -32,6 +32,7 @@ juego y se transfiere al juego objetivo en su etapa inicial.
 | [RN-15](#rn-15) | Penalizar evoluciones tediosas | Blanda | Activable y peso | Vigente |
 | [RN-16](#rn-16) | Excluir Pokémon ya usados según el recorrido | Dura | Activable | Vigente |
 | [RN-17](#rn-17) | Primar los tipos más eficaces frente a los combates clave del juego | Blanda | Activable y peso | Vigente |
+| [RN-18](#rn-18) | Los datos sin verificar los confirma el usuario | Mecanismo | No | Vigente |
 
 Estados posibles:
 
@@ -50,7 +51,8 @@ Las reglas duras son de dos clases:
 
 ## Proceso de generación
 
-Las reglas se aplican en este orden:
+Antes de empezar, el usuario ha confirmado los datos sin verificar del juego objetivo y de sus
+favoritos ([RN-18](#rn-18)). Después, las reglas se aplican en este orden:
 
 1. Se parte de la lista de favoritos ([RN-02](#rn-02)). Cada favorito es la evolución hasta la
    que se quiere llegar ([RN-09](#rn-09)).
@@ -202,7 +204,7 @@ parámetros son fijos.
 - **Quedan descartados**, entre otros:
     - Legendarios y singulares (también llamados míticos), como Mewtwo, Lugia o Mew.
     - Ultraentes y Pokémon paradójicos, que se asimilan a los legendarios.
-    - Otros Pokémon que no se pueden criar, como Ditto, Unown o Rotom.
+    - Otros Pokémon que no se pueden criar, como Ditto o Unown.
 - **Ejemplos**:
     - Zapdos y Mew no son candidatos.
     - Dragonite sí lo es: es un pseudolegendario y se cría a partir de Dratini.
@@ -403,7 +405,9 @@ parámetros son fijos.
     3. Sugiere **Pokémon que no son favoritos** para completar los huecos. Las sugerencias
        existen en el juego objetivo ([RN-03](#rn-03)), cumplen las reglas duras activas junto
        con el equipo incompleto y se ordenan por lo que aportarían a la puntuación. Un hueco
-       reservado por una regla de presencia solo admite sugerencias que la cumplan.
+       reservado por una regla de presencia solo admite sugerencias que la cumplan. Las
+       sugerencias que dependen de datos sin confirmar se muestran marcadas como «sin
+       verificar» ([RN-18](#rn-18)).
 - **Ejemplos**:
     - Si solo 4 favoritos son candidatos válidos para Pokémon Rojo Fuego, se muestra el equipo
       de esos 4 y, para los 2 huecos libres, una lista de Pokémon de Rojo Fuego que encajan con
@@ -425,6 +429,31 @@ parámetros son fijos.
     - El tipo Hada no existe antes de la 6.ª generación, así que no cuenta para la cobertura.
     - Magneton evoluciona en un lugar concreto hasta la 7.ª generación y con la Piedra Trueno
       desde la 8.ª ([RN-15](#rn-15)).
+
+### RN-18 · Los datos sin verificar los confirma el usuario { #rn-18 }
+
+- **Tipo**: mecanismo
+- **Descripción**: algunos datos no se pueden cargar de forma fiable desde las fuentes
+  ([RF-11](requisitos-funcionales.md#rf-11)). Cada dato tiene un **origen**:
+    - **Automático**: se ha cargado de una fuente sin ambigüedad.
+    - **Inferido**: hay una propuesta, pero sin certeza.
+    - **Pendiente**: no hay propuesta.
+    - **Confirmado**: el usuario lo ha revisado y aceptado o corregido.
+- **Confirmación obligatoria**: antes de generar un equipo, el usuario tiene que confirmar todos
+  los datos inferidos o pendientes que intervienen en la generación
+  ([RF-15](requisitos-funcionales.md#rf-15), [CA-30](cuestiones-abiertas.md#resueltas)):
+    - Los del juego objetivo, como sus mecánicas o sus combates clave.
+    - Los de los favoritos que no se han descartado ya con datos automáticos, como si pueden
+      llegar al juego antes de completarlo ([RN-03](#rn-03)).
+- **Responsabilidad**: los datos confirmados se usan tal cual. Si el usuario confirma un dato
+  erróneo, el resultado puede ser inexacto. Es un mal uso de la aplicación, no un error del
+  algoritmo.
+- **Excepción**: las sugerencias de [RN-08](#rn-08) pueden incluir Pokémon que no son favoritos
+  con datos sin confirmar. No se pide confirmarlos; se muestran marcados como «sin verificar»
+  ([CA-31](cuestiones-abiertas.md#resueltas)).
+- **Ejemplo**: al elegir Pokémon Rojo Fuego, la aplicación propone (dato inferido) que antes de
+  completar el juego solo pueden llegar Pokémon de la Pokédex de Kanto. El usuario lo confirma
+  y Raichu se descarta, porque de su huevo nace Pichu.
 
 ## Reglas candidatas
 
