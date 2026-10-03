@@ -25,13 +25,13 @@ juego y se transfiere al juego objetivo en su etapa inicial.
 | [RN-08](#rn-08) | Equipo incompleto y sugerencias cuando no se llega a 6 | Mecanismo | No | Vigente |
 | [RN-09](#rn-09) | Cada favorito marca hasta qué evolución se quiere llegar | Dura | No | Vigente |
 | [RN-10](#rn-10) | Se usan los datos tal como son en el juego objetivo | Mecanismo | No | Vigente |
-| [RN-11](#rn-11) | Solo Pokémon que se pueden obtener por crianza | Dura | Activable | Borrador |
-| [RN-12](#rn-12) | Sin tipos repetidos en el equipo | Dura | Activable | Borrador |
-| [RN-13](#rn-13) | Dragonite obligatorio o, si no, un Pokémon de tipo primario Dragón | Dura (presencia) | Activable | Borrador |
-| [RN-14](#rn-14) | Una evolución de Eevee obligatoria, y solo una | Dura (presencia) | Activable | Borrador |
-| [RN-15](#rn-15) | Penalizar evoluciones tediosas | Blanda | Activable y peso | Borrador |
-| [RN-16](#rn-16) | Excluir Pokémon ya usados según el recorrido | Dura | Activable | Borrador |
-| [RN-17](#rn-17) | Primar los tipos más eficaces frente a los combates clave del juego | Blanda | Activable y peso | Borrador |
+| [RN-11](#rn-11) | Solo Pokémon que se pueden obtener por crianza | Dura | Activable | Vigente |
+| [RN-12](#rn-12) | Sin tipos repetidos en el equipo | Dura | Activable | Vigente |
+| [RN-13](#rn-13) | Dragonite obligatorio o, si no, un Pokémon de tipo primario Dragón | Dura (presencia) | Activable | Vigente |
+| [RN-14](#rn-14) | Una evolución de Eevee obligatoria, y solo una | Dura (presencia) | Activable | Vigente |
+| [RN-15](#rn-15) | Penalizar evoluciones tediosas | Blanda | Activable y peso | Vigente |
+| [RN-16](#rn-16) | Excluir Pokémon ya usados según el recorrido | Dura | Activable | Vigente |
+| [RN-17](#rn-17) | Primar los tipos más eficaces frente a los combates clave del juego | Blanda | Activable y peso | Vigente |
 
 Estados posibles:
 
