@@ -12,8 +12,6 @@ afectadas.
 | ID | Cuestión | Afecta a | Propuesta |
 |----|----------|----------|-----------|
 | CA-28 | ¿Qué Pokémon pueden llegar al juego objetivo y evolucionar antes de completarlo? | RN-03, RN-14, RN-15, RF-11 | Solo son candidatos los Pokémon cuya etapa de entrada (la que nace del huevo) se puede recibir en el juego objetivo y evolucionar hasta la evolución de favoritos antes de completarlo. Estos datos se cargan como inferidos y los confirma el usuario (RN-18), así que no bloquean la implementación. Investigar cada juego sirve para que las propuestas sean correctas. Ver [lo comprobado en Rojo Fuego y Verde Hoja](../02-ddt/datos-requeridos.md#restricciones-de-llegada-por-juego). |
-| CA-32 | ¿Es tediosa una evolución que exige conocer un movimiento que la evolución anterior solo aprende a nivel 1, de modo que hay que usar el recordador de movimientos? | RN-15 | Sí. Aunque las fuentes lo registren como aprendizaje por nivel, en la práctica hay que enseñárselo con el recordador. |
-| CA-33 | Si la puntuación solo depende de los tipos, Pokémon con los mismos tipos son intercambiables y los empates se multiplican. ¿Cómo se muestran? | RN-04, RF-08 | Agrupar los equipos empatados que solo se diferencian en miembros con los mismos tipos (p. ej., «Agua: Vaporeon o Lapras»), en lugar de listar cada combinación. |
 
 ## Aplazadas
 
@@ -57,3 +55,5 @@ DDF.
 | CA-29 | ¿Qué juegos pueden ser juego objetivo? | Solo los que permiten la crianza. Se excluyen los de la 1.ª generación (Rojo, Azul y Amarillo), porque no se puede llevar a ellos un Pokémon recién nacido del huevo (RF-05). |
 | CA-30 | ¿Qué se hace con los datos que no se pueden cargar de forma fiable? | Se cargan como inferidos (con propuesta) o pendientes, y el usuario tiene que confirmarlos antes de generar un equipo. Los datos confirmados son responsabilidad del usuario: si son erróneos, el resultado puede ser inexacto, pero no es un error del algoritmo (RN-18, RF-15). |
 | CA-31 | ¿Qué se hace con las sugerencias que dependen de datos sin confirmar? | Se muestran marcadas como «sin verificar». No se pide confirmarlas (RN-08, RN-18). |
+| CA-32 | ¿Es tediosa una evolución que exige conocer un movimiento que la evolución anterior solo aprende a nivel 1? | Sí. Aunque las fuentes lo registren como aprendizaje por nivel, en la práctica hay que enseñárselo con el recordador (RN-15). |
+| CA-33 | ¿Cómo se muestran los empates, que se multiplican porque la puntuación depende sobre todo de los tipos? | Se agrupan los equipos que solo se diferencian en miembros intercambiables: mismos tipos en el juego objetivo y ambos equipos válidos. Por ejemplo, Lapras o Cloyster (Agua/Hielo). Una evolución de Eevee nunca es intercambiable con otro Pokémon, porque es obligatoria por RN-14 (RN-04). |

@@ -152,6 +152,6 @@ Consultas puntuales hechas el 2026-10-03 para valorar la viabilidad:
   (Acero, con cambios hasta la 5.ª) cubren RN-10.
 - `evolution_details` incluye `version_group` (Feebas, Magneton).
 - Los movimientos por nivel vienen por grupo de versiones. Los de nivel 1 de una evolución
-  solo se aprenden con el recordador ([CA-32](../01-ddf/cuestiones-abiertas.md#abiertas)).
+  solo se aprenden con el recordador ([CA-32](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - WikiDex responde a la API MediaWiki (`action=parse&prop=wikitext`) y la página de Brock tiene
   su equipo de Rojo Fuego y Verde Hoja en una plantilla `{{Equipo}}`.

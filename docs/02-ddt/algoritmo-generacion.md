@@ -91,9 +91,17 @@ programación lineal entera. Se decidirá en el ADR si las pruebas lo hacen nece
 
 ## Empates
 
-La puntuación depende sobre todo de los tipos, así que dos candidatos con los mismos tipos son
-intercambiables y los equipos empatados se multiplican. Se propone agruparlos al mostrarlos
-([CA-33](../01-ddf/cuestiones-abiertas.md#abiertas)).
+La puntuación depende sobre todo de los tipos, así que dos candidatos con los mismos tipos
+suelen ser intercambiables y los equipos empatados se multiplican. Se muestran agrupados
+([RN-04](../01-ddf/reglas-negocio.md#rn-04), [CA-33](../01-ddf/cuestiones-abiertas.md#resueltas)):
+
+1. Se toman los equipos empatados con la puntuación máxima, ya validados con las reglas duras.
+2. Se agrupan los que coinciden en todos los miembros salvo en posiciones cuyos candidatos
+   tienen los mismos tipos en el juego objetivo (p. ej., Lapras o Cloyster).
+3. Como cada equipo del grupo ya es válido, no hace falta comprobar de nuevo las reglas de
+   presencia: una evolución de Eevee nunca queda agrupada con un Pokémon que no lo sea, porque
+   el equipo resultante no cumpliría [RN-14](../01-ddf/reglas-negocio.md#rn-14) y no estaría
+   entre los empatados.
 
 ## Pureza del motor
 

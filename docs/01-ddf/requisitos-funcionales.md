@@ -155,8 +155,8 @@ Hay dos excepciones:
     - Todos los equipos cumplen las reglas duras activas.
     - Solo se puede generar cuando están confirmados los datos del juego objetivo y de los
       favoritos que lo requieren ([RF-15](#rf-15)).
-    - Si varios equipos empatan con la puntuación más alta, se muestran todos
-      ([RN-04](reglas-negocio.md#rn-04)).
+    - Si varios equipos empatan con la puntuación más alta, se muestran todos, agrupando los
+      que solo se diferencian en miembros intercambiables ([RN-04](reglas-negocio.md#rn-04)).
 
 ### RF-09 · Explicar el equipo generado { #rf-09 }
 

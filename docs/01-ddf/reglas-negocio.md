@@ -302,13 +302,16 @@ parámetros son fijos.
       Pangoro).
     - Conocer un movimiento que el Pokémon **no** aprende subiendo de nivel, de modo que hay que
       enseñárselo con MT, tutor o recordador (si lo aprende solo por nivel, no es tedioso).
+      Cuenta como no aprendido por nivel el movimiento que la evolución anterior solo tiene
+      a nivel 1, porque en la práctica hay que recurrir al recordador
+      ([CA-32](cuestiones-abiertas.md#resueltas)).
     - Otros requisitos poco habituales: clima, girar la consola, golpes críticos, daño recibido,
       etc.
     - Cualquier evolución que **no se puede hacer en el juego objetivo** y obliga a evolucionar
       al Pokémon en otro juego y transferirlo, siempre que la transferencia sea posible antes
       de completar el juego. Si no lo es, el Pokémon no es candidato ([RN-03](#rn-03)).
 - **Métodos no tediosos**: subir de nivel, amistad o cariño, usar una piedra u otro objeto, y
-  conocer un movimiento que el Pokémon aprende solo subiendo de nivel.
+  conocer un movimiento que el Pokémon aprende solo subiendo de nivel a partir del nivel 2.
 - **Puntuación**: `1 − (miembros con alguna evolución tediosa / miembros del equipo)`.
 - **Ejemplos**:
     - Gengar puntúa en contra, porque Haunter evoluciona por intercambio.
@@ -385,6 +388,16 @@ parámetros son fijos.
   y 1, que se multiplica por el peso de la regla. La puntuación del equipo es la suma de esas
   aportaciones. Entre los equipos que cumplen todas las reglas duras, se recomiendan los que
   tienen la puntuación más alta. Si hay empate, se recomiendan todos los empatados.
+- **Agrupación de empates** ([CA-33](cuestiones-abiertas.md#resueltas)): los equipos empatados
+  que solo se diferencian en miembros intercambiables se muestran agrupados. Dos miembros son
+  intercambiables si tienen los mismos tipos en el juego objetivo y ambos equipos cumplen
+  todas las reglas duras.
+    - Ejemplo: Lapras y Cloyster (ambos Agua/Hielo) se pueden agrupar como «Agua/Hielo: Lapras
+      o Cloyster».
+    - Contraejemplo: Vaporeon y Lapras nunca se agrupan. Si Vaporeon está en el equipo, es la
+      evolución de Eevee obligatoria ([RN-14](#rn-14)) y no se puede cambiar por Lapras sin
+      romper esa regla. Si la evolución elegida es otra, Vaporeon ya no puede estar en el
+      equipo. Además, sus tipos no coinciden (Agua frente a Agua/Hielo).
 - **Fórmula**: `P(equipo) = Σ peso(r) · s(r, equipo)` para cada regla blanda activa `r`,
   con `s(r, equipo)` entre 0 y 1.
 - **Pesos** ([CA-05](cuestiones-abiertas.md#resueltas)): enteros de 0 a 10. Por defecto,
