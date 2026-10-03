@@ -32,6 +32,8 @@ juego y se transfiere al juego objetivo en su etapa inicial.
 | [RN-15](#rn-15) | Penalizar evoluciones tediosas | Blanda | Activable y peso | Vigente |
 | [RN-16](#rn-16) | Excluir Pokémon ya usados según el recorrido | Dura | Activable | Vigente |
 | [RN-17](#rn-17) | Primar los tipos más eficaces frente a los combates clave del juego | Blanda | Activable y peso | Vigente |
+| [RN-18](#rn-18) | Los datos sin verificar los confirma el usuario | Mecanismo | No | Vigente |
+| [RN-19](#rn-19) | A igual puntuación, se prefieren los Pokémon con dos tipos | Mecanismo | No | Vigente |
 
 Estados posibles:
 
@@ -50,7 +52,8 @@ Las reglas duras son de dos clases:
 
 ## Proceso de generación
 
-Las reglas se aplican en este orden:
+Antes de empezar, el usuario ha confirmado los datos sin verificar del juego objetivo y de sus
+favoritos ([RN-18](#rn-18)). Después, las reglas se aplican en este orden:
 
 1. Se parte de la lista de favoritos ([RN-02](#rn-02)). Cada favorito es la evolución hasta la
    que se quiere llegar ([RN-09](#rn-09)).
@@ -70,8 +73,9 @@ Las reglas se aplican en este orden:
    presencia activas ([RN-13](#rn-13), [RN-14](#rn-14)).
 5. **Puntuación**. Entre los equipos de 6 que cumplen todo lo anterior, se eligen los de mayor
    puntuación ([RN-04](#rn-04)) según las reglas blandas activas ([RN-06](#rn-06),
-   [RN-15](#rn-15), [RN-17](#rn-17)). Los tipos, la tabla de eficacias y los métodos de
-   evolución son los del juego objetivo ([RN-10](#rn-10)).
+   [RN-15](#rn-15), [RN-17](#rn-17)). Los empates se resuelven prefiriendo a los Pokémon con
+   dos tipos ([RN-19](#rn-19)). Los tipos, la tabla de eficacias y los métodos de evolución
+   son los del juego objetivo ([RN-10](#rn-10)).
 6. Si no hay ningún equipo de 6, se explica el motivo y se muestra el equipo incompleto más
    grande con sugerencias para completarlo ([RN-08](#rn-08)).
 
@@ -80,7 +84,7 @@ flowchart LR
     F[Favoritos] -- "RN-03 · RN-11 · RN-16<br/>filtros por candidato" --> V[Candidatos<br/>válidos]
     V -- "RN-01 · RN-07 · RN-12 · RN-14<br/>restricciones de equipo" --> C[Combinaciones<br/>válidas]
     C -- "RN-13 · RN-14<br/>presencia obligatoria" --> P[Equipos<br/>admisibles]
-    P -- "RN-04: RN-06 · RN-15 · RN-17<br/>puntuación" --> E[Mejores<br/>equipos de 6]
+    P -- "RN-04: RN-06 · RN-15 · RN-17<br/>puntuación · RN-19 desempate" --> E[Mejores<br/>equipos de 6]
     P -. "ninguno de 6<br/>RN-08" .-> A[Equipo incompleto<br/>y sugerencias]
 ```
 
@@ -202,7 +206,7 @@ parámetros son fijos.
 - **Quedan descartados**, entre otros:
     - Legendarios y singulares (también llamados míticos), como Mewtwo, Lugia o Mew.
     - Ultraentes y Pokémon paradójicos, que se asimilan a los legendarios.
-    - Otros Pokémon que no se pueden criar, como Ditto, Unown o Rotom.
+    - Otros Pokémon que no se pueden criar, como Ditto o Unown.
 - **Ejemplos**:
     - Zapdos y Mew no son candidatos.
     - Dragonite sí lo es: es un pseudolegendario y se cría a partir de Dratini.
@@ -300,13 +304,16 @@ parámetros son fijos.
       Pangoro).
     - Conocer un movimiento que el Pokémon **no** aprende subiendo de nivel, de modo que hay que
       enseñárselo con MT, tutor o recordador (si lo aprende solo por nivel, no es tedioso).
+      Cuenta como no aprendido por nivel el movimiento que la evolución anterior solo tiene
+      a nivel 1, porque en la práctica hay que recurrir al recordador
+      ([CA-32](cuestiones-abiertas.md#resueltas)).
     - Otros requisitos poco habituales: clima, girar la consola, golpes críticos, daño recibido,
       etc.
     - Cualquier evolución que **no se puede hacer en el juego objetivo** y obliga a evolucionar
       al Pokémon en otro juego y transferirlo, siempre que la transferencia sea posible antes
       de completar el juego. Si no lo es, el Pokémon no es candidato ([RN-03](#rn-03)).
 - **Métodos no tediosos**: subir de nivel, amistad o cariño, usar una piedra u otro objeto, y
-  conocer un movimiento que el Pokémon aprende solo subiendo de nivel.
+  conocer un movimiento que el Pokémon aprende solo subiendo de nivel a partir del nivel 2.
 - **Puntuación**: `1 − (miembros con alguna evolución tediosa / miembros del equipo)`.
 - **Ejemplos**:
     - Gengar puntúa en contra, porque Haunter evoluciona por intercambio.
@@ -382,7 +389,18 @@ parámetros son fijos.
 - **Descripción**: cada regla blanda activa da a un equipo una puntuación normalizada entre 0
   y 1, que se multiplica por el peso de la regla. La puntuación del equipo es la suma de esas
   aportaciones. Entre los equipos que cumplen todas las reglas duras, se recomiendan los que
-  tienen la puntuación más alta. Si hay empate, se recomiendan todos los empatados.
+  tienen la puntuación más alta. Si hay empate, se desempata con [RN-19](#rn-19) y se
+  recomiendan todos los que sigan empatados.
+- **Agrupación de empates** ([CA-33](cuestiones-abiertas.md#resueltas)): los equipos empatados
+  que solo se diferencian en miembros intercambiables se muestran agrupados. Dos miembros son
+  intercambiables si tienen los mismos tipos en el juego objetivo y ambos equipos cumplen
+  todas las reglas duras.
+    - Ejemplo: Lapras y Cloyster (ambos Agua/Hielo) se pueden agrupar como «Agua/Hielo: Lapras
+      o Cloyster».
+    - Contraejemplo: Vaporeon y Lapras nunca se agrupan. Si Vaporeon está en el equipo, es la
+      evolución de Eevee obligatoria ([RN-14](#rn-14)) y no se puede cambiar por Lapras sin
+      romper esa regla. Si la evolución elegida es otra, Vaporeon ya no puede estar en el
+      equipo. Además, sus tipos no coinciden (Agua frente a Agua/Hielo).
 - **Fórmula**: `P(equipo) = Σ peso(r) · s(r, equipo)` para cada regla blanda activa `r`,
   con `s(r, equipo)` entre 0 y 1.
 - **Pesos** ([CA-05](cuestiones-abiertas.md#resueltas)): enteros de 0 a 10. Por defecto,
@@ -399,11 +417,14 @@ parámetros son fijos.
        todas las reglas duras. Las de presencia tienen prioridad sobre el tamaño: si una regla
        de presencia solo se puede cumplir con un Pokémon que no es favorito, se le reserva un
        hueco. Entre los equipos de ese tamaño, se eligen los de mayor puntuación
-       ([RN-04](#rn-04)).
+       ([RN-04](#rn-04)), con el mismo desempate ([RN-19](#rn-19)).
     3. Sugiere **Pokémon que no son favoritos** para completar los huecos. Las sugerencias
        existen en el juego objetivo ([RN-03](#rn-03)), cumplen las reglas duras activas junto
-       con el equipo incompleto y se ordenan por lo que aportarían a la puntuación. Un hueco
-       reservado por una regla de presencia solo admite sugerencias que la cumplan.
+       con el equipo incompleto y se ordenan por lo que aportarían a la puntuación; a igual
+       aportación, primero las de dos tipos ([RN-19](#rn-19)). Un hueco
+       reservado por una regla de presencia solo admite sugerencias que la cumplan. Las
+       sugerencias que dependen de datos sin confirmar se muestran marcadas como «sin
+       verificar» ([RN-18](#rn-18)).
 - **Ejemplos**:
     - Si solo 4 favoritos son candidatos válidos para Pokémon Rojo Fuego, se muestra el equipo
       de esos 4 y, para los 2 huecos libres, una lista de Pokémon de Rojo Fuego que encajan con
@@ -425,6 +446,52 @@ parámetros son fijos.
     - El tipo Hada no existe antes de la 6.ª generación, así que no cuenta para la cobertura.
     - Magneton evoluciona en un lugar concreto hasta la 7.ª generación y con la Piedra Trueno
       desde la 8.ª ([RN-15](#rn-15)).
+
+### RN-18 · Los datos sin verificar los confirma el usuario { #rn-18 }
+
+- **Tipo**: mecanismo
+- **Descripción**: algunos datos no se pueden cargar de forma fiable desde las fuentes
+  ([RF-11](requisitos-funcionales.md#rf-11)). Cada dato tiene un **origen**:
+    - **Automático**: se ha cargado de una fuente sin ambigüedad.
+    - **Inferido**: hay una propuesta, pero sin certeza.
+    - **Pendiente**: no hay propuesta.
+    - **Confirmado**: el usuario lo ha revisado y aceptado o corregido.
+- **Confirmación obligatoria**: antes de generar un equipo, el usuario tiene que confirmar todos
+  los datos inferidos o pendientes que intervienen en la generación
+  ([RF-15](requisitos-funcionales.md#rf-15), [CA-30](cuestiones-abiertas.md#resueltas)):
+    - Los del juego objetivo, como sus mecánicas o sus combates clave.
+    - Los de los favoritos que no se han descartado ya con datos automáticos, como si pueden
+      llegar al juego antes de completarlo ([RN-03](#rn-03)).
+- **Responsabilidad**: los datos confirmados se usan tal cual. Si el usuario confirma un dato
+  erróneo, el resultado puede ser inexacto. Es un mal uso de la aplicación, no un error del
+  algoritmo.
+- **Excepción**: las sugerencias de [RN-08](#rn-08) pueden incluir Pokémon que no son favoritos
+  con datos sin confirmar. No se pide confirmarlos; se muestran marcados como «sin verificar»
+  ([CA-31](cuestiones-abiertas.md#resueltas)).
+- **Ejemplo**: al elegir Pokémon Rojo Fuego, la aplicación propone (dato inferido) que antes de
+  completar el juego solo pueden llegar Pokémon de la Pokédex de Kanto. El usuario lo confirma
+  y Raichu se descarta, porque de su huevo nace Pichu.
+
+### RN-19 · A igual puntuación, se prefieren los Pokémon con dos tipos { #rn-19 }
+
+- **Tipo**: mecanismo de desempate
+- **Descripción**: no suma puntuación; solo actúa cuando hay empate
+  ([CA-34](cuestiones-abiertas.md#resueltas)):
+    - **Equipos** ([RN-04](#rn-04), [RN-08](#rn-08)): entre los equipos con la misma
+      puntuación, se prefieren los que tienen más miembros con dos tipos en el juego objetivo
+      ([RN-10](#rn-10)). Si siguen empatados, se recomiendan todos, agrupados según
+      [RN-04](#rn-04).
+    - **Sugerencias** ([RN-08](#rn-08)): entre las sugerencias que aportarían lo mismo a la
+      puntuación, primero las de dos tipos.
+- **Ejemplos**:
+    - En un equipo que necesita un miembro de tipo Agua, si el equipo con Lapras (Agua/Hielo)
+      y el equipo con Blastoise (Agua) tienen la misma puntuación, se recomienda el de Lapras.
+    - Si el tipo Hielo de Lapras mejora la cobertura de [RN-17](#rn-17), el equipo de Lapras
+      ya gana por puntuación y el desempate no llega a actuar.
+    - Lapras y Cloyster (ambos Agua/Hielo) siguen empatados tras el desempate y se muestran
+      agrupados ([RN-04](#rn-04)).
+    - Azumarill cuenta como Pokémon de un solo tipo (Agua) hasta la 5.ª generación y de dos
+      tipos (Agua/Hada) desde la 6.ª ([RN-10](#rn-10)).
 
 ## Reglas candidatas
 

@@ -80,13 +80,28 @@ Registro del *Hall of Fame*
 | Especies, formas, grupos huevo, legendario y singular | PokeAPI | Campos `egg_groups`, `is_legendary` e `is_mythical` de la especie. El grupo «Desconocido» (`no-eggs`) indica que no se puede criar; en las líneas con bebés (Pichu) cuenta el grupo de las demás especies. |
 | Tipos actuales y antiguos | PokeAPI | `types` y `past_types` de cada Pokémon. |
 | Tabla de eficacias por generación | PokeAPI | `damage_relations` y `past_damage_relations` de cada tipo. |
-| Cadenas y métodos de evolución | PokeAPI, completado con WikiDex | `evolution_details` describe las condiciones, pero no siempre indica en qué juego se aplica cada método (p. ej., Milotic o Magnezone). Hay que comprobarlo en la prueba de datos. |
+| Cadenas y métodos de evolución | PokeAPI | `evolution_details` describe las condiciones e incluye `version_group`, el grupo de versiones desde el que se aplica cada método (p. ej., Feebas: belleza en Rubí y Zafiro, intercambio con Escama Bella en Negro y Blanco). Hay que definir cómo se interpreta: un método vale desde su grupo de versiones hasta que otro lo sustituye. Faltan mecánicas de juego, como el ciclo de día y noche, que se cargan como datos inferidos. |
 | Movimientos por nivel | PokeAPI | `moves` de cada Pokémon, por grupo de versiones y método de aprendizaje. |
-| Pokémon que existen en cada juego | PokeAPI, completado con WikiDex | Las Pokédex regionales no incluyen todo lo que se puede conseguir por intercambio o evolución. Es el dato más delicado de RN-03. |
-| Combates clave | WikiDex | PokeAPI no tiene entrenadores. Es la principal razón para usar WikiDex. |
+| Pokémon que existen en cada juego | PokeAPI, completado con WikiDex | Las Pokédex regionales de cada grupo de versiones están en PokeAPI. `game_indices` no sirve (p. ej., Crobat no figura en Escarlata y Violeta, y las formas de Hisui no tienen ninguno). Hasta la 7.ª generación se puede deducir de la Pokédex Nacional; desde la 8.ª hay que sumar Pokédex regionales, contenidos descargables y Pokémon que solo llegan por HOME. Lo que no sea seguro se carga como inferido (RN-18). |
+| Combates clave | WikiDex | PokeAPI no tiene entrenadores. Las páginas de WikiDex tienen los equipos en plantillas `{{Equipo}}` (Pokémon, tipos, nivel y movimientos) bajo una sección por juego, que se pueden procesar con mwparserfromhell. La lista de entrenadores de cada juego se mantiene a mano. Lo que no se pueda procesar con certeza (revanchas, variantes según el inicial) se carga como inferido (RN-18). |
 
 Con el catálogo actual, ninguna regla necesita datos de Pokémon Showdown (learnsets
 competitivos, habilidades o formatos). Si se confirma, se puede aplazar esa fuente con un ADR.
+
+## Origen de los datos
+
+Cada dato que interviene en la generación guarda su origen ([RN-18](../01-ddf/reglas-negocio.md#rn-18)):
+
+| Origen | Significado | Ejemplos |
+|--------|-------------|----------|
+| Automático | Cargado sin ambigüedad. | Tipos, tabla de eficacias, grupos huevo, métodos de evolución con `version_group`. |
+| Inferido | Propuesta de la ingesta, sin certeza. | Llegada antes de completar el juego (por la Pokédex regional), ciclo de día y noche, equipos de los combates clave con variantes. |
+| Pendiente | Sin propuesta. | Lo que la ingesta no ha podido deducir. |
+| Confirmado | Revisado por el usuario ([RF-15](../01-ddf/requisitos-funcionales.md#rf-15)). | Cualquier dato inferido o pendiente, tras la revisión. |
+
+La confirmación se guarda aparte de los datos cargados, junto con el valor propuesto que se
+confirmó. Si una nueva carga propone un valor distinto, la confirmación deja de valer y se
+vuelve a pedir. El motor (`core/`) recibe los datos ya resueltos y no conoce su origen.
 
 ## Restricciones de llegada por juego
 
@@ -126,3 +141,17 @@ y [Bulbapedia: Pokédex Nacional](https://bulbapedia.bulbagarden.net/wiki/Nation
 - 4.ª generación en adelante: restricciones de intercambio o evolución antes de la Pokédex
   Nacional, y canales de transferencia disponibles (Pal Park, Pokétransfer, Pokémon HOME), que
   suelen exigir haber completado el juego de destino.
+
+## Comprobación de las fuentes
+
+Consultas puntuales hechas el 2026-10-03 para valorar la viabilidad:
+
+- PokeAPI devuelve `egg_groups` (`no-eggs` para Unown y Pichu, `ditto` para Ditto,
+  `indeterminate` para Rotom, que sí se puede criar con Ditto) e `is_baby`.
+- `past_types` (Clefairy era Normal hasta la 5.ª generación) y `past_damage_relations`
+  (Acero, con cambios hasta la 5.ª) cubren RN-10.
+- `evolution_details` incluye `version_group` (Feebas, Magneton).
+- Los movimientos por nivel vienen por grupo de versiones. Los de nivel 1 de una evolución
+  solo se aprenden con el recordador ([CA-32](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- WikiDex responde a la API MediaWiki (`action=parse&prop=wikitext`) y la página de Brock tiene
+  su equipo de Rojo Fuego y Verde Hoja en una plantilla `{{Equipo}}`.
