@@ -1,9 +1,7 @@
 # Datos requeridos por las reglas
 
-!!! warning "Borrador"
-    Se deriva del catálogo de reglas del [DDF](../01-ddf/reglas-negocio.md) (RN-01 a RN-17) y
-    sirve de base para el modelo de datos. Todavía no es el modelo definitivo: no fija tablas,
-    claves ni tipos.
+Se deriva del catálogo de reglas del [DDF](../01-ddf/reglas-negocio.md). Las tablas, claves y
+columnas concretas están en el [modelo de datos](modelo-datos.md).
 
 ## Resumen por regla
 
@@ -73,7 +71,13 @@ Registro del *Hall of Fame*
 :   Juego, fecha, orden en el recorrido, notas y miembros (forma). Los tipos de cada miembro
     se obtienen de su forma y la generación del juego (RF-12, RN-16).
 
-## Fuentes previstas
+## Fuentes
+
+PokeAPI se carga mediante su volcado CSV, fijado a un commit
+([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)). Los campos que se citan abajo son los de la
+API REST, que se usaron para comprobar los datos; en el CSV están en las tablas equivalentes
+(`pokemon_species`, `pokemon_egg_groups`, `pokemon_types_past`, `type_efficacy_past`,
+`pokemon_evolution`, `pokemon_moves`, `pokedexes` y `pokemon_dex_numbers`).
 
 | Dato | Fuente principal | Observaciones |
 |------|------------------|---------------|
@@ -85,8 +89,9 @@ Registro del *Hall of Fame*
 | Pokémon que existen en cada juego | PokeAPI, completado con WikiDex | Las Pokédex regionales de cada grupo de versiones están en PokeAPI. `game_indices` no sirve (p. ej., Crobat no figura en Escarlata y Violeta, y las formas de Hisui no tienen ninguno). Hasta la 7.ª generación se puede deducir de la Pokédex Nacional; desde la 8.ª hay que sumar Pokédex regionales, contenidos descargables y Pokémon que solo llegan por HOME. Lo que no sea seguro se carga como inferido (RN-18). |
 | Combates clave | WikiDex | PokeAPI no tiene entrenadores. Las páginas de WikiDex tienen los equipos en plantillas `{{Equipo}}` (Pokémon, tipos, nivel y movimientos) bajo una sección por juego, que se pueden procesar con mwparserfromhell. La lista de entrenadores de cada juego se mantiene a mano. Lo que no se pueda procesar con certeza (revanchas, variantes según el inicial) se carga como inferido (RN-18). |
 
-Con el catálogo actual, ninguna regla necesita datos de Pokémon Showdown (learnsets
-competitivos, habilidades o formatos). Si se confirma, se puede aplazar esa fuente con un ADR.
+Ninguna regla del catálogo necesita datos de Pokémon Showdown, así que esa fuente queda
+aplazada ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)). Los datos curados se guardan en
+YAML ([ADR-0005](../03-adr/0005-datos-curados-yaml.md)).
 
 ## Origen de los datos
 
