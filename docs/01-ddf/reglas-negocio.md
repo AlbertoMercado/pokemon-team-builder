@@ -105,28 +105,37 @@ Siempre están activas.
 ### RN-03 · Solo se eligen Pokémon de la generación y del juego objetivo { #rn-03 }
 
 - **Tipo**: dura
-- **Descripción**: es el primer filtro sobre los favoritos y se aplica en dos niveles:
+- **Descripción**: es el primer filtro sobre los favoritos y se aplica en tres niveles:
     1. **Generación**: solo pasan los Pokémon que aparecen en alguno de los juegos de la
        generación del juego objetivo.
     2. **Juego**: de ellos, solo pasan los que existen en el juego objetivo. Un Pokémon existe
        en un juego si se puede tener en él, aunque no se pueda atrapar allí y haya que
        conseguirlo por intercambio, evolución o transferencia.
+    3. **Llegada**: de ellos, solo pasan aquellos cuya etapa de entrada (la que nace del huevo,
+       [CA-25](cuestiones-abiertas.md#resueltas)) puede llegar al juego objetivo y evolucionar
+       hasta la evolución de favoritos **antes de completarlo**
+       ([CA-28](cuestiones-abiertas.md#abiertas)).
 - **Ejemplos**:
-    - Si el juego objetivo es Pokémon Amarillo (1.ª generación), Koffing es candidato. No se
-      puede atrapar en Amarillo, pero existe en el juego. Chikorita no es candidato, porque
-      aparece en la 2.ª generación.
+    - Si el juego objetivo es Pokémon Rojo Fuego (3.ª generación), Vulpix es candidato. No se
+      puede atrapar en Rojo Fuego, porque es exclusivo de Verde Hoja, pero existe en el juego.
+    - Si el juego objetivo es Pokémon Oro (2.ª generación), Treecko no es candidato, porque
+      aparece en la 3.ª generación.
     - Si el juego objetivo es Pokémon Espada (8.ª generación), Growlithe de Hisui no es
       candidato. Pasa el filtro de generación, porque aparece en Leyendas Pokémon: Arceus,
       pero no existe en Espada.
     - La disponibilidad se mira por forma y por la evolución que figura en favoritos
       ([RN-09](#rn-09)). Si Marowak de Alola no se puede conseguir en el juego objetivo, se
       descarta aunque Cubone sí esté disponible. Que su preevolución esté disponible no basta.
-- **Nota**: el nivel de juego ya implica el de generación. Los dos niveles se mantienen porque
-  permiten explicar mejor por qué se descarta un Pokémon ([RF-10](requisitos-funcionales.md#rf-10)).
-- **Nota**: que no se pueda atrapar no importa porque todo el equipo llega al juego objetivo
-  por transferencia, tras criarlo en otro juego ([forma de jugar](index.md#forma-de-jugar)).
-  Qué etapa de la línea es la que llega está pendiente de
-  [CA-25](cuestiones-abiertas.md#abiertas).
+    - En Rojo Fuego, antes de la Pokédex Nacional, no se pueden recibir por intercambio
+      Pokémon de fuera de la Pokédex de Kanto. Raichu no es candidato, porque de un huevo de
+      su línea nace Pichu, que no puede llegar al juego. Crobat tampoco, porque Golbat no
+      puede evolucionar a Crobat antes de la Pokédex Nacional (pendiente de
+      [CA-28](cuestiones-abiertas.md#abiertas)).
+- **Nota**: el nivel de juego ya implica el de generación. Los niveles se mantienen separados
+  porque permiten explicar mejor por qué se descarta un Pokémon
+  ([RF-10](requisitos-funcionales.md#rf-10)).
+- **Nota**: que no se pueda atrapar no importa, porque todo el equipo llega al juego objetivo
+  por transferencia tras criarlo en otro juego ([forma de jugar](index.md#forma-de-jugar)).
 
 ### RN-05 · Cada forma regional es un Pokémon distinto { #rn-05 }
 
@@ -214,7 +223,7 @@ parámetros son fijos.
 - **Nota**: los tipos son los del juego objetivo ([RN-10](#rn-10)) y los de la evolución que
   figura en favoritos ([RN-09](#rn-09)), no los de la etapa con la que empieza el juego. Por
   ejemplo:
-    - En la 1.ª generación Magnemite es solo Eléctrico, así que no ocupa el tipo Acero.
+    - Hasta la 5.ª generación Clefairy es Normal, así que no ocupa el tipo Hada.
     - Vaporeon ocupa el tipo Agua, aunque el juego se empiece con Eevee (Normal).
     - Dragonite ocupa Dragón y Volador, aunque el juego se empiece con Dratini (Dragón).
 
@@ -262,20 +271,21 @@ parámetros son fijos.
 - **Recorrido**: Eevee nunca queda excluido; solo se excluye la evolución que se usó
   ([RN-16](#rn-16)).
 - **Ejemplos**:
-    - En Pokémon Amarillo, con Vaporeon, Jolteon y Flareon en favoritos, el equipo incluye una
-      sola de ellas: la que dé mayor puntuación al equipo.
-    - Si en Verde Hoja se usó Vaporeon, en Rojo Fuego se elige entre Jolteon y Flareon. Espeon
-      y Umbreon son posibles, pero tediosos, porque Rojo Fuego no tiene ciclo de día y noche
-      ([RN-15](#rn-15)). Leafeon, Glaceon y Sylveon no existen en Rojo Fuego
-      ([RN-03](#rn-03)).
+    - En Pokémon Rojo Fuego, con Vaporeon, Jolteon y Flareon en favoritos, el equipo incluye
+      una sola de ellas: la que dé mayor puntuación al equipo.
+    - Si en Verde Hoja se usó Vaporeon, en Rojo Fuego se elige entre Jolteon y Flareon.
+      Leafeon, Glaceon y Sylveon no existen en Rojo Fuego. Espeon y Umbreon no pueden
+      conseguirse antes de completarlo: Eevee no puede evolucionar a ellos antes de la
+      Pokédex Nacional, y el juego no tiene ciclo de día y noche ([RN-03](#rn-03),
+      [CA-28](cuestiones-abiertas.md#abiertas)).
 
 ### RN-15 · Penalizar evoluciones tediosas { #rn-15 }
 
 - **Tipo**: blanda
 - **Descripción**: puntúa en contra los miembros que necesitan una **evolución tediosa** para
   llegar a la evolución de favoritos ([RN-09](#rn-09)). No los descarta. Se revisan todos los
-  pasos desde la etapa con la que el Pokémon llega al juego objetivo
-  ([CA-25](cuestiones-abiertas.md#abiertas)), con los métodos de evolución de ese juego
+  pasos desde la etapa que nace del huevo, que es con la que el Pokémon llega al juego
+  objetivo ([CA-25](cuestiones-abiertas.md#resueltas)), con los métodos de evolución de ese juego
   ([RN-10](#rn-10)).
 - **Métodos tediosos** ([CA-20](cuestiones-abiertas.md#resueltas)):
     - Intercambio, con o sin objeto, o por un Pokémon concreto (Machoke → Machamp, Karrablast
@@ -293,8 +303,8 @@ parámetros son fijos.
     - Otros requisitos poco habituales: clima, girar la consola, golpes críticos, daño recibido,
       etc.
     - Cualquier evolución que **no se puede hacer en el juego objetivo** y obliga a evolucionar
-      al Pokémon en otro juego y transferirlo. Por ejemplo, Espeon y Umbreon en Rojo Fuego,
-      que no tiene ciclo de día y noche.
+      al Pokémon en otro juego y transferirlo, siempre que la transferencia sea posible antes
+      de completar el juego. Si no lo es, el Pokémon no es candidato ([RN-03](#rn-03)).
 - **Métodos no tediosos**: subir de nivel, amistad o cariño, usar una piedra u otro objeto, y
   conocer un movimiento que el Pokémon aprende solo subiendo de nivel.
 - **Puntuación**: `1 − (miembros con alguna evolución tediosa / miembros del equipo)`.
@@ -343,8 +353,11 @@ parámetros son fijos.
   más alto.
 - **Descripción**: puntúa a favor que los tipos del equipo sean eficaces frente a los
   **combates clave** del juego objetivo: líderes de gimnasio o sus equivalentes, Alto Mando,
-  Campeón y jefes del equipo malvado. Si cuenta también el rival está pendiente de
-  [CA-26](cuestiones-abiertas.md#abiertas). Se usan solo los tipos de los miembros y de los Pokémon
+  Campeón, jefes del equipo malvado y el último combate obligatorio contra el rival
+  ([CA-26](cuestiones-abiertas.md#resueltas)).
+- **Rival**: solo cuenta su equipo en el último combate obligatorio, sin el Pokémon inicial,
+  que depende de la elección del jugador. Si el rival es también el Campeón, como en Rojo
+  Fuego, ese combate cuenta una sola vez y también sin su inicial. Se usan solo los tipos de los miembros y de los Pokémon
   rivales, con la tabla de eficacias del juego objetivo ([RN-10](#rn-10)). No se tienen en
   cuenta movimientos, niveles ni estadísticas.
 - **Puntuación** ([CA-24](cuestiones-abiertas.md#resueltas)): para cada Pokémon rival
@@ -357,7 +370,7 @@ parámetros son fijos.
   La puntuación de cada rival es la media de los dos aspectos (0, 0,5 o 1). La de cada combate
   es la media de sus rivales, y la de la regla es la media de todos los combates, de modo que
   cada combate pesa lo mismo.
-- **Ejemplo**: en Pokémon Amarillo, contra Brock (Geodude y Onix, Roca/Tierra), un miembro de
+- **Ejemplo**: en Pokémon Rojo Fuego, contra Brock (Geodude y Onix, Roca/Tierra), un miembro de
   tipo Agua cubre el ataque (×4). Uno de tipo Lucha cubre la defensa: resiste Roca y no es
   débil a Tierra.
 
@@ -392,9 +405,9 @@ parámetros son fijos.
        con el equipo incompleto y se ordenan por lo que aportarían a la puntuación. Un hueco
        reservado por una regla de presencia solo admite sugerencias que la cumplan.
 - **Ejemplos**:
-    - Si solo 4 favoritos son candidatos válidos para Pokémon Amarillo, se muestra el equipo de
-      esos 4 y, para los 2 huecos libres, una lista de Pokémon de Amarillo que encajan con las
-      reglas activas.
+    - Si solo 4 favoritos son candidatos válidos para Pokémon Rojo Fuego, se muestra el equipo
+      de esos 4 y, para los 2 huecos libres, una lista de Pokémon de Rojo Fuego que encajan con
+      las reglas activas.
     - Si incluir a Dragonite solo permite un equipo de 5 por [RN-12](#rn-12), se muestra ese
       equipo de 5 con Dragonite y sugerencias para el sexto, aunque sin Dragonite se pudiera
       formar un equipo de 6.
@@ -407,7 +420,7 @@ parámetros son fijos.
   tipos o evoluciones.
 - **Ejemplos**:
     - Clefairy es de tipo Normal hasta la 5.ª generación y de tipo Hada desde la 6.ª. En un
-      juego de la 1.ª generación se evalúa como Normal.
+      juego de la 3.ª generación se evalúa como Normal.
     - Magnemite es de tipo Eléctrico en la 1.ª generación y Eléctrico/Acero desde la 2.ª.
     - El tipo Hada no existe antes de la 6.ª generación, así que no cuenta para la cobertura.
     - Magneton evoluciona en un lugar concreto hasta la 7.ª generación y con la Piedra Trueno

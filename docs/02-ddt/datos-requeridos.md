@@ -10,7 +10,7 @@
 | Regla | Datos que necesita |
 |-------|--------------------|
 | RN-02, RN-09 | Favoritos del usuario (forma concreta). Cadena evolutiva para conocer las preevoluciones. |
-| RN-03 | Generación de cada juego. Pokémon (por forma) que pueden estar en cada juego, también por transferencia. Etapa con la que llega cada línea ([CA-25](../01-ddf/cuestiones-abiertas.md#abiertas)). |
+| RN-03 | Generación de cada juego. Pokémon (por forma) que pueden estar en cada juego, también por transferencia. Etapa que nace del huevo en cada línea. Restricciones de llegada y de evolución antes de completar cada juego ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). |
 | RN-05, RN-06 | Especie de cada forma y si la forma es regional. |
 | RN-07 | Línea evolutiva de cada forma. |
 | RN-10 | Tipos de cada forma por generación, tabla de eficacias por generación y métodos de evolución por juego. |
@@ -87,3 +87,42 @@ Registro del *Hall of Fame*
 
 Con el catálogo actual, ninguna regla necesita datos de Pokémon Showdown (learnsets
 competitivos, habilidades o formatos). Si se confirma, se puede aplazar esa fuente con un ADR.
+
+## Restricciones de llegada por juego
+
+Para [RN-03](../01-ddf/reglas-negocio.md#rn-03) no basta con que un Pokémon exista en el juego:
+la etapa que nace del huevo tiene que poder llegar y evolucionar **antes de completarlo**
+([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Hay juegos con restricciones hasta que se
+obtiene la Pokédex Nacional, que suele darse tras la Liga. Hay que investigarlo juego a juego y
+guardarlo como dato de cada juego.
+
+### Rojo Fuego y Verde Hoja (comprobado)
+
+- Antes de la Pokédex Nacional solo se pueden intercambiar Pokémon de la Pokédex de Kanto
+  (los 151 de la 1.ª generación). Un Pichu no se puede enviar a Verde Hoja hasta tener la
+  Pokédex Nacional, aunque sí después de evolucionarlo a Pikachu.
+- No se puede intercambiar con Rubí, Zafiro o Esmeralda hasta tener la Pokédex Nacional y
+  completar la misión de Celio en Isla Prima. Antes de la Liga, el equipo solo puede venir de
+  otra copia de Rojo Fuego o Verde Hoja.
+- Antes de la Pokédex Nacional, los Pokémon intentan evolucionar a especies de la 2.ª
+  generación, pero fallan (p. ej., Golbat → Crobat). Por extensión, tampoco funcionan
+  Onix → Steelix, Chansey → Blissey, Scyther → Scizor, Seadra → Kingdra, Slowpoke → Slowking,
+  Poliwhirl → Politoed, Gloom → Bellossom, Porygon → Porygon2 ni Eevee → Espeon o Umbreon.
+- La guardería está en Isla Cuatro, a la que se llega tras la Liga. La crianza se hace en otra
+  partida ya completada.
+- Conclusión: en Rojo Fuego y Verde Hoja solo pueden ser candidatos los Pokémon de la Pokédex
+  de Kanto cuya etapa que nace del huevo también está en ella, y con evoluciones solo dentro de
+  ella. Raichu queda fuera, porque su huevo da Pichu.
+
+Fuentes: [Thonky: intercambiar entre Rojo Fuego y Verde Hoja](https://www.thonky.com/pokemon/trade-from-firered-to-leafgreen),
+[Bulbapedia: discusión sobre Rojo Fuego y Verde Hoja](https://bulbapedia.bulbagarden.net/wiki/Talk:Pok%C3%A9mon_FireRed_and_LeafGreen_Versions)
+y [Bulbapedia: Pokédex Nacional](https://bulbapedia.bulbagarden.net/wiki/National_Pok%C3%A9dex).
+
+### Pendiente de investigar
+
+- Rubí, Zafiro y Esmeralda: si antes de la Pokédex Nacional se pueden recibir Pokémon de fuera
+  de la Pokédex de Hoenn y si pueden evolucionar.
+- Oro, Plata y Cristal: si hay alguna restricción parecida (en principio, no).
+- 4.ª generación en adelante: restricciones de intercambio o evolución antes de la Pokédex
+  Nacional, y canales de transferencia disponibles (Pal Park, Pokétransfer, Pokémon HOME), que
+  suelen exigir haber completado el juego de destino.

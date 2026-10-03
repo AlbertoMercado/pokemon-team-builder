@@ -89,6 +89,9 @@ Hay dos excepciones:
 - **Descripción**: el usuario elige el juego que quiere completar.
 - **Criterios de aceptación**:
     - Solo se ofrecen juegos de la saga principal con datos cargados.
+    - Solo se ofrecen juegos que permiten la crianza. Quedan fuera los de la 1.ª generación
+      (Rojo, Azul y Amarillo) ([forma de jugar](index.md#forma-de-jugar),
+      [CA-29](cuestiones-abiertas.md#resueltas)).
     - Cambiar de juego no modifica la lista de favoritos.
 
 ### RF-06 · Configurar las reglas duras { #rf-06 }
@@ -150,8 +153,8 @@ Hay dos excepciones:
   activas ([RN-08](reglas-negocio.md#rn-08)).
 - **Criterios de aceptación**:
     - El mensaje indica la causa y en qué filtro se ha descartado cada favorito. Por ejemplo:
-      «de tus 9 favoritos, 3 no existen en la 1.ª generación, 2 no existen en Pokémon
-      Amarillo y 1 se usó en Pokémon Verde Hoja».
+      «de tus 9 favoritos, 3 no existen en la 3.ª generación, 2 no pueden llegar a Pokémon
+      Rojo Fuego antes de la Pokédex Nacional y 1 se usó en Pokémon Verde Hoja».
     - Si una regla de presencia ([RN-13](reglas-negocio.md#rn-13),
       [RN-14](reglas-negocio.md#rn-14)) reserva un hueco, se indica qué regla es y sus
       sugerencias la cumplen.

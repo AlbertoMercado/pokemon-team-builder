@@ -11,8 +11,7 @@ afectadas.
 
 | ID | Cuestión | Afecta a | Propuesta |
 |----|----------|----------|-----------|
-| CA-25 | ¿Con qué etapa de su línea llega cada Pokémon al juego objetivo? | RN-03, RN-15 | Con la etapa más baja de la línea, en la misma forma, que puede estar en el juego objetivo. Normalmente es la que nace del huevo, pero no siempre: en la 1.ª generación no existe Pichu, así que Raichu llega como Pikachu. Las evoluciones que se revisan en RN-15 son las que van desde esa etapa. |
-| CA-26 | ¿Cuentan los combates contra el rival como combates clave? | RN-17 | No, por ahora. Su equipo cambia según el inicial elegido y suele repetir tipos que ya cubren los líderes. Se puede añadir más adelante. |
+| CA-28 | ¿Qué Pokémon pueden llegar al juego objetivo y evolucionar antes de completarlo? | RN-03, RN-14, RN-15, RF-11 | Solo son candidatos los Pokémon cuya etapa de entrada (la que nace del huevo) se puede recibir en el juego objetivo y evolucionar hasta la evolución de favoritos antes de completarlo. Hay que investigar las restricciones de cada juego. Ver [lo comprobado en Rojo Fuego y Verde Hoja](../02-ddt/datos-requeridos.md#restricciones-de-llegada-por-juego). |
 
 ## Aplazadas
 
@@ -21,7 +20,7 @@ DDF.
 
 | ID | Cuestión | Afecta a | Cuándo se decide |
 |----|----------|----------|------------------|
-| CA-11 | Qué generaciones y juegos incluye la carga inicial (2 o 3 primeras generaciones, ver CA-02). | RF-05, RF-11 | Al planificar la ingesta de datos. |
+| CA-11 | Qué generaciones y juegos incluye la carga inicial. Los juegos objetivo empiezan en la 2.ª generación (CA-29), aunque se necesitan datos de especies de la 1.ª. | RF-05, RF-11 | Al planificar la ingesta de datos. |
 
 ## Resueltas
 
@@ -50,4 +49,7 @@ DDF.
 | CA-22 | ¿Qué Pokémon se descartan por ser legendarios o singulares? | Todos los que no se pueden obtener por crianza: legendarios, singulares, ultraentes, paradójicos y otros, como Ditto o Unown (RN-11). |
 | CA-23 | ¿Tienen que estar Dragonite y las evoluciones de Eevee en favoritos? | Sí, y tienen que estar en el equipo aunque eso impida completarlo. En ese caso se muestra el equipo incompleto con sugerencias (RN-08, RN-13, RN-14). Para los tipos del equipo cuenta la evolución de Eevee elegida, no Eevee. |
 | CA-24 | ¿Cómo se puntúa la eficacia frente a los combates clave? | Solo por tipos, sin movimientos ni niveles. Ataque: algún miembro es superefectivo contra el rival. Defensa: algún miembro resiste al menos un tipo del rival y no es débil a ninguno. Cada combate pesa lo mismo. Cuentan los líderes de gimnasio o sus equivalentes, el Alto Mando, el Campeón y los jefes del equipo malvado (RN-17). |
+| CA-25 | ¿Con qué etapa de su línea llega cada Pokémon al juego objetivo? | Con la que nace del huevo. Si esa etapa no puede llegar al juego objetivo, el Pokémon no es candidato (RN-03, CA-28). Las evoluciones que revisa RN-15 son las que van desde esa etapa. |
+| CA-26 | ¿Cuentan los combates contra el rival como combates clave? | Solo su equipo en el último combate obligatorio, sin el Pokémon inicial, que depende de la elección del jugador. Si el rival es también el Campeón, ese combate cuenta una vez (RN-17). |
 | CA-27 | ¿Cómo empieza el equipo cada juego? | Se cría en otro juego y llega al juego objetivo por transferencia, en su etapa inicial y a nivel 1 (o al más bajo posible). Se recoge en el primer PC y se juega con él desde ahí. Por eso no importa dónde se atrapa cada Pokémon (RN-03, RN-11). |
+| CA-29 | ¿Qué juegos pueden ser juego objetivo? | Solo los que permiten la crianza. Se excluyen los de la 1.ª generación (Rojo, Azul y Amarillo), porque no se puede llevar a ellos un Pokémon recién nacido del huevo (RF-05). |

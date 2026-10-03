@@ -66,7 +66,7 @@ Sin restricciones entre miembros, con `N` candidatos hay `C(N, 6)` equipos: unos
 `N = 30` y unos 50 millones con `N = 60`.
 
 Con [RN-12](../01-ddf/reglas-negocio.md#rn-12) activa, el espacio se reduce mucho. Cada
-miembro ocupa uno o dos de los 15 a 18 tipos del juego, y la búsqueda con retroceso poda en
+miembro ocupa uno o dos de los 17 o 18 tipos del juego, y la búsqueda con retroceso poda en
 cuanto dos miembros comparten tipo. Los miembros fijados por RN-13 y RN-14 reducen aún más el
 problema. Para los tamaños esperados (decenas de favoritos), la enumeración exhaustiva con
 poda es suficiente y exacta.

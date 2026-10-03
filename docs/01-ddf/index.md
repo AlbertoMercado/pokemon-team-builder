@@ -26,13 +26,16 @@ La aplicación está pensada para una forma de jugar concreta, de la que parten 
 3. Se **transfieren** al juego objetivo y se recogen en el primer PC o en el primer momento en
    que el juego permite acceder a las cajas.
 4. El juego se completa con ese equipo, que evoluciona dentro del juego objetivo.
+
+    Por eso solo pueden ser juego objetivo los juegos que permiten la crianza: quedan fuera
+    los de la 1.ª generación ([CA-29](cuestiones-abiertas.md#resueltas)).
 5. El equipo se registra en el *Hall of Fame*. Los juegos completados forman el **recorrido**,
    que determina qué Pokémon no se pueden repetir en los siguientes juegos.
 
 Consecuencias:
 
-- No importa dónde se atrapa cada Pokémon, sino que pueda estar en el juego objetivo
-  ([RN-03](reglas-negocio.md#rn-03)).
+- No importa dónde se atrapa cada Pokémon, sino que la etapa que nace del huevo pueda llegar
+  al juego objetivo y evolucionar antes de completarlo ([RN-03](reglas-negocio.md#rn-03)).
 - Solo valen Pokémon que se pueden obtener por crianza ([RN-11](reglas-negocio.md#rn-11)).
 - Las evoluciones se hacen en el juego objetivo, con sus métodos
   ([RN-10](reglas-negocio.md#rn-10), [RN-15](reglas-negocio.md#rn-15)).
@@ -138,7 +141,7 @@ Generación
     Amarillo, con 151 Pokémon).
 
 Juego objetivo
-:   Juego de la saga principal que se quiere completar (p. ej., Pokémon Amarillo). Pertenece a
+:   Juego de la saga principal que se quiere completar (p. ej., Pokémon Rojo Fuego). Pertenece a
     una generación. Ambos determinan los candidatos ([RN-03](reglas-negocio.md#rn-03)).
 
 Completar un juego
