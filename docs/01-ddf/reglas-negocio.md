@@ -33,6 +33,7 @@ juego y se transfiere al juego objetivo en su etapa inicial.
 | [RN-16](#rn-16) | Excluir Pokémon ya usados según el recorrido | Dura | Activable | Vigente |
 | [RN-17](#rn-17) | Primar los tipos más eficaces frente a los combates clave del juego | Blanda | Activable y peso | Vigente |
 | [RN-18](#rn-18) | Los datos sin verificar los confirma el usuario | Mecanismo | No | Vigente |
+| [RN-19](#rn-19) | A igual puntuación, se prefieren los Pokémon con dos tipos | Mecanismo | No | Vigente |
 
 Estados posibles:
 
@@ -72,8 +73,9 @@ favoritos ([RN-18](#rn-18)). Después, las reglas se aplican en este orden:
    presencia activas ([RN-13](#rn-13), [RN-14](#rn-14)).
 5. **Puntuación**. Entre los equipos de 6 que cumplen todo lo anterior, se eligen los de mayor
    puntuación ([RN-04](#rn-04)) según las reglas blandas activas ([RN-06](#rn-06),
-   [RN-15](#rn-15), [RN-17](#rn-17)). Los tipos, la tabla de eficacias y los métodos de
-   evolución son los del juego objetivo ([RN-10](#rn-10)).
+   [RN-15](#rn-15), [RN-17](#rn-17)). Los empates se resuelven prefiriendo a los Pokémon con
+   dos tipos ([RN-19](#rn-19)). Los tipos, la tabla de eficacias y los métodos de evolución
+   son los del juego objetivo ([RN-10](#rn-10)).
 6. Si no hay ningún equipo de 6, se explica el motivo y se muestra el equipo incompleto más
    grande con sugerencias para completarlo ([RN-08](#rn-08)).
 
@@ -82,7 +84,7 @@ flowchart LR
     F[Favoritos] -- "RN-03 · RN-11 · RN-16<br/>filtros por candidato" --> V[Candidatos<br/>válidos]
     V -- "RN-01 · RN-07 · RN-12 · RN-14<br/>restricciones de equipo" --> C[Combinaciones<br/>válidas]
     C -- "RN-13 · RN-14<br/>presencia obligatoria" --> P[Equipos<br/>admisibles]
-    P -- "RN-04: RN-06 · RN-15 · RN-17<br/>puntuación" --> E[Mejores<br/>equipos de 6]
+    P -- "RN-04: RN-06 · RN-15 · RN-17<br/>puntuación · RN-19 desempate" --> E[Mejores<br/>equipos de 6]
     P -. "ninguno de 6<br/>RN-08" .-> A[Equipo incompleto<br/>y sugerencias]
 ```
 
@@ -387,7 +389,8 @@ parámetros son fijos.
 - **Descripción**: cada regla blanda activa da a un equipo una puntuación normalizada entre 0
   y 1, que se multiplica por el peso de la regla. La puntuación del equipo es la suma de esas
   aportaciones. Entre los equipos que cumplen todas las reglas duras, se recomiendan los que
-  tienen la puntuación más alta. Si hay empate, se recomiendan todos los empatados.
+  tienen la puntuación más alta. Si hay empate, se desempata con [RN-19](#rn-19) y se
+  recomiendan todos los que sigan empatados.
 - **Agrupación de empates** ([CA-33](cuestiones-abiertas.md#resueltas)): los equipos empatados
   que solo se diferencian en miembros intercambiables se muestran agrupados. Dos miembros son
   intercambiables si tienen los mismos tipos en el juego objetivo y ambos equipos cumplen
@@ -414,10 +417,11 @@ parámetros son fijos.
        todas las reglas duras. Las de presencia tienen prioridad sobre el tamaño: si una regla
        de presencia solo se puede cumplir con un Pokémon que no es favorito, se le reserva un
        hueco. Entre los equipos de ese tamaño, se eligen los de mayor puntuación
-       ([RN-04](#rn-04)).
+       ([RN-04](#rn-04)), con el mismo desempate ([RN-19](#rn-19)).
     3. Sugiere **Pokémon que no son favoritos** para completar los huecos. Las sugerencias
        existen en el juego objetivo ([RN-03](#rn-03)), cumplen las reglas duras activas junto
-       con el equipo incompleto y se ordenan por lo que aportarían a la puntuación. Un hueco
+       con el equipo incompleto y se ordenan por lo que aportarían a la puntuación; a igual
+       aportación, primero las de dos tipos ([RN-19](#rn-19)). Un hueco
        reservado por una regla de presencia solo admite sugerencias que la cumplan. Las
        sugerencias que dependen de datos sin confirmar se muestran marcadas como «sin
        verificar» ([RN-18](#rn-18)).
@@ -467,6 +471,27 @@ parámetros son fijos.
 - **Ejemplo**: al elegir Pokémon Rojo Fuego, la aplicación propone (dato inferido) que antes de
   completar el juego solo pueden llegar Pokémon de la Pokédex de Kanto. El usuario lo confirma
   y Raichu se descarta, porque de su huevo nace Pichu.
+
+### RN-19 · A igual puntuación, se prefieren los Pokémon con dos tipos { #rn-19 }
+
+- **Tipo**: mecanismo de desempate
+- **Descripción**: no suma puntuación; solo actúa cuando hay empate
+  ([CA-34](cuestiones-abiertas.md#resueltas)):
+    - **Equipos** ([RN-04](#rn-04), [RN-08](#rn-08)): entre los equipos con la misma
+      puntuación, se prefieren los que tienen más miembros con dos tipos en el juego objetivo
+      ([RN-10](#rn-10)). Si siguen empatados, se recomiendan todos, agrupados según
+      [RN-04](#rn-04).
+    - **Sugerencias** ([RN-08](#rn-08)): entre las sugerencias que aportarían lo mismo a la
+      puntuación, primero las de dos tipos.
+- **Ejemplos**:
+    - En un equipo que necesita un miembro de tipo Agua, si el equipo con Lapras (Agua/Hielo)
+      y el equipo con Blastoise (Agua) tienen la misma puntuación, se recomienda el de Lapras.
+    - Si el tipo Hielo de Lapras mejora la cobertura de [RN-17](#rn-17), el equipo de Lapras
+      ya gana por puntuación y el desempate no llega a actuar.
+    - Lapras y Cloyster (ambos Agua/Hielo) siguen empatados tras el desempate y se muestran
+      agrupados ([RN-04](#rn-04)).
+    - Azumarill cuenta como Pokémon de un solo tipo (Agua) hasta la 5.ª generación y de dos
+      tipos (Agua/Hada) desde la 6.ª ([RN-10](#rn-10)).
 
 ## Reglas candidatas
 

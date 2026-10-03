@@ -33,7 +33,7 @@ DDF.
 | CA-06 | ¿Qué pasa si no se puede formar un equipo? | El equipo se completa siempre con favoritos. Si no se llega a 6, se muestra el equipo incompleto con el mayor número de favoritos y se sugieren Pokémon no favoritos que encajen con las reglas (RN-08, RF-10). |
 | CA-07 | ¿Qué se guarda de cada miembro en el Hall of Fame? | Nombre y tipo o tipos (RF-12). |
 | CA-08 | ¿Qué significa «disponible en el juego»? | Un Pokémon es candidato si existe en el juego, aunque no se pueda atrapar en él. Ver CA-12 (RN-03). |
-| CA-09 | ¿Cómo se desempata? | Se recomiendan todos los equipos empatados (RN-04). |
+| CA-09 | ¿Cómo se desempata? | Se recomiendan todos los equipos empatados (RN-04). Modificada por CA-34: antes se desempata por el número de miembros con dos tipos. |
 | CA-05 | Escala de los pesos de las reglas blandas y valores por defecto. | Pesos enteros de 0 a 10. Por defecto: RN-17 = 10, RN-15 = 3 y RN-06 = 1 (RN-04). |
 | CA-10 | ¿Qué reglas forman el catálogo de la primera versión y de qué tipo es cada una? | Un catálogo estático: las reglas RN-01 a RN-10 y las nuevas RN-11 a RN-17. El usuario solo las activa o desactiva y ajusta los pesos de las blandas; los parámetros (Dragonite, Eevee…) son fijos. |
 | CA-12 | ¿Qué Pokémon «existen» en una generación? | Los que aparecen en alguno de sus juegos. El filtro es doble: primero por generación y después por el juego, aunque el Pokémon no se pueda atrapar en él (RN-03). |
@@ -57,3 +57,4 @@ DDF.
 | CA-31 | ¿Qué se hace con las sugerencias que dependen de datos sin confirmar? | Se muestran marcadas como «sin verificar». No se pide confirmarlas (RN-08, RN-18). |
 | CA-32 | ¿Es tediosa una evolución que exige conocer un movimiento que la evolución anterior solo aprende a nivel 1? | Sí. Aunque las fuentes lo registren como aprendizaje por nivel, en la práctica hay que enseñárselo con el recordador (RN-15). |
 | CA-33 | ¿Cómo se muestran los empates, que se multiplican porque la puntuación depende sobre todo de los tipos? | Se agrupan los equipos que solo se diferencian en miembros intercambiables: mismos tipos en el juego objetivo y ambos equipos válidos. Por ejemplo, Lapras o Cloyster (Agua/Hielo). Una evolución de Eevee nunca es intercambiable con otro Pokémon, porque es obligatoria por RN-14 (RN-04). |
+| CA-34 | ¿Hay algún criterio de desempate antes de mostrar todos los equipos empatados? | Sí: a igual puntuación, se prefieren los equipos con más miembros con dos tipos en el juego objetivo, y entre sugerencias que aportan lo mismo, primero las de dos tipos. Es un desempate, no una regla blanda: no suma puntuación y solo actúa cuando hay empate (RN-19). |

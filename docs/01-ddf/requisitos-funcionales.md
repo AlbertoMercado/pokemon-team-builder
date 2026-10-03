@@ -155,8 +155,10 @@ Hay dos excepciones:
     - Todos los equipos cumplen las reglas duras activas.
     - Solo se puede generar cuando están confirmados los datos del juego objetivo y de los
       favoritos que lo requieren ([RF-15](#rf-15)).
-    - Si varios equipos empatan con la puntuación más alta, se muestran todos, agrupando los
-      que solo se diferencian en miembros intercambiables ([RN-04](reglas-negocio.md#rn-04)).
+    - Si varios equipos empatan con la puntuación más alta, se prefieren los que tienen más
+      miembros con dos tipos ([RN-19](reglas-negocio.md#rn-19)). Los que sigan empatados se
+      muestran todos, agrupando los que solo se diferencian en miembros intercambiables
+      ([RN-04](reglas-negocio.md#rn-04)).
 
 ### RF-09 · Explicar el equipo generado { #rf-09 }
 
@@ -183,7 +185,8 @@ Hay dos excepciones:
       [RN-14](reglas-negocio.md#rn-14)) reserva un hueco, se indica qué regla es y sus
       sugerencias la cumplen.
     - Las sugerencias se muestran separadas del equipo y ordenadas por lo que aportarían a la
-      puntuación.
+      puntuación; a igual aportación, primero las de dos tipos
+      ([RN-19](reglas-negocio.md#rn-19)).
     - Las sugerencias que dependen de datos sin confirmar se marcan como «sin verificar»
       ([RN-18](reglas-negocio.md#rn-18)).
     - El usuario puede añadir una sugerencia a favoritos desde ahí.

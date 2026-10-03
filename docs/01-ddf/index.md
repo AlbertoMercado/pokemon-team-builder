@@ -8,7 +8,7 @@ las reglas de negocio (**RN-XX**).
 |---------|-------|---------|
 | 0.1 | 2026-10-02 | Versión inicial: alcance, requisitos RF-01 a RF-14 y reglas RN-01 a RN-10. |
 | 0.2 | 2026-10-03 | Forma de jugar (crianza y transferencia). Catálogo de reglas de la primera versión (RN-11 a RN-17). El *Hall of Fame* pasa a Must por el recorrido (RN-16). RN-08 y RN-10 se amplían. |
-| 0.3 | 2026-10-03 | Confirmación de los datos sin verificar por el usuario (RN-18, RF-15). |
+| 0.3 | 2026-10-03 | Confirmación de los datos sin verificar por el usuario (RN-18, RF-15). Desempate por Pokémon con dos tipos (RN-19). |
 
 ## Propósito
 
