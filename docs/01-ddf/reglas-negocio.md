@@ -8,6 +8,9 @@ desactiva las reglas y ajusta los pesos de las blandas, pero no crea reglas nuev
 parámetros ([RF-14](requisitos-funcionales.md#rf-14)). Una regla nueva se documenta aquí antes
 de implementarla.
 
+Las reglas parten de la [forma de jugar](index.md#forma-de-jugar): el equipo se cría en otro
+juego y se transfiere al juego objetivo en su etapa inicial.
+
 ## Catálogo
 
 | ID | Regla | Tipo | Configurable | Estado |
@@ -22,7 +25,7 @@ de implementarla.
 | [RN-08](#rn-08) | Equipo incompleto y sugerencias cuando no se llega a 6 | Mecanismo | No | Vigente |
 | [RN-09](#rn-09) | Cada favorito marca hasta qué evolución se quiere llegar | Dura | No | Vigente |
 | [RN-10](#rn-10) | Se usan los datos tal como son en el juego objetivo | Mecanismo | No | Vigente |
-| [RN-11](#rn-11) | Sin legendarios ni singulares | Dura | Activable | Borrador |
+| [RN-11](#rn-11) | Solo Pokémon que se pueden obtener por crianza | Dura | Activable | Borrador |
 | [RN-12](#rn-12) | Sin tipos repetidos en el equipo | Dura | Activable | Borrador |
 | [RN-13](#rn-13) | Dragonite obligatorio o, si no, un Pokémon de tipo primario Dragón | Dura (presencia) | Activable | Borrador |
 | [RN-14](#rn-14) | Una evolución de Eevee obligatoria, y solo una | Dura (presencia) | Activable | Borrador |
@@ -53,7 +56,8 @@ Las reglas se aplican en este orden:
    que se quiere llegar ([RN-09](#rn-09)).
 2. **Filtros por candidato**. Se descartan los favoritos que:
     1. No existen en la generación ni en el juego objetivo ([RN-03](#rn-03)).
-    2. Son legendarios o singulares ([RN-11](#rn-11)).
+    2. No se pueden obtener por crianza, como los legendarios o los singulares
+       ([RN-11](#rn-11)).
     3. Están excluidos por el recorrido del usuario ([RN-16](#rn-16)).
 
     Los que quedan son los **candidatos válidos**. Cada descarte guarda su motivo
@@ -119,6 +123,10 @@ Siempre están activas.
       descarta aunque Cubone sí esté disponible. Que su preevolución esté disponible no basta.
 - **Nota**: el nivel de juego ya implica el de generación. Los dos niveles se mantienen porque
   permiten explicar mejor por qué se descarta un Pokémon ([RF-10](requisitos-funcionales.md#rf-10)).
+- **Nota**: que no se pueda atrapar no importa porque todo el equipo llega al juego objetivo
+  por transferencia, tras criarlo en otro juego ([forma de jugar](index.md#forma-de-jugar)).
+  Qué etapa de la línea es la que llega está pendiente de
+  [CA-25](cuestiones-abiertas.md#abiertas).
 
 ### RN-05 · Cada forma regional es un Pokémon distinto { #rn-05 }
 
@@ -175,16 +183,21 @@ parámetros son fijos.
 - **Descripción**: si está activa, el equipo no puede incluir dos miembros de la misma línea
   evolutiva. Por ejemplo, Jolteon y Vaporeon, o Rhydon y Rhyperior.
 
-### RN-11 · Sin legendarios ni singulares { #rn-11 }
+### RN-11 · Solo Pokémon que se pueden obtener por crianza { #rn-11 }
 
 - **Tipo**: dura, activable
-- **Descripción**: si está activa, se descartan los Pokémon legendarios y singulares (también
-  llamados míticos), como Mewtwo, Lugia o Mew.
+- **Descripción**: si está activa, se descartan los Pokémon que no se pueden obtener de un
+  huevo, porque el equipo se cría en otro juego ([forma de jugar](index.md#forma-de-jugar)).
+  Un Pokémon se puede criar si alguna especie de su línea evolutiva puede poner huevos de los
+  que nace esa línea ([CA-22](cuestiones-abiertas.md#resueltas)).
+- **Quedan descartados**, entre otros:
+    - Legendarios y singulares (también llamados míticos), como Mewtwo, Lugia o Mew.
+    - Ultraentes y Pokémon paradójicos, que se asimilan a los legendarios.
+    - Otros Pokémon que no se pueden criar, como Ditto, Unown o Rotom.
 - **Ejemplos**:
     - Zapdos y Mew no son candidatos.
-    - Dragonite sí lo es: es un pseudolegendario, no un legendario.
-- **Nota**: qué Pokémon cuentan como legendarios o singulares está pendiente de
-  [CA-22](cuestiones-abiertas.md#abiertas).
+    - Dragonite sí lo es: es un pseudolegendario y se cría a partir de Dratini.
+    - Pikachu sí lo es, aunque Pichu no pueda criar: de un huevo de Pikachu nace Pichu.
 
 ### RN-12 · Sin tipos repetidos en el equipo { #rn-12 }
 
@@ -198,8 +211,12 @@ parámetros son fijos.
       comparten el tipo Veneno.
     - Vaporeon (Agua) y Jolteon (Eléctrico) no comparten tipo. Si no pueden estar juntos es por
       [RN-14](#rn-14).
-- **Nota**: los tipos son los del juego objetivo ([RN-10](#rn-10)). Por ejemplo, en la 1.ª
-  generación Magnemite es solo Eléctrico, así que no ocupa el tipo Acero.
+- **Nota**: los tipos son los del juego objetivo ([RN-10](#rn-10)) y los de la evolución que
+  figura en favoritos ([RN-09](#rn-09)), no los de la etapa con la que empieza el juego. Por
+  ejemplo:
+    - En la 1.ª generación Magnemite es solo Eléctrico, así que no ocupa el tipo Acero.
+    - Vaporeon ocupa el tipo Agua, aunque el juego se empiece con Eevee (Normal).
+    - Dragonite ocupa Dragón y Volador, aunque el juego se empiece con Dratini (Dragón).
 
 ### RN-13 · Dragonite obligatorio o, si no, un Pokémon de tipo primario Dragón { #rn-13 }
 
@@ -220,9 +237,10 @@ parámetros son fijos.
 - **Ejemplos**:
     - Con Kingdra (Agua/Dragón) y Garchomp (Dragón/Tierra) como candidatos y sin Dragonite,
       Garchomp cumple la regla y Kingdra no, porque su tipo primario es Agua.
-    - Dragonite nunca queda excluido por el recorrido ([RN-16](#rn-16)).
-- **Nota**: Dragonite tiene que estar en favoritos para ser candidato ([RN-02](#rn-02)). Ver
-  [CA-23](cuestiones-abiertas.md#abiertas).
+    - La línea de Dragonite (Dratini, Dragonair y Dragonite) nunca queda excluida por el
+      recorrido ([RN-16](#rn-16)).
+- **Nota**: Dragonite tiene que estar en favoritos para ser candidato ([RN-02](#rn-02),
+  [CA-23](cuestiones-abiertas.md#resueltas)).
 
 ### RN-14 · Una evolución de Eevee obligatoria, y solo una { #rn-14 }
 
@@ -231,6 +249,9 @@ parámetros son fijos.
   (Vaporeon, Jolteon, Flareon, Espeon, Umbreon, Leafeon, Glaceon o Sylveon). En cuanto el
   algoritmo elige una, las demás quedan descartadas para ese equipo. Eevee sin evolucionar no
   cuenta como evolución de Eevee.
+- **Tipos**: para el resto de reglas cuenta el tipo de la evolución elegida (Agua para
+  Vaporeon, Eléctrico para Jolteon, Fuego para Flareon…), no el de Eevee (Normal), aunque el
+  juego se empiece con Eevee ([RN-12](#rn-12)).
 - **Niveles**: como en [RN-13](#rn-13):
     1. Hay alguna evolución de Eevee entre los candidatos válidos: una de ellas forma parte del
        equipo. Cuál se decide por puntuación ([RN-04](#rn-04)).
@@ -238,15 +259,23 @@ parámetros son fijos.
        ([RN-08](#rn-08)).
     3. Si tampoco, la regla no se puede cumplir y se explica el motivo.
 - **Prioridad**: igual que en [RN-13](#rn-13), tiene prioridad sobre el tamaño del equipo.
-- **Ejemplo**: en Pokémon Amarillo, con Vaporeon, Jolteon y Flareon en favoritos, el equipo
-  incluye una sola de ellas: la que dé mayor puntuación al equipo.
+- **Recorrido**: Eevee nunca queda excluido; solo se excluye la evolución que se usó
+  ([RN-16](#rn-16)).
+- **Ejemplos**:
+    - En Pokémon Amarillo, con Vaporeon, Jolteon y Flareon en favoritos, el equipo incluye una
+      sola de ellas: la que dé mayor puntuación al equipo.
+    - Si en Verde Hoja se usó Vaporeon, en Rojo Fuego se elige entre Jolteon y Flareon. Espeon
+      y Umbreon son posibles, pero tediosos, porque Rojo Fuego no tiene ciclo de día y noche
+      ([RN-15](#rn-15)). Leafeon, Glaceon y Sylveon no existen en Rojo Fuego
+      ([RN-03](#rn-03)).
 
 ### RN-15 · Penalizar evoluciones tediosas { #rn-15 }
 
 - **Tipo**: blanda
 - **Descripción**: puntúa en contra los miembros que necesitan una **evolución tediosa** para
   llegar a la evolución de favoritos ([RN-09](#rn-09)). No los descarta. Se revisan todos los
-  pasos desde la forma inicial de la línea, con los métodos de evolución del juego objetivo
+  pasos desde la etapa con la que el Pokémon llega al juego objetivo
+  ([CA-25](cuestiones-abiertas.md#abiertas)), con los métodos de evolución de ese juego
   ([RN-10](#rn-10)).
 - **Métodos tediosos** ([CA-20](cuestiones-abiertas.md#resueltas)):
     - Intercambio, con o sin objeto, o por un Pokémon concreto (Machoke → Machamp, Karrablast
@@ -263,6 +292,9 @@ parámetros son fijos.
       enseñárselo con MT, tutor o recordador (si lo aprende solo por nivel, no es tedioso).
     - Otros requisitos poco habituales: clima, girar la consola, golpes críticos, daño recibido,
       etc.
+    - Cualquier evolución que **no se puede hacer en el juego objetivo** y obliga a evolucionar
+      al Pokémon en otro juego y transferirlo. Por ejemplo, Espeon y Umbreon en Rojo Fuego,
+      que no tiene ciclo de día y noche.
 - **Métodos no tediosos**: subir de nivel, amistad o cariño, usar una piedra u otro objeto, y
   conocer un movimiento que el Pokémon aprende solo subiendo de nivel.
 - **Puntuación**: `1 − (miembros con alguna evolución tediosa / miembros del equipo)`.
@@ -286,9 +318,11 @@ parámetros son fijos.
        3.ª generación, no de la 1.ª.
 - **Qué se excluye**: la línea evolutiva del Pokémon usado, en la misma forma
   ([RN-05](#rn-05)), no solo esa evolución concreta ([CA-18](cuestiones-abiertas.md#resueltas)).
-  En las líneas que se ramifican, como la de Eevee, solo se excluye la rama del Pokémon usado:
-  sus preevoluciones y sus evoluciones posteriores ([CA-21](cuestiones-abiertas.md#abiertas)).
-- **Excepción**: Dragonite nunca queda excluido ([RN-13](#rn-13)).
+- **Excepciones** ([CA-21](cuestiones-abiertas.md#resueltas)):
+    - La línea de Dragonite (Dratini, Dragonair y Dragonite) nunca queda excluida
+      ([RN-13](#rn-13)).
+    - De la línea de Eevee solo se excluye la evolución usada. Eevee y el resto de sus
+      evoluciones siguen siendo candidatos ([RN-14](#rn-14)).
 - **Ejemplos** (cada flecha es el siguiente juego completado):
     - Verde Hoja (3.ª) → Rojo Fuego (3.ª): se excluye el equipo de Verde Hoja.
     - Verde Hoja (3.ª) → Platino (4.ª): se excluye el equipo de Verde Hoja.
@@ -298,9 +332,8 @@ parámetros son fijos.
       (último juego) y el de Verde Hoja (misma generación).
     - Escarlata (9.ª) → Escudo (8.ª): se excluye el equipo de Escarlata.
     - Si en Verde Hoja se usaron Dragonite, Vaporeon, Gengar, Raichu, Charizard y Rhyhorn, en
-      Rojo Fuego quedan excluidos Eevee y Vaporeon, la línea de Gastly, la de Pichu, la de
-      Charmander y la de Rhyhorn. Dragonite sigue siendo candidato, y también Jolteon, que
-      está en otra rama de la línea de Eevee.
+      Rojo Fuego quedan excluidos Vaporeon, la línea de Gastly, la de Pichu, la de Charmander
+      y la de Rhyhorn. Dragonite sigue siendo candidato, y también Jolteon y Flareon.
 - **Nota**: el recorrido es el registrado en el *Hall of Fame*. Si el usuario modifica el
   equipo al registrarlo, cuenta el equipo registrado, no el generado.
 
@@ -310,10 +343,11 @@ parámetros son fijos.
   más alto.
 - **Descripción**: puntúa a favor que los tipos del equipo sean eficaces frente a los
   **combates clave** del juego objetivo: líderes de gimnasio o sus equivalentes, Alto Mando,
-  Campeón y jefes del equipo malvado. Se usan solo los tipos de los miembros y de los Pokémon
+  Campeón y jefes del equipo malvado. Si cuenta también el rival está pendiente de
+  [CA-26](cuestiones-abiertas.md#abiertas). Se usan solo los tipos de los miembros y de los Pokémon
   rivales, con la tabla de eficacias del juego objetivo ([RN-10](#rn-10)). No se tienen en
   cuenta movimientos, niveles ni estadísticas.
-- **Puntuación** (propuesta, [CA-24](cuestiones-abiertas.md#abiertas)): para cada Pokémon rival
+- **Puntuación** ([CA-24](cuestiones-abiertas.md#resueltas)): para cada Pokémon rival
   de los combates clave se miran dos aspectos:
     - **Ataque**: algún miembro del equipo tiene un tipo que es superefectivo (×2 o más) contra
       él.
@@ -338,8 +372,8 @@ parámetros son fijos.
   tienen la puntuación más alta. Si hay empate, se recomiendan todos los empatados.
 - **Fórmula**: `P(equipo) = Σ peso(r) · s(r, equipo)` para cada regla blanda activa `r`,
   con `s(r, equipo)` entre 0 y 1.
-- **Nota**: la escala de pesos y los valores por defecto están en
-  [CA-05](cuestiones-abiertas.md#abiertas).
+- **Pesos** ([CA-05](cuestiones-abiertas.md#resueltas)): enteros de 0 a 10. Por defecto,
+  [RN-17](#rn-17) = 10, [RN-15](#rn-15) = 3 y [RN-06](#rn-06) = 1.
 
 ### RN-08 · Equipo incompleto y sugerencias cuando no se llega a 6 { #rn-08 }
 
@@ -388,5 +422,4 @@ decida incluirla.
 |------|---------------|-------|
 | Excluir el inicial | Dura (opcional) | |
 | Pocas debilidades compartidas | Blanda | Con [RN-12](#rn-12) activa pierde sentido, porque los miembros no comparten tipos. La defensa de [RN-17](#rn-17) cubre parte de la idea. |
-| Disponibilidad temprana | Blanda | Choca con [RN-03](#rn-03), que no mira dónde se atrapa cada Pokémon. Habría que descartarla o cargar ese dato aparte. |
 | Estadísticas base | Blanda | Suma o media de estadísticas base de la evolución favorita (RN-09). |

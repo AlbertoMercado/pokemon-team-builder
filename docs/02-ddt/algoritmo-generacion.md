@@ -10,7 +10,7 @@ Las reglas del catálogo se agrupan en tres tipos de restricción, cada uno con 
 
 | Tipo de restricción | Reglas | Técnica |
 |---------------------|--------|---------|
-| Sobre cada candidato | RN-03, RN-11, RN-16 | Filtro lineal previo. Cada descarte guarda su motivo (RF-10). |
+| Sobre cada candidato | RN-03, RN-11, RN-16 | Filtro lineal previo. Cada descarte guarda su motivo (RF-10). Las exclusiones de RN-16 se calculan antes, a partir del recorrido, con las excepciones de Dragonite y Eevee. |
 | Entre pares de miembros | RN-07, RN-12, RN-14 (máximo una) | **Grafo de incompatibilidades**: hay una arista entre dos candidatos si comparten tipo, línea evolutiva o ambos son evoluciones de Eevee. Un equipo válido es un conjunto de candidatos sin aristas entre ellos (conjunto independiente). |
 | De presencia | RN-13, RN-14 (al menos una) | Niveles de prioridad: se fija primero el miembro obligatorio y se completa el resto del equipo. |
 

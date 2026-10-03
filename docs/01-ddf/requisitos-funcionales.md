@@ -115,8 +115,8 @@ Hay dos excepciones:
 - **Criterios de aceptación**:
     - Cada regla blanda muestra una descripción de lo que puntúa.
     - La configuración se conserva entre sesiones.
-- **Nota**: la escala de pesos y los valores por defecto están pendientes de
-  [CA-05](cuestiones-abiertas.md#abiertas).
+- **Nota**: los pesos son enteros de 0 a 10, con valores por defecto
+  ([CA-05](cuestiones-abiertas.md#resueltas), [RN-04](reglas-negocio.md#rn-04)).
 
 ## Generación de equipo
 
@@ -173,7 +173,7 @@ Hay dos excepciones:
 - **Criterios de aceptación**:
     - Se cargan las generaciones, los juegos de cada generación y qué Pokémon (por forma)
       existen en cada juego ([RN-03](reglas-negocio.md#rn-03)).
-    - Se cargan los datos que necesitan las reglas del catálogo: legendarios y singulares,
+    - Se cargan los datos que necesitan las reglas del catálogo: si cada Pokémon se puede criar,
       tipos y tabla de eficacias por generación, líneas evolutivas con el método de cada
       evolución en cada juego, movimientos que se aprenden subiendo de nivel y los combates
       clave de cada juego con sus Pokémon. El detalle está en el

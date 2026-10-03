@@ -10,16 +10,16 @@
 | Regla | Datos que necesita |
 |-------|--------------------|
 | RN-02, RN-09 | Favoritos del usuario (forma concreta). Cadena evolutiva para conocer las preevoluciones. |
-| RN-03 | Generación de cada juego. Pokémon (por forma) que existen en cada juego. |
+| RN-03 | Generación de cada juego. Pokémon (por forma) que pueden estar en cada juego, también por transferencia. Etapa con la que llega cada línea ([CA-25](../01-ddf/cuestiones-abiertas.md#abiertas)). |
 | RN-05, RN-06 | Especie de cada forma y si la forma es regional. |
 | RN-07 | Línea evolutiva de cada forma. |
 | RN-10 | Tipos de cada forma por generación, tabla de eficacias por generación y métodos de evolución por juego. |
-| RN-11 | Marcas de legendario y singular de cada especie. |
+| RN-11 | Grupos huevo de cada especie, para saber si la línea se puede criar. Marcas de legendario y singular, como comprobación. |
 | RN-12 | Tipos de cada forma en el juego objetivo y tipos que existen en su generación. |
 | RN-13 | Tipos con su orden (primario y secundario) en el juego objetivo. Identificar a Dragonite. |
 | RN-14 | Identificar las evoluciones de Eevee (rama de la cadena de Eevee). |
-| RN-15 | Método de cada paso de evolución en el juego objetivo, clasificado como tedioso o no. Movimientos que se aprenden subiendo de nivel, para el método «conocer un movimiento». |
-| RN-16 | *Hall of Fame*: juego, orden en el recorrido y miembros (forma). Generación de cada juego. Ramas de las cadenas evolutivas. |
+| RN-15 | Método de cada paso de evolución en el juego objetivo, clasificado como tedioso o no. Qué mecánicas tiene cada juego (p. ej., ciclo de día y noche), para saber si una evolución se puede hacer en él. Movimientos que se aprenden subiendo de nivel, para el método «conocer un movimiento». |
+| RN-16 | *Hall of Fame*: juego, orden en el recorrido y miembros (forma). Generación de cada juego. Líneas evolutivas, con las excepciones de Dragonite y Eevee. |
 | RN-17 | Combates clave de cada juego con sus Pokémon rivales (forma). Tipos de esos Pokémon y tabla de eficacias del juego. |
 
 ## Entidades
@@ -33,11 +33,12 @@ Generación
 
 Juego
 :   Identificador, nombre en español, generación de lanzamiento y orden de lanzamiento. Lista
-    de Pokémon (por forma) que existen en él (RN-03).
+    de Pokémon (por forma) que pueden estar en él (RN-03). Mecánicas que condicionan las
+    evoluciones, como el ciclo de día y noche (RN-15).
 
 Especie
-:   Número de la Pokédex nacional, nombre, legendario (sí/no), singular (sí/no) y cadena
-    evolutiva a la que pertenece.
+:   Número de la Pokédex nacional, nombre, grupos huevo, legendario (sí/no), singular (sí/no)
+    y cadena evolutiva a la que pertenece.
 
 Forma (Pokémon)
 :   Especie, si es la forma base o una regional (y de qué región), nombre completo
@@ -58,7 +59,7 @@ Combate clave
 :   Juego, categoría (líder de gimnasio o equivalente, Alto Mando, Campeón, jefe del equipo
     malvado, rival), nombre del entrenador, orden dentro del juego y Pokémon rivales (forma y,
     opcionalmente, nivel). Si el equipo del rival depende del inicial elegido, se guarda cada
-    variante (RN-17, [CA-24](../01-ddf/cuestiones-abiertas.md#abiertas)).
+    variante (RN-17, [CA-24](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 ### Datos del usuario
 
@@ -76,7 +77,7 @@ Registro del *Hall of Fame*
 
 | Dato | Fuente principal | Observaciones |
 |------|------------------|---------------|
-| Especies, formas, legendario y singular | PokeAPI | Campos `is_legendary` e `is_mythical` de la especie. |
+| Especies, formas, grupos huevo, legendario y singular | PokeAPI | Campos `egg_groups`, `is_legendary` e `is_mythical` de la especie. El grupo «Desconocido» (`no-eggs`) indica que no se puede criar; en las líneas con bebés (Pichu) cuenta el grupo de las demás especies. |
 | Tipos actuales y antiguos | PokeAPI | `types` y `past_types` de cada Pokémon. |
 | Tabla de eficacias por generación | PokeAPI | `damage_relations` y `past_damage_relations` de cada tipo. |
 | Cadenas y métodos de evolución | PokeAPI, completado con WikiDex | `evolution_details` describe las condiciones, pero no siempre indica en qué juego se aplica cada método (p. ej., Milotic o Magnezone). Hay que comprobarlo en la prueba de datos. |
