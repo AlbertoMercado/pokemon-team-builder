@@ -26,10 +26,13 @@ de Pokémon favoritos y un juego objetivo, genera un equipo de 6 según reglas c
 
 ### Fuentes de datos
 
-- **PokeAPI**: datos base (especies, tipos, estadísticas, movimientos, juegos).
-- **Pokémon Showdown**: datos de combate (learnsets, formatos, habilidades).
-- **WikiDex**: vía API MediaWiki. **Siempre con caché local y rate limit**; nunca hacer
-  peticiones masivas sin caché. Identificarse con un `User-Agent` descriptivo.
+- **PokeAPI**: datos base (especies, tipos, evoluciones, movimientos, juegos). Se carga desde
+  su **volcado CSV fijado a un commit**, no desde la API REST (ADR-0004).
+- **WikiDex**: equipos de los combates clave, vía API MediaWiki. **Siempre con caché local y
+  rate limit**; nunca hacer peticiones masivas sin caché. Identificarse con un `User-Agent`
+  descriptivo.
+- **Datos curados**: `data/curated/*.yaml`, versionados y validados con pydantic (ADR-0005).
+- **Pokémon Showdown**: aplazado; ninguna regla lo necesita por ahora (ADR-0004).
 
 ## Estructura
 
@@ -40,15 +43,19 @@ docs/
   03-adr/             Architecture Decision Records (0000-plantilla.md + NNNN-titulo.md)
   04-manual-usuario/  Manual de usuario
   05-operacion/       Instalación, despliegue, ingesta y mantenimiento
-ingest/               Descarga, parseo y normalización de fuentes → SQLite
-core/                 Motor de generación de equipos (filtros + puntuación), sin I/O
-api/                  API FastAPI sobre el motor y la BD
+ingest/               Descarga, parseo y normalización de fuentes → reference.sqlite
+core/                 Dominio puro: reglas RN-XX y motor de generación, sin I/O
+db/                   Modelos SQLModel de reference.sqlite y user.sqlite (Alembic)
+api/                  API FastAPI: routers → services → repositories, sobre core/ y db/
+data/                 curated/*.yaml en git; cache/ y *.sqlite fuera de git
 web/                  Frontend React + Vite + TypeScript + Tailwind
 tests/                Tests de Python (pytest + hypothesis)
 .github/workflows/    CI de GitHub Actions (ci.yml: Python, Documentación, Secretos)
 ```
 
-`core/` debe mantenerse puro (sin acceso a red ni BD) para poder testearlo con hypothesis.
+`core/` debe mantenerse puro (sin acceso a red ni BD, solo biblioteca estándar) para poder
+testearlo con hypothesis. Dependencias permitidas: `api → core, db` e `ingest → db`
+([arquitectura](docs/02-ddt/arquitectura.md), ADR-0002).
 
 ## Convenciones
 

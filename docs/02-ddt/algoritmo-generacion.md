@@ -1,8 +1,7 @@
 # Algoritmo de generación de equipos
 
-!!! warning "Borrador"
-    Perfil del algoritmo a partir del catálogo de reglas del
-    [DDF](../01-ddf/reglas-negocio.md). La elección definitiva se registrará en un ADR.
+Algoritmo del motor a partir del catálogo de reglas del [DDF](../01-ddf/reglas-negocio.md). La
+decisión está registrada en [ADR-0006](../03-adr/0006-algoritmo-busqueda-exacta.md).
 
 ## Forma del problema
 
@@ -90,7 +89,8 @@ suficiente y exacta.
 Si RN-12 está desactivada y hay muchos favoritos, se puede añadir **ramificación y poda**
 (*branch and bound*) con una cota superior de la puntuación: por ejemplo, la cobertura de RN-17
 que darían los mejores candidatos restantes. La alternativa es formularlo como un problema de
-programación lineal entera. Se decidirá en el ADR si las pruebas lo hacen necesario.
+programación lineal entera, que se descartó en
+[ADR-0006](../03-adr/0006-algoritmo-busqueda-exacta.md).
 
 ## Empates
 

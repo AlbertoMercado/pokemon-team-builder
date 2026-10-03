@@ -58,12 +58,21 @@ nav:
       - Cuestiones funcionales: 01-ddf/cuestiones-abiertas.md
   - Diseño técnico (DDT):
       - 02-ddt/index.md
-      - Datos requeridos: 02-ddt/datos-requeridos.md
+      - Arquitectura: 02-ddt/arquitectura.md
+      - Modelo de datos: 02-ddt/modelo-datos.md
+      - API: 02-ddt/api.md
       - Algoritmo de generación: 02-ddt/algoritmo-generacion.md
+      - Datos requeridos: 02-ddt/datos-requeridos.md
   - Decisiones (ADR):
       - 03-adr/index.md
       - Plantilla: 03-adr/0000-plantilla.md
       - "0001 · Stack tecnológico": 03-adr/0001-stack-tecnologico.md
+      - "0002 · Monolito modular con núcleo puro": 03-adr/0002-monolito-modular-nucleo-puro.md
+      - "0003 · Dos bases de datos SQLite": 03-adr/0003-dos-bases-de-datos-sqlite.md
+      - "0004 · PokeAPI mediante su volcado CSV": 03-adr/0004-pokeapi-volcado-csv.md
+      - "0005 · Datos curados en YAML": 03-adr/0005-datos-curados-yaml.md
+      - "0006 · Búsqueda exacta": 03-adr/0006-algoritmo-busqueda-exacta.md
+      - "0007 · Cliente generado desde OpenAPI": 03-adr/0007-cliente-generado-openapi.md
   - Manual de usuario: 04-manual-usuario/index.md
   - Operación:
       - 05-operacion/index.md

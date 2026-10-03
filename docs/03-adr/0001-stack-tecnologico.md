@@ -97,4 +97,8 @@ flowchart LR
 
 - [ ] Inicializar el proyecto `web/` con Vite y sus herramientas de calidad.
 - [x] Configurar CI en `.github/workflows/`.
-- [ ] Definir el modelo de datos en el DDT.
+- [x] Definir el modelo de datos en el DDT ([modelo de datos](../02-ddt/modelo-datos.md)).
+
+!!! note "Actualización"
+    [ADR-0004](0004-pokeapi-volcado-csv.md) concreta las fuentes de datos: PokeAPI se carga
+    mediante su volcado CSV y Pokémon Showdown queda aplazado.
