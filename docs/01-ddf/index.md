@@ -7,6 +7,7 @@ las reglas de negocio (**RN-XX**).
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
 | 0.1 | 2026-10-02 | Versión inicial: alcance, requisitos RF-01 a RF-14 y reglas RN-01 a RN-10. |
+| 0.2 | 2026-10-03 | Catálogo de reglas de la primera versión (RN-11 a RN-17, en borrador). El *Hall of Fame* pasa a Must por el recorrido (RN-16). RN-08 y RN-10 se amplían. |
 
 ## Propósito
 
@@ -34,10 +35,8 @@ equipo que mejor cumple esos criterios.
 
 **Fuera del alcance de este documento**:
 
-- El diseño detallado de las reglas de elección: qué reglas forman el catálogo, cómo puntúa
-  cada una y la escala de pesos. El DDF fija el marco común a todas las reglas; las reglas
-  concretas se definen más adelante y se incorporan aquí como `RN-XX`
-  ([cuestiones aplazadas](cuestiones-abiertas.md#aplazadas)).
+- Cómo se implementa la búsqueda del mejor equipo y qué datos se guardan de cada Pokémon y
+  juego. Se tratan en el [DDT](../02-ddt/index.md).
 
 ## Actores
 
@@ -55,12 +54,12 @@ flowchart LR
         FAV[Favoritos]
         REG[Juego objetivo<br/>y reglas]
         GEN[Generación<br/>de equipo]
+        HOF[Hall of Fame<br/>y recorrido]
     end
     subgraph should ["Apoyo (Should)"]
         CAT[Catálogo y ficha<br/>de Pokémon]
     end
     subgraph could ["Deseable (Could)"]
-        HOF[Hall of Fame]
         PER[Reglas<br/>personalizadas]
     end
     DAT --> CAT
@@ -69,6 +68,7 @@ flowchart LR
     REG --> GEN
     PER -.-> REG
     GEN -- equipo usado --> HOF
+    HOF -- Pokémon ya usados --> GEN
 ```
 
 ## Glosario
@@ -90,6 +90,20 @@ Línea evolutiva
 
 Mecanismo de evolución
 :   Condición para evolucionar: subir de nivel, usar una piedra, intercambio, amistad, etc.
+    Puede cambiar de un juego a otro ([RN-10](reglas-negocio.md#rn-10)).
+
+Evolución tediosa
+:   Evolución que exige algo más que subir de nivel, usar un objeto o tener amistad:
+    intercambio, belleza, un lugar concreto, la hora del día, etc. Penaliza, pero no descarta
+    ([RN-15](reglas-negocio.md#rn-15)).
+
+Tipo primario
+:   Primer tipo de un Pokémon con dos tipos, o su único tipo. Por ejemplo, Dragonite es
+    Dragón/Volador: su tipo primario es Dragón ([RN-13](reglas-negocio.md#rn-13)).
+
+Legendario y singular
+:   Pokémon especiales según la clasificación oficial, como Mewtwo (legendario) o Mew
+    (singular). Los pseudolegendarios, como Dragonite, no lo son ([RN-11](reglas-negocio.md#rn-11)).
 
 Generación
 :   Etapa de la saga principal que agrupa varios juegos. Los Pokémon de una generación son los
@@ -113,14 +127,24 @@ Existir en un juego
     (p. ej., porque se consigue por intercambio, evolución o transferencia).
 
 Candidatos
-:   Favoritos que existen en la generación y en el juego objetivo. Entre ellos se elige el equipo.
+:   Favoritos que existen en la generación y en el juego objetivo.
+
+Candidatos válidos
+:   Candidatos que además pasan el resto de filtros por candidato (legendarios, recorrido).
+    Entre ellos se elige el equipo.
+
+Combate clave
+:   Combate obligatorio que marca la dificultad de un juego: líderes de gimnasio o sus
+    equivalentes, Alto Mando, Campeón y jefes del equipo malvado
+    ([RN-17](reglas-negocio.md#rn-17)).
 
 Catálogo de reglas
 :   Conjunto de reglas predefinidas en la aplicación. El usuario las configura, pero no crea
     reglas nuevas ([RF-14](requisitos-funcionales.md#rf-14)).
 
 Regla dura
-:   Condición obligatoria. Un candidato o equipo que no la cumple se descarta.
+:   Condición obligatoria. Un candidato o equipo que no la cumple se descarta. Las de
+    **presencia** obligan a incluir un Pokémon con ciertas características.
 
 Regla blanda
 :   Criterio que puntúa a un equipo. Cada regla blanda tiene un peso configurable.
@@ -128,12 +152,17 @@ Regla blanda
 Hall of Fame
 :   Registro de los equipos con los que el usuario ha completado un juego.
 
+Recorrido
+:   Los juegos completados por el usuario, en el orden en que los completó, con su equipo.
+    Determina qué Pokémon quedan excluidos en el siguiente juego
+    ([RN-16](reglas-negocio.md#rn-16)).
+
 ## Contenido
 
 - [Requisitos funcionales](requisitos-funcionales.md) (**RF-XX**).
 - [Reglas de negocio](reglas-negocio.md) (**RN-XX**).
-- [Cuestiones funcionales](cuestiones-abiertas.md) (**CA-XX**): decisiones tomadas y
-  aplazadas.
+- [Cuestiones funcionales](cuestiones-abiertas.md) (**CA-XX**): decisiones abiertas, tomadas
+  y aplazadas.
 
 ## Convenciones
 

@@ -7,8 +7,12 @@ partida:
 - Las de **apoyo** son **Should**.
 - Las **deseadas** son **Could**.
 
-Hay una excepción: la carga de datos (RF-11) se ha subido a **Must**, empezando con un conjunto
-pequeño de datos ([CA-02](cuestiones-abiertas.md#resueltas)).
+Hay dos excepciones:
+
+- La carga de datos (RF-11) se ha subido a **Must**, empezando con un conjunto pequeño de datos
+  ([CA-02](cuestiones-abiertas.md#resueltas)).
+- El *Hall of Fame* (RF-12 y RF-13) se ha subido a **Must**, porque guarda el recorrido del
+  que depende [RN-16](reglas-negocio.md#rn-16).
 
 ## Resumen
 
@@ -25,8 +29,8 @@ pequeño de datos ([CA-02](cuestiones-abiertas.md#resueltas)).
 | [RF-09](#rf-09) | Explicar el equipo generado | Generación | Should |
 | [RF-10](#rf-10) | Mostrar el equipo incompleto con sugerencias | Generación | Must |
 | [RF-11](#rf-11) | Cargar y actualizar los datos | Datos | Must |
-| [RF-12](#rf-12) | Registrar un equipo en el Hall of Fame | Hall of Fame | Could |
-| [RF-13](#rf-13) | Consultar el Hall of Fame | Hall of Fame | Could |
+| [RF-12](#rf-12) | Registrar un equipo en el Hall of Fame | Hall of Fame | Must |
+| [RF-13](#rf-13) | Consultar el Hall of Fame | Hall of Fame | Must |
 | [RF-14](#rf-14) | Cargar reglas definidas por el usuario | Reglas | Could |
 
 ## Catálogo
@@ -91,25 +95,28 @@ pequeño de datos ([CA-02](cuestiones-abiertas.md#resueltas)).
 
 - **Prioridad**: Must
 - **Descripción**: el usuario activa o desactiva las reglas duras opcionales del catálogo
-  predefinido y ajusta sus parámetros, si los tienen.
+  predefinido. Sus parámetros son fijos ([CA-10](cuestiones-abiertas.md#resueltas)).
 - **Criterios de aceptación**:
     - Las [reglas estructurales](reglas-negocio.md#reglas-estructurales) siempre están
       activas.
-    - Las reglas duras activables (p. ej., [RN-07](reglas-negocio.md#rn-07)) se pueden activar
-      y desactivar.
+    - Las reglas duras activables ([RN-07](reglas-negocio.md#rn-07),
+      [RN-11](reglas-negocio.md#rn-11), [RN-12](reglas-negocio.md#rn-12),
+      [RN-13](reglas-negocio.md#rn-13), [RN-14](reglas-negocio.md#rn-14) y
+      [RN-16](reglas-negocio.md#rn-16)) se pueden activar y desactivar.
     - La configuración se conserva entre sesiones.
 
 ### RF-07 · Configurar las reglas blandas y sus pesos { #rf-07 }
 
 - **Prioridad**: Must
 - **Descripción**: el usuario activa o desactiva las reglas blandas del catálogo predefinido
-  (p. ej., [RN-06](reglas-negocio.md#rn-06)) y asigna un peso a cada una
+  ([RN-06](reglas-negocio.md#rn-06), [RN-15](reglas-negocio.md#rn-15) y
+  [RN-17](reglas-negocio.md#rn-17)) y asigna un peso a cada una
   ([RN-04](reglas-negocio.md#rn-04)).
 - **Criterios de aceptación**:
     - Cada regla blanda muestra una descripción de lo que puntúa.
     - La configuración se conserva entre sesiones.
-- **Nota**: la escala de pesos se define junto con el catálogo de reglas
-  ([CA-05](cuestiones-abiertas.md#aplazadas)).
+- **Nota**: la escala de pesos y los valores por defecto están pendientes de
+  [CA-05](cuestiones-abiertas.md#abiertas).
 
 ## Generación de equipo
 
@@ -143,8 +150,11 @@ pequeño de datos ([CA-02](cuestiones-abiertas.md#resueltas)).
   activas ([RN-08](reglas-negocio.md#rn-08)).
 - **Criterios de aceptación**:
     - El mensaje indica la causa y en qué filtro se ha descartado cada favorito. Por ejemplo:
-      «de tus 9 favoritos, 3 no existen en la 1.ª generación y 2 no existen en Pokémon
-      Amarillo».
+      «de tus 9 favoritos, 3 no existen en la 1.ª generación, 2 no existen en Pokémon
+      Amarillo y 1 se usó en Pokémon Verde Hoja».
+    - Si una regla de presencia ([RN-13](reglas-negocio.md#rn-13),
+      [RN-14](reglas-negocio.md#rn-14)) reserva un hueco, se indica qué regla es y sus
+      sugerencias la cumplen.
     - Las sugerencias se muestran separadas del equipo y ordenadas por lo que aportarían a la
       puntuación.
     - El usuario puede añadir una sugerencia a favoritos desde ahí.
@@ -163,6 +173,11 @@ pequeño de datos ([CA-02](cuestiones-abiertas.md#resueltas)).
 - **Criterios de aceptación**:
     - Se cargan las generaciones, los juegos de cada generación y qué Pokémon (por forma)
       existen en cada juego ([RN-03](reglas-negocio.md#rn-03)).
+    - Se cargan los datos que necesitan las reglas del catálogo: legendarios y singulares,
+      tipos y tabla de eficacias por generación, líneas evolutivas con el método de cada
+      evolución en cada juego, movimientos que se aprenden subiendo de nivel y los combates
+      clave de cada juego con sus Pokémon. El detalle está en el
+      [DDT](../02-ddt/datos-requeridos.md).
     - Repetir la carga no duplica datos.
     - Se respetan los límites de uso de cada fuente.
     - Al terminar, se informa de qué se ha cargado y de los errores, si los hay.
@@ -171,22 +186,29 @@ pequeño de datos ([CA-02](cuestiones-abiertas.md#resueltas)).
 
 ### RF-12 · Registrar un equipo en el Hall of Fame { #rf-12 }
 
-- **Prioridad**: Could
-- **Descripción**: el usuario registra el equipo con el que ha completado un juego.
+- **Prioridad**: Must
+- **Descripción**: el usuario registra el equipo con el que ha completado un juego. Los
+  registros, en orden, forman el **recorrido** del usuario, que usa
+  [RN-16](reglas-negocio.md#rn-16) para excluir Pokémon ya usados.
 - **Criterios de aceptación**:
-    - El registro incluye el juego, la fecha, notas opcionales y los 6 Pokémon. De cada
-      Pokémon se guardan el nombre y el tipo o tipos que tenía en ese juego
-      ([RN-10](reglas-negocio.md#rn-10)).
+    - El registro incluye el juego, la fecha, notas opcionales y los Pokémon del equipo (hasta
+      6). De cada Pokémon se guardan la forma concreta, el nombre y el tipo o tipos que tenía
+      en ese juego ([RN-05](reglas-negocio.md#rn-05), [RN-10](reglas-negocio.md#rn-10)).
+    - Queda claro qué registro es el último juego completado: se ordenan por fecha y, si dos
+      coinciden, por orden de registro.
     - Se puede crear a partir de un equipo generado, que el usuario puede modificar antes de
       guardarlo.
 
 ### RF-13 · Consultar el Hall of Fame { #rf-13 }
 
-- **Prioridad**: Could
-- **Descripción**: el usuario consulta los equipos registrados en su Hall of Fame.
+- **Prioridad**: Must
+- **Descripción**: el usuario consulta los equipos registrados en su Hall of Fame, es decir,
+  su recorrido.
 - **Criterios de aceptación**:
     - Se puede filtrar por juego.
     - Cada registro muestra el equipo, el juego y la fecha.
+    - Se puede corregir o eliminar un registro, porque cambia las exclusiones de
+      [RN-16](reglas-negocio.md#rn-16).
 
 ## Reglas personalizadas
 

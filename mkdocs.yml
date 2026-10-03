@@ -56,7 +56,10 @@ nav:
       - Requisitos funcionales: 01-ddf/requisitos-funcionales.md
       - Reglas de negocio: 01-ddf/reglas-negocio.md
       - Cuestiones funcionales: 01-ddf/cuestiones-abiertas.md
-  - Diseño técnico (DDT): 02-ddt/index.md
+  - Diseño técnico (DDT):
+      - 02-ddt/index.md
+      - Datos requeridos: 02-ddt/datos-requeridos.md
+      - Algoritmo de generación: 02-ddt/algoritmo-generacion.md
   - Decisiones (ADR):
       - 03-adr/index.md
       - Plantilla: 03-adr/0000-plantilla.md
