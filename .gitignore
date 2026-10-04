@@ -227,6 +227,7 @@ test-results/
 .cache/
 data/cache/
 *.sqlite
+*.sqlite.tmp
 *.db
 
 # macOS
