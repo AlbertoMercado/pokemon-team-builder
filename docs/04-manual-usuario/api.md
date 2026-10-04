@@ -7,9 +7,9 @@ ejemplo para probarla o automatizar algo. Qué hace cada endpoint, en detalle, e
 
 !!! note "Disponible por ahora"
     Arrancar la API, consultar su versión y la de los datos, gestionar los favoritos y las
-    reglas, ver los juegos objetivo, revisar sus datos, generar equipos y registrar tu *Hall of
-    Fame*. El catálogo se añadirá a esta guía cuando se implemente
-    ([plan de la API](../02-ddt/plan-api.md#fases)).
+    reglas, consultar el catálogo de Pokémon, ver los juegos objetivo, revisar sus datos,
+    generar equipos y registrar tu *Hall of Fame*: todos los endpoints previstos en el
+    [plan de la API](../02-ddt/plan-api.md#fases).
 
 ## Antes de empezar
 
@@ -58,6 +58,27 @@ curl http://127.0.0.1:8000/api/meta
 
 Si has vuelto a cargar los datos y `ingested_at` sigue siendo la fecha anterior, reinicia la
 API.
+
+## Buscar Pokémon
+
+```bash
+curl "http://127.0.0.1:8000/api/pokemon?q=vulpix"            # por nombre
+curl "http://127.0.0.1:8000/api/pokemon?type=dragon"          # por tipo
+curl "http://127.0.0.1:8000/api/pokemon?favorite=true"        # solo tus favoritos
+curl http://127.0.0.1:8000/api/pokemon/haunter                # ficha
+```
+
+- La lista tiene todos los Pokémon cargados en orden de la Pokédex Nacional, con sus tipos
+  actuales y si están en tus favoritos (`favorite`). Los filtros se pueden combinar.
+- La búsqueda no distingue mayúsculas ni tildes y también mira el identificador, que es el que
+  usan el resto de endpoints: busca «mr mime» y verás que es `mr-mime`.
+- Las formas regionales son entradas propias, con su región: `vulpix` y `vulpix-alola`.
+- La **ficha** muestra además la línea evolutiva completa (`line`), con la etapa de cada forma,
+  y cómo se evoluciona (`evolutions`): el disparador (`level-up`, `use-item`, `trade`…) y sus
+  condiciones (`minimum_level`, `trigger_item`…), en los términos de PokeAPI. Si hay varios
+  métodos, cualquiera sirve.
+- Los tipos son los **actuales**. Para generar equipos se usan los que tenía en el juego
+  objetivo.
 
 ## Favoritos
 
@@ -220,6 +241,7 @@ curl -X DELETE http://127.0.0.1:8000/api/hall-of-fame/1
 | Respuesta | Causa | Solución |
 |-----------|-------|----------|
 | `503` «No hay datos de referencia…» | No se han cargado los datos. | Ejecuta la [carga](cargar-datos.md); la siguiente petición ya los encuentra. |
+| `404` al consultar una ficha | La forma no existe en los datos cargados. | Búscala en la lista (`?q=`) para ver su identificador. |
 | `404` al añadir un favorito | La forma no existe en los datos cargados. Hoy solo están las generaciones 1 a 3. | Revisa el identificador (en inglés y en minúsculas, como `mr-mime`). |
 | `409` al cambiar una regla | La regla no se puede desactivar, o no es blanda y le has dado peso. | El mensaje dice cuál de las dos. |
 | `404` al revisar un juego | El juego no es juego objetivo, o el dato no es de ese juego. | Consulta los juegos con `GET /api/games` y las claves con `GET …/review`. |

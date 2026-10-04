@@ -27,8 +27,45 @@ del [plan de la API](plan-api.md#fases). Cómo se arranca: [Operación](../05-op
 
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
-| `GET` | `/api/pokemon` | Lista de Pokémon. Filtros: `q` (nombre), `type`, `favorite`. | RF-01 |
-| `GET` | `/api/pokemon/{pokemon}` | Ficha: número, nombre, tipos actuales, línea evolutiva y método de cada evolución. | RF-02 |
+| `GET` | `/api/pokemon` | Lista de Pokémon con su número total (`total`). Filtros: `q` (nombre), `type`, `favorite`. ✅ | RF-01 |
+| `GET` | `/api/pokemon/{pokemon}` | Ficha: número, nombre, tipos actuales, línea evolutiva y método de cada evolución. `404` si la forma no existe. ✅ | RF-01, RF-02 |
+
+- **Lista**: todas las formas cargadas, en orden de la Pokédex Nacional, cada una con su
+  número, su nombre, sus tipos actuales, su región si es una forma regional y si está en
+  favoritos. Las formas regionales son entradas propias
+  ([RN-05](../01-ddf/reglas-negocio.md#rn-05)): `vulpix` y `vulpix-alola`, «Vulpix de Alola».
+- **Filtros**, combinables: `q` busca una parte del nombre o del identificador sin distinguir
+  mayúsculas ni tildes, y con los guiones del identificador como espacios (`mr mime`,
+  `flabebe`); `type` deja los que tienen ese tipo actual; `favorite=true` o `false`, los que
+  están o no en favoritos.
+- **Ficha**: lo mismo que la lista y, además, la generación en que apareció la especie, si es
+  legendaria o singular, la **línea evolutiva completa** (`line`, todas las formas de la cadena
+  evolutiva con su etapa, ramas incluidas) y cada **evolución** (`evolutions`) con su mecanismo:
+
+```json
+{
+  "pokemon": "haunter", "name": "Haunter", "dex_number": 93, "types": ["ghost", "poison"],
+  "region": null, "favorite": false, "generation": 1, "species": "haunter",
+  "is_legendary": false, "is_mythical": false,
+  "line": [
+    {"pokemon": "gastly", "name": "Gastly", "dex_number": 92, "types": ["ghost", "poison"], "region": null, "favorite": false, "stage": 1},
+    {"pokemon": "haunter", "…": "…", "stage": 2},
+    {"pokemon": "gengar", "…": "…", "stage": 3}
+  ],
+  "evolutions": [
+    {"from_pokemon": "gastly", "to_pokemon": "haunter", "version_group": "firered-leafgreen",
+     "methods": [{"trigger": "level-up", "conditions": {"minimum_level": 25}}]},
+    {"from_pokemon": "haunter", "to_pokemon": "gengar", "version_group": "firered-leafgreen",
+     "methods": [{"trigger": "trade", "conditions": {}}]}
+  ]
+}
+```
+
+El mecanismo es el disparador (`trigger`) y las condiciones (`conditions`) de PokeAPI, tal como
+los guarda la ingesta ([modelo de datos](modelo-datos.md#evoluciones)); varias entradas en
+`methods` son métodos alternativos. Como el método puede cambiar entre juegos, se muestra el
+del grupo de versiones más reciente cargado que tiene esa evolución (`version_group`). La
+interfaz traduce el disparador y las condiciones a texto.
 
 ### Favoritos
 
