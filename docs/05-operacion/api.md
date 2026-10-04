@@ -33,7 +33,9 @@ PTB_DATA_DIR=/ruta/a/otros-datos uv run uvicorn api.main:app
   referencia responden `503` con un mensaje que pide ejecutar la carga. Si la carga se hace con
   la API en marcha, la siguiente petición ya encuentra el fichero.
 - **Después de volver a cargar los datos**, hay que reiniciar la API: las conexiones abiertas
-  siguen leyendo el fichero anterior ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md)).
+  siguen leyendo el fichero anterior ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md))
+  y los datos de referencia de cada juego se guardan en memoria la primera vez que se usan
+  ([plan de la API](../02-ddt/plan-api.md#construccion-del-gamecontext)).
   `GET /api/meta` dice con qué carga está trabajando.
 
 ## Base de datos del usuario (`user.sqlite`)

@@ -7,8 +7,8 @@ ejemplo para probarla o automatizar algo. Qué hace cada endpoint, en detalle, e
 
 !!! note "Disponible por ahora"
     Arrancar la API, consultar su versión y la de los datos, gestionar los favoritos y las
-    reglas y ver los juegos objetivo. La revisión de datos, la generación de equipos, el *Hall
-    of Fame* y el catálogo se irán añadiendo a esta guía según se implementen
+    reglas, ver los juegos objetivo y revisar sus datos. La generación de equipos, el *Hall of
+    Fame* y el catálogo se irán añadiendo a esta guía según se implementen
     ([plan de la API](../02-ddt/plan-api.md#fases)).
 
 ## Antes de empezar
@@ -106,6 +106,45 @@ curl http://127.0.0.1:8000/api/games
 Los juegos que puedes elegir para generar un equipo, en orden de lanzamiento. Solo aparecen los
 que tienen datos cargados y permiten la crianza.
 
+## Revisar los datos de un juego
+
+Algunos datos no se pueden cargar con certeza: la carga los deja **inferidos** (con una
+propuesta) o **pendientes** (sin ella). Antes de generar un equipo tienes que confirmar los que
+intervienen con tus favoritos y tus reglas ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). Por
+ejemplo, en Rojo Fuego: si el juego tiene ciclo de día y noche o concursos, y si cada favorito
+puede llegar al juego y evolucionar antes de completarlo.
+
+```bash
+curl http://127.0.0.1:8000/api/games/firered/review
+```
+
+`pending` dice cuántos faltan; con 0 ya se puede generar. Cada dato de `facts` trae su clave
+(`fact_key`), qué es (`name`), lo que propone la carga (`proposal`) y su estado (`status`):
+`pending` o `confirmed`. No aparecen los favoritos que ya están descartados por otros motivos
+(Zapdos no se puede criar, así que no importa si puede llegar).
+
+```bash
+# Aceptar de una vez todas las propuestas
+curl -X POST http://127.0.0.1:8000/api/games/firered/review/accept-proposals
+
+# Confirmar o corregir un dato: true o false…
+curl -X PUT http://127.0.0.1:8000/api/games/firered/review/pokemon:firered:raichu:arrival \
+     -H "Content-Type: application/json" -d '{"value": false}'
+
+# …o, en un combate clave, la lista de Pokémon de su equipo
+curl -X PUT http://127.0.0.1:8000/api/games/firered/review/battle:firered:misty \
+     -H "Content-Type: application/json" -d '{"value": ["staryu", "starmie"]}'
+```
+
+- Aceptar las propuestas no rellena los datos **pendientes**: no tienen propuesta, así que los
+  tienes que confirmar uno a uno.
+- Lo que confirmas se usa tal cual. Si confirmas un dato erróneo, el equipo puede no ser el
+  adecuado.
+- Tus confirmaciones se guardan. Si una carga nueva propone otro valor para alguno, vuelve a
+  aparecer como `pending` con `outdated` a `true`.
+- Los datos que la carga obtuvo sin ambigüedad (automáticos) no aparecen y no se pueden
+  cambiar.
+
 ## Errores habituales
 
 | Respuesta | Causa | Solución |
@@ -113,4 +152,7 @@ que tienen datos cargados y permiten la crianza.
 | `503` «No hay datos de referencia…» | No se han cargado los datos. | Ejecuta la [carga](cargar-datos.md); la siguiente petición ya los encuentra. |
 | `404` al añadir un favorito | La forma no existe en los datos cargados. Hoy solo están las generaciones 1 a 3. | Revisa el identificador (en inglés y en minúsculas, como `mr-mime`). |
 | `409` al cambiar una regla | La regla no se puede desactivar, o no es blanda y le has dado peso. | El mensaje dice cuál de las dos. |
+| `404` al revisar un juego | El juego no es juego objetivo, o el dato no es de ese juego. | Consulta los juegos con `GET /api/games` y las claves con `GET …/review`. |
+| `409` al confirmar un dato | El dato se cargó sin ambigüedad (automático): no se revisa. | Nada. |
+| `422` al confirmar un dato | El valor no es del tipo del dato (un booleano, o una lista en un combate clave) o el equipo incluye Pokémon que no existen en la generación del juego. | Revisa el valor y los identificadores. |
 | `Address already in use` al arrancar | Ya hay otra API (u otro programa) en el puerto 8000. | Para la otra o arranca en otro puerto: `--port 8001`. |

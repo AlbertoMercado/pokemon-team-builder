@@ -14,7 +14,8 @@ from fastapi import FastAPI
 from api import errors
 from api.config import Settings
 from api.database import Databases
-from api.routers import favorites, games, meta, rules
+from api.routers import favorites, games, meta, review, rules
+from api.services.context import GameReferences
 from api.services.meta import app_version
 
 
@@ -25,6 +26,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.databases = Databases(chosen)
+        app.state.game_references = GameReferences()
         yield
         app.state.databases.dispose()
 
@@ -39,7 +41,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         redoc_url=None,
     )
     errors.register(app)
-    for router in (favorites.router, rules.router, games.router, meta.router):
+    for router in (favorites.router, rules.router, games.router, review.router, meta.router):
         app.include_router(router, prefix="/api")
     return app
 

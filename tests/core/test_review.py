@@ -3,7 +3,7 @@
 import pytest
 
 from core.domain import GameInfo, PokemonData
-from core.review import Fact, FactKind, FavoriteFacts, Origin, pending_facts
+from core.review import Fact, FactKind, FavoriteFacts, Origin, involved_facts, pending_facts
 from core.rules.catalog import RuleSettings
 from tests.core.builders import completed, pokemon
 
@@ -99,7 +99,7 @@ def test_game_data_comes_first_and_only_if_unverified() -> None:
     game_facts = [
         Fact("mechanic:firered:day_night_cycle", FactKind.MECHANIC, Origin.INFERRED, False),
         Fact("mechanic:firered:contests", FactKind.MECHANIC, Origin.CONFIRMED, False),
-        Fact("battle:firered:brock", FactKind.KEY_BATTLE, Origin.AUTOMATIC, True),
+        Fact("battle:firered:brock", FactKind.KEY_BATTLE, Origin.AUTOMATIC, ("geodude", "onix")),
         Fact("battle:firered:misty", FactKind.KEY_BATTLE, Origin.PENDING),
     ]
     found = pending_facts(FIRERED, game_facts, [_favorite(RAICHU)], DEFAULTS)
@@ -134,6 +134,43 @@ def test_favourites_in_canonical_order() -> None:
 
 def test_only_a_pending_fact_has_no_value() -> None:
     with pytest.raises(ValueError, match="pendiente"):
-        Fact("battle:firered:brock", FactKind.KEY_BATTLE, Origin.PENDING, True)
+        Fact("battle:firered:brock", FactKind.KEY_BATTLE, Origin.PENDING, ("onix",))
     with pytest.raises(ValueError, match="pendiente"):
         Fact("battle:firered:brock", FactKind.KEY_BATTLE, Origin.INFERRED)
+
+
+@pytest.mark.rn("RN-18")
+def test_involved_facts_include_the_known_ones() -> None:
+    """What takes part, whatever its origin: the API shows it and says what was confirmed."""
+    game_facts = [
+        Fact("mechanic:firered:contests", FactKind.MECHANIC, Origin.CONFIRMED, False),
+        Fact("battle:firered:brock", FactKind.KEY_BATTLE, Origin.AUTOMATIC, ("geodude", "onix")),
+    ]
+    raichu = _favorite(RAICHU, arrival=Origin.CONFIRMED, arrival_value=True)
+    found = involved_facts(FIRERED, game_facts, [raichu], DEFAULTS)
+    assert [fact.key for fact in found] == [
+        "mechanic:firered:contests",
+        "battle:firered:brock",
+        "pokemon:firered:raichu:exists",
+        "pokemon:firered:raichu:arrival",
+    ]
+    assert pending_facts(FIRERED, game_facts, [raichu], DEFAULTS) == ()
+
+
+@pytest.mark.rn("RN-18")
+@pytest.mark.rn("RN-03")
+def test_a_known_false_value_that_discards_a_favourite_takes_part() -> None:
+    """Raichu confirmed as unable to arrive: that confirmation decides its discard (RF-09)."""
+    raichu = _favorite(RAICHU, arrival=Origin.CONFIRMED, arrival_value=False)
+    keys = [fact.key for fact in involved_facts(FIRERED, (), [raichu], DEFAULTS)]
+    assert keys == ["pokemon:firered:raichu:exists", "pokemon:firered:raichu:arrival"]
+    growlithe = pokemon("growlithe-hisui", ("fire", "rock"), dex_number=58, region="hisui")
+    missing = _favorite(growlithe, exists=Origin.CONFIRMED, exists_value=False)
+    keys = [fact.key for fact in involved_facts(FIRERED, (), [missing], DEFAULTS)]
+    assert keys == ["pokemon:firered:growlithe-hisui:exists"]
+
+
+@pytest.mark.rn("RN-18")
+@pytest.mark.rn("RN-11")
+def test_nothing_takes_part_of_a_favourite_discarded_by_other_rules() -> None:
+    assert involved_facts(FIRERED, (), [_favorite(ZAPDOS)], DEFAULTS) == ()

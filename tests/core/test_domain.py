@@ -144,3 +144,14 @@ def test_types_must_exist_in_the_game_generation() -> None:
         context([candidate(pokemon("clefairy", ("fairy",)))])
     with pytest.raises(GameContextError, match="mawile: fairy"):
         context(key_battles=[battle("x", ("mawile", ("steel", "fairy")))])
+
+
+@pytest.mark.rn("RN-10")
+@pytest.mark.rn("RN-03")
+def test_a_form_of_a_later_generation_keeps_the_types_it_appeared_with() -> None:
+    """Sylveon has no types in the 3rd generation; RN-03 discards it before using them."""
+    sylveon = pokemon("sylveon", ("fairy",), generation=6, dex_number=700)
+    ctx = context(
+        [candidate(sylveon)], pool=[pool_entry(pokemon("xerneas", ("fairy",), generation=6))]
+    )
+    assert ctx.favorites[0].pokemon.types == ("fairy",)
