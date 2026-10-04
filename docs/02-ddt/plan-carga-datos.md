@@ -55,14 +55,13 @@ commit fijado para la primera carga ([ADR-0004](../03-adr/0004-pokeapi-volcado-c
 | `pokemon_egg_groups.csv`, `egg_groups.csv` | `species_egg_group` | Sin filtro adicional. |
 | `pokemon_evolution.csv`, `evolution_triggers.csv` | `evolution_step` | Ver [evoluciones](#evoluciones). Cualquier columna de condición desconocida con valor hace fallar la carga: hay que revisarla para RN-15 y RN-20 antes de cargarla. |
 | `items.csv`, `locations.csv`, `moves.csv`, `regions.csv` | Identificadores en `conditions` | Los ids de objetos, lugares, movimientos y regiones de las condiciones se sustituyen por su identificador (`thunder-stone`, `kings-rock`…). |
-| `pokedexes.csv`, `pokedex_version_groups.csv`, `pokemon_dex_numbers.csv` | Propuestas de llegada | Pokédex de Kanto (151) para Rojo Fuego y Verde Hoja, y de Hoenn (202) para Rubí, Zafiro y Esmeralda. |
+| `pokedexes.csv`, `pokemon_dex_numbers.csv` | Propuestas de llegada | La Pokédex regional de la regla de cada juego en `arrival.yaml`: Kanto (151) para Rojo Fuego y Verde Hoja ([datos curados](datos-curados.md#arrivalyaml)). |
 
 Todos los nombres en español de las 386 especies y de los 11 juegos están en el volcado.
 
 Cada fila se valida con un modelo pydantic (`ingest/sources/pokeapi/rows.py`): si falta una
 columna o un valor no tiene el tipo esperado, la carga falla en lugar de cargar datos
-erróneos. Las Pokédex regionales no se leen todavía: sirven para las propuestas de llegada de
-la fase 4.
+erróneos.
 
 ### Cómo se interpretan los datos «antiguos»
 
@@ -141,7 +140,7 @@ En PokeAPI, las evoluciones aleatorias se reconocen por `percentage_chance` o
 ## Datos curados
 
 Ficheros YAML en `data/curated/` ([ADR-0005](../03-adr/0005-datos-curados-yaml.md)). Sus
-esquemas se definen y documentan en la fase 4.
+esquemas, su significado y cómo se cargan están en [Datos curados](datos-curados.md).
 
 | Fichero | Contenido | Origen de los datos |
 |---------|-----------|---------------------|
@@ -149,7 +148,7 @@ esquemas se definen y documentan en la fase 4.
 | `games.yaml` | Mecánicas de cada juego objetivo: ciclo de día y noche (Rubí, Zafiro y Esmeralda tienen reloj; Rojo Fuego y Verde Hoja, no) y concursos (solo Rubí, Zafiro y Esmeralda). | Inferido |
 | `breeding.yaml` | Bebés que solo nacen con incienso (Azurill, Wynaut). Se cargan en `species.requires_incense`; `core/breeding.py` toma entonces la etapa siguiente (Marill, Wobbuffet) como etapa de entrada ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). | Automático |
 | `arrival.yaml` | Regla de llegada de cada juego objetivo (Pokédex regional de referencia, evoluciones bloqueadas antes de la Pokédex Nacional). | Inferido o pendiente |
-| `key_battles/<juego>.yaml` | Combates clave de cada juego: categoría, entrenador, orden y página de WikiDex. Los equipos se descargan de WikiDex. | Lista curada; equipos automáticos o inferidos |
+| `key_battles/<grupo-de-versiones>.yaml` | Combates clave de los juegos del grupo: categoría, entrenador, orden y página de WikiDex. Los equipos se descargan de WikiDex. | Lista curada; equipos automáticos o inferidos |
 
 ## WikiDex
 
@@ -183,7 +182,7 @@ flowchart LR
 | 1 ✅ | `feat/db-reference` | Modelos SQLModel de las tablas de `reference.sqlite` que usa la primera carga (sin `level_move`). | [Modelo de datos](modelo-datos.md#implementacion-de-referencesqlite): tablas, columnas y decisiones de implementación. |
 | 2 ✅ | `feat/ingest-esqueleto` | CLI `uv run python -m ingest`, informe de la carga, tabla `ingest_run` y sustitución atómica del fichero. | Nueva página de Operación: «Ingesta de datos» (uso, opciones, informe y errores). Tabla de comandos de `CLAUDE.md`. |
 | 3 ✅ | `feat/ingest-pokeapi` | Descarga de los CSV del commit fijado a `data/cache/pokeapi/<commit>/`, validación de cada fila con pydantic, transformaciones y carga. Tests con extractos reales de los CSV. | Detalle de cada transformación en esta página o en una de la ingesta. |
-| 4 | `feat/ingest-curados` | Esquemas pydantic de los YAML y datos de Rojo Fuego y Verde Hoja: juego, mecánicas, llegada y lista de combates clave. | Esquema de cada fichero YAML. |
+| 4 ✅ | `feat/ingest-curados` | Esquemas pydantic de los YAML y datos de Rojo Fuego y Verde Hoja: juego, mecánicas, llegada y lista de combates clave. | Esquema de cada fichero YAML. |
 | 5 | `feat/ingest-wikidex` | Adaptador de WikiDex con caché y límite de peticiones, y equipos de los combates clave de Rojo Fuego y Verde Hoja. Tests con wikitexto real guardado. | Cómo se procesan las plantillas y qué se marca como inferido. |
 | 6 | `feat/ingest-hoenn` | Datos curados y combates clave de Rubí, Zafiro y Esmeralda, después de investigar su llegada (issue #8). | Restricciones de llegada en [datos requeridos](datos-requeridos.md#restricciones-de-llegada-por-juego). |
 
@@ -210,16 +209,27 @@ Implementadas (fase 3):
   por muda; Feebas → Milotic es por belleza en Rubí y Zafiro.
 - **Crianza**: Mewtwo es legendario y Ditto está en el grupo huevo `ditto`.
 
+Implementadas (fase 4):
+
+- **Datos curados**: 4 mecánicas (2 por juego) y 15 combates clave en cada uno de Rojo Fuego y
+  Verde Hoja, de Brock a Azul.
+- **Bebés de incienso**: exactamente Azurill y Wynaut.
+- **Propuestas de llegada**: inferidas en Rojo Fuego y Verde Hoja y pendientes en el resto.
+  Casos conocidos en Rojo Fuego: llegan Bulbasaur, Vaporeon, Golbat y Chansey, y no llegan
+  Pikachu, Raichu, Clefairy, Crobat, Espeon ni Blissey.
+
 Pendientes:
 
-- Fase 4: Raichu no llega a Rojo Fuego (propuesta de llegada) y Azurill y Wynaut tienen
-  `requires_incense`.
 - Fase 5: cada combate clave de Rojo Fuego y Verde Hoja tiene al menos un Pokémon rival y
   todos sus Pokémon son formas cargadas. El equipo de Brock en Rojo Fuego es Geodude y Onix.
 
 ### Resultado de la carga real
 
-Carga del 2026-10-04 con el commit `bc92d3b`: todas las comprobaciones superadas, en menos de
+Carga del 2026-10-04 con el commit `bc92d3b` y los datos curados de la fase 4: las 9
+comprobaciones superadas. Pueden llegar a Rojo Fuego y Verde Hoja 140 Pokémon
+([detalle](datos-curados.md#arrivalyaml)).
+
+Carga de la fase 3 (solo PokeAPI): todas las comprobaciones superadas, en menos de
 un segundo con la caché llena. 386 especies y formas, 11 juegos, 17 tipos, 803 eficacias
 (225 + 289 + 289), 504 grupos huevo, 1131 tipos por forma y generación, 940 pasos de
 evolución (72 en cada grupo de la 1.ª generación, 122 en la 2.ª y 184 en la 3.ª: uno por

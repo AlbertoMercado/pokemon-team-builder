@@ -1,0 +1,9 @@
+# Bebés que solo nacen del huevo si un progenitor lleva un incienso (CA-36).
+# Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# En estas líneas se toma como etapa de entrada la que nace sin incienso (Marill en lugar de
+# Azurill), porque no exige ningún objeto. La ingesta marca estas especies con
+# species.requires_incense. Formato: <bebé>: <incienso> (identificadores de PokeAPI).
+incense_babies:
+  azurill: sea-incense
+  wynaut: lax-incense

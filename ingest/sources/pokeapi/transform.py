@@ -25,11 +25,14 @@ from db.reference import (
 )
 from db.reference.evolution import ConditionValue
 from ingest import scope
+from ingest.sources.curated import CuratedData
 from ingest.sources.pokeapi.rows import (
+    DexNumberRow,
     EggGroupRow,
     EvolutionRow,
     GenerationRow,
     IdentifierRow,
+    PokedexRow,
     PokemonFormRow,
     PokemonRow,
     PokemonTypePastRow,
@@ -93,11 +96,16 @@ class PokeapiTables:
     locations: list[IdentifierRow]
     moves: list[IdentifierRow]
     regions: list[IdentifierRow]
+    pokedexes: list[PokedexRow]
+    dex_numbers: list[DexNumberRow]
 
 
-def build_rows(tables: PokeapiTables) -> list[ReferenceModel]:
-    """Every reference.sqlite row that comes from PokeAPI, for the generations in scope."""
-    return list(_Builder(tables).rows())
+def build_rows(tables: PokeapiTables, curated: CuratedData) -> list[ReferenceModel]:
+    """Every reference.sqlite row that comes from PokeAPI, for the generations in scope.
+
+    ``curated`` provides the incense babies (CA-36) and the arrival rules (CA-28).
+    """
+    return list(_Builder(tables, curated).rows())
 
 
 def _lookup[K, V](mapping: Mapping[K, V], key: K, what: str) -> V:
@@ -108,8 +116,10 @@ def _lookup[K, V](mapping: Mapping[K, V], key: K, what: str) -> V:
 
 
 class _Builder:
-    def __init__(self, tables: PokeapiTables) -> None:
+    def __init__(self, tables: PokeapiTables, curated: CuratedData) -> None:
         self.t = tables
+        self.curated = curated
+        self.incense_babies = set(curated.breeding.incense_babies)
         self.generations = [g for g in tables.generations if g.id <= scope.MAX_GENERATION]
         self.all_version_groups = {vg.id: vg for vg in tables.version_groups}
         self.version_groups = [
@@ -138,6 +148,7 @@ class _Builder:
         self.default_form_ids = {f.id for f in tables.pokemon_forms if f.is_default}
 
     def rows(self) -> Iterator[ReferenceModel]:
+        self._check_incense_babies()
         yield from self._generations()
         yield from self._version_groups_and_games()
         yield from self._types()
@@ -242,6 +253,7 @@ class _Builder:
                 evolves_from=evolves_from,
                 evolution_chain=species.evolution_chain_id,
                 is_baby=species.is_baby,
+                requires_incense=species.identifier in self.incense_babies,
                 is_legendary=species.is_legendary,
                 is_mythical=species.is_mythical,
             )
@@ -258,6 +270,12 @@ class _Builder:
                     species=self.species[row.species_id].identifier,
                     egg_group=_lookup(egg_groups, row.egg_group_id, "Grupo huevo"),
                 )
+
+    def _check_incense_babies(self) -> None:
+        babies = {s.identifier for s in self.species.values() if s.is_baby}
+        unknown = sorted(self.incense_babies - babies)
+        if unknown:
+            raise TransformError(f"breeding.yaml: {unknown} no son bebés cargados")
 
     def _pokemon_types(self) -> Iterator[PokemonType]:
         """Types of each form in each generation where it exists, resolved with past types.
@@ -374,26 +392,60 @@ class _Builder:
     # --- Availability ----------------------------------------------------------------------
 
     def _game_pokemon(self) -> Iterator[GamePokemon]:
-        """Existence of every loaded form in each target game (RN-03).
+        """Existence and arrival of every loaded form in each target game (RN-03).
 
-        Up to the 7th generation, every species of the National Pokédex up to the game's
-        generation can be had in the game, at least by trade, so existence is automatic.
-        Arrival before completing the game (CA-28) stays pending: proposals come from the
-        curated data (phase 4 of the data load plan).
+        Existence: up to the 7th generation, every species of the National Pokédex up to the
+        game's generation can be had in the game, at least by trade, so it is automatic.
+        Arrival before completing the game (CA-28): proposed from the game's arrival rule in
+        ``arrival.yaml``, or pending if it has none.
         """
         groups = {vg.id: vg for vg in self.version_groups}
+        target_games = set()
         for version in self.t.versions:
             group = groups.get(version.version_group_id)
             if group is None or group.generation_id not in scope.TARGET_GENERATIONS:
                 continue
+            target_games.add(version.identifier)
+            rule = self.curated.arrival_rule(version.identifier)
+            members = self._pokedex_members(rule.regional_pokedex) if rule else None
             for species_id, pokemon in self.default_pokemon.items():
-                if self.species[species_id].generation_id > group.generation_id:
+                species = self.species[species_id]
+                if species.generation_id > group.generation_id:
                     continue
+                can_arrive, origin = None, Origin.PENDING
+                if members is not None:
+                    stages = self._stages_from_egg(species)
+                    can_arrive = all(stage.id in members for stage in stages)
+                    origin = Origin.INFERRED
                 yield GamePokemon(
                     game=version.identifier,
                     pokemon=pokemon.identifier,
                     exists_in_game=True,
                     exists_origin=Origin.AUTOMATIC,
-                    can_arrive=None,
-                    arrival_origin=Origin.PENDING,
+                    can_arrive=can_arrive,
+                    arrival_origin=origin,
                 )
+        unknown = sorted(set(self.curated.arrival.games) - target_games)
+        if unknown:
+            raise TransformError(f"arrival.yaml: {unknown} no son juegos objetivo cargados")
+
+    def _pokedex_members(self, pokedex: str | None) -> set[int] | None:
+        """Species ids of a regional Pokédex, or ``None`` if there is no Pokédex."""
+        if pokedex is None:
+            return None
+        ids = {p.identifier: p.id for p in self.t.pokedexes}
+        pokedex_id = _lookup(ids, pokedex, "Pokédex")
+        return {row.species_id for row in self.t.dex_numbers if row.pokedex_id == pokedex_id}
+
+    def _stages_from_egg(self, species: SpeciesRow) -> list[SpeciesRow]:
+        """Stages from the one that hatches from the egg up to ``species`` (CA-25, CA-36).
+
+        The first stage of the line hatches from the egg, unless it is an incense baby: then
+        the next stage does (Marill rather than Azurill), except for the baby itself.
+        """
+        stages = [species]
+        while (origin := self.species.get(stages[0].evolves_from_species_id or 0)) is not None:
+            stages.insert(0, origin)
+        if len(stages) > 1 and stages[0].identifier in self.incense_babies:
+            stages = stages[1:]
+        return stages

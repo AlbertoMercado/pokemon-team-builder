@@ -14,6 +14,7 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
   carga, recuento por origen, conservación de la base de datos anterior si algo falla) y CLI.
 - `ingest/test_pokeapi.py`: fuente de PokeAPI sobre un extracto real del volcado
   (`ingest/fixtures/pokeapi/`, con su README y el script que lo genera).
+- `ingest/test_curated.py`: datos curados (los ficheros reales, los esquemas y la fuente).
 - `conftest.py`: hace fallar cualquier petición HTTP. **Los tests nunca usan la red.**
 - Los tests de cada paquete van en `tests/<paquete>/` (`core/`, `db/`, `ingest/`, `api/`).
 

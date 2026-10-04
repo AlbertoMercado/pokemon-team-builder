@@ -26,24 +26,34 @@ from db.reference import (
 from db.sqlite import create_sqlite_engine
 from ingest.checks import FIRST_LOAD_CHECKS, check_counts
 from ingest.load import build_reference
-from ingest.sources.pokeapi import PinnedCommitError, PokeapiCsvSource, read_pinned_commit
+from ingest.sources.curated import (
+    CuratedData,
+    CuratedDataError,
+    CuratedSource,
+    read_curated,
+    read_pinned_commit,
+)
+from ingest.sources.curated.schemas import ArrivalFile, ArrivalRule
+from ingest.sources.pokeapi import PokeapiCsvSource
 from ingest.sources.pokeapi.download import CsvCache, MissingCsvError
 from ingest.sources.pokeapi.rows import CsvSchemaError
+from ingest.sources.pokeapi.transform import TransformError
 
 COMMIT = "bc92d3b6029ef1abe9e7ad424c400b338f3c11fe"
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "pokeapi"
 REPOSITORY = Path(__file__).resolve().parents[2]
+CURATED = read_curated(REPOSITORY / "data" / "curated")
 
 
-def _offline_source(cache_dir: Path = FIXTURES) -> PokeapiCsvSource:
-    return PokeapiCsvSource(CsvCache(cache_dir, COMMIT, downloader=None))
+def _offline_source(cache_dir: Path = FIXTURES, curated: CuratedData = CURATED) -> PokeapiCsvSource:
+    return PokeapiCsvSource(CsvCache(cache_dir, COMMIT, downloader=None), curated)
 
 
 @pytest.fixture(scope="module")
 def loaded(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Session]:
     """Database built from the extract, shared by the read-only tests of this module."""
     target = tmp_path_factory.mktemp("pokeapi") / "reference.sqlite"
-    report = build_reference([_offline_source()], target)
+    report = build_reference([_offline_source(), CuratedSource(CURATED)], target)
     assert report.succeeded, report.errors
     engine = create_sqlite_engine(target)
     with Session(engine) as session:
@@ -87,7 +97,7 @@ def test_repository_pins_a_full_commit() -> None:
 def test_invalid_pinned_commit_is_rejected(tmp_path: Path) -> None:
     path = tmp_path / "pokeapi.yaml"
     path.write_text("commit: bc92d3b\n", encoding="utf-8")  # abbreviated SHA
-    with pytest.raises(PinnedCommitError):
+    with pytest.raises(CuratedDataError):
         read_pinned_commit(path)
 
 
@@ -200,7 +210,10 @@ def test_breeding_data(loaded: Session) -> None:
     assert mewtwo.is_legendary
     assert azurill is not None
     assert azurill.is_baby
-    assert not azurill.requires_incense  # set by the curated data (phase 4, CA-36)
+    assert azurill.requires_incense  # from data/curated/breeding.yaml (CA-36)
+    pichu = loaded.get(Species, "pichu")
+    assert pichu is not None
+    assert not pichu.requires_incense
 
 
 # --- Types (RN-10) -------------------------------------------------------------------------
@@ -274,6 +287,12 @@ def test_random_evolution_keeps_its_chance(loaded: Session) -> None:
 # --- Availability (RN-03) ------------------------------------------------------------------
 
 
+def _arrival(session: Session, game: str, pokemon: str) -> tuple[bool | None, Origin]:
+    row = session.get(GamePokemon, (game, pokemon))
+    assert row is not None
+    return row.can_arrive, row.arrival_origin
+
+
 @pytest.mark.rn("RN-03")
 def test_every_loaded_form_exists_in_every_target_game(loaded: Session) -> None:
     rows = loaded.exec(select(GamePokemon)).all()
@@ -281,15 +300,72 @@ def test_every_loaded_form_exists_in_every_target_game(loaded: Session) -> None:
 
     assert len(rows) == 5 * len(pokemon)
     assert all(row.exists_in_game and row.exists_origin is Origin.AUTOMATIC for row in rows)
-    # Arrival before completing the game stays pending until the curated data (CA-28).
+
+
+@pytest.mark.rn("RN-03")
+def test_arrival_is_proposed_from_the_kanto_pokedex_in_firered(loaded: Session) -> None:
+    """CA-28: the stage that hatches and every stage up to the favourite are in Kanto."""
+    assert _arrival(loaded, "firered", "bulbasaur") == (True, Origin.INFERRED)
+    assert _arrival(loaded, "firered", "golbat") == (True, Origin.INFERRED)
+    assert _arrival(loaded, "firered", "vaporeon") == (True, Origin.INFERRED)
+    # Chansey hatches as Chansey: Happiny (4th generation) is not loaded.
+    assert _arrival(loaded, "leafgreen", "chansey") == (True, Origin.INFERRED)
+    # Pikachu and Raichu hatch as Pichu, which is not in the Kanto Pokédex.
+    assert _arrival(loaded, "firered", "pikachu") == (False, Origin.INFERRED)
+    assert _arrival(loaded, "firered", "raichu") == (False, Origin.INFERRED)
+    # Crobat, Espeon and Blissey are 2nd generation evolutions.
+    assert _arrival(loaded, "firered", "crobat") == (False, Origin.INFERRED)
+    assert _arrival(loaded, "firered", "espeon") == (False, Origin.INFERRED)
+    assert _arrival(loaded, "firered", "blissey") == (False, Origin.INFERRED)
+
+
+@pytest.mark.rn("RN-03")
+def test_arrival_without_rule_stays_pending(loaded: Session) -> None:
+    rows = loaded.exec(select(GamePokemon).where(GamePokemon.game == "ruby")).all()
+    assert rows
     assert all(row.can_arrive is None and row.arrival_origin is Origin.PENDING for row in rows)
+
+
+def _with_arrival(game: str, pokedex: str) -> CuratedData:
+    rule = ArrivalRule(regional_pokedex=pokedex, origin="inferred")
+    return CuratedData(
+        pokeapi_commit=CURATED.pokeapi_commit,
+        games=CURATED.games,
+        breeding=CURATED.breeding,
+        arrival=ArrivalFile(games={game: rule}),
+        key_battles=CURATED.key_battles,
+    )
+
+
+@pytest.mark.rn("RN-03")
+def test_incense_babies_are_skipped_as_egg_stage(tmp_path: Path) -> None:
+    """CA-36: Azumarill hatches as Marill, so Azurill (3rd generation) does not matter.
+
+    With the Johto Pokédex (Marill and Azumarill, not Azurill) as arrival rule, Azumarill
+    can arrive, while Azurill itself cannot.
+    """
+    target = tmp_path / "reference.sqlite"
+    source = _offline_source(curated=_with_arrival("ruby", "original-johto"))
+    assert build_reference([source], target).succeeded
+    engine = create_sqlite_engine(target)
+    with Session(engine) as session:
+        assert _arrival(session, "ruby", "azumarill") == (True, Origin.INFERRED)
+        assert _arrival(session, "ruby", "azurill") == (False, Origin.INFERRED)
+        assert _arrival(session, "ruby", "wobbuffet") == (True, Origin.INFERRED)
+    engine.dispose()
+
+
+def test_arrival_rule_for_a_game_that_is_not_a_target_fails() -> None:
+    source = _offline_source(curated=_with_arrival("red", "kanto"))
+    with pytest.raises(TransformError, match="red"):
+        list(source.rows())
 
 
 # --- Checks of the first load --------------------------------------------------------------
 
 
 def test_first_load_checks_reject_an_incomplete_load(tmp_path: Path) -> None:
-    """The extract has ~45 species, not 386: the counts check rejects it."""
+    """The extract has ~50 species, not 386: the counts check rejects it."""
     target = tmp_path / "reference.sqlite"
 
     report = build_reference([_offline_source()], target, FIRST_LOAD_CHECKS)

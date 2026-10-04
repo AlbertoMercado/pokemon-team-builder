@@ -48,9 +48,11 @@ propuesta o `automatic` si es seguro. Los cambios entran por PR, como el código
 
 ### Acciones derivadas
 
-- [ ] Definir los esquemas de los ficheros YAML.
-- [ ] Rellenar los datos de Rojo Fuego y Verde Hoja para el primer prototipo.
+- [x] Definir los esquemas de los ficheros YAML ([datos curados](../02-ddt/datos-curados.md)).
+- [ ] Rellenar los datos de Rojo Fuego y Verde Hoja para el primer prototipo: mecánicas,
+  llegada y lista de combates clave hechos; faltan los equipos de los combates (fase 5).
 
 ## Referencias
 
 - [Datos requeridos por las reglas](../02-ddt/datos-requeridos.md)
+- [Datos curados](../02-ddt/datos-curados.md)

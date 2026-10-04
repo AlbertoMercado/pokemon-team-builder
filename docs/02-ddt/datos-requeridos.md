@@ -132,7 +132,8 @@ guardarlo como dato de cada juego.
   partida ya completada.
 - Conclusión: en Rojo Fuego y Verde Hoja solo pueden ser candidatos los Pokémon de la Pokédex
   de Kanto cuya etapa que nace del huevo también está en ella, y con evoluciones solo dentro de
-  ella. Raichu queda fuera, porque su huevo da Pichu.
+  ella. Raichu queda fuera, porque su huevo da Pichu. La ingesta lo propone con la regla de
+  `arrival.yaml` ([datos curados](datos-curados.md#arrivalyaml)).
 
 Fuentes: [Thonky: intercambiar entre Rojo Fuego y Verde Hoja](https://www.thonky.com/pokemon/trade-from-firered-to-leafgreen),
 [Bulbapedia: discusión sobre Rojo Fuego y Verde Hoja](https://bulbapedia.bulbagarden.net/wiki/Talk:Pok%C3%A9mon_FireRed_and_LeafGreen_Versions)

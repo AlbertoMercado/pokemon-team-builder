@@ -1,0 +1,34 @@
+# Mecánicas de cada juego objetivo que condicionan las evoluciones (RN-15).
+# Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# Cada mecánica es sí/no, con su origen (RN-18): automatic, inferred o pending. Un valor
+# inferido lo confirma el usuario antes de generar; uno pendiente no lleva value.
+#
+# Rubí, Zafiro y Esmeralda se completan en la fase 6 del plan de carga.
+games:
+  firered:
+    day_night_cycle:
+      value: false
+      origin: inferred
+      note: >-
+        No tiene reloj interno: no hay evoluciones por hora del día, como Eevee a Espeon o
+        Umbreon.
+    contests:
+      value: false
+      origin: inferred
+      note: >-
+        No tiene concursos ni Pokécubos: no se puede subir la belleza, que necesita Feebas
+        para evolucionar a Milotic.
+  leafgreen:
+    day_night_cycle:
+      value: false
+      origin: inferred
+      note: >-
+        No tiene reloj interno: no hay evoluciones por hora del día, como Eevee a Espeon o
+        Umbreon.
+    contests:
+      value: false
+      origin: inferred
+      note: >-
+        No tiene concursos ni Pokécubos: no se puede subir la belleza, que necesita Feebas
+        para evolucionar a Milotic.

@@ -10,7 +10,8 @@ from pathlib import Path
 from ingest.checks import FIRST_LOAD_CHECKS
 from ingest.load import build_reference
 from ingest.sources import Source
-from ingest.sources.pokeapi import PokeapiCsvSource, read_pinned_commit
+from ingest.sources.curated import CuratedDataError, CuratedSource, read_curated
+from ingest.sources.pokeapi import PokeapiCsvSource
 from ingest.sources.pokeapi.download import CsvCache, download
 
 DEFAULT_DATA_DIR = Path("data")
@@ -21,9 +22,10 @@ CURATED_DIR = Path(__file__).resolve().parent.parent / "data" / "curated"
 
 def default_sources(data_dir: Path, *, offline: bool) -> list[Source]:
     """Sources of a full load. Caches live in ``<data_dir>/cache``."""
-    commit = read_pinned_commit(CURATED_DIR / "pokeapi.yaml")
-    cache = CsvCache(data_dir / "cache" / "pokeapi", commit, None if offline else download)
-    return [PokeapiCsvSource(cache)]
+    curated = read_curated(CURATED_DIR)
+    downloader = None if offline else download
+    cache = CsvCache(data_dir / "cache" / "pokeapi", curated.pokeapi_commit, downloader)
+    return [PokeapiCsvSource(cache, curated), CuratedSource(curated)]
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -47,7 +49,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     data_dir: Path = args.data_dir
     data_dir.mkdir(parents=True, exist_ok=True)
-    sources = default_sources(data_dir, offline=args.offline)
+    try:
+        sources = default_sources(data_dir, offline=args.offline)
+    except CuratedDataError as error:
+        print(f"ERROR en los datos curados; no se ha cargado nada.\n  - {error}")
+        return 1
     report = build_reference(sources, data_dir / REFERENCE_FILE_NAME, FIRST_LOAD_CHECKS)
     print(report.render())
     return 0 if report.succeeded else 1

@@ -1,23 +1,22 @@
 """PokeAPI source: species, forms, types, type charts, egg groups, evolutions and games.
 
 Reads the CSV dump of the PokeAPI repository pinned to the commit in
-``data/curated/pokeapi.yaml`` (ADR-0004). See docs/02-ddt/plan-carga-datos.md.
+``data/curated/pokeapi.yaml`` (ADR-0004), and uses the curated data for incense babies and
+arrival proposals. See docs/02-ddt/plan-carga-datos.md.
 """
 
-import re
 from collections.abc import Iterable
-from pathlib import Path
-
-import yaml
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from db.reference import ReferenceModel
+from ingest.sources.curated import CuratedData
 from ingest.sources.pokeapi.download import CsvCache
 from ingest.sources.pokeapi.rows import (
+    DexNumberRow,
     EggGroupRow,
     EvolutionRow,
     GenerationRow,
     IdentifierRow,
+    PokedexRow,
     PokemonFormRow,
     PokemonRow,
     PokemonTypePastRow,
@@ -36,44 +35,22 @@ from ingest.sources.pokeapi.rows import (
 )
 from ingest.sources.pokeapi.transform import PokeapiTables, build_rows
 
-COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
-
-
-class PinnedCommit(BaseModel):
-    """Content of ``data/curated/pokeapi.yaml``: the full SHA of the pinned commit."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    commit: str = Field(pattern=COMMIT_PATTERN.pattern)
-
-
-class PinnedCommitError(Exception):
-    """``pokeapi.yaml`` is missing or invalid."""
-
-
-def read_pinned_commit(path: Path) -> str:
-    """Read and validate the pinned PokeAPI commit."""
-    try:
-        content = yaml.safe_load(path.read_text(encoding="utf-8"))
-        return PinnedCommit.model_validate(content).commit
-    except (OSError, yaml.YAMLError, ValidationError) as error:
-        raise PinnedCommitError(f"{path}: {error}") from error
-
 
 class PokeapiCsvSource:
     """Ingest source that builds rows from the PokeAPI CSV dump of one commit."""
 
     name = "pokeapi"
 
-    def __init__(self, cache: CsvCache) -> None:
+    def __init__(self, cache: CsvCache, curated: CuratedData) -> None:
         self._cache = cache
+        self._curated = curated
 
     @property
     def pokeapi_commit(self) -> str:
         return self._cache.commit
 
     def rows(self) -> Iterable[ReferenceModel]:
-        return build_rows(self.read_tables())
+        return build_rows(self.read_tables(), self._curated)
 
     def read_tables(self) -> PokeapiTables:
         """Read (downloading if needed) and validate every CSV file the load uses."""
@@ -101,4 +78,6 @@ class PokeapiCsvSource:
             locations=read_rows(c.path("locations"), IdentifierRow),
             moves=read_rows(c.path("moves"), IdentifierRow),
             regions=read_rows(c.path("regions"), IdentifierRow),
+            pokedexes=read_rows(c.path("pokedexes"), PokedexRow),
+            dex_numbers=read_rows(c.path("pokemon_dex_numbers"), DexNumberRow),
         )

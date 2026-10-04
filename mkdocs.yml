@@ -64,6 +64,7 @@ nav:
       - API: 02-ddt/api.md
       - Algoritmo de generación: 02-ddt/algoritmo-generacion.md
       - Datos requeridos: 02-ddt/datos-requeridos.md
+      - Datos curados: 02-ddt/datos-curados.md
       - Plan de la primera carga: 02-ddt/plan-carga-datos.md
   - Decisiones (ADR):
       - 03-adr/index.md
