@@ -1,11 +1,19 @@
-"""Reads and writes of user.sqlite: favourites, rule settings and confirmations."""
+"""Reads and writes of user.sqlite: favourites, rule settings, confirmations and the Hall of
+Fame."""
 
 from collections.abc import Iterable, Sequence
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, func, select
 
-from db.user import ConfirmedValue, FactConfirmation, Favorite, RuleSetting
+from db.user import (
+    ConfirmedValue,
+    FactConfirmation,
+    Favorite,
+    HallOfFameEntry,
+    HallOfFameMember,
+    RuleSetting,
+)
 
 
 def favorites(user: Session) -> Sequence[Favorite]:
@@ -72,3 +80,63 @@ def save_confirmations(
         user.add(row)
     user.commit()
     return now
+
+
+# A member to save: its form and its types in the entry's game, in team order.
+type MemberRow = tuple[str, tuple[str, ...]]
+
+
+def hall_of_fame(user: Session) -> list[tuple[HallOfFameEntry, list[HallOfFameMember]]]:
+    """Every entry with its members by position, in order of registration."""
+    entries = user.exec(select(HallOfFameEntry).order_by(col(HallOfFameEntry.sequence))).all()
+    members: dict[int, list[HallOfFameMember]] = {}
+    for member in user.exec(select(HallOfFameMember).order_by(col(HallOfFameMember.position))):
+        members.setdefault(member.entry, []).append(member)
+    return [(entry, members.get(entry.id or 0, [])) for entry in entries]
+
+
+def hall_of_fame_entry(user: Session, entry_id: int) -> HallOfFameEntry | None:
+    return user.get(HallOfFameEntry, entry_id)
+
+
+def add_hall_of_fame_entry(
+    user: Session, game: str, completed_on: date, notes: str | None, members: list[MemberRow]
+) -> HallOfFameEntry:
+    """Registers an entry after the others: its ``sequence`` is the next one."""
+    last = user.exec(select(func.max(HallOfFameEntry.sequence))).one()
+    entry = HallOfFameEntry(
+        game=game, completed_on=completed_on, sequence=(last or 0) + 1, notes=notes
+    )
+    user.add(entry)
+    user.flush()
+    _add_members(user, entry, members)
+    user.commit()
+    user.refresh(entry)
+    return entry
+
+
+def update_hall_of_fame_entry(
+    user: Session, entry: HallOfFameEntry, members: list[MemberRow] | None
+) -> None:
+    """Saves the changed fields of ``entry`` and, if given, replaces its members."""
+    user.add(entry)
+    if members is not None:
+        for member in user.exec(select(HallOfFameMember).where(HallOfFameMember.entry == entry.id)):
+            user.delete(member)
+        user.flush()
+        _add_members(user, entry, members)
+    user.commit()
+
+
+def remove_hall_of_fame_entry(user: Session, entry: HallOfFameEntry) -> None:
+    """Removes the entry; the database removes its members (``ON DELETE CASCADE``)."""
+    user.delete(entry)
+    user.commit()
+
+
+def _add_members(user: Session, entry: HallOfFameEntry, members: list[MemberRow]) -> None:
+    assert entry.id is not None
+    user.add_all(
+        HallOfFameMember(entry=entry.id, position=position, pokemon=pokemon, types=list(types))
+        for position, (pokemon, types) in enumerate(members, start=1)
+    )

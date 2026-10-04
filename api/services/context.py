@@ -6,7 +6,8 @@ It has two parts (docs/02-ddt/plan-api.md, "Construcción del GameContext"):
   the game's generation, the type chart and the reviewable values as loaded, with their
   origin. ``GameReferences`` builds it on first use and keeps it in memory until the
   application restarts: reference data does not change while it runs.
-- What the user has: favourites, rule settings and confirmations, read on every request.
+- What the user has: favourites, rule settings, confirmations and the journey of the Hall of
+  Fame, read on every request.
   ``build_context`` combines both.
 
 A reviewable value is confirmed when the user confirmed it and the current load still
@@ -17,7 +18,7 @@ that takes part is unverified (``core.review.pending_facts``).
 """
 
 from collections import defaultdict
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from functools import cached_property
 from itertools import pairwise
@@ -33,6 +34,7 @@ from core.domain import (
     EvolutionStep,
     GameContext,
     GameInfo,
+    HallOfFameEntry,
     KeyBattle,
     PokemonData,
     PoolEntry,
@@ -201,8 +203,10 @@ def build_context(
     favorites: Iterable[str],
     settings: RuleSettings,
     confirmations: Confirmations,
+    journey: Sequence[HallOfFameEntry] = (),
 ) -> GameContext:
-    """The engine's input: the game with the user's favourites, settings and confirmations.
+    """The engine's input: the game with the user's favourites, settings, confirmations and
+    journey (RN-16).
 
     Favourites that are not loaded forms are left out. The pool has every other form of the
     game's generation or earlier, marked as unverified if a value of its own is (CA-31).
@@ -231,6 +235,7 @@ def build_context(
         pool=tuple(pool),
         key_battles=_key_battles(game, confirmations),
         settings=settings,
+        journey=tuple(journey),
     )
 
 

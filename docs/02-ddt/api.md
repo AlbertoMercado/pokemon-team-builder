@@ -215,10 +215,50 @@ su estado:
 
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
-| `GET` | `/api/hall-of-fame` | Registros en el orden del recorrido. Filtro: `game`. | RF-13 |
-| `POST` | `/api/hall-of-fame` | Registra un equipo (juego, fecha, notas y hasta 6 Pokémon). Guarda los tipos de cada miembro en ese juego. | RF-12 |
-| `PATCH` | `/api/hall-of-fame/{id}` | Corrige un registro. | RF-13 |
-| `DELETE` | `/api/hall-of-fame/{id}` | Elimina un registro. | RF-13 |
+| `GET` | `/api/hall-of-fame` | Registros en el orden del recorrido. Filtro: `game`. ✅ | RF-13 |
+| `POST` | `/api/hall-of-fame` | Registra un equipo (juego, fecha, notas y de 1 a 6 Pokémon) y lo devuelve con `201`. Guarda los tipos de cada miembro en ese juego. `422` si el juego o algún Pokémon no existen en los datos cargados o en la generación del juego. ✅ | RF-12 |
+| `PATCH` | `/api/hall-of-fame/{id}` | Corrige el juego, la fecha, las notas o el equipo. Si cambian el juego o el equipo, vuelve a copiar los tipos. `404` si no existe; `422` como al registrar o si no se indica nada. ✅ | RF-13 |
+| `DELETE` | `/api/hall-of-fame/{id}` | Elimina un registro y su equipo: `204`, o `404` si no existe. ✅ | RF-13 |
+
+Petición para registrar un equipo (`notes` es opcional; los miembros, en orden, pueden repetir
+forma):
+
+```json
+{"game": "leafgreen", "completed_on": "2026-05-01", "notes": "Sin objetos", "members": ["dragonite", "vaporeon", "gengar"]}
+```
+
+Cada registro de la respuesta:
+
+```json
+{
+  "id": 1,
+  "game": "leafgreen",
+  "game_name": "Verde Hoja",
+  "generation": 3,
+  "completed_on": "2026-05-01",
+  "notes": "Sin objetos",
+  "order": 2,
+  "last": true,
+  "members": [
+    {"position": 1, "pokemon": "dragonite", "name": "Dragonite", "types": ["dragon", "flying"]},
+    "…"
+  ]
+}
+```
+
+- **Recorrido**: los registros se ordenan por fecha y, a igualdad, por orden de registro
+  ([RF-12](../01-ddf/requisitos-funcionales.md#rf-12)). `order` es la posición en el recorrido
+  y `last` marca el último juego completado. Con el filtro `game`, `order` sigue siendo la del
+  recorrido completo.
+- **Juegos**: se puede registrar cualquier juego cargado, también los que no son juego objetivo
+  (Rojo, Oro…), porque todos forman parte del recorrido.
+- **Tipos**: cada miembro guarda una copia de sus tipos en la generación de ese juego
+  ([CA-07](../01-ddf/cuestiones-abiertas.md#resueltas)): Magneton es Eléctrico en Rojo y
+  Eléctrico/Acero en Rojo Fuego. Un Pokémon que no existe en la generación del juego no se
+  puede registrar.
+- **Exclusiones**: al revisar los datos y al generar, el recorrido se pasa al motor, que excluye
+  las líneas ya usadas según [RN-16](../01-ddf/reglas-negocio.md#rn-16). Corregir o eliminar un
+  registro cambia las exclusiones desde la siguiente petición.
 
 ### Metadatos
 

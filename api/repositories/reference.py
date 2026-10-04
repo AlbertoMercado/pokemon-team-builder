@@ -150,3 +150,24 @@ def key_battle_pokemon(reference: Session, game: str) -> Sequence[KeyBattlePokem
         .where(KeyBattle.game == game)
         .order_by(col(KeyBattlePokemon.battle), col(KeyBattlePokemon.position))
     ).all()
+
+
+def all_games(reference: Session) -> dict[str, Game]:
+    """Every loaded game, target or not, by slug: any can be in the Hall of Fame (RF-12)."""
+    return {game.slug: game for game in reference.exec(select(Game))}
+
+
+def types_in_generation(
+    reference: Session, slugs: Iterable[str], generation: int
+) -> dict[str, tuple[str, ...]]:
+    """The types of the given forms in ``generation``; a form without them is left out."""
+    wanted = list(set(slugs))
+    rows = reference.exec(
+        select(PokemonType)
+        .where(col(PokemonType.pokemon).in_(wanted), PokemonType.generation == generation)
+        .order_by(col(PokemonType.slot))
+    )
+    types: dict[str, list[str]] = {}
+    for row in rows:
+        types.setdefault(row.pokemon, []).append(row.type)
+    return {slug: tuple(found) for slug, found in types.items()}

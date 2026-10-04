@@ -17,6 +17,7 @@ from api.schemas.review import (
     ReviewStatus,
     ReviewValue,
 )
+from api.services import hall_of_fame
 from api.services.context import (
     Confirmations,
     GameReference,
@@ -31,8 +32,9 @@ from db.user import ConfirmedValue
 MECHANIC_NAMES = {"day_night_cycle": "Ciclo de día y noche", "contests": "Concursos"}
 
 
-def involved_values(user: Session, game: GameReference) -> list[Reviewable]:
-    """The values that take part in a generation for the user's favourites and settings."""
+def involved_values(user: Session, reference: Session, game: GameReference) -> list[Reviewable]:
+    """The values that take part in a generation for the user's favourites, settings and
+    journey."""
     confirmations = user_repo.confirmations(user, game.slug)
     favorites = [favorite.pokemon for favorite in user_repo.favorites(user)]
     facts = involved_facts(
@@ -40,16 +42,17 @@ def involved_values(user: Session, game: GameReference) -> list[Reviewable]:
         game.game_facts(confirmations),
         game.favorite_facts(favorites, confirmations),
         current_settings(user),
+        hall_of_fame.journey(user, reference, game),
     )
     values = [game.reviewable(fact.key) for fact in facts]
     return [value for value in values if value is not None]
 
 
-def review(user: Session, game: GameReference) -> ReviewOut:
+def review(user: Session, reference: Session, game: GameReference) -> ReviewOut:
     confirmations = user_repo.confirmations(user, game.slug)
     facts = [
         _out(game, value, confirmations)
-        for value in involved_values(user, game)
+        for value in involved_values(user, reference, game)
         if value.origin is not Origin.AUTOMATIC
     ]
     pending = sum(fact.status is ReviewStatus.PENDING for fact in facts)
@@ -68,11 +71,11 @@ def confirm(user: Session, game: GameReference, fact_key: str, value: ReviewValu
     return _out(game, found, user_repo.confirmations(user, game.slug))
 
 
-def accept_proposals(user: Session, game: GameReference) -> ReviewOut:
+def accept_proposals(user: Session, reference: Session, game: GameReference) -> ReviewOut:
     """Confirms at once every inferred proposal still unconfirmed; pending ones stay as they are."""
     confirmations = user_repo.confirmations(user, game.slug)
     accepted: list[tuple[str, ConfirmedValue, str]] = []
-    for value in involved_values(user, game):
+    for value in involved_values(user, reference, game):
         proposal = to_stored(value.proposal)
         if (
             value.origin is Origin.INFERRED
@@ -82,7 +85,7 @@ def accept_proposals(user: Session, game: GameReference) -> ReviewOut:
             accepted.append((value.key, proposal, value.proposal_hash))
     if accepted:
         user_repo.save_confirmations(user, game.slug, accepted)
-    return review(user, game)
+    return review(user, reference, game)
 
 
 def _valid_value(game: GameReference, fact: Reviewable, value: ReviewValue) -> ConfirmedValue:
