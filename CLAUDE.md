@@ -79,8 +79,9 @@ Cada directorio de código tiene un `README.md` y cada paquete un *docstring* en
 - **Documentación del código**: todo código o cambio de base de datos se documenta **en el
   mismo PR**: qué es, por qué existe y qué hace (docstring de módulo, `README.md` en
   directorios nuevos), tablas y migraciones en el [modelo de datos](docs/02-ddt/modelo-datos.md),
-  y el DDT u Operación afectados. Si hace falta, se crea una página nueva y se enlaza en
-  `mkdocs.yml`. Detalle en [estructura del código](docs/02-ddt/estructura-codigo.md#documentacion-del-codigo).
+  y el DDT u Operación afectados. Toda interfaz de uso (la CLI, la API y la web) se documenta
+  además en el [manual de usuario](docs/04-manual-usuario/index.md). Si hace falta, se crea
+  una página nueva y se enlaza en `mkdocs.yml`. Detalle en [estructura del código](docs/02-ddt/estructura-codigo.md#documentacion-del-codigo).
 
 ### Reglas de negocio (RN-XX)
 

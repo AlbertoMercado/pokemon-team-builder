@@ -79,7 +79,9 @@ nav:
       - "0006 · Búsqueda exacta": 03-adr/0006-algoritmo-busqueda-exacta.md
       - "0007 · Cliente generado desde OpenAPI": 03-adr/0007-cliente-generado-openapi.md
       - "0008 · Cargas bloqueadas": 03-adr/0008-cargas-bloqueadas.md
-  - Manual de usuario: 04-manual-usuario/index.md
+  - Manual de usuario:
+      - 04-manual-usuario/index.md
+      - Cargar y actualizar los datos: 04-manual-usuario/cargar-datos.md
   - Operación:
       - 05-operacion/index.md
       - Entorno de desarrollo en macOS: 05-operacion/entorno-desarrollo-macos.md

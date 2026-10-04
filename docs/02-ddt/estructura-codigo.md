@@ -111,3 +111,6 @@ Todo código o cambio de base de datos se documenta en el mismo PR que lo introd
   [índice del DDT](index.md).
 - **Operación**: los comandos nuevos (ingesta, arranque…), en
   [Operación](../05-operacion/index.md) y en la tabla de comandos de `CLAUDE.md`.
+- **Manual de usuario**: cómo se usa cada interfaz (la CLI, la API y la web), orientado a
+  tareas, en el [manual de usuario](../04-manual-usuario/index.md). Operación explica cómo
+  funciona por dentro; el manual, cómo usarla.

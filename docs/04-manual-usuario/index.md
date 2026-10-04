@@ -1,6 +1,14 @@
 # Manual de usuario
 
-Guía de uso de la aplicación.
+Guía de uso de la aplicación, por cada forma de usarla. Cada interfaz (la CLI de carga, la API y
+la web) se documenta aquí en el mismo PR que la introduce o la cambia
+([documentación del código](../02-ddt/estructura-codigo.md#documentacion-del-codigo)).
+
+| Interfaz | Quién la usa | Guía | Estado |
+|----------|--------------|------|--------|
+| CLI de carga de datos | Administrador | [Cargar y actualizar los datos](cargar-datos.md) | Disponible |
+| API | Integraciones y la propia web | — | Pendiente: se documentará al implementarla |
+| Web | Usuario | — | Pendiente: se documentará al desarrollarla |
 
 ## Responsabilidad sobre los datos confirmados
 
@@ -17,4 +25,4 @@ Las sugerencias para completar un equipo incompleto pueden depender de datos que
 confirmado. En ese caso aparecen marcadas como «sin verificar».
 
 !!! note "Pendiente"
-    El resto del manual está en construcción.
+    Las guías de la API y de la web se añadirán cuando existan.

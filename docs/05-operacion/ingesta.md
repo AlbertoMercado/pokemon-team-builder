@@ -30,8 +30,11 @@ uv run python -m ingest --data-dir otra/   # escribe otra/reference.sqlite y usa
 |------------------|-------------|
 | `0` | Carga completada: `reference.sqlite` se ha sustituido por la nueva. |
 | `1` | La carga ha fallado: se conserva la base de datos anterior y el informe explica el motivo. También si un fichero de `data/curated/` no es válido: en ese caso no se llega a cargar nada. |
+| `2` | Carga bloqueada: se conserva la base de datos anterior y se genera un informe para el arquitecto ([carga bloqueada](#carga-bloqueada)). Pendiente de implementar (fase 7). |
 
 Después de una carga correcta hay que reiniciar la API para que lea la base de datos nueva.
+Guía paso a paso para el administrador en el
+[manual de usuario](../04-manual-usuario/cargar-datos.md).
 
 ### Primera ejecución y caché
 
