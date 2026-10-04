@@ -12,11 +12,11 @@ paquete de Python un *docstring* de módulo en su `__init__.py`.
 | Directorio | Qué es | Por qué existe | Qué hace | Estado |
 |------------|--------|----------------|----------|--------|
 | `core/` | Paquete de Python: dominio puro. | Aislar las reglas de negocio de la infraestructura para probarlas a fondo con hypothesis ([ADR-0002](../03-adr/0002-monolito-modular-nucleo-puro.md)). | Implementa las reglas `RN-XX` y el motor de generación a partir de un `GameContext` inmutable. | Vacío |
-| `db/` | Paquete de Python: persistencia. | Un único lugar para los modelos de las dos bases de datos ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md)). | Define los modelos SQLModel de `reference.sqlite` y `user.sqlite` y las migraciones de esta última. | Vacío |
+| `db/` | Paquete de Python: persistencia. | Un único lugar para los modelos de las dos bases de datos ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md)). | Define los modelos SQLModel de `reference.sqlite` (`db/reference/`) y `user.sqlite` y las migraciones de esta última. `db/sqlite.py` crea los motores con las claves foráneas activadas. | `reference.sqlite` implementada ([detalle](modelo-datos.md#implementacion-de-referencesqlite)) |
 | `ingest/` | Paquete de Python: CLI de ingesta. | Los datos de referencia vienen de fuentes externas y se cargan de forma puntual ([RF-11](../01-ddf/requisitos-funcionales.md#rf-11)). | Descarga (con caché), valida y normaliza PokeAPI, WikiDex y los datos curados, y construye `reference.sqlite`. | Vacío |
 | `api/` | Paquete de Python: capa de aplicación. | Exponer los casos de uso al frontend por HTTP ([API](api.md)). | Routers de FastAPI, servicios que montan el `GameContext` y llaman a `core/`, y repositorios sobre `db/`. | Vacío |
 | `data/` | Datos, no código. | Separar los datos versionados de los generados ([ADR-0005](../03-adr/0005-datos-curados-yaml.md)). | `curated/`: YAML curados a mano, en git. `cache/` y `*.sqlite`: generados, fuera de git. | `curated/` vacío |
-| `tests/` | Tests de Python (pytest + hypothesis). | Verificar cada regla y las propiedades del motor ([estrategia de pruebas](arquitectura.md#estrategia-de-pruebas)). | Contiene el guardián de arquitectura (`test_architecture.py`); los tests de cada paquete irán en `tests/<paquete>/`. | Iniciado |
+| `tests/` | Tests de Python (pytest + hypothesis). | Verificar cada regla y las propiedades del motor ([estrategia de pruebas](arquitectura.md#estrategia-de-pruebas)). | Contiene el guardián de arquitectura (`test_architecture.py`) y los tests de cada paquete en `tests/<paquete>/` (de momento, `tests/db/`). pytest añade la raíz del repositorio al `sys.path` (`pythonpath` en `pyproject.toml`), porque el proyecto no se instala como paquete. | En uso |
 | `web/` | Frontend React + Vite + TypeScript + Tailwind. | Interfaz de la aplicación ([ADR-0001](../03-adr/0001-stack-tecnologico.md)). | Pantallas de catálogo, favoritos, reglas, nuevo juego, resultado y *Hall of Fame*. | Vacío |
 | `docs/` | Documentación MkDocs. | Docs-as-code: el diseño se versiona con el código. | DDF, DDT, ADR, manual de usuario y operación. | En uso |
 
@@ -78,6 +78,13 @@ import-linter solo puede prohibir paquetes que se nombran uno a uno. Para garant
 `tests/test_architecture.py` recorre los ficheros de `core/` y falla si alguno importa un
 módulo que no está en `sys.stdlib_module_names` ni es el propio `core`. Se ejecuta con el
 resto de tests (`uv run pytest`).
+
+## Hooks de pre-commit con el entorno del proyecto
+
+`mypy` y `lint-imports` se ejecutan en pre-commit como hooks **locales** (`uv run …`), con el
+entorno del proyecto, en lugar de con un entorno aislado de pre-commit. Así ven todas las
+dependencias del código (SQLModel, pydantic…) sin mantener una segunda lista en
+`.pre-commit-config.yaml`. En CI se ejecutan como pasos propios del job de Python.
 
 ## Añadir un paquete o una dependencia
 

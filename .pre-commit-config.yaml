@@ -19,16 +19,18 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.3.1
-    hooks:
-      - id: mypy
-        args: [--strict]
-        additional_dependencies: [pytest, hypothesis]
-
-  # Contratos de dependencia entre paquetes (ADR-0002), definidos en pyproject.toml.
+  # mypy y import-linter usan el entorno del proyecto (uv) para ver todas sus dependencias
+  # (SQLModel, pydantic…) sin duplicarlas aquí. La configuración está en pyproject.toml.
   - repo: local
     hooks:
+      - id: mypy
+        name: mypy (strict)
+        entry: uv run mypy
+        language: system
+        pass_filenames: false
+        types: [python]
+
+      # Contratos de dependencia entre paquetes (ADR-0002).
       - id: lint-imports
         name: import-linter (contratos de dependencia)
         entry: uv run lint-imports

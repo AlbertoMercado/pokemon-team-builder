@@ -112,8 +112,9 @@ En PokeAPI, las evoluciones aleatorias se reconocen por `percentage_chance` o
   los 10 bebés, Unown, Nidorina y Nidoqueen. Ditto es el único del grupo `ditto`.
 - La etapa que nace del huevo es la primera de la cadena (`evolves_from_species_id` vacío).
   Azurill y Wynaut solo nacen si un progenitor lleva un incienso; sin él nacen Marill y
-  Wobbuffet. Se toma como etapa de entrada la que nace sin incienso (Marill y Wobbuffet), y se
-  guarda como dato curado ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)).
+  Wobbuffet. Se toma como etapa de entrada la que nace sin incienso (Marill y Wobbuffet). La
+  ingesta marca esos bebés con `species.requires_incense` y `core/breeding.py` aplica la
+  decisión ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 ### Existencia y llegada
 
@@ -137,7 +138,7 @@ esquemas se definen y documentan en la fase 4.
 |---------|-----------|---------------------|
 | `pokeapi.yaml` | Commit fijado del volcado de PokeAPI. | — |
 | `games.yaml` | Qué juegos son juego objetivo y sus mecánicas: ciclo de día y noche (Rubí, Zafiro y Esmeralda tienen reloj; Rojo Fuego y Verde Hoja, no) y concursos (solo Rubí, Zafiro y Esmeralda). | Inferido |
-| `breeding.yaml` | Etapa de entrada de las líneas con bebé de incienso: Marill y Wobbuffet en lugar de Azurill y Wynaut ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). | Automático (decisión funcional) |
+| `breeding.yaml` | Bebés que solo nacen con incienso (Azurill, Wynaut). Se cargan en `species.requires_incense`; `core/breeding.py` toma entonces la etapa siguiente (Marill, Wobbuffet) como etapa de entrada ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). | Automático |
 | `arrival.yaml` | Regla de llegada de cada juego objetivo (Pokédex regional de referencia, evoluciones bloqueadas antes de la Pokédex Nacional). | Inferido o pendiente |
 | `key_battles/<juego>.yaml` | Combates clave de cada juego: categoría, entrenador, orden y página de WikiDex. Los equipos se descargan de WikiDex. | Lista curada; equipos automáticos o inferidos |
 
@@ -170,7 +171,7 @@ flowchart LR
 
 | Fase | Rama | Contenido | Documentación |
 |------|------|-----------|---------------|
-| 1 | `feat/db-reference` | Modelos SQLModel de las tablas de `reference.sqlite` que usa la primera carga (sin `level_move`). | [Modelo de datos](modelo-datos.md): tablas y columnas definitivas. |
+| 1 ✅ | `feat/db-reference` | Modelos SQLModel de las tablas de `reference.sqlite` que usa la primera carga (sin `level_move`). | [Modelo de datos](modelo-datos.md#implementacion-de-referencesqlite): tablas, columnas y decisiones de implementación. |
 | 2 | `feat/ingest-esqueleto` | CLI `uv run python -m ingest`, informe de la carga, tabla `ingest_run` y sustitución atómica del fichero. | Nueva página de Operación: «Ingesta de datos» (uso, opciones, informe y errores). Tabla de comandos de `CLAUDE.md`. |
 | 3 | `feat/ingest-pokeapi` | Descarga de los CSV del commit fijado a `data/cache/pokeapi/<commit>/`, validación de cada fila con pydantic, transformaciones y carga. Tests con extractos reales de los CSV. | Detalle de cada transformación en esta página o en una de la ingesta. |
 | 4 | `feat/ingest-curados` | Esquemas pydantic de los YAML y datos de Rojo Fuego y Verde Hoja: juego, mecánicas, llegada y lista de combates clave. | Esquema de cada fichero YAML. |
