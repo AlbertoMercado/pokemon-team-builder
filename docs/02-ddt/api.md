@@ -2,7 +2,9 @@
 
 API HTTP de la aplicación, servida por FastAPI bajo el prefijo `/api`. El contrato completo se
 publica como OpenAPI en `/api/openapi.json`, del que se genera el cliente del frontend
-([ADR-0007](../03-adr/0007-cliente-generado-openapi.md)).
+([ADR-0007](../03-adr/0007-cliente-generado-openapi.md)), y la documentación interactiva en
+`/api/docs`. Los endpoints marcados con ✅ están implementados; el resto llega con las fases
+del [plan de la API](plan-api.md#fases). Cómo se arranca: [Operación](../05-operacion/api.md).
 
 ## Convenciones
 
@@ -14,6 +16,7 @@ publica como OpenAPI en `/api/openapi.json`, del que se genera el cliente del fr
     - `409`: la operación no se puede hacer en el estado actual (p. ej., generar con datos sin
       confirmar).
     - `422`: datos de entrada no válidos.
+    - `503`: todavía no se han cargado los datos de referencia (`reference.sqlite`).
 - Sin autenticación: la aplicación es de un solo usuario.
 
 ## Endpoints
@@ -117,4 +120,4 @@ de los 6 miembros):
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| `GET` | `/api/meta` | Versión de la aplicación y de los datos (commit de PokeAPI y fecha de la ingesta). |
+| `GET` | `/api/meta` | Versión de la aplicación y de los datos: commit de PokeAPI, fecha de la carga y juegos cargados. `data` es nulo si la carga no dejó registro. ✅ |

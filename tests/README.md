@@ -12,6 +12,11 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
   legibles (`pokemon(...)`, `type_chart(...)`, `context(...)`) que usan todos sus tests.
   `core/scenario.py` construye el escenario real de Rojo Fuego a partir de un extracto de
   `reference.sqlite` (`core/fixtures/`, con su README y el script que lo genera).
+- `api/`: tests de la API con el `TestClient` de FastAPI sobre un directorio de datos temporal
+  (`api/conftest.py`). `api/factories.py` crea los `reference.sqlite` de prueba.
+- `db/test_user_schema.py`: esquema de `user.sqlite` (las migraciones coinciden con los modelos,
+  se pueden deshacer y las restricciones funcionan).
+- `test_network_blocked.py`: comprueba que ningún cliente HTTP llega a la red.
 - `db/test_reference_schema.py`: esquema de `reference.sqlite` (tablas documentadas, lectura
   y escritura, y restricciones de integridad).
 - `ingest/test_load.py`: carga de `reference.sqlite` (filas desordenadas, registro de la

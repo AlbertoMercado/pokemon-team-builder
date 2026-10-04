@@ -148,7 +148,7 @@ contexto incorpora el recorrido (RN-16).
 
 | Fase | Rama | Contenido | Tests |
 |------|------|-----------|-------|
-| 1 | `feat/api-base` | Dependencias (`fastapi`, `uvicorn`, `alembic`), configuración, `create_app`, modelos de `db/user/` y migración inicial con todas las tablas, migraciones al arrancar, `503` sin `reference.sqlite`, `GET /api/meta` y la infraestructura de tests. | Arranque con y sin `reference.sqlite`, migraciones sobre una base vacía, `/api/meta`, OpenAPI generado. |
+| 1 ✅ | `feat/api-base` | Dependencias (`fastapi`, `uvicorn`, `alembic`), configuración, `create_app`, modelos de `db/user/` y migración inicial con todas las tablas, migraciones al arrancar, `503` sin `reference.sqlite`, `GET /api/meta` y la infraestructura de tests. | Arranque con y sin `reference.sqlite`, migraciones sobre una base vacía, `/api/meta`, OpenAPI generado. |
 | 2 | `feat/api-favoritos-reglas` | `GET`, `PUT` y `DELETE` de favoritos; `GET` y `PATCH` de reglas con los errores de `RuleSettings`; `GET /api/games` (juegos objetivo con crianza, RF-05). | Favoritos idempotentes y forma inexistente (`404`); regla no configurable (`409`) y peso fuera de rango (`422`); valores por defecto (CA-41); juegos ofrecidos. |
 | 3 | `feat/api-contexto` | Repositorios de `reference.sqlite`, construcción del contexto y de los datos revisables con sus confirmaciones, caché por juego, función de `core.review` con todos los datos que intervienen, y `GET`/`PUT /review` y `POST /review/accept-proposals`. | El contexto de Rojo Fuego coincide con el del escenario del motor; confirmar, corregir y aceptar propuestas; una confirmación deja de valer si cambia la propuesta; valores no válidos (`422`). |
 | 4 | `feat/api-generacion` | `POST /generations`, esquemas de respuesta, enteros con mayor resto y `409` con datos pendientes. | Generación de Rojo Fuego de principio a fin con datos reales; `409`; las aportaciones suman el total; equipo incompleto con sugerencias. |
@@ -168,10 +168,9 @@ los datos reales; con la 5, teniendo en cuenta el recorrido.
 | **Escenario real** | El extracto de Rojo Fuego del motor (`tests/core/fixtures/firered.json`) cargado en un `reference.sqlite` temporal: la generación de la API da los mismos equipos que el motor. | `tests/api/` |
 | **Migraciones** | La migración inicial crea exactamente las tablas de los modelos (sin diferencias en la autogeneración de Alembic). | `tests/db/` |
 
-Los tests siguen sin red. `tests/conftest.py` bloquea hoy `httpx.Client.send`, que también usa
-`TestClient`; en la fase 1 se cambia para bloquear solo el transporte de red real
-(`httpx.HTTPTransport`), de modo que `TestClient` funcione y cualquier petición a internet siga
-fallando.
+Los tests siguen sin red. `tests/conftest.py` bloquea los transportes de red de `httpx` y de
+`httpx2` (el que usa el `TestClient` de FastAPI), pero no el transporte en memoria del
+`TestClient`; `tests/test_network_blocked.py` lo comprueba.
 
 ## Riesgos
 

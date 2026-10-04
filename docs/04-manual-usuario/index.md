@@ -7,7 +7,7 @@ la web) se documenta aquí en el mismo PR que la introduce o la cambia
 | Interfaz | Quién la usa | Guía | Estado |
 |----------|--------------|------|--------|
 | CLI de carga de datos | Administrador | [Cargar y actualizar los datos](cargar-datos.md) | Disponible |
-| API | Integraciones y la propia web | — | Pendiente: se documentará al implementarla |
+| API | Integraciones y la propia web | [Usar la API](api.md) | Parcial: arranque y versión de los datos |
 | Web | Usuario | — | Pendiente: se documentará al desarrollarla |
 
 ## Responsabilidad sobre los datos confirmados
