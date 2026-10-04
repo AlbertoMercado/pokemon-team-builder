@@ -160,7 +160,6 @@ erDiagram
 | `hall_of_fame_entry` | `id` PK, `game`, `completed_on`, `sequence`, `notes` | `sequence` es el orden de registro y desempata dos fechas iguales ([RF-12](../01-ddf/requisitos-funcionales.md#rf-12)). |
 | `hall_of_fame_member` | `entry`, `position`, `pokemon`, `types` | `types` guarda los tipos que tenía en ese juego, como copia ([CA-07](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `fact_confirmation` | `fact_key` PK, `game`, `confirmed_value`, `proposed_value_hash`, `confirmed_at` | Si una nueva carga propone un valor con otro hash, la confirmación deja de valer ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). |
-| `evolution_method_classification` | `kind` y `name` PK, `category`, `reason`?, `classified_at` | Pendiente. Métodos de evolución que el usuario ha catalogado porque no estaban en los datos curados ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)). Sobreviven a las recargas; la carga los une a los curados. |
 
 Las columnas que apuntan a `reference.sqlite` (`pokemon`, `game`, `fact_key`) no pueden ser
 claves foráneas, porque están en otro fichero. Las comprueba la ingesta antes de sustituir la

@@ -203,8 +203,9 @@ una condición nueva de PokeAPI nunca haga parecer fácil una evolución.
 !!! warning "Provisional hasta la fase 7 del plan de carga"
     Tras revisar esta fase se decidió que la clasificación sea un dato
     ([`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml)) y que lo que no esté
-    catalogado detenga la carga para que lo catalogue el usuario
-    ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)). Entonces el motor recibirá la
+    catalogado bloquee la carga para que lo catalogue el arquitecto en una nueva versión
+    ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas),
+    [CA-47](../01-ddf/cuestiones-abiertas.md#resueltas)). Entonces el motor recibirá la
     clasificación en el contexto y un método sin catalogar será un error. También cambia el
     sexo (`gender_id`), que pasa a no ser tedioso
     ([CA-43](../01-ddf/cuestiones-abiertas.md#resueltas)); hoy cuenta como `other`. Ninguno

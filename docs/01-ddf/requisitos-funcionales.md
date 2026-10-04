@@ -33,7 +33,7 @@ Hay dos excepciones:
 | [RF-13](#rf-13) | Consultar el Hall of Fame | Hall of Fame | Must |
 | [RF-14](#rf-14) | Cargar reglas definidas por el usuario | Reglas | Could |
 | [RF-15](#rf-15) | Revisar los datos del juego objetivo | Reglas | Must |
-| [RF-16](#rf-16) | Catalogar los métodos de evolución desconocidos | Datos | Must |
+| [RF-16](#rf-16) | Informar de las cargas bloqueadas | Datos | Must |
 
 ## Catálogo
 
@@ -199,10 +199,10 @@ Hay dos excepciones:
 ### RF-11 · Cargar y actualizar los datos { #rf-11 }
 
 - **Prioridad**: Must
-- **Descripción**: el usuario carga los datos de Pokémon, juegos y generaciones desde las
-  fuentes externas (PokeAPI, Pokémon Showdown y WikiDex), y los vuelve a cargar para
-  actualizarlos. La carga se lanza a petición desde un apartado de la aplicación; en
-  desarrollo, también desde la terminal.
+- **Descripción**: el administrador carga los datos de Pokémon, juegos y generaciones desde
+  las fuentes externas (PokeAPI, Pokémon Showdown y WikiDex), y los vuelve a cargar para
+  actualizarlos. La carga se ejecuta a mano desde la terminal, aparte de la aplicación
+  ([CA-47](cuestiones-abiertas.md#resueltas)).
 - **Alcance inicial**: las 386 especies de las generaciones 1 a 3 y sus 11 juegos, con los 5
   de la 3.ª generación como juego objetivo, para validar el algoritmo antes de ampliarlo
   ([CA-11](cuestiones-abiertas.md#resueltas),
@@ -222,32 +222,34 @@ Hay dos excepciones:
     - Repetir la carga no duplica datos ni borra las confirmaciones del usuario.
     - Se respetan los límites de uso de cada fuente.
     - Al terminar, se informa de qué se ha cargado y de los errores, si los hay.
-    - Si la carga encuentra algo que la aplicación no sabe tratar, se detiene sin cambiar los
-      datos y lo explica:
-        - Un método de evolución sin catalogar: muestra un informe con lo desconocido para que
-          el usuario lo catalogue ([RF-16](#rf-16), [CA-42](cuestiones-abiertas.md#resueltas)).
+    - Si la carga encuentra algo que la aplicación no sabe tratar, queda **bloqueada**: no
+      cambia los datos y genera un informe para el arquitecto ([RF-16](#rf-16)). Bloquean la
+      carga:
+        - Un método de evolución sin catalogar ([CA-42](cuestiones-abiertas.md#resueltas)).
         - Una evolución que exige conocer un movimiento sin que estén cargados los movimientos
-          que se aprenden por nivel: avisa de que hacen falta y pregunta si se quieren cargar.
-          Hasta que se carguen, no se puede cargar nueva información
-          ([CA-45](cuestiones-abiertas.md#resueltas)).
-        - Un juego objetivo sin combates clave: no se puede cargar hasta una nueva versión de
-          la aplicación ([CA-46](cuestiones-abiertas.md#resueltas)).
+          que se aprenden por nivel ([CA-45](cuestiones-abiertas.md#resueltas)).
+        - Un juego objetivo sin combates clave ([CA-46](cuestiones-abiertas.md#resueltas)).
+        - El equipo de un combate clave que no se encuentra en WikiDex.
+    - Una carga bloqueada solo se resuelve con una nueva versión de la aplicación o de sus
+      datos curados. Hasta entonces se sigue usando la base de datos anterior.
 
-### RF-16 · Catalogar los métodos de evolución desconocidos { #rf-16 }
+### RF-16 · Informar de las cargas bloqueadas { #rf-16 }
 
 - **Prioridad**: Must
-- **Descripción**: cuando la carga de datos se detiene porque encuentra disparadores o
-  condiciones de evolución sin catalogar ([RF-11](#rf-11)), la aplicación los muestra y el
-  usuario elige cómo los tratan [RN-15](reglas-negocio.md#rn-15) y
-  [RN-20](reglas-negocio.md#rn-20) ([CA-42](cuestiones-abiertas.md#resueltas)).
+- **Descripción**: cuando la carga de datos queda bloqueada ([RF-11](#rf-11)), genera un
+  informe para que el arquitecto revise el modelo y prepare la nueva versión que la
+  desbloquea ([CA-47](cuestiones-abiertas.md#resueltas)).
 - **Criterios de aceptación**:
-    - De cada método desconocido se muestra su nombre en la fuente, sus valores y las
-      evoluciones afectadas, por ejemplo «`spin`: Milcery → Alcremie».
-    - El usuario elige su categoría: no tedioso, tedioso o aleatorio. Un método aleatorio es
-      también tedioso ([RN-20](reglas-negocio.md#rn-20)).
-    - Las clasificaciones se guardan, sobreviven a las recargas y no se vuelven a pedir.
-    - Cuando no queda nada sin catalogar, se puede repetir la carga.
-    - El usuario puede revisar y cambiar después lo que catalogó.
+    - La carga recoge **todos** los bloqueos antes de parar, para resolverlos de una vez.
+    - De cada bloqueo, el informe dice qué es, dónde aparece (p. ej., «`spin`: Milcery →
+      Alcremie en Espada y Escudo»), a qué reglas afecta, qué decisión hace falta y una
+      plantilla para completarlo en los datos curados.
+    - El informe incluye un resumen, la fecha y las versiones de los datos usados (commit de
+      PokeAPI), para poder repetir la carga.
+    - Se guarda en un formato para leer y en otro para procesar por programa.
+    - La carga termina con un código de salida propio, distinto del de un error.
+    - La carga nunca publica nada: los informes se registran en git después, a mano, según
+      el protocolo de Operación.
 
 ## Hall of Fame
 

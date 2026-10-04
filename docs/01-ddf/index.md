@@ -14,6 +14,7 @@ las reglas de negocio (**RN-XX**).
 | 0.6 | 2026-10-04 | CA-38 resuelta: del rival solo cuentan los Pokémon comunes a todas las variantes. CA-39: en Kanto, Giovanni solo cuenta como líder de gimnasio (RN-17). |
 | 0.7 | 2026-10-04 | CA-40: las sugerencias de RN-08 pasan los mismos filtros por candidato que los favoritos. CA-41: todas las reglas activables están activas por defecto. |
 | 0.8 | 2026-10-04 | Casos de RN-15, RN-17 y RN-20 que el DDF no cubría (CA-42 a CA-46): los métodos de evolución sin catalogar detienen la carga y los cataloga el usuario (RF-16, nuevo); el sexo y el objeto equipado no son tediosos; con varios métodos cuenta el más fácil; sin movimientos por nivel o sin combates clave la carga se detiene. La carga se lanza desde la aplicación (RF-11). |
+| 0.9 | 2026-10-04 | CA-47: la carga sigue siendo una tarea manual del administrador. Si queda bloqueada, genera un informe para el arquitecto, que la resuelve con una nueva versión (RF-11; RF-16 pasa a ser «Informar de las cargas bloqueadas»). |
 
 ## Propósito
 
