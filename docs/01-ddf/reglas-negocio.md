@@ -308,7 +308,8 @@ parámetros son fijos.
       a nivel 1, porque en la práctica hay que recurrir al recordador
       ([CA-32](cuestiones-abiertas.md#resueltas)).
     - Otros requisitos poco habituales: clima, girar la consola, golpes críticos, daño recibido,
-      etc.
+      etc. Wurmple y Shedinja están pendientes de
+      [CA-35](cuestiones-abiertas.md#abiertas).
     - Cualquier evolución que **no se puede hacer en el juego objetivo** y obliga a evolucionar
       al Pokémon en otro juego y transferirlo, siempre que la transferencia sea posible antes
       de completar el juego. Si no lo es, el Pokémon no es candidato ([RN-03](#rn-03)).

@@ -12,15 +12,12 @@ afectadas.
 | ID | Cuestión | Afecta a | Propuesta |
 |----|----------|----------|-----------|
 | CA-28 | ¿Qué Pokémon pueden llegar al juego objetivo y evolucionar antes de completarlo? | RN-03, RN-14, RN-15, RF-11 | Solo son candidatos los Pokémon cuya etapa de entrada (la que nace del huevo) se puede recibir en el juego objetivo y evolucionar hasta la evolución de favoritos antes de completarlo. Estos datos se cargan como inferidos y los confirma el usuario (RN-18), así que no bloquean la implementación. Investigar cada juego sirve para que las propuestas sean correctas. Ver [lo comprobado en Rojo Fuego y Verde Hoja](../02-ddt/datos-requeridos.md#restricciones-de-llegada-por-juego). |
+| CA-35 | ¿Son tediosas las evoluciones de Wurmple (Silcoon o Cascoon, al azar según la personalidad) y de Nincada a Shedinja (hace falta un hueco libre en el equipo y una Poké Ball)? | RN-15 | Wurmple no: sube de nivel y el resultado lo fija el huevo, no la evolución. Shedinja sí: con un equipo de 6 no hay hueco libre y hay que dejar un miembro en la caja ([plan de carga](../02-ddt/plan-carga-datos.md#evoluciones)). |
+| CA-36 | ¿Qué etapa nace del huevo en las líneas con bebé de incienso, como Azurill (Marill) y Wynaut (Wobbuffet), en las que el bebé solo nace si un progenitor lleva un incienso? | RN-03, RN-15, CA-25 | La que nace sin incienso (Marill, Wobbuffet), porque no exige ningún objeto. Se guarda como dato curado ([plan de carga](../02-ddt/plan-carga-datos.md#crianza)). |
 
 ## Aplazadas
 
-Dependen de la planificación de la ingesta, que queda fuera del alcance de esta versión del
-DDF.
-
-| ID | Cuestión | Afecta a | Cuándo se decide |
-|----|----------|----------|------------------|
-| CA-11 | Qué generaciones y juegos incluye la carga inicial. Los juegos objetivo empiezan en la 2.ª generación (CA-29), aunque se necesitan datos de especies de la 1.ª. | RF-05, RF-11 | Al planificar la ingesta de datos. |
+Ninguna por ahora.
 
 ## Resueltas
 
@@ -36,6 +33,7 @@ DDF.
 | CA-09 | ¿Cómo se desempata? | Se recomiendan todos los equipos empatados (RN-04). Modificada por CA-34: antes se desempata por el número de miembros con dos tipos. |
 | CA-05 | Escala de los pesos de las reglas blandas y valores por defecto. | Pesos enteros de 0 a 10. Por defecto: RN-17 = 10, RN-15 = 3 y RN-06 = 1 (RN-04). |
 | CA-10 | ¿Qué reglas forman el catálogo de la primera versión y de qué tipo es cada una? | Un catálogo estático: las reglas RN-01 a RN-10 y las nuevas RN-11 a RN-17. El usuario solo las activa o desactiva y ajusta los pesos de las blandas; los parámetros (Dragonite, Eevee…) son fijos. |
+| CA-11 | ¿Qué generaciones y juegos incluye la carga inicial? | Las 386 especies de las generaciones 1 a 3 (de #0001 Bulbasaur a #0386 Deoxys), solo en su forma por defecto, y los 11 juegos de esas generaciones. Son juego objetivo los 5 de la 3.ª generación (Rubí, Zafiro, Esmeralda, Rojo Fuego y Verde Hoja), empezando por Rojo Fuego y Verde Hoja. Los de la 1.ª y la 2.ª se cargan para el recorrido. Las formas regionales se cargarán con la generación que las introduce ([plan de carga](../02-ddt/plan-carga-datos.md), RF-05, RF-11). |
 | CA-12 | ¿Qué Pokémon «existen» en una generación? | Los que aparecen en alguno de sus juegos. El filtro es doble: primero por generación y después por el juego, aunque el Pokémon no se pueda atrapar en él (RN-03). |
 | CA-13 | ¿Qué otras formas cuentan como Pokémon distintos? | Ninguna aparte de las regionales. Las formas que cambian de forma dinámica en el juego (megaevolución, Gigamax, Rotom, Deoxys…) no se tienen en cuenta (RN-05). |
 | CA-14 | ¿Vulpix y Vulpix de Alola cuentan como la misma especie? | Sí, pero no se descartan: tener varias formas de la misma especie solo resta puntuación, con un peso pequeño (RN-06). |

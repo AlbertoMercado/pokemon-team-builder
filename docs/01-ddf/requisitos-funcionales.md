@@ -199,9 +199,10 @@ Hay dos excepciones:
 - **Descripción**: el administrador carga los datos de Pokémon, juegos y generaciones desde
   las fuentes externas (PokeAPI, Pokémon Showdown y WikiDex), y los vuelve a cargar para
   actualizarlos.
-- **Alcance inicial**: un conjunto de datos pequeño y controlable, por ejemplo las 2 o 3
-  primeras generaciones, para validar el algoritmo antes de ampliarlo
-  ([CA-11](cuestiones-abiertas.md#aplazadas)).
+- **Alcance inicial**: las 386 especies de las generaciones 1 a 3 y sus 11 juegos, con los 5
+  de la 3.ª generación como juego objetivo, para validar el algoritmo antes de ampliarlo
+  ([CA-11](cuestiones-abiertas.md#resueltas),
+  [plan de carga](../02-ddt/plan-carga-datos.md)).
 - **Criterios de aceptación**:
     - Se cargan las generaciones, los juegos de cada generación y qué Pokémon (por forma)
       existen en cada juego ([RN-03](reglas-negocio.md#rn-03)).
