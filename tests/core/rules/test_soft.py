@@ -4,16 +4,26 @@ from fractions import Fraction
 
 import pytest
 
-from core.domain import GameInfo, KeyBattle, PokemonData
+from core.domain import GameContext, GameInfo, KeyBattle, PokemonData
 from core.rules.catalog import CATALOG, RuleKind
 from core.rules.soft import (
     SOFT_RULES,
     KeyBattleCoverageRule,
     RandomEvolutionRule,
+    Rivals,
     SameSpeciesRule,
+    SoftRule,
+    SoftScore,
     TediousEvolutionRule,
+    member_profile,
 )
 from tests.core.builders import battle, context, pokemon, step, type_chart
+
+
+def _score(rule: SoftRule, team: list[PokemonData], ctx: GameContext) -> SoftScore:
+    rivals = Rivals.of(ctx.key_battles)
+    return rule.score([member_profile(m, ctx, rivals) for m in team], rivals)
+
 
 GENGAR = pokemon(
     "gengar",
@@ -70,14 +80,14 @@ def test_every_soft_rule_of_the_catalogue_is_implemented() -> None:
 def test_vulpix_and_alolan_vulpix_score_zero() -> None:
     vulpix = pokemon("vulpix", ("fire",), species="vulpix")
     alolan = pokemon("vulpix-alola", ("ice",), species="vulpix", region="alola")
-    result = SameSpeciesRule().score([vulpix, alolan, MACHOP], context())
+    result = _score(SameSpeciesRule(), [vulpix, alolan, MACHOP], context())
     assert result.value == 0
     assert result.penalized == ("vulpix", "vulpix-alola")
 
 
 @pytest.mark.rn("RN-06")
 def test_different_species_score_one() -> None:
-    assert SameSpeciesRule().score([SQUIRTLE, MACHOP], context()).value == 1
+    assert _score(SameSpeciesRule(), [SQUIRTLE, MACHOP], context()).value == 1
 
 
 # --- RN-15 ---------------------------------------------------------------------------------
@@ -86,19 +96,19 @@ def test_different_species_score_one() -> None:
 @pytest.mark.rn("RN-15")
 def test_one_tedious_member_out_of_two_scores_half() -> None:
     """Gengar counts against (trade); Raichu does not (Thunder Stone)."""
-    result = TediousEvolutionRule().score([GENGAR, RAICHU], context())
+    result = _score(TediousEvolutionRule(), [GENGAR, RAICHU], context())
     assert (result.value, result.penalized) == (Fraction(1, 2), ("gengar",))
 
 
 @pytest.mark.rn("RN-15")
 def test_one_tedious_member_out_of_six() -> None:
     team = [GENGAR, *(pokemon(f"p{i}") for i in range(5))]
-    assert TediousEvolutionRule().score(team, context()).value == Fraction(5, 6)
+    assert _score(TediousEvolutionRule(), team, context()).value == Fraction(5, 6)
 
 
 @pytest.mark.rn("RN-15")
 def test_empty_team_has_no_tedious_member() -> None:
-    assert TediousEvolutionRule().score([], context()).value == 1
+    assert _score(TediousEvolutionRule(), [], context()).value == 1
 
 
 # --- RN-20 ---------------------------------------------------------------------------------
@@ -106,14 +116,14 @@ def test_empty_team_has_no_tedious_member() -> None:
 
 @pytest.mark.rn("RN-20")
 def test_beautifly_scores_zero() -> None:
-    result = RandomEvolutionRule().score([BEAUTIFLY, RAICHU], context())
+    result = _score(RandomEvolutionRule(), [BEAUTIFLY, RAICHU], context())
     assert (result.value, result.penalized) == (Fraction(0), ("beautifly",))
 
 
 @pytest.mark.rn("RN-20")
 def test_gengar_scores_one() -> None:
     """Trade is tedious (RN-15) but not random."""
-    assert RandomEvolutionRule().score([GENGAR], context()).value == 1
+    assert _score(RandomEvolutionRule(), [GENGAR], context()).value == 1
 
 
 # --- RN-17 ---------------------------------------------------------------------------------
@@ -121,7 +131,7 @@ def test_gengar_scores_one() -> None:
 
 def _coverage(team: list[PokemonData], *battles: KeyBattle) -> Fraction:
     ctx = context(key_battles=battles, chart=CHART)
-    return KeyBattleCoverageRule().score(team, ctx).value
+    return _score(KeyBattleCoverageRule(), team, ctx).value
 
 
 @pytest.mark.rn("RN-17")
@@ -179,4 +189,4 @@ def test_types_follow_the_generation_chart() -> None:
     abra = battle("sabrina", ("abra", ("psychic",)))
     gastly = battle("agatha", ("gastly", ("ghost",)))
     ctx = context(key_battles=[abra, gastly], chart=gen1, game=GameInfo("red", 1))
-    assert KeyBattleCoverageRule().score([haunter], ctx).value == Fraction(1, 4)
+    assert _score(KeyBattleCoverageRule(), [haunter], ctx).value == Fraction(1, 4)

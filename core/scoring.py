@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from fractions import Fraction
 
 from core.domain import GameContext, PokemonData
-from core.rules.soft import SOFT_RULES
+from core.rules.soft import SOFT_RULES, MemberProfile, Rivals, member_profile
 
 
 @dataclass(frozen=True)
@@ -49,14 +49,52 @@ def canonical_team(team: Iterable[PokemonData]) -> tuple[PokemonData, ...]:
     return tuple(sorted(team, key=lambda p: (p.dex_number, p.slug)))
 
 
-def score_team(team: Iterable[PokemonData], ctx: GameContext) -> TeamScore:
-    """Score ``team`` with the active soft rules, in catalogue order."""
-    members = canonical_team(team)
-    settings = ctx.settings
-    breakdown = []
-    for rule_id in settings.active_soft_rules():
-        result = SOFT_RULES[rule_id].score(members, ctx)
-        breakdown.append(
-            RuleContribution(rule_id, settings.weight(rule_id), result.value, result.penalized)
+class Scorer:
+    """Scores teams of one context, computing each member's profile only once.
+
+    The engine scores many teams built from the same candidates; ``ranking_key`` skips the
+    breakdown, and ``score`` builds it for the teams that are shown.
+    """
+
+    def __init__(self, ctx: GameContext) -> None:
+        settings = ctx.settings
+        self._ctx = ctx
+        self._rivals = Rivals.of(ctx.key_battles)
+        self._rules = tuple(
+            (SOFT_RULES[rule_id], settings.weight(rule_id))
+            for rule_id in settings.active_soft_rules()
         )
-    return TeamScore(tuple(breakdown), sum(1 for m in members if m.is_dual_type))
+        self._profiles: dict[str, MemberProfile] = {}
+
+    def profile(self, pokemon: PokemonData) -> MemberProfile:
+        cached = self._profiles.get(pokemon.slug)
+        if cached is None or cached.pokemon != pokemon:
+            cached = member_profile(pokemon, self._ctx, self._rivals)
+            self._profiles[pokemon.slug] = cached
+        return cached
+
+    def _profiles_of(self, team: Iterable[PokemonData]) -> tuple[MemberProfile, ...]:
+        return tuple(self.profile(member) for member in canonical_team(team))
+
+    def ranking_key(self, team: Iterable[PokemonData]) -> tuple[Fraction, int]:
+        """The same as ``score(team).ranking_key``, without building the breakdown."""
+        profiles = self._profiles_of(team)
+        total = sum(
+            (weight * rule.score(profiles, self._rivals).value for rule, weight in self._rules),
+            Fraction(0),
+        )
+        return total, sum(1 for p in profiles if p.pokemon.is_dual_type)
+
+    def score(self, team: Iterable[PokemonData]) -> TeamScore:
+        """Score ``team`` with the active soft rules, in catalogue order."""
+        profiles = self._profiles_of(team)
+        breakdown = []
+        for rule, weight in self._rules:
+            result = rule.score(profiles, self._rivals)
+            breakdown.append(RuleContribution(rule.rule_id, weight, result.value, result.penalized))
+        return TeamScore(tuple(breakdown), sum(1 for p in profiles if p.pokemon.is_dual_type))
+
+
+def score_team(team: Iterable[PokemonData], ctx: GameContext) -> TeamScore:
+    """Score one team; to score many teams of the same context, use a ``Scorer``."""
+    return Scorer(ctx).score(team)

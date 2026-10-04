@@ -110,7 +110,7 @@ corrige primero en el DDF.
 | RN-07 | Misma línea evolutiva = misma cadena de evolución de PokeAPI. Las formas regionales comparten cadena con la forma base; no afecta a la primera carga, que no tiene formas regionales. |
 | RN-11 | Se puede criar si alguna especie de las etapas tiene un grupo huevo distinto de `no-eggs` y `ditto`. La etapa que nace del huevo es la primera de la línea, salvo los bebés de incienso (CA-36). |
 | RN-12 | Dos miembros chocan si comparten algún tipo en la generación del juego, como primario o como secundario. |
-| RN-13 | Dragonite se identifica por su forma (`dragonite`). El nivel 2 son los candidatos válidos con tipo primario Dragón; el 3, los Pokémon del juego con tipo primario Dragón que no son candidatos válidos. |
+| RN-13 | Dragonite se identifica por su forma (`dragonite`). El nivel 2 son los candidatos válidos con tipo primario Dragón, y el equipo tiene que incluir al menos uno; el 3, los Pokémon del juego con tipo primario Dragón que no son favoritos y pasan los filtros por candidato (CA-40). La presencia no fija un miembro: exige que el equipo contenga uno del conjunto, lo que equivale a ramificar sobre cada uno sin repetir equipos. |
 | RN-14 | Evolución de Eevee = cualquier forma de la cadena de Eevee salvo Eevee. Como restricción entre miembros, dos evoluciones de Eevee chocan; como presencia, el equipo necesita una. |
 | RN-15 | Un miembro es tedioso si lo es alguno de los pasos desde la etapa que nace del huevo hasta él. Tediosos: intercambio, muda (Shedinja), aleatorio, comparación de estadísticas, hora del día, belleza, lugar, equipo, movimiento no aprendido por nivel, otros raros; y cualquier paso imposible en el juego: hora del día sin `day_night_cycle` o belleza sin `contests`. No tediosos: nivel, amistad, objeto y piedras, objeto equipado y sexo (CA-43). Si una pareja de etapas tiene varios métodos, cuenta el más fácil (CA-44). Los métodos sin catalogar y las evoluciones por movimiento sin datos de `level_move` no llegan al motor: bloquean la carga (CA-42, CA-45, CA-47). Un equipo vacío puntúa 1. |
 | RN-16 | Se excluyen las formas de la misma cadena y región que cada miembro de los equipos afectados, salvo la cadena de Dragonite; de la de Eevee, solo la evolución usada. |
@@ -174,7 +174,7 @@ flowchart LR
 | 1 ✅ | `feat/core-dominio` | Modelos de entrada de `core/domain/`, `TypeChart` con el factor contra dos tipos, catálogo de reglas con sus valores por defecto y `RuleSettings`. Nueva página del DDT [Motor de reglas](motor.md). Los modelos de salida (`GenerationResult`) se añaden en las fases que los usan. | Modelos, tabla de tipos (Fantasma contra Psíquico en la 1.ª generación, Agua contra Roca/Tierra ×4) y catálogo. |
 | 2 ✅ | `feat/core-filtros` | `breeding.py`, `journey.py` y los filtros RN-03, RN-11 y RN-16 con su motivo de descarte. Ajustes de los modelos: los grupos huevo pasan a ser de toda la línea (Pichu se puede criar), cada forma lleva su generación (para explicar el nivel de RN-03) y el contexto recibe el *Hall of Fame* en lugar de una lista de exclusiones. | Ejemplos de RN-03, RN-11 y RN-16 del DDF, incluidas las excepciones de Dragonite y Eevee. |
 | 3 ✅ | `feat/core-puntuacion` | `evolution.py`, las reglas blandas RN-06, RN-15, RN-17 y RN-20, la puntuación ponderada con desglose y la clave de RN-19. | Ejemplos de RN-15 (Gengar, Raichu, Milotic), RN-20 (Wurmple) y RN-17 (Brock); suma del desglose. |
-| 4 | `feat/core-busqueda` | Restricciones RN-07, RN-12 y RN-14, niveles de presencia de RN-13 y RN-14, grafo de incompatibilidades, búsqueda con retroceso y `generate` para equipos completos. | Ejemplos de RN-07, RN-12, RN-13 y RN-14; propiedades con hypothesis y fuerza bruta; escenario real de Rojo Fuego. |
+| 4 ✅ | `feat/core-busqueda` | Restricciones RN-07, RN-12 y RN-14, niveles de presencia de RN-13 y RN-14, grafo de incompatibilidades, búsqueda con retroceso y `generate` para equipos completos. | Ejemplos de RN-07, RN-12, RN-13 y RN-14; propiedades con hypothesis y fuerza bruta; escenario real de Rojo Fuego. |
 | 5 | `feat/core-sugerencias` | Equipo incompleto con huecos reservados por las reglas de presencia, sugerencias que pasan los filtros por candidato y ordenadas (RN-08, RN-19, CA-40) y agrupación de empates (CA-33). | Ejemplos de RN-08 (4 candidatos en Rojo Fuego, Dragonite que deja un equipo de 5) y de CA-33 (Lapras o Cloyster). |
 | 6 | `feat/core-revision` | `review.py`: datos inferidos o pendientes que intervienen (RN-18), sin los de favoritos ya descartados con datos automáticos. | Ejemplo de RN-18 (Raichu en Rojo Fuego). |
 
@@ -189,25 +189,25 @@ Se completa en cada fase con el módulo y los tests de cada regla. Detalle de lo
 
 | Regla | Módulo | Fase | Estado |
 |-------|--------|------|--------|
-| RN-01 | `engine/` | 4 | Pendiente |
-| RN-02 | `engine/` | 4 | Pendiente |
+| RN-01 | `engine/` | 4 | Hecho (`engine/test_generate.py`, `test_engine_properties.py`) |
+| RN-02 | `engine/` | 4 | Hecho (`engine/test_generate.py`, `test_engine_properties.py`) |
 | RN-03 | `rules/candidate.py` | 2 | Hecho (`rules/test_candidate.py`) |
 | RN-04 | `rules/catalog.py` (pesos), `scoring.py` | 1, 3 | Hecho (`test_catalog.py`, `test_scoring.py`) |
 | RN-05 | `domain/` | 1 | Hecho (`test_domain.py`) |
 | RN-06 | `rules/soft.py` | 3 | Hecho (`rules/test_soft.py`) |
-| RN-07 | `rules/team.py` | 4 | Pendiente |
+| RN-07 | `rules/team.py` | 4 | Hecho (`rules/test_team.py`, `test_engine_properties.py`) |
 | RN-08 | `engine/suggestions.py` | 5 | Pendiente |
-| RN-09 | `domain/`, `engine/` | 1, 4 | Modelo hecho (`test_domain.py`); uso en el motor pendiente |
+| RN-09 | `domain/`, `engine/` | 1, 4 | Hecho: el motor evalúa la forma de favoritos con sus tipos (`test_domain.py`, `rules/test_team.py`) |
 | RN-10 | `domain/` (`TypeChart`, tipos por generación) | 1 | Hecho (`test_type_chart.py`, `test_domain.py`) |
 | RN-11 | `breeding.py`, `rules/candidate.py` | 2 | Hecho (`test_breeding.py`, `rules/test_candidate.py`) |
-| RN-12 | `rules/team.py` | 4 | Pendiente |
-| RN-13 | `rules/team.py` | 4 | Pendiente |
-| RN-14 | `rules/team.py` | 4 | Pendiente |
+| RN-12 | `rules/team.py` | 4 | Hecho (`rules/test_team.py`, `test_scenario_firered.py`) |
+| RN-13 | `rules/team.py` | 4 | Hecho (`rules/test_team.py`, `engine/test_generate.py`); el hueco reservado del nivel 3, en la fase 5 |
+| RN-14 | `rules/team.py` | 4 | Hecho (`rules/test_team.py`, `engine/test_generate.py`); el hueco reservado del nivel 2, en la fase 5 |
 | RN-15 | `evolution.py`, `rules/soft.py` | 3 | Hecho (`test_evolution.py`, `rules/test_soft.py`, `test_scoring.py`) |
 | RN-16 | `journey.py`, `rules/candidate.py` | 2 | Hecho (`test_journey.py`, `rules/test_candidate.py`) |
 | RN-17 | `rules/soft.py` | 3 | Hecho (`rules/test_soft.py`) |
 | RN-18 | `review.py` | 6 | Pendiente |
-| RN-19 | `scoring.py`, `engine/suggestions.py` | 3, 5 | Clave de los equipos hecha (`test_scoring.py`); sugerencias pendientes |
+| RN-19 | `scoring.py`, `engine/suggestions.py` | 3, 5 | Equipos hechos (`test_scoring.py`, `engine/test_generate.py`); sugerencias pendientes |
 | RN-20 | `evolution.py`, `rules/soft.py` | 3 | Hecho (`test_evolution.py`, `rules/test_soft.py`, `test_scoring.py`) |
 
 ## Riesgos
@@ -215,5 +215,5 @@ Se completa en cada fase con el módulo y los tests de cada regla. Detalle de lo
 | Riesgo | Mitigación |
 |--------|------------|
 | Demasiados equipos empatados para mostrarlos, porque la puntuación depende sobre todo de los tipos. | Desempate RN-19 y agrupación CA-33. El escenario real de Rojo Fuego medirá cuántos grupos salen; si son demasiados, se plantea en el DDF cómo limitarlos. |
-| Búsqueda lenta sin RN-12 y con muchos favoritos (unos 20 s con 120 candidatos). | Con RN-12 activa y los tamaños esperados basta la búsqueda exhaustiva. Si hace falta, ramificación y poda con una cota de la puntuación ([algoritmo](algoritmo-generacion.md#tamano-de-la-busqueda)). |
+| Búsqueda lenta sin RN-12 y con muchos favoritos (unos 20 s con 120 candidatos). | Con RN-12 activa y los tamaños esperados basta la búsqueda exhaustiva: Rojo Fuego con 28 candidatos tarda 0,04 s con las reglas por defecto y 5,6 s sin RN-12 ni reglas de presencia ([rendimiento](motor.md#rendimiento)). Si hace falta, ramificación y poda con una cota de la puntuación ([algoritmo](algoritmo-generacion.md#tamano-de-la-busqueda)). |
 | Interpretaciones de reglas que no coinciden con lo que se quiere. | Están escritas en [esta tabla](#como-se-interpreta-cada-regla) para revisarlas antes de implementar; los tests usan los ejemplos del DDF. |

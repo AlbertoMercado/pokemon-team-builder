@@ -1,0 +1,7177 @@
+{
+ "source": {
+  "game": "firered",
+  "pokeapi": {
+   "commit": "bc92d3b6029ef1abe9e7ad424c400b338f3c11fe"
+  }
+ },
+ "game": {
+  "slug": "firered",
+  "generation": 3,
+  "mechanics": []
+ },
+ "types": [
+  "normal",
+  "fighting",
+  "flying",
+  "poison",
+  "ground",
+  "rock",
+  "bug",
+  "ghost",
+  "steel",
+  "fire",
+  "water",
+  "grass",
+  "electric",
+  "psychic",
+  "ice",
+  "dragon",
+  "dark"
+ ],
+ "type_efficacy": [
+  [
+   "bug",
+   "bug",
+   100
+  ],
+  [
+   "bug",
+   "dark",
+   200
+  ],
+  [
+   "bug",
+   "dragon",
+   100
+  ],
+  [
+   "bug",
+   "electric",
+   100
+  ],
+  [
+   "bug",
+   "fighting",
+   50
+  ],
+  [
+   "bug",
+   "fire",
+   50
+  ],
+  [
+   "bug",
+   "flying",
+   50
+  ],
+  [
+   "bug",
+   "ghost",
+   50
+  ],
+  [
+   "bug",
+   "grass",
+   200
+  ],
+  [
+   "bug",
+   "ground",
+   100
+  ],
+  [
+   "bug",
+   "ice",
+   100
+  ],
+  [
+   "bug",
+   "normal",
+   100
+  ],
+  [
+   "bug",
+   "poison",
+   50
+  ],
+  [
+   "bug",
+   "psychic",
+   200
+  ],
+  [
+   "bug",
+   "rock",
+   100
+  ],
+  [
+   "bug",
+   "steel",
+   50
+  ],
+  [
+   "bug",
+   "water",
+   100
+  ],
+  [
+   "dark",
+   "bug",
+   100
+  ],
+  [
+   "dark",
+   "dark",
+   50
+  ],
+  [
+   "dark",
+   "dragon",
+   100
+  ],
+  [
+   "dark",
+   "electric",
+   100
+  ],
+  [
+   "dark",
+   "fighting",
+   50
+  ],
+  [
+   "dark",
+   "fire",
+   100
+  ],
+  [
+   "dark",
+   "flying",
+   100
+  ],
+  [
+   "dark",
+   "ghost",
+   200
+  ],
+  [
+   "dark",
+   "grass",
+   100
+  ],
+  [
+   "dark",
+   "ground",
+   100
+  ],
+  [
+   "dark",
+   "ice",
+   100
+  ],
+  [
+   "dark",
+   "normal",
+   100
+  ],
+  [
+   "dark",
+   "poison",
+   100
+  ],
+  [
+   "dark",
+   "psychic",
+   200
+  ],
+  [
+   "dark",
+   "rock",
+   100
+  ],
+  [
+   "dark",
+   "steel",
+   50
+  ],
+  [
+   "dark",
+   "water",
+   100
+  ],
+  [
+   "dragon",
+   "bug",
+   100
+  ],
+  [
+   "dragon",
+   "dark",
+   100
+  ],
+  [
+   "dragon",
+   "dragon",
+   200
+  ],
+  [
+   "dragon",
+   "electric",
+   100
+  ],
+  [
+   "dragon",
+   "fighting",
+   100
+  ],
+  [
+   "dragon",
+   "fire",
+   100
+  ],
+  [
+   "dragon",
+   "flying",
+   100
+  ],
+  [
+   "dragon",
+   "ghost",
+   100
+  ],
+  [
+   "dragon",
+   "grass",
+   100
+  ],
+  [
+   "dragon",
+   "ground",
+   100
+  ],
+  [
+   "dragon",
+   "ice",
+   100
+  ],
+  [
+   "dragon",
+   "normal",
+   100
+  ],
+  [
+   "dragon",
+   "poison",
+   100
+  ],
+  [
+   "dragon",
+   "psychic",
+   100
+  ],
+  [
+   "dragon",
+   "rock",
+   100
+  ],
+  [
+   "dragon",
+   "steel",
+   50
+  ],
+  [
+   "dragon",
+   "water",
+   100
+  ],
+  [
+   "electric",
+   "bug",
+   100
+  ],
+  [
+   "electric",
+   "dark",
+   100
+  ],
+  [
+   "electric",
+   "dragon",
+   50
+  ],
+  [
+   "electric",
+   "electric",
+   50
+  ],
+  [
+   "electric",
+   "fighting",
+   100
+  ],
+  [
+   "electric",
+   "fire",
+   100
+  ],
+  [
+   "electric",
+   "flying",
+   200
+  ],
+  [
+   "electric",
+   "ghost",
+   100
+  ],
+  [
+   "electric",
+   "grass",
+   50
+  ],
+  [
+   "electric",
+   "ground",
+   0
+  ],
+  [
+   "electric",
+   "ice",
+   100
+  ],
+  [
+   "electric",
+   "normal",
+   100
+  ],
+  [
+   "electric",
+   "poison",
+   100
+  ],
+  [
+   "electric",
+   "psychic",
+   100
+  ],
+  [
+   "electric",
+   "rock",
+   100
+  ],
+  [
+   "electric",
+   "steel",
+   100
+  ],
+  [
+   "electric",
+   "water",
+   200
+  ],
+  [
+   "fighting",
+   "bug",
+   50
+  ],
+  [
+   "fighting",
+   "dark",
+   200
+  ],
+  [
+   "fighting",
+   "dragon",
+   100
+  ],
+  [
+   "fighting",
+   "electric",
+   100
+  ],
+  [
+   "fighting",
+   "fighting",
+   100
+  ],
+  [
+   "fighting",
+   "fire",
+   100
+  ],
+  [
+   "fighting",
+   "flying",
+   50
+  ],
+  [
+   "fighting",
+   "ghost",
+   0
+  ],
+  [
+   "fighting",
+   "grass",
+   100
+  ],
+  [
+   "fighting",
+   "ground",
+   100
+  ],
+  [
+   "fighting",
+   "ice",
+   200
+  ],
+  [
+   "fighting",
+   "normal",
+   200
+  ],
+  [
+   "fighting",
+   "poison",
+   50
+  ],
+  [
+   "fighting",
+   "psychic",
+   50
+  ],
+  [
+   "fighting",
+   "rock",
+   200
+  ],
+  [
+   "fighting",
+   "steel",
+   200
+  ],
+  [
+   "fighting",
+   "water",
+   100
+  ],
+  [
+   "fire",
+   "bug",
+   200
+  ],
+  [
+   "fire",
+   "dark",
+   100
+  ],
+  [
+   "fire",
+   "dragon",
+   50
+  ],
+  [
+   "fire",
+   "electric",
+   100
+  ],
+  [
+   "fire",
+   "fighting",
+   100
+  ],
+  [
+   "fire",
+   "fire",
+   50
+  ],
+  [
+   "fire",
+   "flying",
+   100
+  ],
+  [
+   "fire",
+   "ghost",
+   100
+  ],
+  [
+   "fire",
+   "grass",
+   200
+  ],
+  [
+   "fire",
+   "ground",
+   100
+  ],
+  [
+   "fire",
+   "ice",
+   200
+  ],
+  [
+   "fire",
+   "normal",
+   100
+  ],
+  [
+   "fire",
+   "poison",
+   100
+  ],
+  [
+   "fire",
+   "psychic",
+   100
+  ],
+  [
+   "fire",
+   "rock",
+   50
+  ],
+  [
+   "fire",
+   "steel",
+   200
+  ],
+  [
+   "fire",
+   "water",
+   50
+  ],
+  [
+   "flying",
+   "bug",
+   200
+  ],
+  [
+   "flying",
+   "dark",
+   100
+  ],
+  [
+   "flying",
+   "dragon",
+   100
+  ],
+  [
+   "flying",
+   "electric",
+   50
+  ],
+  [
+   "flying",
+   "fighting",
+   200
+  ],
+  [
+   "flying",
+   "fire",
+   100
+  ],
+  [
+   "flying",
+   "flying",
+   100
+  ],
+  [
+   "flying",
+   "ghost",
+   100
+  ],
+  [
+   "flying",
+   "grass",
+   200
+  ],
+  [
+   "flying",
+   "ground",
+   100
+  ],
+  [
+   "flying",
+   "ice",
+   100
+  ],
+  [
+   "flying",
+   "normal",
+   100
+  ],
+  [
+   "flying",
+   "poison",
+   100
+  ],
+  [
+   "flying",
+   "psychic",
+   100
+  ],
+  [
+   "flying",
+   "rock",
+   50
+  ],
+  [
+   "flying",
+   "steel",
+   50
+  ],
+  [
+   "flying",
+   "water",
+   100
+  ],
+  [
+   "ghost",
+   "bug",
+   100
+  ],
+  [
+   "ghost",
+   "dark",
+   50
+  ],
+  [
+   "ghost",
+   "dragon",
+   100
+  ],
+  [
+   "ghost",
+   "electric",
+   100
+  ],
+  [
+   "ghost",
+   "fighting",
+   100
+  ],
+  [
+   "ghost",
+   "fire",
+   100
+  ],
+  [
+   "ghost",
+   "flying",
+   100
+  ],
+  [
+   "ghost",
+   "ghost",
+   200
+  ],
+  [
+   "ghost",
+   "grass",
+   100
+  ],
+  [
+   "ghost",
+   "ground",
+   100
+  ],
+  [
+   "ghost",
+   "ice",
+   100
+  ],
+  [
+   "ghost",
+   "normal",
+   0
+  ],
+  [
+   "ghost",
+   "poison",
+   100
+  ],
+  [
+   "ghost",
+   "psychic",
+   200
+  ],
+  [
+   "ghost",
+   "rock",
+   100
+  ],
+  [
+   "ghost",
+   "steel",
+   50
+  ],
+  [
+   "ghost",
+   "water",
+   100
+  ],
+  [
+   "grass",
+   "bug",
+   50
+  ],
+  [
+   "grass",
+   "dark",
+   100
+  ],
+  [
+   "grass",
+   "dragon",
+   50
+  ],
+  [
+   "grass",
+   "electric",
+   100
+  ],
+  [
+   "grass",
+   "fighting",
+   100
+  ],
+  [
+   "grass",
+   "fire",
+   50
+  ],
+  [
+   "grass",
+   "flying",
+   50
+  ],
+  [
+   "grass",
+   "ghost",
+   100
+  ],
+  [
+   "grass",
+   "grass",
+   50
+  ],
+  [
+   "grass",
+   "ground",
+   200
+  ],
+  [
+   "grass",
+   "ice",
+   100
+  ],
+  [
+   "grass",
+   "normal",
+   100
+  ],
+  [
+   "grass",
+   "poison",
+   50
+  ],
+  [
+   "grass",
+   "psychic",
+   100
+  ],
+  [
+   "grass",
+   "rock",
+   200
+  ],
+  [
+   "grass",
+   "steel",
+   50
+  ],
+  [
+   "grass",
+   "water",
+   200
+  ],
+  [
+   "ground",
+   "bug",
+   50
+  ],
+  [
+   "ground",
+   "dark",
+   100
+  ],
+  [
+   "ground",
+   "dragon",
+   100
+  ],
+  [
+   "ground",
+   "electric",
+   200
+  ],
+  [
+   "ground",
+   "fighting",
+   100
+  ],
+  [
+   "ground",
+   "fire",
+   200
+  ],
+  [
+   "ground",
+   "flying",
+   0
+  ],
+  [
+   "ground",
+   "ghost",
+   100
+  ],
+  [
+   "ground",
+   "grass",
+   50
+  ],
+  [
+   "ground",
+   "ground",
+   100
+  ],
+  [
+   "ground",
+   "ice",
+   100
+  ],
+  [
+   "ground",
+   "normal",
+   100
+  ],
+  [
+   "ground",
+   "poison",
+   200
+  ],
+  [
+   "ground",
+   "psychic",
+   100
+  ],
+  [
+   "ground",
+   "rock",
+   200
+  ],
+  [
+   "ground",
+   "steel",
+   200
+  ],
+  [
+   "ground",
+   "water",
+   100
+  ],
+  [
+   "ice",
+   "bug",
+   100
+  ],
+  [
+   "ice",
+   "dark",
+   100
+  ],
+  [
+   "ice",
+   "dragon",
+   200
+  ],
+  [
+   "ice",
+   "electric",
+   100
+  ],
+  [
+   "ice",
+   "fighting",
+   100
+  ],
+  [
+   "ice",
+   "fire",
+   50
+  ],
+  [
+   "ice",
+   "flying",
+   200
+  ],
+  [
+   "ice",
+   "ghost",
+   100
+  ],
+  [
+   "ice",
+   "grass",
+   200
+  ],
+  [
+   "ice",
+   "ground",
+   200
+  ],
+  [
+   "ice",
+   "ice",
+   50
+  ],
+  [
+   "ice",
+   "normal",
+   100
+  ],
+  [
+   "ice",
+   "poison",
+   100
+  ],
+  [
+   "ice",
+   "psychic",
+   100
+  ],
+  [
+   "ice",
+   "rock",
+   100
+  ],
+  [
+   "ice",
+   "steel",
+   50
+  ],
+  [
+   "ice",
+   "water",
+   50
+  ],
+  [
+   "normal",
+   "bug",
+   100
+  ],
+  [
+   "normal",
+   "dark",
+   100
+  ],
+  [
+   "normal",
+   "dragon",
+   100
+  ],
+  [
+   "normal",
+   "electric",
+   100
+  ],
+  [
+   "normal",
+   "fighting",
+   100
+  ],
+  [
+   "normal",
+   "fire",
+   100
+  ],
+  [
+   "normal",
+   "flying",
+   100
+  ],
+  [
+   "normal",
+   "ghost",
+   0
+  ],
+  [
+   "normal",
+   "grass",
+   100
+  ],
+  [
+   "normal",
+   "ground",
+   100
+  ],
+  [
+   "normal",
+   "ice",
+   100
+  ],
+  [
+   "normal",
+   "normal",
+   100
+  ],
+  [
+   "normal",
+   "poison",
+   100
+  ],
+  [
+   "normal",
+   "psychic",
+   100
+  ],
+  [
+   "normal",
+   "rock",
+   50
+  ],
+  [
+   "normal",
+   "steel",
+   50
+  ],
+  [
+   "normal",
+   "water",
+   100
+  ],
+  [
+   "poison",
+   "bug",
+   100
+  ],
+  [
+   "poison",
+   "dark",
+   100
+  ],
+  [
+   "poison",
+   "dragon",
+   100
+  ],
+  [
+   "poison",
+   "electric",
+   100
+  ],
+  [
+   "poison",
+   "fighting",
+   100
+  ],
+  [
+   "poison",
+   "fire",
+   100
+  ],
+  [
+   "poison",
+   "flying",
+   100
+  ],
+  [
+   "poison",
+   "ghost",
+   50
+  ],
+  [
+   "poison",
+   "grass",
+   200
+  ],
+  [
+   "poison",
+   "ground",
+   50
+  ],
+  [
+   "poison",
+   "ice",
+   100
+  ],
+  [
+   "poison",
+   "normal",
+   100
+  ],
+  [
+   "poison",
+   "poison",
+   50
+  ],
+  [
+   "poison",
+   "psychic",
+   100
+  ],
+  [
+   "poison",
+   "rock",
+   50
+  ],
+  [
+   "poison",
+   "steel",
+   0
+  ],
+  [
+   "poison",
+   "water",
+   100
+  ],
+  [
+   "psychic",
+   "bug",
+   100
+  ],
+  [
+   "psychic",
+   "dark",
+   0
+  ],
+  [
+   "psychic",
+   "dragon",
+   100
+  ],
+  [
+   "psychic",
+   "electric",
+   100
+  ],
+  [
+   "psychic",
+   "fighting",
+   200
+  ],
+  [
+   "psychic",
+   "fire",
+   100
+  ],
+  [
+   "psychic",
+   "flying",
+   100
+  ],
+  [
+   "psychic",
+   "ghost",
+   100
+  ],
+  [
+   "psychic",
+   "grass",
+   100
+  ],
+  [
+   "psychic",
+   "ground",
+   100
+  ],
+  [
+   "psychic",
+   "ice",
+   100
+  ],
+  [
+   "psychic",
+   "normal",
+   100
+  ],
+  [
+   "psychic",
+   "poison",
+   200
+  ],
+  [
+   "psychic",
+   "psychic",
+   50
+  ],
+  [
+   "psychic",
+   "rock",
+   100
+  ],
+  [
+   "psychic",
+   "steel",
+   50
+  ],
+  [
+   "psychic",
+   "water",
+   100
+  ],
+  [
+   "rock",
+   "bug",
+   200
+  ],
+  [
+   "rock",
+   "dark",
+   100
+  ],
+  [
+   "rock",
+   "dragon",
+   100
+  ],
+  [
+   "rock",
+   "electric",
+   100
+  ],
+  [
+   "rock",
+   "fighting",
+   50
+  ],
+  [
+   "rock",
+   "fire",
+   200
+  ],
+  [
+   "rock",
+   "flying",
+   200
+  ],
+  [
+   "rock",
+   "ghost",
+   100
+  ],
+  [
+   "rock",
+   "grass",
+   100
+  ],
+  [
+   "rock",
+   "ground",
+   50
+  ],
+  [
+   "rock",
+   "ice",
+   200
+  ],
+  [
+   "rock",
+   "normal",
+   100
+  ],
+  [
+   "rock",
+   "poison",
+   100
+  ],
+  [
+   "rock",
+   "psychic",
+   100
+  ],
+  [
+   "rock",
+   "rock",
+   100
+  ],
+  [
+   "rock",
+   "steel",
+   50
+  ],
+  [
+   "rock",
+   "water",
+   100
+  ],
+  [
+   "steel",
+   "bug",
+   100
+  ],
+  [
+   "steel",
+   "dark",
+   100
+  ],
+  [
+   "steel",
+   "dragon",
+   100
+  ],
+  [
+   "steel",
+   "electric",
+   50
+  ],
+  [
+   "steel",
+   "fighting",
+   100
+  ],
+  [
+   "steel",
+   "fire",
+   50
+  ],
+  [
+   "steel",
+   "flying",
+   100
+  ],
+  [
+   "steel",
+   "ghost",
+   100
+  ],
+  [
+   "steel",
+   "grass",
+   100
+  ],
+  [
+   "steel",
+   "ground",
+   100
+  ],
+  [
+   "steel",
+   "ice",
+   200
+  ],
+  [
+   "steel",
+   "normal",
+   100
+  ],
+  [
+   "steel",
+   "poison",
+   100
+  ],
+  [
+   "steel",
+   "psychic",
+   100
+  ],
+  [
+   "steel",
+   "rock",
+   200
+  ],
+  [
+   "steel",
+   "steel",
+   50
+  ],
+  [
+   "steel",
+   "water",
+   50
+  ],
+  [
+   "water",
+   "bug",
+   100
+  ],
+  [
+   "water",
+   "dark",
+   100
+  ],
+  [
+   "water",
+   "dragon",
+   50
+  ],
+  [
+   "water",
+   "electric",
+   100
+  ],
+  [
+   "water",
+   "fighting",
+   100
+  ],
+  [
+   "water",
+   "fire",
+   200
+  ],
+  [
+   "water",
+   "flying",
+   100
+  ],
+  [
+   "water",
+   "ghost",
+   100
+  ],
+  [
+   "water",
+   "grass",
+   50
+  ],
+  [
+   "water",
+   "ground",
+   200
+  ],
+  [
+   "water",
+   "ice",
+   100
+  ],
+  [
+   "water",
+   "normal",
+   100
+  ],
+  [
+   "water",
+   "poison",
+   100
+  ],
+  [
+   "water",
+   "psychic",
+   100
+  ],
+  [
+   "water",
+   "rock",
+   200
+  ],
+  [
+   "water",
+   "steel",
+   100
+  ],
+  [
+   "water",
+   "water",
+   50
+  ]
+ ],
+ "pokemon": [
+  {
+   "slug": "bulbasaur",
+   "species": "bulbasaur",
+   "name": "Bulbasaur",
+   "dex_number": 1,
+   "generation": 1,
+   "types": [
+    "grass",
+    "poison"
+   ],
+   "evolution_chain": 1,
+   "stages": [
+    {
+     "pokemon": "bulbasaur",
+     "species": "bulbasaur",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster",
+    "plant"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "ivysaur",
+   "species": "ivysaur",
+   "name": "Ivysaur",
+   "dex_number": 2,
+   "generation": 1,
+   "types": [
+    "grass",
+    "poison"
+   ],
+   "evolution_chain": 1,
+   "stages": [
+    {
+     "pokemon": "bulbasaur",
+     "species": "bulbasaur",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "ivysaur",
+     "species": "ivysaur",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster",
+    "plant"
+   ],
+   "evolution_steps": [
+    {
+     "from": "bulbasaur",
+     "to": "ivysaur",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "venusaur",
+   "species": "venusaur",
+   "name": "Venusaur",
+   "dex_number": 3,
+   "generation": 1,
+   "types": [
+    "grass",
+    "poison"
+   ],
+   "evolution_chain": 1,
+   "stages": [
+    {
+     "pokemon": "bulbasaur",
+     "species": "bulbasaur",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "ivysaur",
+     "species": "ivysaur",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "venusaur",
+     "species": "venusaur",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster",
+    "plant"
+   ],
+   "evolution_steps": [
+    {
+     "from": "bulbasaur",
+     "to": "ivysaur",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    },
+    {
+     "from": "ivysaur",
+     "to": "venusaur",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 32
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "charmander",
+   "species": "charmander",
+   "name": "Charmander",
+   "dex_number": 4,
+   "generation": 1,
+   "types": [
+    "fire"
+   ],
+   "evolution_chain": 2,
+   "stages": [
+    {
+     "pokemon": "charmander",
+     "species": "charmander",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "monster"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "charmeleon",
+   "species": "charmeleon",
+   "name": "Charmeleon",
+   "dex_number": 5,
+   "generation": 1,
+   "types": [
+    "fire"
+   ],
+   "evolution_chain": 2,
+   "stages": [
+    {
+     "pokemon": "charmander",
+     "species": "charmander",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "charmeleon",
+     "species": "charmeleon",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "monster"
+   ],
+   "evolution_steps": [
+    {
+     "from": "charmander",
+     "to": "charmeleon",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "charizard",
+   "species": "charizard",
+   "name": "Charizard",
+   "dex_number": 6,
+   "generation": 1,
+   "types": [
+    "fire",
+    "flying"
+   ],
+   "evolution_chain": 2,
+   "stages": [
+    {
+     "pokemon": "charmander",
+     "species": "charmander",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "charmeleon",
+     "species": "charmeleon",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "charizard",
+     "species": "charizard",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "monster"
+   ],
+   "evolution_steps": [
+    {
+     "from": "charmander",
+     "to": "charmeleon",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    },
+    {
+     "from": "charmeleon",
+     "to": "charizard",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 36
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "squirtle",
+   "species": "squirtle",
+   "name": "Squirtle",
+   "dex_number": 7,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 3,
+   "stages": [
+    {
+     "pokemon": "squirtle",
+     "species": "squirtle",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster",
+    "water1"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "wartortle",
+   "species": "wartortle",
+   "name": "Wartortle",
+   "dex_number": 8,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 3,
+   "stages": [
+    {
+     "pokemon": "squirtle",
+     "species": "squirtle",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "wartortle",
+     "species": "wartortle",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster",
+    "water1"
+   ],
+   "evolution_steps": [
+    {
+     "from": "squirtle",
+     "to": "wartortle",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "blastoise",
+   "species": "blastoise",
+   "name": "Blastoise",
+   "dex_number": 9,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 3,
+   "stages": [
+    {
+     "pokemon": "squirtle",
+     "species": "squirtle",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "wartortle",
+     "species": "wartortle",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "blastoise",
+     "species": "blastoise",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster",
+    "water1"
+   ],
+   "evolution_steps": [
+    {
+     "from": "squirtle",
+     "to": "wartortle",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    },
+    {
+     "from": "wartortle",
+     "to": "blastoise",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 36
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "caterpie",
+   "species": "caterpie",
+   "name": "Caterpie",
+   "dex_number": 10,
+   "generation": 1,
+   "types": [
+    "bug"
+   ],
+   "evolution_chain": 4,
+   "stages": [
+    {
+     "pokemon": "caterpie",
+     "species": "caterpie",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "metapod",
+   "species": "metapod",
+   "name": "Metapod",
+   "dex_number": 11,
+   "generation": 1,
+   "types": [
+    "bug"
+   ],
+   "evolution_chain": 4,
+   "stages": [
+    {
+     "pokemon": "caterpie",
+     "species": "caterpie",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "metapod",
+     "species": "metapod",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug"
+   ],
+   "evolution_steps": [
+    {
+     "from": "caterpie",
+     "to": "metapod",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 7
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "butterfree",
+   "species": "butterfree",
+   "name": "Butterfree",
+   "dex_number": 12,
+   "generation": 1,
+   "types": [
+    "bug",
+    "flying"
+   ],
+   "evolution_chain": 4,
+   "stages": [
+    {
+     "pokemon": "caterpie",
+     "species": "caterpie",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "metapod",
+     "species": "metapod",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "butterfree",
+     "species": "butterfree",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug"
+   ],
+   "evolution_steps": [
+    {
+     "from": "caterpie",
+     "to": "metapod",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 7
+     }
+    },
+    {
+     "from": "metapod",
+     "to": "butterfree",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 10
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "weedle",
+   "species": "weedle",
+   "name": "Weedle",
+   "dex_number": 13,
+   "generation": 1,
+   "types": [
+    "bug",
+    "poison"
+   ],
+   "evolution_chain": 5,
+   "stages": [
+    {
+     "pokemon": "weedle",
+     "species": "weedle",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "kakuna",
+   "species": "kakuna",
+   "name": "Kakuna",
+   "dex_number": 14,
+   "generation": 1,
+   "types": [
+    "bug",
+    "poison"
+   ],
+   "evolution_chain": 5,
+   "stages": [
+    {
+     "pokemon": "weedle",
+     "species": "weedle",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "kakuna",
+     "species": "kakuna",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug"
+   ],
+   "evolution_steps": [
+    {
+     "from": "weedle",
+     "to": "kakuna",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 7
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "beedrill",
+   "species": "beedrill",
+   "name": "Beedrill",
+   "dex_number": 15,
+   "generation": 1,
+   "types": [
+    "bug",
+    "poison"
+   ],
+   "evolution_chain": 5,
+   "stages": [
+    {
+     "pokemon": "weedle",
+     "species": "weedle",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "kakuna",
+     "species": "kakuna",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "beedrill",
+     "species": "beedrill",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug"
+   ],
+   "evolution_steps": [
+    {
+     "from": "weedle",
+     "to": "kakuna",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 7
+     }
+    },
+    {
+     "from": "kakuna",
+     "to": "beedrill",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 10
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "pidgey",
+   "species": "pidgey",
+   "name": "Pidgey",
+   "dex_number": 16,
+   "generation": 1,
+   "types": [
+    "normal",
+    "flying"
+   ],
+   "evolution_chain": 6,
+   "stages": [
+    {
+     "pokemon": "pidgey",
+     "species": "pidgey",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "pidgeotto",
+   "species": "pidgeotto",
+   "name": "Pidgeotto",
+   "dex_number": 17,
+   "generation": 1,
+   "types": [
+    "normal",
+    "flying"
+   ],
+   "evolution_chain": 6,
+   "stages": [
+    {
+     "pokemon": "pidgey",
+     "species": "pidgey",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "pidgeotto",
+     "species": "pidgeotto",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying"
+   ],
+   "evolution_steps": [
+    {
+     "from": "pidgey",
+     "to": "pidgeotto",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 18
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "pidgeot",
+   "species": "pidgeot",
+   "name": "Pidgeot",
+   "dex_number": 18,
+   "generation": 1,
+   "types": [
+    "normal",
+    "flying"
+   ],
+   "evolution_chain": 6,
+   "stages": [
+    {
+     "pokemon": "pidgey",
+     "species": "pidgey",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "pidgeotto",
+     "species": "pidgeotto",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "pidgeot",
+     "species": "pidgeot",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying"
+   ],
+   "evolution_steps": [
+    {
+     "from": "pidgey",
+     "to": "pidgeotto",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 18
+     }
+    },
+    {
+     "from": "pidgeotto",
+     "to": "pidgeot",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 36
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "rattata",
+   "species": "rattata",
+   "name": "Rattata",
+   "dex_number": 19,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 7,
+   "stages": [
+    {
+     "pokemon": "rattata",
+     "species": "rattata",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "raticate",
+   "species": "raticate",
+   "name": "Raticate",
+   "dex_number": 20,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 7,
+   "stages": [
+    {
+     "pokemon": "rattata",
+     "species": "rattata",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "raticate",
+     "species": "raticate",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "rattata",
+     "to": "raticate",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 20
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "spearow",
+   "species": "spearow",
+   "name": "Spearow",
+   "dex_number": 21,
+   "generation": 1,
+   "types": [
+    "normal",
+    "flying"
+   ],
+   "evolution_chain": 8,
+   "stages": [
+    {
+     "pokemon": "spearow",
+     "species": "spearow",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "fearow",
+   "species": "fearow",
+   "name": "Fearow",
+   "dex_number": 22,
+   "generation": 1,
+   "types": [
+    "normal",
+    "flying"
+   ],
+   "evolution_chain": 8,
+   "stages": [
+    {
+     "pokemon": "spearow",
+     "species": "spearow",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "fearow",
+     "species": "fearow",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying"
+   ],
+   "evolution_steps": [
+    {
+     "from": "spearow",
+     "to": "fearow",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 20
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "ekans",
+   "species": "ekans",
+   "name": "Ekans",
+   "dex_number": 23,
+   "generation": 1,
+   "types": [
+    "poison"
+   ],
+   "evolution_chain": 9,
+   "stages": [
+    {
+     "pokemon": "ekans",
+     "species": "ekans",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "arbok",
+   "species": "arbok",
+   "name": "Arbok",
+   "dex_number": 24,
+   "generation": 1,
+   "types": [
+    "poison"
+   ],
+   "evolution_chain": 9,
+   "stages": [
+    {
+     "pokemon": "ekans",
+     "species": "ekans",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "arbok",
+     "species": "arbok",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "ekans",
+     "to": "arbok",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 22
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "sandshrew",
+   "species": "sandshrew",
+   "name": "Sandshrew",
+   "dex_number": 27,
+   "generation": 1,
+   "types": [
+    "ground"
+   ],
+   "evolution_chain": 11,
+   "stages": [
+    {
+     "pokemon": "sandshrew",
+     "species": "sandshrew",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "sandslash",
+   "species": "sandslash",
+   "name": "Sandslash",
+   "dex_number": 28,
+   "generation": 1,
+   "types": [
+    "ground"
+   ],
+   "evolution_chain": 11,
+   "stages": [
+    {
+     "pokemon": "sandshrew",
+     "species": "sandshrew",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "sandslash",
+     "species": "sandslash",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "sandshrew",
+     "to": "sandslash",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 22
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "nidoran-f",
+   "species": "nidoran-f",
+   "name": "Nidoran♀",
+   "dex_number": 29,
+   "generation": 1,
+   "types": [
+    "poison"
+   ],
+   "evolution_chain": 12,
+   "stages": [
+    {
+     "pokemon": "nidoran-f",
+     "species": "nidoran-f",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "monster",
+    "no-eggs"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "nidorina",
+   "species": "nidorina",
+   "name": "Nidorina",
+   "dex_number": 30,
+   "generation": 1,
+   "types": [
+    "poison"
+   ],
+   "evolution_chain": 12,
+   "stages": [
+    {
+     "pokemon": "nidoran-f",
+     "species": "nidoran-f",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "nidorina",
+     "species": "nidorina",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "monster",
+    "no-eggs"
+   ],
+   "evolution_steps": [
+    {
+     "from": "nidoran-f",
+     "to": "nidorina",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "nidoqueen",
+   "species": "nidoqueen",
+   "name": "Nidoqueen",
+   "dex_number": 31,
+   "generation": 1,
+   "types": [
+    "poison",
+    "ground"
+   ],
+   "evolution_chain": 12,
+   "stages": [
+    {
+     "pokemon": "nidoran-f",
+     "species": "nidoran-f",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "nidorina",
+     "species": "nidorina",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "nidoqueen",
+     "species": "nidoqueen",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "monster",
+    "no-eggs"
+   ],
+   "evolution_steps": [
+    {
+     "from": "nidoran-f",
+     "to": "nidorina",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    },
+    {
+     "from": "nidorina",
+     "to": "nidoqueen",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "moon-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "nidoran-m",
+   "species": "nidoran-m",
+   "name": "Nidoran♂",
+   "dex_number": 32,
+   "generation": 1,
+   "types": [
+    "poison"
+   ],
+   "evolution_chain": 13,
+   "stages": [
+    {
+     "pokemon": "nidoran-m",
+     "species": "nidoran-m",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "monster"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "nidorino",
+   "species": "nidorino",
+   "name": "Nidorino",
+   "dex_number": 33,
+   "generation": 1,
+   "types": [
+    "poison"
+   ],
+   "evolution_chain": 13,
+   "stages": [
+    {
+     "pokemon": "nidoran-m",
+     "species": "nidoran-m",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "nidorino",
+     "species": "nidorino",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "monster"
+   ],
+   "evolution_steps": [
+    {
+     "from": "nidoran-m",
+     "to": "nidorino",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "nidoking",
+   "species": "nidoking",
+   "name": "Nidoking",
+   "dex_number": 34,
+   "generation": 1,
+   "types": [
+    "poison",
+    "ground"
+   ],
+   "evolution_chain": 13,
+   "stages": [
+    {
+     "pokemon": "nidoran-m",
+     "species": "nidoran-m",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "nidorino",
+     "species": "nidorino",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "nidoking",
+     "species": "nidoking",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "monster"
+   ],
+   "evolution_steps": [
+    {
+     "from": "nidoran-m",
+     "to": "nidorino",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    },
+    {
+     "from": "nidorino",
+     "to": "nidoking",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "moon-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "vulpix",
+   "species": "vulpix",
+   "name": "Vulpix",
+   "dex_number": 37,
+   "generation": 1,
+   "types": [
+    "fire"
+   ],
+   "evolution_chain": 15,
+   "stages": [
+    {
+     "pokemon": "vulpix",
+     "species": "vulpix",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "ninetales",
+   "species": "ninetales",
+   "name": "Ninetales",
+   "dex_number": 38,
+   "generation": 1,
+   "types": [
+    "fire"
+   ],
+   "evolution_chain": 15,
+   "stages": [
+    {
+     "pokemon": "vulpix",
+     "species": "vulpix",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "ninetales",
+     "species": "ninetales",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "vulpix",
+     "to": "ninetales",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "fire-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "zubat",
+   "species": "zubat",
+   "name": "Zubat",
+   "dex_number": 41,
+   "generation": 1,
+   "types": [
+    "poison",
+    "flying"
+   ],
+   "evolution_chain": 17,
+   "stages": [
+    {
+     "pokemon": "zubat",
+     "species": "zubat",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "golbat",
+   "species": "golbat",
+   "name": "Golbat",
+   "dex_number": 42,
+   "generation": 1,
+   "types": [
+    "poison",
+    "flying"
+   ],
+   "evolution_chain": 17,
+   "stages": [
+    {
+     "pokemon": "zubat",
+     "species": "zubat",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "golbat",
+     "species": "golbat",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying"
+   ],
+   "evolution_steps": [
+    {
+     "from": "zubat",
+     "to": "golbat",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 22
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "oddish",
+   "species": "oddish",
+   "name": "Oddish",
+   "dex_number": 43,
+   "generation": 1,
+   "types": [
+    "grass",
+    "poison"
+   ],
+   "evolution_chain": 18,
+   "stages": [
+    {
+     "pokemon": "oddish",
+     "species": "oddish",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "plant"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "gloom",
+   "species": "gloom",
+   "name": "Gloom",
+   "dex_number": 44,
+   "generation": 1,
+   "types": [
+    "grass",
+    "poison"
+   ],
+   "evolution_chain": 18,
+   "stages": [
+    {
+     "pokemon": "oddish",
+     "species": "oddish",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "gloom",
+     "species": "gloom",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "plant"
+   ],
+   "evolution_steps": [
+    {
+     "from": "oddish",
+     "to": "gloom",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 21
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "vileplume",
+   "species": "vileplume",
+   "name": "Vileplume",
+   "dex_number": 45,
+   "generation": 1,
+   "types": [
+    "grass",
+    "poison"
+   ],
+   "evolution_chain": 18,
+   "stages": [
+    {
+     "pokemon": "oddish",
+     "species": "oddish",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "gloom",
+     "species": "gloom",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "vileplume",
+     "species": "vileplume",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "plant"
+   ],
+   "evolution_steps": [
+    {
+     "from": "oddish",
+     "to": "gloom",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 21
+     }
+    },
+    {
+     "from": "gloom",
+     "to": "vileplume",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "leaf-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "paras",
+   "species": "paras",
+   "name": "Paras",
+   "dex_number": 46,
+   "generation": 1,
+   "types": [
+    "bug",
+    "grass"
+   ],
+   "evolution_chain": 19,
+   "stages": [
+    {
+     "pokemon": "paras",
+     "species": "paras",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug",
+    "plant"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "parasect",
+   "species": "parasect",
+   "name": "Parasect",
+   "dex_number": 47,
+   "generation": 1,
+   "types": [
+    "bug",
+    "grass"
+   ],
+   "evolution_chain": 19,
+   "stages": [
+    {
+     "pokemon": "paras",
+     "species": "paras",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "parasect",
+     "species": "parasect",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug",
+    "plant"
+   ],
+   "evolution_steps": [
+    {
+     "from": "paras",
+     "to": "parasect",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 24
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "venonat",
+   "species": "venonat",
+   "name": "Venonat",
+   "dex_number": 48,
+   "generation": 1,
+   "types": [
+    "bug",
+    "poison"
+   ],
+   "evolution_chain": 20,
+   "stages": [
+    {
+     "pokemon": "venonat",
+     "species": "venonat",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "venomoth",
+   "species": "venomoth",
+   "name": "Venomoth",
+   "dex_number": 49,
+   "generation": 1,
+   "types": [
+    "bug",
+    "poison"
+   ],
+   "evolution_chain": 20,
+   "stages": [
+    {
+     "pokemon": "venonat",
+     "species": "venonat",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "venomoth",
+     "species": "venomoth",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug"
+   ],
+   "evolution_steps": [
+    {
+     "from": "venonat",
+     "to": "venomoth",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 31
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "diglett",
+   "species": "diglett",
+   "name": "Diglett",
+   "dex_number": 50,
+   "generation": 1,
+   "types": [
+    "ground"
+   ],
+   "evolution_chain": 21,
+   "stages": [
+    {
+     "pokemon": "diglett",
+     "species": "diglett",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "dugtrio",
+   "species": "dugtrio",
+   "name": "Dugtrio",
+   "dex_number": 51,
+   "generation": 1,
+   "types": [
+    "ground"
+   ],
+   "evolution_chain": 21,
+   "stages": [
+    {
+     "pokemon": "diglett",
+     "species": "diglett",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "dugtrio",
+     "species": "dugtrio",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "diglett",
+     "to": "dugtrio",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 26
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "meowth",
+   "species": "meowth",
+   "name": "Meowth",
+   "dex_number": 52,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 22,
+   "stages": [
+    {
+     "pokemon": "meowth",
+     "species": "meowth",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "persian",
+   "species": "persian",
+   "name": "Persian",
+   "dex_number": 53,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 22,
+   "stages": [
+    {
+     "pokemon": "meowth",
+     "species": "meowth",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "persian",
+     "species": "persian",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "meowth",
+     "to": "persian",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 28
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "psyduck",
+   "species": "psyduck",
+   "name": "Psyduck",
+   "dex_number": 54,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 23,
+   "stages": [
+    {
+     "pokemon": "psyduck",
+     "species": "psyduck",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "water1"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "golduck",
+   "species": "golduck",
+   "name": "Golduck",
+   "dex_number": 55,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 23,
+   "stages": [
+    {
+     "pokemon": "psyduck",
+     "species": "psyduck",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "golduck",
+     "species": "golduck",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "water1"
+   ],
+   "evolution_steps": [
+    {
+     "from": "psyduck",
+     "to": "golduck",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 33
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "mankey",
+   "species": "mankey",
+   "name": "Mankey",
+   "dex_number": 56,
+   "generation": 1,
+   "types": [
+    "fighting"
+   ],
+   "evolution_chain": 24,
+   "stages": [
+    {
+     "pokemon": "mankey",
+     "species": "mankey",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "primeape",
+   "species": "primeape",
+   "name": "Primeape",
+   "dex_number": 57,
+   "generation": 1,
+   "types": [
+    "fighting"
+   ],
+   "evolution_chain": 24,
+   "stages": [
+    {
+     "pokemon": "mankey",
+     "species": "mankey",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "primeape",
+     "species": "primeape",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "mankey",
+     "to": "primeape",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 28
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "growlithe",
+   "species": "growlithe",
+   "name": "Growlithe",
+   "dex_number": 58,
+   "generation": 1,
+   "types": [
+    "fire"
+   ],
+   "evolution_chain": 25,
+   "stages": [
+    {
+     "pokemon": "growlithe",
+     "species": "growlithe",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "arcanine",
+   "species": "arcanine",
+   "name": "Arcanine",
+   "dex_number": 59,
+   "generation": 1,
+   "types": [
+    "fire"
+   ],
+   "evolution_chain": 25,
+   "stages": [
+    {
+     "pokemon": "growlithe",
+     "species": "growlithe",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "arcanine",
+     "species": "arcanine",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "growlithe",
+     "to": "arcanine",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "fire-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "poliwag",
+   "species": "poliwag",
+   "name": "Poliwag",
+   "dex_number": 60,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 26,
+   "stages": [
+    {
+     "pokemon": "poliwag",
+     "species": "poliwag",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water1"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "poliwhirl",
+   "species": "poliwhirl",
+   "name": "Poliwhirl",
+   "dex_number": 61,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 26,
+   "stages": [
+    {
+     "pokemon": "poliwag",
+     "species": "poliwag",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "poliwhirl",
+     "species": "poliwhirl",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water1"
+   ],
+   "evolution_steps": [
+    {
+     "from": "poliwag",
+     "to": "poliwhirl",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 25
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "poliwrath",
+   "species": "poliwrath",
+   "name": "Poliwrath",
+   "dex_number": 62,
+   "generation": 1,
+   "types": [
+    "water",
+    "fighting"
+   ],
+   "evolution_chain": 26,
+   "stages": [
+    {
+     "pokemon": "poliwag",
+     "species": "poliwag",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "poliwhirl",
+     "species": "poliwhirl",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "poliwrath",
+     "species": "poliwrath",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water1"
+   ],
+   "evolution_steps": [
+    {
+     "from": "poliwag",
+     "to": "poliwhirl",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 25
+     }
+    },
+    {
+     "from": "poliwhirl",
+     "to": "poliwrath",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "water-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "abra",
+   "species": "abra",
+   "name": "Abra",
+   "dex_number": 63,
+   "generation": 1,
+   "types": [
+    "psychic"
+   ],
+   "evolution_chain": 27,
+   "stages": [
+    {
+     "pokemon": "abra",
+     "species": "abra",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "humanshape"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "kadabra",
+   "species": "kadabra",
+   "name": "Kadabra",
+   "dex_number": 64,
+   "generation": 1,
+   "types": [
+    "psychic"
+   ],
+   "evolution_chain": 27,
+   "stages": [
+    {
+     "pokemon": "abra",
+     "species": "abra",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "kadabra",
+     "species": "kadabra",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "humanshape"
+   ],
+   "evolution_steps": [
+    {
+     "from": "abra",
+     "to": "kadabra",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "alakazam",
+   "species": "alakazam",
+   "name": "Alakazam",
+   "dex_number": 65,
+   "generation": 1,
+   "types": [
+    "psychic"
+   ],
+   "evolution_chain": 27,
+   "stages": [
+    {
+     "pokemon": "abra",
+     "species": "abra",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "kadabra",
+     "species": "kadabra",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "alakazam",
+     "species": "alakazam",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "humanshape"
+   ],
+   "evolution_steps": [
+    {
+     "from": "abra",
+     "to": "kadabra",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 16
+     }
+    },
+    {
+     "from": "kadabra",
+     "to": "alakazam",
+     "trigger": "trade",
+     "conditions": {}
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "machop",
+   "species": "machop",
+   "name": "Machop",
+   "dex_number": 66,
+   "generation": 1,
+   "types": [
+    "fighting"
+   ],
+   "evolution_chain": 28,
+   "stages": [
+    {
+     "pokemon": "machop",
+     "species": "machop",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "humanshape"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "machoke",
+   "species": "machoke",
+   "name": "Machoke",
+   "dex_number": 67,
+   "generation": 1,
+   "types": [
+    "fighting"
+   ],
+   "evolution_chain": 28,
+   "stages": [
+    {
+     "pokemon": "machop",
+     "species": "machop",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "machoke",
+     "species": "machoke",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "humanshape"
+   ],
+   "evolution_steps": [
+    {
+     "from": "machop",
+     "to": "machoke",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 28
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "machamp",
+   "species": "machamp",
+   "name": "Machamp",
+   "dex_number": 68,
+   "generation": 1,
+   "types": [
+    "fighting"
+   ],
+   "evolution_chain": 28,
+   "stages": [
+    {
+     "pokemon": "machop",
+     "species": "machop",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "machoke",
+     "species": "machoke",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "machamp",
+     "species": "machamp",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "humanshape"
+   ],
+   "evolution_steps": [
+    {
+     "from": "machop",
+     "to": "machoke",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 28
+     }
+    },
+    {
+     "from": "machoke",
+     "to": "machamp",
+     "trigger": "trade",
+     "conditions": {}
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "bellsprout",
+   "species": "bellsprout",
+   "name": "Bellsprout",
+   "dex_number": 69,
+   "generation": 1,
+   "types": [
+    "grass",
+    "poison"
+   ],
+   "evolution_chain": 29,
+   "stages": [
+    {
+     "pokemon": "bellsprout",
+     "species": "bellsprout",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "plant"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "weepinbell",
+   "species": "weepinbell",
+   "name": "Weepinbell",
+   "dex_number": 70,
+   "generation": 1,
+   "types": [
+    "grass",
+    "poison"
+   ],
+   "evolution_chain": 29,
+   "stages": [
+    {
+     "pokemon": "bellsprout",
+     "species": "bellsprout",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "weepinbell",
+     "species": "weepinbell",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "plant"
+   ],
+   "evolution_steps": [
+    {
+     "from": "bellsprout",
+     "to": "weepinbell",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 21
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "victreebel",
+   "species": "victreebel",
+   "name": "Victreebel",
+   "dex_number": 71,
+   "generation": 1,
+   "types": [
+    "grass",
+    "poison"
+   ],
+   "evolution_chain": 29,
+   "stages": [
+    {
+     "pokemon": "bellsprout",
+     "species": "bellsprout",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "weepinbell",
+     "species": "weepinbell",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "victreebel",
+     "species": "victreebel",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "plant"
+   ],
+   "evolution_steps": [
+    {
+     "from": "bellsprout",
+     "to": "weepinbell",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 21
+     }
+    },
+    {
+     "from": "weepinbell",
+     "to": "victreebel",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "leaf-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "tentacool",
+   "species": "tentacool",
+   "name": "Tentacool",
+   "dex_number": 72,
+   "generation": 1,
+   "types": [
+    "water",
+    "poison"
+   ],
+   "evolution_chain": 30,
+   "stages": [
+    {
+     "pokemon": "tentacool",
+     "species": "tentacool",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water3"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "tentacruel",
+   "species": "tentacruel",
+   "name": "Tentacruel",
+   "dex_number": 73,
+   "generation": 1,
+   "types": [
+    "water",
+    "poison"
+   ],
+   "evolution_chain": 30,
+   "stages": [
+    {
+     "pokemon": "tentacool",
+     "species": "tentacool",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "tentacruel",
+     "species": "tentacruel",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water3"
+   ],
+   "evolution_steps": [
+    {
+     "from": "tentacool",
+     "to": "tentacruel",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 30
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "geodude",
+   "species": "geodude",
+   "name": "Geodude",
+   "dex_number": 74,
+   "generation": 1,
+   "types": [
+    "rock",
+    "ground"
+   ],
+   "evolution_chain": 31,
+   "stages": [
+    {
+     "pokemon": "geodude",
+     "species": "geodude",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "mineral"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "graveler",
+   "species": "graveler",
+   "name": "Graveler",
+   "dex_number": 75,
+   "generation": 1,
+   "types": [
+    "rock",
+    "ground"
+   ],
+   "evolution_chain": 31,
+   "stages": [
+    {
+     "pokemon": "geodude",
+     "species": "geodude",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "graveler",
+     "species": "graveler",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "mineral"
+   ],
+   "evolution_steps": [
+    {
+     "from": "geodude",
+     "to": "graveler",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 25
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "golem",
+   "species": "golem",
+   "name": "Golem",
+   "dex_number": 76,
+   "generation": 1,
+   "types": [
+    "rock",
+    "ground"
+   ],
+   "evolution_chain": 31,
+   "stages": [
+    {
+     "pokemon": "geodude",
+     "species": "geodude",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "graveler",
+     "species": "graveler",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "golem",
+     "species": "golem",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "mineral"
+   ],
+   "evolution_steps": [
+    {
+     "from": "geodude",
+     "to": "graveler",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 25
+     }
+    },
+    {
+     "from": "graveler",
+     "to": "golem",
+     "trigger": "trade",
+     "conditions": {}
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "ponyta",
+   "species": "ponyta",
+   "name": "Ponyta",
+   "dex_number": 77,
+   "generation": 1,
+   "types": [
+    "fire"
+   ],
+   "evolution_chain": 32,
+   "stages": [
+    {
+     "pokemon": "ponyta",
+     "species": "ponyta",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "rapidash",
+   "species": "rapidash",
+   "name": "Rapidash",
+   "dex_number": 78,
+   "generation": 1,
+   "types": [
+    "fire"
+   ],
+   "evolution_chain": 32,
+   "stages": [
+    {
+     "pokemon": "ponyta",
+     "species": "ponyta",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "rapidash",
+     "species": "rapidash",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "ponyta",
+     "to": "rapidash",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 40
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "slowpoke",
+   "species": "slowpoke",
+   "name": "Slowpoke",
+   "dex_number": 79,
+   "generation": 1,
+   "types": [
+    "water",
+    "psychic"
+   ],
+   "evolution_chain": 33,
+   "stages": [
+    {
+     "pokemon": "slowpoke",
+     "species": "slowpoke",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster",
+    "water1"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "slowbro",
+   "species": "slowbro",
+   "name": "Slowbro",
+   "dex_number": 80,
+   "generation": 1,
+   "types": [
+    "water",
+    "psychic"
+   ],
+   "evolution_chain": 33,
+   "stages": [
+    {
+     "pokemon": "slowpoke",
+     "species": "slowpoke",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "slowbro",
+     "species": "slowbro",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster",
+    "water1"
+   ],
+   "evolution_steps": [
+    {
+     "from": "slowpoke",
+     "to": "slowbro",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 37
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "magnemite",
+   "species": "magnemite",
+   "name": "Magnemite",
+   "dex_number": 81,
+   "generation": 1,
+   "types": [
+    "electric",
+    "steel"
+   ],
+   "evolution_chain": 34,
+   "stages": [
+    {
+     "pokemon": "magnemite",
+     "species": "magnemite",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "mineral"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "magneton",
+   "species": "magneton",
+   "name": "Magneton",
+   "dex_number": 82,
+   "generation": 1,
+   "types": [
+    "electric",
+    "steel"
+   ],
+   "evolution_chain": 34,
+   "stages": [
+    {
+     "pokemon": "magnemite",
+     "species": "magnemite",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "magneton",
+     "species": "magneton",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "mineral"
+   ],
+   "evolution_steps": [
+    {
+     "from": "magnemite",
+     "to": "magneton",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 30
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "farfetchd",
+   "species": "farfetchd",
+   "name": "Farfetch’d",
+   "dex_number": 83,
+   "generation": 1,
+   "types": [
+    "normal",
+    "flying"
+   ],
+   "evolution_chain": 35,
+   "stages": [
+    {
+     "pokemon": "farfetchd",
+     "species": "farfetchd",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying",
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "doduo",
+   "species": "doduo",
+   "name": "Doduo",
+   "dex_number": 84,
+   "generation": 1,
+   "types": [
+    "normal",
+    "flying"
+   ],
+   "evolution_chain": 36,
+   "stages": [
+    {
+     "pokemon": "doduo",
+     "species": "doduo",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "dodrio",
+   "species": "dodrio",
+   "name": "Dodrio",
+   "dex_number": 85,
+   "generation": 1,
+   "types": [
+    "normal",
+    "flying"
+   ],
+   "evolution_chain": 36,
+   "stages": [
+    {
+     "pokemon": "doduo",
+     "species": "doduo",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "dodrio",
+     "species": "dodrio",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying"
+   ],
+   "evolution_steps": [
+    {
+     "from": "doduo",
+     "to": "dodrio",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 31
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "seel",
+   "species": "seel",
+   "name": "Seel",
+   "dex_number": 86,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 37,
+   "stages": [
+    {
+     "pokemon": "seel",
+     "species": "seel",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "water1"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "dewgong",
+   "species": "dewgong",
+   "name": "Dewgong",
+   "dex_number": 87,
+   "generation": 1,
+   "types": [
+    "water",
+    "ice"
+   ],
+   "evolution_chain": 37,
+   "stages": [
+    {
+     "pokemon": "seel",
+     "species": "seel",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "dewgong",
+     "species": "dewgong",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "water1"
+   ],
+   "evolution_steps": [
+    {
+     "from": "seel",
+     "to": "dewgong",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 34
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "grimer",
+   "species": "grimer",
+   "name": "Grimer",
+   "dex_number": 88,
+   "generation": 1,
+   "types": [
+    "poison"
+   ],
+   "evolution_chain": 38,
+   "stages": [
+    {
+     "pokemon": "grimer",
+     "species": "grimer",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "indeterminate"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "muk",
+   "species": "muk",
+   "name": "Muk",
+   "dex_number": 89,
+   "generation": 1,
+   "types": [
+    "poison"
+   ],
+   "evolution_chain": 38,
+   "stages": [
+    {
+     "pokemon": "grimer",
+     "species": "grimer",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "muk",
+     "species": "muk",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "indeterminate"
+   ],
+   "evolution_steps": [
+    {
+     "from": "grimer",
+     "to": "muk",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 38
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "shellder",
+   "species": "shellder",
+   "name": "Shellder",
+   "dex_number": 90,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 39,
+   "stages": [
+    {
+     "pokemon": "shellder",
+     "species": "shellder",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water3"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "cloyster",
+   "species": "cloyster",
+   "name": "Cloyster",
+   "dex_number": 91,
+   "generation": 1,
+   "types": [
+    "water",
+    "ice"
+   ],
+   "evolution_chain": 39,
+   "stages": [
+    {
+     "pokemon": "shellder",
+     "species": "shellder",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "cloyster",
+     "species": "cloyster",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water3"
+   ],
+   "evolution_steps": [
+    {
+     "from": "shellder",
+     "to": "cloyster",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "water-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "gastly",
+   "species": "gastly",
+   "name": "Gastly",
+   "dex_number": 92,
+   "generation": 1,
+   "types": [
+    "ghost",
+    "poison"
+   ],
+   "evolution_chain": 40,
+   "stages": [
+    {
+     "pokemon": "gastly",
+     "species": "gastly",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "indeterminate"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "haunter",
+   "species": "haunter",
+   "name": "Haunter",
+   "dex_number": 93,
+   "generation": 1,
+   "types": [
+    "ghost",
+    "poison"
+   ],
+   "evolution_chain": 40,
+   "stages": [
+    {
+     "pokemon": "gastly",
+     "species": "gastly",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "haunter",
+     "species": "haunter",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "indeterminate"
+   ],
+   "evolution_steps": [
+    {
+     "from": "gastly",
+     "to": "haunter",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 25
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "gengar",
+   "species": "gengar",
+   "name": "Gengar",
+   "dex_number": 94,
+   "generation": 1,
+   "types": [
+    "ghost",
+    "poison"
+   ],
+   "evolution_chain": 40,
+   "stages": [
+    {
+     "pokemon": "gastly",
+     "species": "gastly",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "haunter",
+     "species": "haunter",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "gengar",
+     "species": "gengar",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "indeterminate"
+   ],
+   "evolution_steps": [
+    {
+     "from": "gastly",
+     "to": "haunter",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 25
+     }
+    },
+    {
+     "from": "haunter",
+     "to": "gengar",
+     "trigger": "trade",
+     "conditions": {}
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "onix",
+   "species": "onix",
+   "name": "Onix",
+   "dex_number": 95,
+   "generation": 1,
+   "types": [
+    "rock",
+    "ground"
+   ],
+   "evolution_chain": 41,
+   "stages": [
+    {
+     "pokemon": "onix",
+     "species": "onix",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "mineral"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "drowzee",
+   "species": "drowzee",
+   "name": "Drowzee",
+   "dex_number": 96,
+   "generation": 1,
+   "types": [
+    "psychic"
+   ],
+   "evolution_chain": 42,
+   "stages": [
+    {
+     "pokemon": "drowzee",
+     "species": "drowzee",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "humanshape"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "hypno",
+   "species": "hypno",
+   "name": "Hypno",
+   "dex_number": 97,
+   "generation": 1,
+   "types": [
+    "psychic"
+   ],
+   "evolution_chain": 42,
+   "stages": [
+    {
+     "pokemon": "drowzee",
+     "species": "drowzee",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "hypno",
+     "species": "hypno",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "humanshape"
+   ],
+   "evolution_steps": [
+    {
+     "from": "drowzee",
+     "to": "hypno",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 26
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "krabby",
+   "species": "krabby",
+   "name": "Krabby",
+   "dex_number": 98,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 43,
+   "stages": [
+    {
+     "pokemon": "krabby",
+     "species": "krabby",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water3"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "kingler",
+   "species": "kingler",
+   "name": "Kingler",
+   "dex_number": 99,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 43,
+   "stages": [
+    {
+     "pokemon": "krabby",
+     "species": "krabby",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "kingler",
+     "species": "kingler",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water3"
+   ],
+   "evolution_steps": [
+    {
+     "from": "krabby",
+     "to": "kingler",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 28
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "voltorb",
+   "species": "voltorb",
+   "name": "Voltorb",
+   "dex_number": 100,
+   "generation": 1,
+   "types": [
+    "electric"
+   ],
+   "evolution_chain": 44,
+   "stages": [
+    {
+     "pokemon": "voltorb",
+     "species": "voltorb",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "mineral"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "electrode",
+   "species": "electrode",
+   "name": "Electrode",
+   "dex_number": 101,
+   "generation": 1,
+   "types": [
+    "electric"
+   ],
+   "evolution_chain": 44,
+   "stages": [
+    {
+     "pokemon": "voltorb",
+     "species": "voltorb",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "electrode",
+     "species": "electrode",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "mineral"
+   ],
+   "evolution_steps": [
+    {
+     "from": "voltorb",
+     "to": "electrode",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 30
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "exeggcute",
+   "species": "exeggcute",
+   "name": "Exeggcute",
+   "dex_number": 102,
+   "generation": 1,
+   "types": [
+    "grass",
+    "psychic"
+   ],
+   "evolution_chain": 45,
+   "stages": [
+    {
+     "pokemon": "exeggcute",
+     "species": "exeggcute",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "plant"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "exeggutor",
+   "species": "exeggutor",
+   "name": "Exeggutor",
+   "dex_number": 103,
+   "generation": 1,
+   "types": [
+    "grass",
+    "psychic"
+   ],
+   "evolution_chain": 45,
+   "stages": [
+    {
+     "pokemon": "exeggcute",
+     "species": "exeggcute",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "exeggutor",
+     "species": "exeggutor",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "plant"
+   ],
+   "evolution_steps": [
+    {
+     "from": "exeggcute",
+     "to": "exeggutor",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "leaf-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "cubone",
+   "species": "cubone",
+   "name": "Cubone",
+   "dex_number": 104,
+   "generation": 1,
+   "types": [
+    "ground"
+   ],
+   "evolution_chain": 46,
+   "stages": [
+    {
+     "pokemon": "cubone",
+     "species": "cubone",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "marowak",
+   "species": "marowak",
+   "name": "Marowak",
+   "dex_number": 105,
+   "generation": 1,
+   "types": [
+    "ground"
+   ],
+   "evolution_chain": 46,
+   "stages": [
+    {
+     "pokemon": "cubone",
+     "species": "cubone",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "marowak",
+     "species": "marowak",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster"
+   ],
+   "evolution_steps": [
+    {
+     "from": "cubone",
+     "to": "marowak",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 28
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "lickitung",
+   "species": "lickitung",
+   "name": "Lickitung",
+   "dex_number": 108,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 48,
+   "stages": [
+    {
+     "pokemon": "lickitung",
+     "species": "lickitung",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "koffing",
+   "species": "koffing",
+   "name": "Koffing",
+   "dex_number": 109,
+   "generation": 1,
+   "types": [
+    "poison"
+   ],
+   "evolution_chain": 49,
+   "stages": [
+    {
+     "pokemon": "koffing",
+     "species": "koffing",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "indeterminate"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "weezing",
+   "species": "weezing",
+   "name": "Weezing",
+   "dex_number": 110,
+   "generation": 1,
+   "types": [
+    "poison"
+   ],
+   "evolution_chain": 49,
+   "stages": [
+    {
+     "pokemon": "koffing",
+     "species": "koffing",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "weezing",
+     "species": "weezing",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "indeterminate"
+   ],
+   "evolution_steps": [
+    {
+     "from": "koffing",
+     "to": "weezing",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 35
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "rhyhorn",
+   "species": "rhyhorn",
+   "name": "Rhyhorn",
+   "dex_number": 111,
+   "generation": 1,
+   "types": [
+    "ground",
+    "rock"
+   ],
+   "evolution_chain": 50,
+   "stages": [
+    {
+     "pokemon": "rhyhorn",
+     "species": "rhyhorn",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "monster"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "rhydon",
+   "species": "rhydon",
+   "name": "Rhydon",
+   "dex_number": 112,
+   "generation": 1,
+   "types": [
+    "ground",
+    "rock"
+   ],
+   "evolution_chain": 50,
+   "stages": [
+    {
+     "pokemon": "rhyhorn",
+     "species": "rhyhorn",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "rhydon",
+     "species": "rhydon",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground",
+    "monster"
+   ],
+   "evolution_steps": [
+    {
+     "from": "rhyhorn",
+     "to": "rhydon",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 42
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "chansey",
+   "species": "chansey",
+   "name": "Chansey",
+   "dex_number": 113,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 51,
+   "stages": [
+    {
+     "pokemon": "chansey",
+     "species": "chansey",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "fairy"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "tangela",
+   "species": "tangela",
+   "name": "Tangela",
+   "dex_number": 114,
+   "generation": 1,
+   "types": [
+    "grass"
+   ],
+   "evolution_chain": 52,
+   "stages": [
+    {
+     "pokemon": "tangela",
+     "species": "tangela",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "plant"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "kangaskhan",
+   "species": "kangaskhan",
+   "name": "Kangaskhan",
+   "dex_number": 115,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 53,
+   "stages": [
+    {
+     "pokemon": "kangaskhan",
+     "species": "kangaskhan",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "horsea",
+   "species": "horsea",
+   "name": "Horsea",
+   "dex_number": 116,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 54,
+   "stages": [
+    {
+     "pokemon": "horsea",
+     "species": "horsea",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "water1"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "seadra",
+   "species": "seadra",
+   "name": "Seadra",
+   "dex_number": 117,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 54,
+   "stages": [
+    {
+     "pokemon": "horsea",
+     "species": "horsea",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "seadra",
+     "species": "seadra",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "water1"
+   ],
+   "evolution_steps": [
+    {
+     "from": "horsea",
+     "to": "seadra",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 32
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "goldeen",
+   "species": "goldeen",
+   "name": "Goldeen",
+   "dex_number": 118,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 55,
+   "stages": [
+    {
+     "pokemon": "goldeen",
+     "species": "goldeen",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water2"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "seaking",
+   "species": "seaking",
+   "name": "Seaking",
+   "dex_number": 119,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 55,
+   "stages": [
+    {
+     "pokemon": "goldeen",
+     "species": "goldeen",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "seaking",
+     "species": "seaking",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water2"
+   ],
+   "evolution_steps": [
+    {
+     "from": "goldeen",
+     "to": "seaking",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 33
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "staryu",
+   "species": "staryu",
+   "name": "Staryu",
+   "dex_number": 120,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 56,
+   "stages": [
+    {
+     "pokemon": "staryu",
+     "species": "staryu",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water3"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "starmie",
+   "species": "starmie",
+   "name": "Starmie",
+   "dex_number": 121,
+   "generation": 1,
+   "types": [
+    "water",
+    "psychic"
+   ],
+   "evolution_chain": 56,
+   "stages": [
+    {
+     "pokemon": "staryu",
+     "species": "staryu",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "starmie",
+     "species": "starmie",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water3"
+   ],
+   "evolution_steps": [
+    {
+     "from": "staryu",
+     "to": "starmie",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "water-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "mr-mime",
+   "species": "mr-mime",
+   "name": "Mr. Mime",
+   "dex_number": 122,
+   "generation": 1,
+   "types": [
+    "psychic"
+   ],
+   "evolution_chain": 57,
+   "stages": [
+    {
+     "pokemon": "mr-mime",
+     "species": "mr-mime",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "humanshape"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "scyther",
+   "species": "scyther",
+   "name": "Scyther",
+   "dex_number": 123,
+   "generation": 1,
+   "types": [
+    "bug",
+    "flying"
+   ],
+   "evolution_chain": 58,
+   "stages": [
+    {
+     "pokemon": "scyther",
+     "species": "scyther",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "pinsir",
+   "species": "pinsir",
+   "name": "Pinsir",
+   "dex_number": 127,
+   "generation": 1,
+   "types": [
+    "bug"
+   ],
+   "evolution_chain": 62,
+   "stages": [
+    {
+     "pokemon": "pinsir",
+     "species": "pinsir",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "bug"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "tauros",
+   "species": "tauros",
+   "name": "Tauros",
+   "dex_number": 128,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 63,
+   "stages": [
+    {
+     "pokemon": "tauros",
+     "species": "tauros",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "magikarp",
+   "species": "magikarp",
+   "name": "Magikarp",
+   "dex_number": 129,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 64,
+   "stages": [
+    {
+     "pokemon": "magikarp",
+     "species": "magikarp",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "water2"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "gyarados",
+   "species": "gyarados",
+   "name": "Gyarados",
+   "dex_number": 130,
+   "generation": 1,
+   "types": [
+    "water",
+    "flying"
+   ],
+   "evolution_chain": 64,
+   "stages": [
+    {
+     "pokemon": "magikarp",
+     "species": "magikarp",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "gyarados",
+     "species": "gyarados",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "water2"
+   ],
+   "evolution_steps": [
+    {
+     "from": "magikarp",
+     "to": "gyarados",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 20
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "lapras",
+   "species": "lapras",
+   "name": "Lapras",
+   "dex_number": 131,
+   "generation": 1,
+   "types": [
+    "water",
+    "ice"
+   ],
+   "evolution_chain": 65,
+   "stages": [
+    {
+     "pokemon": "lapras",
+     "species": "lapras",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster",
+    "water1"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "ditto",
+   "species": "ditto",
+   "name": "Ditto",
+   "dex_number": 132,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 66,
+   "stages": [
+    {
+     "pokemon": "ditto",
+     "species": "ditto",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ditto"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "eevee",
+   "species": "eevee",
+   "name": "Eevee",
+   "dex_number": 133,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 67,
+   "stages": [
+    {
+     "pokemon": "eevee",
+     "species": "eevee",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "vaporeon",
+   "species": "vaporeon",
+   "name": "Vaporeon",
+   "dex_number": 134,
+   "generation": 1,
+   "types": [
+    "water"
+   ],
+   "evolution_chain": 67,
+   "stages": [
+    {
+     "pokemon": "eevee",
+     "species": "eevee",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "vaporeon",
+     "species": "vaporeon",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "eevee",
+     "to": "vaporeon",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "water-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "jolteon",
+   "species": "jolteon",
+   "name": "Jolteon",
+   "dex_number": 135,
+   "generation": 1,
+   "types": [
+    "electric"
+   ],
+   "evolution_chain": 67,
+   "stages": [
+    {
+     "pokemon": "eevee",
+     "species": "eevee",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "jolteon",
+     "species": "jolteon",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "eevee",
+     "to": "jolteon",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "thunder-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "flareon",
+   "species": "flareon",
+   "name": "Flareon",
+   "dex_number": 136,
+   "generation": 1,
+   "types": [
+    "fire"
+   ],
+   "evolution_chain": 67,
+   "stages": [
+    {
+     "pokemon": "eevee",
+     "species": "eevee",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "flareon",
+     "species": "flareon",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "ground"
+   ],
+   "evolution_steps": [
+    {
+     "from": "eevee",
+     "to": "flareon",
+     "trigger": "use-item",
+     "conditions": {
+      "trigger_item": "fire-stone"
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "porygon",
+   "species": "porygon",
+   "name": "Porygon",
+   "dex_number": 137,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 68,
+   "stages": [
+    {
+     "pokemon": "porygon",
+     "species": "porygon",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "mineral"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "omanyte",
+   "species": "omanyte",
+   "name": "Omanyte",
+   "dex_number": 138,
+   "generation": 1,
+   "types": [
+    "rock",
+    "water"
+   ],
+   "evolution_chain": 69,
+   "stages": [
+    {
+     "pokemon": "omanyte",
+     "species": "omanyte",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water1",
+    "water3"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "omastar",
+   "species": "omastar",
+   "name": "Omastar",
+   "dex_number": 139,
+   "generation": 1,
+   "types": [
+    "rock",
+    "water"
+   ],
+   "evolution_chain": 69,
+   "stages": [
+    {
+     "pokemon": "omanyte",
+     "species": "omanyte",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "omastar",
+     "species": "omastar",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water1",
+    "water3"
+   ],
+   "evolution_steps": [
+    {
+     "from": "omanyte",
+     "to": "omastar",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 40
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "kabuto",
+   "species": "kabuto",
+   "name": "Kabuto",
+   "dex_number": 140,
+   "generation": 1,
+   "types": [
+    "rock",
+    "water"
+   ],
+   "evolution_chain": 70,
+   "stages": [
+    {
+     "pokemon": "kabuto",
+     "species": "kabuto",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water1",
+    "water3"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "kabutops",
+   "species": "kabutops",
+   "name": "Kabutops",
+   "dex_number": 141,
+   "generation": 1,
+   "types": [
+    "rock",
+    "water"
+   ],
+   "evolution_chain": 70,
+   "stages": [
+    {
+     "pokemon": "kabuto",
+     "species": "kabuto",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "kabutops",
+     "species": "kabutops",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "water1",
+    "water3"
+   ],
+   "evolution_steps": [
+    {
+     "from": "kabuto",
+     "to": "kabutops",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 40
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "aerodactyl",
+   "species": "aerodactyl",
+   "name": "Aerodactyl",
+   "dex_number": 142,
+   "generation": 1,
+   "types": [
+    "rock",
+    "flying"
+   ],
+   "evolution_chain": 71,
+   "stages": [
+    {
+     "pokemon": "aerodactyl",
+     "species": "aerodactyl",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "flying"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "snorlax",
+   "species": "snorlax",
+   "name": "Snorlax",
+   "dex_number": 143,
+   "generation": 1,
+   "types": [
+    "normal"
+   ],
+   "evolution_chain": 72,
+   "stages": [
+    {
+     "pokemon": "snorlax",
+     "species": "snorlax",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "monster"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "articuno",
+   "species": "articuno",
+   "name": "Articuno",
+   "dex_number": 144,
+   "generation": 1,
+   "types": [
+    "ice",
+    "flying"
+   ],
+   "evolution_chain": 73,
+   "stages": [
+    {
+     "pokemon": "articuno",
+     "species": "articuno",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "no-eggs"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": true,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "zapdos",
+   "species": "zapdos",
+   "name": "Zapdos",
+   "dex_number": 145,
+   "generation": 1,
+   "types": [
+    "electric",
+    "flying"
+   ],
+   "evolution_chain": 74,
+   "stages": [
+    {
+     "pokemon": "zapdos",
+     "species": "zapdos",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "no-eggs"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": true,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "moltres",
+   "species": "moltres",
+   "name": "Moltres",
+   "dex_number": 146,
+   "generation": 1,
+   "types": [
+    "fire",
+    "flying"
+   ],
+   "evolution_chain": 75,
+   "stages": [
+    {
+     "pokemon": "moltres",
+     "species": "moltres",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "no-eggs"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": true,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "dratini",
+   "species": "dratini",
+   "name": "Dratini",
+   "dex_number": 147,
+   "generation": 1,
+   "types": [
+    "dragon"
+   ],
+   "evolution_chain": 76,
+   "stages": [
+    {
+     "pokemon": "dratini",
+     "species": "dratini",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "water1"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "dragonair",
+   "species": "dragonair",
+   "name": "Dragonair",
+   "dex_number": 148,
+   "generation": 1,
+   "types": [
+    "dragon"
+   ],
+   "evolution_chain": 76,
+   "stages": [
+    {
+     "pokemon": "dratini",
+     "species": "dratini",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "dragonair",
+     "species": "dragonair",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "water1"
+   ],
+   "evolution_steps": [
+    {
+     "from": "dratini",
+     "to": "dragonair",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 30
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "dragonite",
+   "species": "dragonite",
+   "name": "Dragonite",
+   "dex_number": 149,
+   "generation": 1,
+   "types": [
+    "dragon",
+    "flying"
+   ],
+   "evolution_chain": 76,
+   "stages": [
+    {
+     "pokemon": "dratini",
+     "species": "dratini",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "dragonair",
+     "species": "dragonair",
+     "is_baby": false,
+     "requires_incense": false
+    },
+    {
+     "pokemon": "dragonite",
+     "species": "dragonite",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "dragon",
+    "water1"
+   ],
+   "evolution_steps": [
+    {
+     "from": "dratini",
+     "to": "dragonair",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 30
+     }
+    },
+    {
+     "from": "dragonair",
+     "to": "dragonite",
+     "trigger": "level-up",
+     "conditions": {
+      "minimum_level": 55
+     }
+    }
+   ],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "mewtwo",
+   "species": "mewtwo",
+   "name": "Mewtwo",
+   "dex_number": 150,
+   "generation": 1,
+   "types": [
+    "psychic"
+   ],
+   "evolution_chain": 77,
+   "stages": [
+    {
+     "pokemon": "mewtwo",
+     "species": "mewtwo",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "no-eggs"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": true,
+   "is_mythical": false,
+   "exists_in_game": true,
+   "can_arrive": true
+  },
+  {
+   "slug": "mew",
+   "species": "mew",
+   "name": "Mew",
+   "dex_number": 151,
+   "generation": 1,
+   "types": [
+    "psychic"
+   ],
+   "evolution_chain": 78,
+   "stages": [
+    {
+     "pokemon": "mew",
+     "species": "mew",
+     "is_baby": false,
+     "requires_incense": false
+    }
+   ],
+   "line_egg_groups": [
+    "no-eggs"
+   ],
+   "evolution_steps": [],
+   "region": null,
+   "is_legendary": false,
+   "is_mythical": true,
+   "exists_in_game": true,
+   "can_arrive": true
+  }
+ ],
+ "key_battles": [
+  {
+   "slug": "firered-brock",
+   "category": "gym_leader",
+   "trainer": "Brock",
+   "rivals": [
+    {
+     "pokemon": "geodude",
+     "types": [
+      "rock",
+      "ground"
+     ]
+    },
+    {
+     "pokemon": "onix",
+     "types": [
+      "rock",
+      "ground"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-misty",
+   "category": "gym_leader",
+   "trainer": "Misty",
+   "rivals": [
+    {
+     "pokemon": "staryu",
+     "types": [
+      "water"
+     ]
+    },
+    {
+     "pokemon": "starmie",
+     "types": [
+      "water",
+      "psychic"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-lt-surge",
+   "category": "gym_leader",
+   "trainer": "Teniente Surge",
+   "rivals": [
+    {
+     "pokemon": "voltorb",
+     "types": [
+      "electric"
+     ]
+    },
+    {
+     "pokemon": "pikachu",
+     "types": [
+      "electric"
+     ]
+    },
+    {
+     "pokemon": "raichu",
+     "types": [
+      "electric"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-erika",
+   "category": "gym_leader",
+   "trainer": "Erika",
+   "rivals": [
+    {
+     "pokemon": "victreebel",
+     "types": [
+      "grass",
+      "poison"
+     ]
+    },
+    {
+     "pokemon": "tangela",
+     "types": [
+      "grass"
+     ]
+    },
+    {
+     "pokemon": "vileplume",
+     "types": [
+      "grass",
+      "poison"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-koga",
+   "category": "gym_leader",
+   "trainer": "Koga",
+   "rivals": [
+    {
+     "pokemon": "koffing",
+     "types": [
+      "poison"
+     ]
+    },
+    {
+     "pokemon": "koffing",
+     "types": [
+      "poison"
+     ]
+    },
+    {
+     "pokemon": "muk",
+     "types": [
+      "poison"
+     ]
+    },
+    {
+     "pokemon": "weezing",
+     "types": [
+      "poison"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-sabrina",
+   "category": "gym_leader",
+   "trainer": "Sabrina",
+   "rivals": [
+    {
+     "pokemon": "kadabra",
+     "types": [
+      "psychic"
+     ]
+    },
+    {
+     "pokemon": "venomoth",
+     "types": [
+      "bug",
+      "poison"
+     ]
+    },
+    {
+     "pokemon": "mr-mime",
+     "types": [
+      "psychic"
+     ]
+    },
+    {
+     "pokemon": "alakazam",
+     "types": [
+      "psychic"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-blaine",
+   "category": "gym_leader",
+   "trainer": "Blaine",
+   "rivals": [
+    {
+     "pokemon": "growlithe",
+     "types": [
+      "fire"
+     ]
+    },
+    {
+     "pokemon": "ponyta",
+     "types": [
+      "fire"
+     ]
+    },
+    {
+     "pokemon": "rapidash",
+     "types": [
+      "fire"
+     ]
+    },
+    {
+     "pokemon": "arcanine",
+     "types": [
+      "fire"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-giovanni-gym",
+   "category": "gym_leader",
+   "trainer": "Giovanni",
+   "rivals": [
+    {
+     "pokemon": "rhyhorn",
+     "types": [
+      "ground",
+      "rock"
+     ]
+    },
+    {
+     "pokemon": "dugtrio",
+     "types": [
+      "ground"
+     ]
+    },
+    {
+     "pokemon": "nidoking",
+     "types": [
+      "poison",
+      "ground"
+     ]
+    },
+    {
+     "pokemon": "nidoqueen",
+     "types": [
+      "poison",
+      "ground"
+     ]
+    },
+    {
+     "pokemon": "rhyhorn",
+     "types": [
+      "ground",
+      "rock"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-lorelei",
+   "category": "elite_four",
+   "trainer": "Lorelei",
+   "rivals": [
+    {
+     "pokemon": "dewgong",
+     "types": [
+      "water",
+      "ice"
+     ]
+    },
+    {
+     "pokemon": "cloyster",
+     "types": [
+      "water",
+      "ice"
+     ]
+    },
+    {
+     "pokemon": "slowbro",
+     "types": [
+      "water",
+      "psychic"
+     ]
+    },
+    {
+     "pokemon": "jynx",
+     "types": [
+      "ice",
+      "psychic"
+     ]
+    },
+    {
+     "pokemon": "lapras",
+     "types": [
+      "water",
+      "ice"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-bruno",
+   "category": "elite_four",
+   "trainer": "Bruno",
+   "rivals": [
+    {
+     "pokemon": "onix",
+     "types": [
+      "rock",
+      "ground"
+     ]
+    },
+    {
+     "pokemon": "hitmonchan",
+     "types": [
+      "fighting"
+     ]
+    },
+    {
+     "pokemon": "hitmonlee",
+     "types": [
+      "fighting"
+     ]
+    },
+    {
+     "pokemon": "onix",
+     "types": [
+      "rock",
+      "ground"
+     ]
+    },
+    {
+     "pokemon": "machamp",
+     "types": [
+      "fighting"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-agatha",
+   "category": "elite_four",
+   "trainer": "Agatha",
+   "rivals": [
+    {
+     "pokemon": "gengar",
+     "types": [
+      "ghost",
+      "poison"
+     ]
+    },
+    {
+     "pokemon": "golbat",
+     "types": [
+      "poison",
+      "flying"
+     ]
+    },
+    {
+     "pokemon": "haunter",
+     "types": [
+      "ghost",
+      "poison"
+     ]
+    },
+    {
+     "pokemon": "arbok",
+     "types": [
+      "poison"
+     ]
+    },
+    {
+     "pokemon": "gengar",
+     "types": [
+      "ghost",
+      "poison"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-lance",
+   "category": "elite_four",
+   "trainer": "Lance",
+   "rivals": [
+    {
+     "pokemon": "gyarados",
+     "types": [
+      "water",
+      "flying"
+     ]
+    },
+    {
+     "pokemon": "dragonair",
+     "types": [
+      "dragon"
+     ]
+    },
+    {
+     "pokemon": "dragonair",
+     "types": [
+      "dragon"
+     ]
+    },
+    {
+     "pokemon": "aerodactyl",
+     "types": [
+      "rock",
+      "flying"
+     ]
+    },
+    {
+     "pokemon": "dragonite",
+     "types": [
+      "dragon",
+      "flying"
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "firered-champion",
+   "category": "champion",
+   "trainer": "Azul",
+   "rivals": [
+    {
+     "pokemon": "pidgeot",
+     "types": [
+      "normal",
+      "flying"
+     ]
+    },
+    {
+     "pokemon": "alakazam",
+     "types": [
+      "psychic"
+     ]
+    },
+    {
+     "pokemon": "rhydon",
+     "types": [
+      "ground",
+      "rock"
+     ]
+    }
+   ]
+  }
+ ]
+}

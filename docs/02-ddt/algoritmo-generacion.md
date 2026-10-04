@@ -50,6 +50,9 @@ flowchart TD
       primario Dragón.
     - RN-14: se ramifica sobre cada evolución de Eevee candidata.
     - Si un nivel no tiene candidatos, se reserva un hueco para sugerencias (RN-08).
+    - Implementación: en lugar de ramificar, la búsqueda exige que el equipo contenga al menos
+      uno de cada conjunto de presencia y poda en cuanto ya no puede. Es equivalente y no
+      repite equipos cuando RN-12 está desactivada ([motor](motor.md#busqueda-coreenginesearchpy)).
 4. **Buscar con retroceso** (*backtracking*) todos los conjuntos independientes de tamaño
    `k = 6 − huecos reservados` que contienen los miembros fijados. Los candidatos se recorren
    en un orden canónico (número de la Pokédex nacional y forma) para que el resultado sea
@@ -85,7 +88,8 @@ optimizar:
 | 120 | 2,5 millones de equipos, 19,5 s | — |
 
 Para los tamaños esperados (decenas de favoritos), la enumeración exhaustiva con poda es
-suficiente y exacta.
+suficiente y exacta. Con datos reales de Rojo Fuego (28 candidatos), la implementación tarda
+0,04 s con las reglas por defecto ([rendimiento](motor.md#rendimiento)).
 
 Si RN-12 está desactivada y hay muchos favoritos, se puede añadir **ramificación y poda**
 (*branch and bound*) con una cota superior de la puntuación: por ejemplo, la cobertura de RN-17

@@ -10,6 +10,8 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
 - `test_architecture.py`: comprueba que `core/` solo importa la biblioteca estándar.
 - `core/`: tests del motor de reglas. `core/builders.py` tiene constructores de datos de prueba
   legibles (`pokemon(...)`, `type_chart(...)`, `context(...)`) que usan todos sus tests.
+  `core/scenario.py` construye el escenario real de Rojo Fuego a partir de un extracto de
+  `reference.sqlite` (`core/fixtures/`, con su README y el script que lo genera).
 - `db/test_reference_schema.py`: esquema de `reference.sqlite` (tablas documentadas, lectura
   y escritura, y restricciones de integridad).
 - `ingest/test_load.py`: carga de `reference.sqlite` (filas desordenadas, registro de la
