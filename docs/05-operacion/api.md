@@ -5,8 +5,9 @@ endpoint está en la [API](../02-ddt/api.md); cómo se usa, en el
 [manual de usuario](../04-manual-usuario/api.md).
 
 !!! note "Estado"
-    Fase 1 del [plan de la API](../02-ddt/plan-api.md#fases): arranque, `user.sqlite` con sus
-    migraciones y `GET /api/meta`. El resto de endpoints llega en las fases siguientes.
+    Fases 1 y 2 del [plan de la API](../02-ddt/plan-api.md#fases): arranque, `user.sqlite` con
+    sus migraciones, metadatos, favoritos, reglas y juegos. El resto de endpoints llega en las
+    fases siguientes.
 
 ## Arrancar
 
@@ -79,4 +80,5 @@ Al cambiar un modelo de `db/user/models.py`:
 | `api/main.py` | `create_app(settings)`: crea la aplicación, abre las bases de datos al arrancar y las cierra al parar. `app` es la que sirve uvicorn. |
 | `api/config.py` | `Settings`: el directorio de datos, de `PTB_DATA_DIR`. |
 | `api/database.py` | `Databases`: migra y abre `user.sqlite` al arrancar y abre `reference.sqlite` cuando una petición lo necesita (`503` si no existe). Dependencias `reference_session` y `user_session` para los endpoints. |
+| `api/errors.py` | Errores de los casos de uso (`NotFoundError`, `ConflictError`) y su traducción a `404` y `409`. |
 | `db/user/` | Modelos de `user.sqlite`, `upgrade(path)` y las migraciones. |

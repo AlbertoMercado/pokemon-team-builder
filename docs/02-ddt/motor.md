@@ -98,7 +98,8 @@ y `GameContext`, que contienen diccionarios de solo lectura.
 ## Catálogo de reglas (`core/rules/catalog.py`)
 
 `CATALOG` es el catálogo estático de [CA-10](../01-ddf/cuestiones-abiertas.md#resueltas): las 20
-reglas del DDF con su clase y si son configurables.
+reglas del DDF con su nombre, una descripción de una frase para la interfaz
+([RF-07](../01-ddf/requisitos-funcionales.md#rf-07)), su clase y si son configurables.
 
 | Clase | Reglas | Configurable |
 |-------|--------|--------------|

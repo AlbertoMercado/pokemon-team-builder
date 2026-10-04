@@ -11,9 +11,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from api import errors
 from api.config import Settings
 from api.database import Databases
-from api.routers import meta
+from api.routers import favorites, games, meta, rules
 from api.services.meta import app_version
 
 
@@ -37,7 +38,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         docs_url="/api/docs",
         redoc_url=None,
     )
-    app.include_router(meta.router, prefix="/api")
+    errors.register(app)
+    for router in (favorites.router, rules.router, games.router, meta.router):
+        app.include_router(router, prefix="/api")
     return app
 
 

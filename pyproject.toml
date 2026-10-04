@@ -57,6 +57,7 @@ select = [
 "tests/**" = ["PLR2004"] # magic values are fine in assertions
 # Test data builders take many optional keyword arguments so each test states only what it needs.
 "tests/core/builders.py" = ["PLR2004", "PLR0913", "PLR0917"]
+"tests/api/factories.py" = ["PLR2004", "PLR0913", "PLR0917"]
 
 [tool.ruff.format]
 quote-style = "double"

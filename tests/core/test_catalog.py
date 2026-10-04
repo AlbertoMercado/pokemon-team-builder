@@ -84,3 +84,8 @@ def test_invalid_activation_changes_are_rejected(enabled: dict[str, bool], messa
 def test_invalid_weight_changes_are_rejected(weights: dict[str, int], message: str) -> None:
     with pytest.raises(SettingsError, match=message):
         RuleSettings.defaults().with_changes(weights=weights)
+
+
+def test_every_rule_has_a_description() -> None:
+    """RF-07: the interface shows what each rule does."""
+    assert all(rule.description for rule in CATALOG.values())

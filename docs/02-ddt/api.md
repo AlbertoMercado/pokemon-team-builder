@@ -32,22 +32,28 @@ del [plan de la API](plan-api.md#fases). Cómo se arranca: [Operación](../05-op
 
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
-| `GET` | `/api/favorites` | Lista de favoritos con su número total. | RF-04 |
-| `PUT` | `/api/favorites/{pokemon}` | Añade un favorito. Es idempotente. | RF-03 |
-| `DELETE` | `/api/favorites/{pokemon}` | Quita un favorito. | RF-03, RF-04 |
+| `GET` | `/api/favorites` | Lista de favoritos con su número total (`total`), en orden de la Pokédex Nacional. Cada uno con su forma, nombre, número, tipos actuales y cuándo se añadió. ✅ | RF-04 |
+| `PUT` | `/api/favorites/{pokemon}` | Añade un favorito y lo devuelve. Es idempotente. `404` si la forma no existe en los datos cargados. ✅ | RF-03 |
+| `DELETE` | `/api/favorites/{pokemon}` | Quita un favorito: `204`, o `404` si no lo era. ✅ | RF-03, RF-04 |
+
+Los **tipos actuales** son los de la última generación cargada (hoy, la 3.ª: Clefairy es
+Normal). Para generar se usan los del juego objetivo ([RN-10](../01-ddf/reglas-negocio.md#rn-10)).
 
 ### Reglas
 
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
-| `GET` | `/api/rules` | Catálogo con tipo, descripción, si es configurable, estado actual y peso. | RF-06, RF-07 |
-| `PATCH` | `/api/rules/{rule_id}` | Cambia `enabled` o `weight` (0 a 10). `409` si la regla no es configurable. | RF-06, RF-07 |
+| `GET` | `/api/rules` | Las 20 reglas del catálogo, en orden, con su nombre, descripción, tipo (`hard`, `presence`, `soft` o `mechanism`), si son configurables, si están activas, su peso y su peso por defecto. ✅ | RF-06, RF-07 |
+| `PATCH` | `/api/rules/{rule_id}` | Cambia `enabled`, `weight` (0 a 10) o los dos, y devuelve la regla. `404` si no existe; `409` si no es configurable o se da peso a una regla que no es blanda; `422` si el peso está fuera de rango o no se indica nada. ✅ | RF-06, RF-07 |
+
+`user.sqlite` solo guarda las reglas que el usuario ha cambiado; el resto usa los valores por
+defecto del catálogo ([CA-41](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 ### Juegos y revisión de datos
 
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
-| `GET` | `/api/games` | Juegos que pueden ser juego objetivo. | RF-05 |
+| `GET` | `/api/games` | Juegos que pueden ser juego objetivo: los marcados como objetivo y con crianza, en orden de lanzamiento. ✅ | RF-05 |
 | `GET` | `/api/games/{game}/review` | Datos sin verificar que intervienen, con su propuesta y estado. | RF-15 |
 | `PUT` | `/api/games/{game}/review/{fact_key}` | Confirma un dato, con el valor propuesto o corregido: un booleano, o la lista de Pokémon del equipo si es un combate clave. | RF-15 |
 | `POST` | `/api/games/{game}/review/accept-proposals` | Acepta de una vez todas las propuestas inferidas. Los datos pendientes, sin propuesta, se siguen tratando uno a uno. | RF-15 |
