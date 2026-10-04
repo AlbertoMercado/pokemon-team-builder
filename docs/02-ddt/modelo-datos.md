@@ -179,7 +179,7 @@ Es la única entrada de `core/`. Lo construye `api/services/` a partir de las do
 |-------|-----------|
 | `game` | Juego, generación y mecánicas resueltas. |
 | `type_chart` | Tabla de eficacias de la generación. |
-| `favorites` | Candidatos con forma, especie, línea y rama evolutiva, tipos ordenados en el juego, si se puede criar, etapa que nace del huevo, pasos de evolución con su método y disponibilidad. |
+| `favorites` | Candidatos con forma, especie, generación, línea evolutiva con sus etapas y los grupos huevo de toda la línea, tipos ordenados en el juego, pasos de evolución con su método y disponibilidad. El motor decide si se pueden criar y qué etapa nace del huevo ([motor](motor.md)). |
 | `pool` | Los demás Pokémon del juego, para las sugerencias de [RN-08](../01-ddf/reglas-negocio.md#rn-08), cada uno marcado como verificado o no ([CA-31](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `key_battles` | Combates clave con los tipos de cada Pokémon rival. |
 | `journey` | Registros del *Hall of Fame* en orden. `core/journey.py` calcula con ellos las exclusiones. |

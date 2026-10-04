@@ -5,9 +5,9 @@ equipos, y cómo se usa. El plan completo, con las fases y la interpretación de
 está en el [plan de implementación del motor](plan-motor.md).
 
 !!! note "Estado"
-    Fase 1 de 6: modelos del dominio, tabla de tipos y catálogo de reglas con la
-    configuración del usuario. Las reglas, la búsqueda y las sugerencias llegan en las fases
-    2 a 6.
+    Fases 1 y 2 de 6: modelos del dominio, tabla de tipos, catálogo de reglas con la
+    configuración del usuario y filtros por candidato (RN-03, RN-11 y RN-16). La puntuación,
+    la búsqueda y las sugerencias llegan en las fases 3 a 6.
 
 ## Restricciones
 
@@ -29,7 +29,7 @@ classDiagram
         pool
         key_battles
         settings
-        journey_exclusions
+        journey
     }
     GameContext --> GameInfo
     GameContext --> TypeChart
@@ -37,6 +37,8 @@ classDiagram
     GameContext --> "*" PoolEntry : pool
     GameContext --> "*" KeyBattle
     GameContext --> RuleSettings
+    GameContext --> "*" HallOfFameEntry : journey
+    HallOfFameEntry --> "*" JourneyMember
     Candidate --> PokemonData
     Candidate --> Availability
     PoolEntry --> PokemonData
@@ -49,15 +51,19 @@ classDiagram
 | Modelo | Fichero | Qué representa |
 |--------|---------|----------------|
 | `TypeChart` | `types.py` | Tipos de una generación y factor de cada pareja atacante-defensor ([RN-10](../01-ddf/reglas-negocio.md#rn-10)). |
-| `PokemonData` | `pokemon.py` | Una forma ([RN-05](../01-ddf/reglas-negocio.md#rn-05)) con sus tipos en la generación del juego, su especie, su cadena evolutiva y las etapas desde la primera de su línea hasta ella ([RN-09](../01-ddf/reglas-negocio.md#rn-09)). |
-| `Stage` | `pokemon.py` | Una etapa de la línea: forma, especie, grupos huevo y si es un bebé o un bebé de incienso ([RN-11](../01-ddf/reglas-negocio.md#rn-11), [CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `PokemonData` | `pokemon.py` | Una forma ([RN-05](../01-ddf/reglas-negocio.md#rn-05)) con la generación en que apareció ([RN-03](../01-ddf/reglas-negocio.md#rn-03)), sus tipos en la generación del juego, su especie, su cadena evolutiva, las etapas desde la primera de su línea hasta ella ([RN-09](../01-ddf/reglas-negocio.md#rn-09)) y los grupos huevo de toda la línea, evoluciones posteriores incluidas ([RN-11](../01-ddf/reglas-negocio.md#rn-11)). |
+| `Stage` | `pokemon.py` | Una etapa de la línea: forma, especie y si es un bebé o un bebé de incienso ([CA-25](../01-ddf/cuestiones-abiertas.md#resueltas), [CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `EvolutionStep` | `pokemon.py` | Un paso entre dos etapas en el juego objetivo, con el disparador y las condiciones de PokeAPI ([RN-15](../01-ddf/reglas-negocio.md#rn-15), [RN-20](../01-ddf/reglas-negocio.md#rn-20)). |
 | `Availability` | `pokemon.py` | Si la forma existe en el juego y puede llegar a tiempo ([RN-03](../01-ddf/reglas-negocio.md#rn-03)), ya confirmado. |
 | `Candidate` | `pokemon.py` | Un favorito con su disponibilidad ([RN-02](../01-ddf/reglas-negocio.md#rn-02)). |
 | `PoolEntry` | `pokemon.py` | Un Pokémon del juego que no es favorito, para las sugerencias, y si sus datos están verificados ([RN-08](../01-ddf/reglas-negocio.md#rn-08), [CA-31](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `GameInfo` | `game.py` | Juego objetivo, su generación y las mecánicas que tiene (`day_night_cycle`, `contests`). |
 | `KeyBattle`, `Rival` | `game.py` | Combate clave y los tipos de cada Pokémon rival ([RN-17](../01-ddf/reglas-negocio.md#rn-17)). |
-| `GameContext` | `context.py` | La única entrada del motor: todo lo anterior más la configuración y las exclusiones del recorrido ([RN-16](../01-ddf/reglas-negocio.md#rn-16)). |
+| `HallOfFameEntry`, `JourneyMember` | `journey.py` | Un juego completado, su orden en el recorrido y su equipo, con la cadena evolutiva y la región de cada miembro ([RN-16](../01-ddf/reglas-negocio.md#rn-16), [RF-12](../01-ddf/requisitos-funcionales.md#rf-12)). |
+| `GameContext` | `context.py` | La única entrada del motor: todo lo anterior más la configuración del usuario y su recorrido. |
+
+`core/domain/lines.py` identifica las líneas que algunas reglas tratan aparte: la de Dragonite
+(RN-13, RN-16) y las evoluciones de Eevee que enumera RN-14.
 
 ### Tabla de tipos
 
@@ -82,7 +88,7 @@ Preguntar por un tipo que no existe en la generación (Hada en la 3.ª) es un er
 | `TypeChart` | Que estén todas las parejas de tipos y que cada factor sea 0, 50, 100 o 200. |
 | `PokemonData` | Uno o dos tipos distintos; que la última etapa sea el propio Pokémon; que los pasos de evolución unan exactamente sus etapas consecutivas (puede haber varios pasos para la misma pareja: métodos alternativos). |
 | `KeyBattle` | Que tenga al menos un rival. |
-| `GameContext` | Que la tabla de tipos sea de la generación del juego, que no haya favoritos repetidos, que ningún favorito esté también en el `pool` y que todos los tipos existan en la generación del juego ([RN-10](../01-ddf/reglas-negocio.md#rn-10)). |
+| `GameContext` | Que la tabla de tipos sea de la generación del juego, que no haya favoritos repetidos, que ningún favorito esté también en el `pool`, que no haya dos registros del *Hall of Fame* con el mismo orden y que todos los tipos existan en la generación del juego ([RN-10](../01-ddf/reglas-negocio.md#rn-10)). |
 
 Los modelos son *hashables* para poder usarlos en conjuntos, salvo `TypeChart`, `RuleSettings`
 y `GameContext`, que contienen diccionarios de solo lectura.
@@ -118,6 +124,52 @@ reglas del DDF con su clase y si son configurables.
 Es lo que guardará `user.sqlite` (`rule_setting`) y lo que la API validará al cambiar una regla
 ([API](api.md#reglas)).
 
+## Crianza (`core/breeding.py`)
+
+| Función | Qué hace |
+|---------|----------|
+| `can_be_bred(pokemon)` | Si la línea se puede criar: alguno de sus grupos huevo es distinto de `no-eggs` y `ditto` ([RN-11](../01-ddf/reglas-negocio.md#rn-11)). Pikachu y Pichu se pueden criar, porque los huevos de Pikachu dan Pichu; Mew, Zapdos, Ditto y Unown, no. |
+| `egg_stage(pokemon)` | La etapa que nace del huevo y llega al juego: la primera de la línea, salvo un bebé de incienso, que se salta (Azumarill nace como Marill). Un bebé de incienso que es el propio favorito nace como él mismo ([CA-25](../01-ddf/cuestiones-abiertas.md#resueltas), [CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `steps_from_egg(pokemon)` | Los pasos de evolución desde esa etapa hasta el favorito, que son los que revisarán RN-15 y RN-20 (fase 3). |
+
+## Recorrido (`core/journey.py`)
+
+| Función | Qué hace |
+|---------|----------|
+| `affected_entries(recorrido, generación)` | Los registros del *Hall of Fame* cuyos equipos se excluyen en un juego de esa generación: el último juego completado, sea de la generación que sea, y todos los de la misma generación ([CA-17](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `excluding_entry(pokemon, recorrido, generación)` | El registro y el miembro que excluyen a un Pokémon, o nada. Un miembro excluye su línea evolutiva en la misma forma: misma cadena y misma región ([CA-18](../01-ddf/cuestiones-abiertas.md#resueltas)). Excepciones ([CA-21](../01-ddf/cuestiones-abiertas.md#resueltas)): la línea de Dragonite nunca se excluye, y de la de Eevee solo se excluye la forma usada. |
+
+## Filtros por candidato (`core/rules/candidate.py`)
+
+Se aplican a cada favorito por separado, en este orden. El primero que lo excluye da el
+motivo ([RF-10](../01-ddf/requisitos-funcionales.md#rf-10)). Las sugerencias pasarán los mismos
+filtros ([CA-40](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+| Filtro | Regla | Configurable | Descarta si… | Motivo (`reason`) |
+|--------|-------|--------------|--------------|-------------------|
+| `AvailabilityFilter` | [RN-03](../01-ddf/reglas-negocio.md#rn-03) | No | apareció en una generación posterior a la del juego | `generation` |
+| | | | no se puede tener en el juego | `game` |
+| | | | no puede llegar y evolucionar antes de completarlo | `arrival` |
+| `BreedingFilter` | [RN-11](../01-ddf/reglas-negocio.md#rn-11) | Sí | su línea no se puede criar | `breeding` |
+| `JourneyFilter` | [RN-16](../01-ddf/reglas-negocio.md#rn-16) | Sí | su línea se usó en un equipo del recorrido que afecta al juego | `journey` |
+
+Cada descarte (`Discard`) tiene el Pokémon, la regla, el motivo, un texto en español que lo
+explica y, si lo decidió un dato que confirmó el usuario, su clave (`fact_key`), para indicar
+qué datos confirmados se usaron ([RF-09](../01-ddf/requisitos-funcionales.md#rf-09)). Por
+ejemplo:
+
+| Pokémon | Regla | `reason` | `detail` | `fact_key` |
+|---------|-------|----------|----------|------------|
+| Treecko en Oro | RN-03 | `generation` | Treecko aparece en la 3.ª generación y gold es de la 2.ª | — |
+| Raichu en Rojo Fuego | RN-03 | `arrival` | Raichu no puede llegar a firered y evolucionar antes de completarlo | `pokemon:firered:raichu:arrival` |
+| Zapdos | RN-11 | `breeding` | Zapdos no se puede criar (grupos huevo de su línea: no-eggs) | — |
+| Haunter tras usar Gengar en Verde Hoja | RN-16 | `journey` | Haunter queda excluido porque se usó gengar en leafgreen | — |
+
+`valid_candidates(ctx)` devuelve los candidatos válidos y los descartes, los dos en **orden
+canónico**: número de la Pokédex Nacional y, a igualdad, identificador de la forma
+([RF-08](../01-ddf/requisitos-funcionales.md#rf-08)). Los textos usan los identificadores de
+los juegos; la interfaz los mostrará con su nombre en español.
+
 ## Pruebas
 
 | Fichero | Qué comprueba |
@@ -125,6 +177,9 @@ Es lo que guardará `user.sqlite` (`rule_setting`) y lo que la API validará al 
 | `tests/core/test_type_chart.py` | Factores contra uno y dos tipos, inmunidades, tablas distintas por generación (RN-10) y tablas incompletas o con factores no válidos. |
 | `tests/core/test_catalog.py` | Que el catálogo tenga las 20 reglas, cuáles son configurables, los pesos por defecto (RN-04), que todas empiecen activas (CA-41) y los cambios válidos y no válidos. |
 | `tests/core/test_domain.py` | Formas regionales como Pokémon distintos (RN-05), el favorito como evolución con sus etapas (RN-09), validaciones de los modelos y del contexto, y tipos que no existen en la generación (RN-10). |
+| `tests/core/test_breeding.py` | Crianza por grupos huevo con los ejemplos de RN-11 (Zapdos, Mew, Ditto, Dragonite, Pikachu y Pichu), etapa que nace del huevo (CA-25) y bebés de incienso (CA-36). |
+| `tests/core/test_journey.py` | Qué equipos se excluyen en cada ejemplo del recorrido de RN-16, el equipo de Verde Hoja en Rojo Fuego con las excepciones de Dragonite y Eevee, y que la exclusión es por forma (CA-18). |
+| `tests/core/rules/test_candidate.py` | Los tres niveles de RN-03 (Vulpix, Treecko, Growlithe de Hisui y Raichu), RN-11 y RN-16 con su motivo, las reglas desactivadas, el orden entre filtros y el orden canónico. |
 
 `tests/core/builders.py` tiene constructores de datos de prueba legibles, que usarán todas las
 fases: `pokemon("gengar", ("ghost", "poison"), line=("gastly", "haunter"), steps=[...])`,

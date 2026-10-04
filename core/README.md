@@ -9,12 +9,15 @@ cualquier biblioteca de terceros, para poder probarlas a fondo con hypothesis
 **Qué hace**: implementa las reglas y el motor de generación de equipos a partir de un
 `GameContext` inmutable ([algoritmo](../docs/02-ddt/algoritmo-generacion.md)).
 
-**Contenido** (fase 1 de 6 del [plan del motor](../docs/02-ddt/plan-motor.md)):
+**Contenido** (fases 1 y 2 de 6 del [plan del motor](../docs/02-ddt/plan-motor.md)):
 
 | Ruta | Qué hace |
 |------|----------|
-| `domain/` | Modelos inmutables: `TypeChart`, `PokemonData` y sus etapas y pasos de evolución, `Candidate`, `PoolEntry`, `GameInfo`, `KeyBattle` y `GameContext`. |
+| `domain/` | Modelos inmutables: `TypeChart`, `PokemonData` y sus etapas y pasos de evolución, `Candidate`, `PoolEntry`, `GameInfo`, `KeyBattle`, `HallOfFameEntry` y `GameContext`; y las líneas especiales (`lines.py`). |
 | `rules/catalog.py` | Catálogo de las 20 reglas (`CATALOG`) y configuración del usuario (`RuleSettings`). |
+| `rules/candidate.py` | Filtros por candidato (RN-03, RN-11, RN-16) con el motivo de cada descarte. |
+| `breeding.py` | Si una línea se puede criar y qué etapa nace del huevo. |
+| `journey.py` | Qué excluye el recorrido del *Hall of Fame*. |
 
 **Restricciones**: solo biblioteca estándar y ningún otro paquete del proyecto. Lo comprueban
 `lint-imports` y `tests/test_architecture.py`.
