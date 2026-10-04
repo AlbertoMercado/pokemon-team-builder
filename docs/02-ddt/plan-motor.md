@@ -112,9 +112,9 @@ corrige primero en el DDF.
 | RN-12 | Dos miembros chocan si comparten algún tipo en la generación del juego, como primario o como secundario. |
 | RN-13 | Dragonite se identifica por su forma (`dragonite`). El nivel 2 son los candidatos válidos con tipo primario Dragón; el 3, los Pokémon del juego con tipo primario Dragón que no son candidatos válidos. |
 | RN-14 | Evolución de Eevee = cualquier forma de la cadena de Eevee salvo Eevee. Como restricción entre miembros, dos evoluciones de Eevee chocan; como presencia, el equipo necesita una. |
-| RN-15 | Un miembro es tedioso si lo es alguno de los pasos desde la etapa que nace del huevo hasta él. Tediosos: intercambio, muda (Shedinja), aleatorio, comparación de estadísticas, hora del día, belleza, lugar, equipo, movimiento no aprendido por nivel, otros raros; y cualquier paso imposible en el juego: hora del día sin `day_night_cycle` o belleza sin `contests`. No tediosos: nivel, amistad, objeto y piedras. |
+| RN-15 | Un miembro es tedioso si lo es alguno de los pasos desde la etapa que nace del huevo hasta él. Tediosos: intercambio, muda (Shedinja), aleatorio, comparación de estadísticas, hora del día, belleza, lugar, equipo, movimiento no aprendido por nivel, otros raros; y cualquier paso imposible en el juego: hora del día sin `day_night_cycle` o belleza sin `contests`. No tediosos: nivel, amistad, objeto y piedras, y llevar un objeto equipado si no hay otra condición. Una condición o un disparador desconocidos cuentan como tediosos, para que una condición nueva de PokeAPI nunca haga parecer fácil una evolución. Si una pareja de etapas tiene varios métodos, cuenta el más fácil, porque el jugador lo elige. Sin la tabla `level_move`, conocer un movimiento cuenta siempre como tedioso; hasta la 3.ª generación ninguna evolución lo exige. Un equipo vacío puntúa 1. |
 | RN-16 | Se excluyen las formas de la misma cadena y región que cada miembro de los equipos afectados, salvo la cadena de Dragonite; de la de Eevee, solo la evolución usada. |
-| RN-17 | Por cada Pokémon rival: **ataque** = algún miembro tiene un tipo cuyo factor contra el rival (producto de sus tipos) es ×2 o más; **defensa** = algún miembro tiene un factor ×0,5 o menos (inmunidad incluida) frente a al menos un tipo del rival y menos de ×2 frente a todos. La puntuación del rival es la media de los dos; la del combate, la media de sus rivales; la de la regla, la media de los combates. |
+| RN-17 | Por cada Pokémon rival: **ataque** = algún miembro tiene un tipo cuyo factor contra el rival (producto de sus tipos) es ×2 o más; **defensa** = algún miembro tiene un factor ×0,5 o menos (inmunidad incluida) frente a al menos un tipo del rival y menos de ×2 frente a todos. La puntuación del rival es la media de los dos; la del combate, la media de sus rivales; la de la regla, la media de los combates. Sin combates clave, la regla puntúa 0. |
 | RN-19 | La clave de comparación es `(puntuación, miembros con dos tipos)`. |
 | RN-20 | Un miembro es aleatorio si alguno de sus pasos tiene `percentage_chance` o `condition_expression` (Wurmple). Puntúa 0 si hay alguno en el equipo. |
 
@@ -155,7 +155,7 @@ flowchart LR
 |------|------|-----------|-------|
 | 1 ✅ | `feat/core-dominio` | Modelos de entrada de `core/domain/`, `TypeChart` con el factor contra dos tipos, catálogo de reglas con sus valores por defecto y `RuleSettings`. Nueva página del DDT [Motor de reglas](motor.md). Los modelos de salida (`GenerationResult`) se añaden en las fases que los usan. | Modelos, tabla de tipos (Fantasma contra Psíquico en la 1.ª generación, Agua contra Roca/Tierra ×4) y catálogo. |
 | 2 ✅ | `feat/core-filtros` | `breeding.py`, `journey.py` y los filtros RN-03, RN-11 y RN-16 con su motivo de descarte. Ajustes de los modelos: los grupos huevo pasan a ser de toda la línea (Pichu se puede criar), cada forma lleva su generación (para explicar el nivel de RN-03) y el contexto recibe el *Hall of Fame* en lugar de una lista de exclusiones. | Ejemplos de RN-03, RN-11 y RN-16 del DDF, incluidas las excepciones de Dragonite y Eevee. |
-| 3 | `feat/core-puntuacion` | `evolution.py`, las reglas blandas RN-06, RN-15, RN-17 y RN-20, la puntuación ponderada con desglose y la clave de RN-19. | Ejemplos de RN-15 (Gengar, Raichu, Milotic), RN-20 (Wurmple) y RN-17 (Brock); suma del desglose. |
+| 3 ✅ | `feat/core-puntuacion` | `evolution.py`, las reglas blandas RN-06, RN-15, RN-17 y RN-20, la puntuación ponderada con desglose y la clave de RN-19. | Ejemplos de RN-15 (Gengar, Raichu, Milotic), RN-20 (Wurmple) y RN-17 (Brock); suma del desglose. |
 | 4 | `feat/core-busqueda` | Restricciones RN-07, RN-12 y RN-14, niveles de presencia de RN-13 y RN-14, grafo de incompatibilidades, búsqueda con retroceso y `generate` para equipos completos. | Ejemplos de RN-07, RN-12, RN-13 y RN-14; propiedades con hypothesis y fuerza bruta; escenario real de Rojo Fuego. |
 | 5 | `feat/core-sugerencias` | Equipo incompleto con huecos reservados por las reglas de presencia, sugerencias que pasan los filtros por candidato y ordenadas (RN-08, RN-19, CA-40) y agrupación de empates (CA-33). | Ejemplos de RN-08 (4 candidatos en Rojo Fuego, Dragonite que deja un equipo de 5) y de CA-33 (Lapras o Cloyster). |
 | 6 | `feat/core-revision` | `review.py`: datos inferidos o pendientes que intervienen (RN-18), sin los de favoritos ya descartados con datos automáticos. | Ejemplo de RN-18 (Raichu en Rojo Fuego). |
@@ -174,9 +174,9 @@ Se completa en cada fase con el módulo y los tests de cada regla. Detalle de lo
 | RN-01 | `engine/` | 4 | Pendiente |
 | RN-02 | `engine/` | 4 | Pendiente |
 | RN-03 | `rules/candidate.py` | 2 | Hecho (`rules/test_candidate.py`) |
-| RN-04 | `rules/catalog.py` (pesos), `scoring.py` | 1, 3 | Pesos hechos (`test_catalog.py`); puntuación pendiente |
+| RN-04 | `rules/catalog.py` (pesos), `scoring.py` | 1, 3 | Hecho (`test_catalog.py`, `test_scoring.py`) |
 | RN-05 | `domain/` | 1 | Hecho (`test_domain.py`) |
-| RN-06 | `rules/soft.py` | 3 | Pendiente |
+| RN-06 | `rules/soft.py` | 3 | Hecho (`rules/test_soft.py`) |
 | RN-07 | `rules/team.py` | 4 | Pendiente |
 | RN-08 | `engine/suggestions.py` | 5 | Pendiente |
 | RN-09 | `domain/`, `engine/` | 1, 4 | Modelo hecho (`test_domain.py`); uso en el motor pendiente |
@@ -185,12 +185,12 @@ Se completa en cada fase con el módulo y los tests de cada regla. Detalle de lo
 | RN-12 | `rules/team.py` | 4 | Pendiente |
 | RN-13 | `rules/team.py` | 4 | Pendiente |
 | RN-14 | `rules/team.py` | 4 | Pendiente |
-| RN-15 | `evolution.py`, `rules/soft.py` | 3 | Pendiente |
+| RN-15 | `evolution.py`, `rules/soft.py` | 3 | Hecho (`test_evolution.py`, `rules/test_soft.py`, `test_scoring.py`) |
 | RN-16 | `journey.py`, `rules/candidate.py` | 2 | Hecho (`test_journey.py`, `rules/test_candidate.py`) |
-| RN-17 | `rules/soft.py` | 3 | Pendiente |
+| RN-17 | `rules/soft.py` | 3 | Hecho (`rules/test_soft.py`) |
 | RN-18 | `review.py` | 6 | Pendiente |
-| RN-19 | `scoring.py`, `engine/suggestions.py` | 3, 5 | Pendiente |
-| RN-20 | `evolution.py`, `rules/soft.py` | 3 | Pendiente |
+| RN-19 | `scoring.py`, `engine/suggestions.py` | 3, 5 | Clave de los equipos hecha (`test_scoring.py`); sugerencias pendientes |
+| RN-20 | `evolution.py`, `rules/soft.py` | 3 | Hecho (`test_evolution.py`, `rules/test_soft.py`, `test_scoring.py`) |
 
 ## Riesgos
 

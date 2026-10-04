@@ -5,9 +5,11 @@ equipos, y cómo se usa. El plan completo, con las fases y la interpretación de
 está en el [plan de implementación del motor](plan-motor.md).
 
 !!! note "Estado"
-    Fases 1 y 2 de 6: modelos del dominio, tabla de tipos, catálogo de reglas con la
-    configuración del usuario y filtros por candidato (RN-03, RN-11 y RN-16). La puntuación,
-    la búsqueda y las sugerencias llegan en las fases 3 a 6.
+    Fases 1 a 3 de 6: modelos del dominio, tabla de tipos, catálogo de reglas con la
+    configuración del usuario, filtros por candidato (RN-03, RN-11 y RN-16), dificultad de
+    las evoluciones, reglas blandas (RN-06, RN-15, RN-17 y RN-20) y puntuación con su
+    desglose y su desempate (RN-04, RN-19). La búsqueda y las sugerencias llegan en las
+    fases 4 a 6.
 
 ## Restricciones
 
@@ -130,7 +132,7 @@ Es lo que guardará `user.sqlite` (`rule_setting`) y lo que la API validará al 
 |---------|----------|
 | `can_be_bred(pokemon)` | Si la línea se puede criar: alguno de sus grupos huevo es distinto de `no-eggs` y `ditto` ([RN-11](../01-ddf/reglas-negocio.md#rn-11)). Pikachu y Pichu se pueden criar, porque los huevos de Pikachu dan Pichu; Mew, Zapdos, Ditto y Unown, no. |
 | `egg_stage(pokemon)` | La etapa que nace del huevo y llega al juego: la primera de la línea, salvo un bebé de incienso, que se salta (Azumarill nace como Marill). Un bebé de incienso que es el propio favorito nace como él mismo ([CA-25](../01-ddf/cuestiones-abiertas.md#resueltas), [CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| `steps_from_egg(pokemon)` | Los pasos de evolución desde esa etapa hasta el favorito, que son los que revisarán RN-15 y RN-20 (fase 3). |
+| `steps_from_egg(pokemon)` | Los pasos de evolución desde esa etapa hasta el favorito, que son los que revisan RN-15 y RN-20 ([evoluciones](#evoluciones-coreevolutionpy)). |
 
 ## Recorrido (`core/journey.py`)
 
@@ -170,6 +172,88 @@ canónico**: número de la Pokédex Nacional y, a igualdad, identificador de la 
 ([RF-08](../01-ddf/requisitos-funcionales.md#rf-08)). Los textos usan los identificadores de
 los juegos; la interfaz los mostrará con su nombre en español.
 
+## Evoluciones (`core/evolution.py`)
+
+Decide si un paso de evolución es tedioso ([RN-15](../01-ddf/reglas-negocio.md#rn-15)),
+aleatorio ([RN-20](../01-ddf/reglas-negocio.md#rn-20)) o imposible en el juego objetivo, a
+partir del disparador y las condiciones de PokeAPI tal como los guarda la ingesta
+([modelo de datos](modelo-datos.md#evoluciones)).
+
+`step_tedium(paso, juego)` devuelve los motivos (`Tedium`) por los que un paso es tedioso, o
+ninguno si es fácil:
+
+| Motivo | Disparador o condición de PokeAPI | Ejemplo |
+|--------|-----------------------------------|---------|
+| `trade` | `trade` (con o sin `held_item` o `trade_species`) | Haunter → Gengar, Onix → Steelix |
+| `shed` | `shed` | Nincada → Shedinja |
+| `random` | `percentage_chance` o `condition_expression` | Wurmple → Silcoon o Cascoon |
+| `stats` | `relative_physical_stats` | Tyrogue → Hitmonlee |
+| `time_of_day` | `time_of_day` | Eevee → Espeon |
+| `beauty` | `minimum_beauty` | Feebas → Milotic |
+| `location` | `location`, `region` | Magneton → Magnezone (4.ª generación) |
+| `party` | `party_species`, `party_type` | Mantyke → Mantine (4.ª generación) |
+| `move` | `known_move`, `known_move_type` | Piloswine → Mamoswine (4.ª generación) |
+| `other` | Cualquier otro disparador o condición, también los desconocidos | Lluvia, girar la consola, golpes críticos |
+| `impossible` | `time_of_day` sin `day_night_cycle` o `minimum_beauty` sin `contests` en el juego | Espeon y Milotic en Rojo Fuego |
+
+No son tediosos `level-up` y `use-item` con nivel, amistad, cariño, objeto o un objeto
+equipado sin más condiciones. Todo lo que el módulo no conoce cuenta como tedioso, para que
+una condición nueva de PokeAPI nunca haga parecer fácil una evolución.
+
+`assess(pokemon, juego)` revisa los pasos desde la etapa que nace del huevo
+([CA-25](../01-ddf/cuestiones-abiertas.md#resueltas)) hasta el favorito y devuelve una
+`EvolutionAssessment` con los pasos tediosos, en el orden de la línea, y sus motivos:
+
+- `is_tedious`: algún paso es tedioso (RN-15).
+- `is_random`: algún paso es aleatorio (RN-20). Un paso aleatorio también es tedioso.
+
+Si una pareja de etapas tiene varios métodos, cuenta el más fácil, porque el jugador lo elige.
+
+Con los datos reales de Rojo Fuego, 21 de los 184 pasos son tediosos: los intercambios, Tyrogue,
+Wurmple, Nincada → Shedinja y, por ser imposibles en el juego, Espeon, Umbreon y Milotic.
+
+## Reglas blandas (`core/rules/soft.py`)
+
+Cada regla blanda puntúa un equipo entre 0 y 1 y dice qué miembros cuentan en contra
+(`SoftScore`). `SOFT_RULES` las reúne por identificador.
+
+| Clase | Regla | Puntuación |
+|-------|-------|------------|
+| `SameSpeciesRule` | [RN-06](../01-ddf/reglas-negocio.md#rn-06) | 1 si no hay dos formas de la misma especie; si las hay, 0. |
+| `TediousEvolutionRule` | [RN-15](../01-ddf/reglas-negocio.md#rn-15) | `1 − tediosos / miembros`. Un equipo vacío puntúa 1. |
+| `KeyBattleCoverageRule` | [RN-17](../01-ddf/reglas-negocio.md#rn-17) | Media de los combates clave; cada combate es la media de sus rivales y cada rival, la media de ataque y defensa. Sin combates clave, 0. |
+| `RandomEvolutionRule` | [RN-20](../01-ddf/reglas-negocio.md#rn-20) | 1 si ningún miembro necesita una evolución aleatoria; si alguno la necesita, 0. |
+
+En RN-17, frente a cada Pokémon rival:
+
+- **Ataque**: algún tipo de algún miembro le hace ×2 o más (el factor es el producto contra
+  sus dos tipos).
+- **Defensa**: algún miembro recibe ×0,5 o menos (inmunidad incluida) de al menos un tipo del
+  rival y menos de ×2 de todos.
+
+Ejemplo de Brock (Geodude y Onix, Roca/Tierra): un miembro de tipo Agua cubre el ataque
+(×4) y puntúa 1/2. Con uno de tipo Lucha, que resiste Roca y no es débil a Tierra, se cubre
+también la defensa y se llega a 1.
+
+## Puntuación (`core/scoring.py`)
+
+`score_team(equipo, ctx)` aplica las reglas blandas activas, en el orden del catálogo, y
+devuelve un `TeamScore`:
+
+| Campo | Qué es |
+|-------|--------|
+| `breakdown` | Una `RuleContribution` por regla activa: peso, puntuación, aportación (`peso · puntuación`) y miembros que cuentan en contra ([RF-09](../01-ddf/requisitos-funcionales.md#rf-09)). Una regla con peso 0 aparece, pero no aporta nada. |
+| `total` | La suma de las aportaciones ([RN-04](../01-ddf/reglas-negocio.md#rn-04)), así que el desglose siempre cuadra. |
+| `dual_types` | Miembros con dos tipos en el juego objetivo. |
+| `ranking_key` | `(total, dual_types)`: mayor es mejor. Primero la puntuación y, a igualdad, más miembros con dos tipos ([RN-19](../01-ddf/reglas-negocio.md#rn-19)). |
+
+Los miembros se ordenan antes de puntuar (`canonical_team`), así que el resultado no depende del
+orden en que llegan. Todo es exacto, con `Fraction`
+([ADR-0006](../03-adr/0006-algoritmo-busqueda-exacta.md)).
+
+Con los pesos por defecto, en un equipo de 6, Beautifly resta 5,5 puntos (0,5 por RN-15 y 5
+por RN-20) y Gengar resta 0,5, como en el ejemplo de RN-20.
+
 ## Pruebas
 
 | Fichero | Qué comprueba |
@@ -179,6 +263,9 @@ los juegos; la interfaz los mostrará con su nombre en español.
 | `tests/core/test_domain.py` | Formas regionales como Pokémon distintos (RN-05), el favorito como evolución con sus etapas (RN-09), validaciones de los modelos y del contexto, y tipos que no existen en la generación (RN-10). |
 | `tests/core/test_breeding.py` | Crianza por grupos huevo con los ejemplos de RN-11 (Zapdos, Mew, Ditto, Dragonite, Pikachu y Pichu), etapa que nace del huevo (CA-25) y bebés de incienso (CA-36). |
 | `tests/core/test_journey.py` | Qué equipos se excluyen en cada ejemplo del recorrido de RN-16, el equipo de Verde Hoja en Rojo Fuego con las excepciones de Dragonite y Eevee, y que la exclusión es por forma (CA-18). |
+| `tests/core/test_evolution.py` | Gengar, Raichu, Milotic, Espeon y Beautifly en Rojo Fuego y en Esmeralda, cada método de CA-20, condiciones desconocidas, métodos alternativos y pasos anteriores a la etapa que nace del huevo (RN-15, RN-20). |
+| `tests/core/rules/test_soft.py` | RN-06 (Vulpix y Vulpix de Alola), RN-15, RN-20 y RN-17 con el ejemplo de Brock, el peso de cada combate y de cada rival, y la tabla de tipos de la generación. Que cada regla blanda del catálogo esté implementada. |
+| `tests/core/test_scoring.py` | Pesos por defecto en el desglose, el ejemplo de Beautifly y Gengar, reglas desactivadas y con peso 0, desempate de Lapras y Blastoise (RN-19) y, con hypothesis, que el total sea la suma del desglose, esté entre 0 y la suma de pesos y no dependa del orden de los miembros. |
 | `tests/core/rules/test_candidate.py` | Los tres niveles de RN-03 (Vulpix, Treecko, Growlithe de Hisui y Raichu), RN-11 y RN-16 con su motivo, las reglas desactivadas, el orden entre filtros y el orden canónico. |
 
 `tests/core/builders.py` tiene constructores de datos de prueba legibles, que usarán todas las
