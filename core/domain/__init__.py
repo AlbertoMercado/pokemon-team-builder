@@ -2,6 +2,7 @@
 
 from core.domain.context import GameContext, GameContextError
 from core.domain.game import CONTESTS, DAY_NIGHT_CYCLE, GameInfo, KeyBattle, Rival
+from core.domain.journey import HallOfFameEntry, JourneyMember
 from core.domain.pokemon import (
     Availability,
     Candidate,
@@ -24,6 +25,8 @@ __all__ = [
     "GameContext",
     "GameContextError",
     "GameInfo",
+    "HallOfFameEntry",
+    "JourneyMember",
     "KeyBattle",
     "PokemonData",
     "PokemonDataError",

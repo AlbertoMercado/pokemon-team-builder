@@ -44,14 +44,13 @@ en memoria.
 
 ## Interfaz pública
 
-Tres funciones, una por caso de uso. Todo lo demás es interno.
+Dos funciones, una por caso de uso. Todo lo demás es interno: el recorrido (RN-16) lo calcula
+el motor a partir de los registros del *Hall of Fame* que van en el contexto.
 
 ```mermaid
 flowchart LR
-    S["api/services/<br/>(más adelante)"] -- GameContext --> G["engine.generate(ctx)"]
+    S["api/services/<br/>(más adelante)"] -- "GameContext<br/>(con el Hall of Fame)" --> G["engine.generate(ctx)"]
     S -- "favoritos y datos revisables" --> R["review.pending_facts(...)"]
-    S -- "Hall of Fame" --> J["journey.exclusions(...)"]
-    J -- exclusiones --> S
     G --> Res["GenerationResult<br/>equipos agrupados, desglose,<br/>descartes y sugerencias"]
     R --> F["Datos sin verificar<br/>que intervienen"]
 ```
@@ -60,7 +59,6 @@ flowchart LR
 |---------|---------|--------|--------|
 | `engine.generate(ctx)` | `GameContext` con todos los datos ya confirmados | `GenerationResult` | RN-01 a RN-17, RN-19, RN-20 |
 | `review.pending_facts(...)` | Favoritos, datos del juego y su origen | Datos inferidos o pendientes que intervienen | RN-18 |
-| `journey.exclusions(...)` | Registros del *Hall of Fame* en orden y juego objetivo | Formas excluidas | RN-16 |
 
 `generate` nunca recibe datos sin confirmar: si queda alguno, la API responde `409` antes de
 llamarla ([API](api.md#generacion)). Por eso el motor no conoce el origen de los datos; solo
@@ -78,7 +76,8 @@ En `core/domain/`. Los nombres de campo son orientativos y se fijan en la fase 1
 | `KeyBattle` | Combate clave: categoría y tipos de cada Pokémon rival (RN-17). |
 | `GameInfo` | Juego, generación y mecánicas (`day_night_cycle`, `contests`). |
 | `RuleSettings` | Reglas activas y pesos de las blandas, con los valores por defecto del catálogo (RN-04, CA-05, CA-37). |
-| `GameContext` | Todo lo anterior: juego, tabla de tipos, favoritos con su disponibilidad, Pokémon del juego para sugerencias (`pool`), combates clave, exclusiones del recorrido y configuración. |
+| `HallOfFameEntry` | Un juego completado con su orden y su equipo, para el recorrido (RN-16). |
+| `GameContext` | Todo lo anterior: juego, tabla de tipos, favoritos con su disponibilidad, Pokémon del juego para sugerencias (`pool`), combates clave, recorrido y configuración. |
 | `GenerationResult` | Estado (`complete` o `incomplete`), grupos de equipos empatados con su puntuación y desglose, descartes con su motivo, reglas de presencia que no se pueden cumplir y sugerencias por hueco. |
 
 ## Módulos
@@ -155,7 +154,7 @@ flowchart LR
 | Fase | Rama | Contenido | Tests |
 |------|------|-----------|-------|
 | 1 ✅ | `feat/core-dominio` | Modelos de entrada de `core/domain/`, `TypeChart` con el factor contra dos tipos, catálogo de reglas con sus valores por defecto y `RuleSettings`. Nueva página del DDT [Motor de reglas](motor.md). Los modelos de salida (`GenerationResult`) se añaden en las fases que los usan. | Modelos, tabla de tipos (Fantasma contra Psíquico en la 1.ª generación, Agua contra Roca/Tierra ×4) y catálogo. |
-| 2 | `feat/core-filtros` | `breeding.py`, `journey.py` y los filtros RN-03, RN-11 y RN-16 con su motivo de descarte. | Ejemplos de RN-03, RN-11 y RN-16 del DDF, incluidas las excepciones de Dragonite y Eevee. |
+| 2 ✅ | `feat/core-filtros` | `breeding.py`, `journey.py` y los filtros RN-03, RN-11 y RN-16 con su motivo de descarte. Ajustes de los modelos: los grupos huevo pasan a ser de toda la línea (Pichu se puede criar), cada forma lleva su generación (para explicar el nivel de RN-03) y el contexto recibe el *Hall of Fame* en lugar de una lista de exclusiones. | Ejemplos de RN-03, RN-11 y RN-16 del DDF, incluidas las excepciones de Dragonite y Eevee. |
 | 3 | `feat/core-puntuacion` | `evolution.py`, las reglas blandas RN-06, RN-15, RN-17 y RN-20, la puntuación ponderada con desglose y la clave de RN-19. | Ejemplos de RN-15 (Gengar, Raichu, Milotic), RN-20 (Wurmple) y RN-17 (Brock); suma del desglose. |
 | 4 | `feat/core-busqueda` | Restricciones RN-07, RN-12 y RN-14, niveles de presencia de RN-13 y RN-14, grafo de incompatibilidades, búsqueda con retroceso y `generate` para equipos completos. | Ejemplos de RN-07, RN-12, RN-13 y RN-14; propiedades con hypothesis y fuerza bruta; escenario real de Rojo Fuego. |
 | 5 | `feat/core-sugerencias` | Equipo incompleto con huecos reservados por las reglas de presencia, sugerencias que pasan los filtros por candidato y ordenadas (RN-08, RN-19, CA-40) y agrupación de empates (CA-33). | Ejemplos de RN-08 (4 candidatos en Rojo Fuego, Dragonite que deja un equipo de 5) y de CA-33 (Lapras o Cloyster). |
@@ -174,7 +173,7 @@ Se completa en cada fase con el módulo y los tests de cada regla. Detalle de lo
 |-------|--------|------|--------|
 | RN-01 | `engine/` | 4 | Pendiente |
 | RN-02 | `engine/` | 4 | Pendiente |
-| RN-03 | `rules/candidate.py` | 2 | Pendiente |
+| RN-03 | `rules/candidate.py` | 2 | Hecho (`rules/test_candidate.py`) |
 | RN-04 | `rules/catalog.py` (pesos), `scoring.py` | 1, 3 | Pesos hechos (`test_catalog.py`); puntuación pendiente |
 | RN-05 | `domain/` | 1 | Hecho (`test_domain.py`) |
 | RN-06 | `rules/soft.py` | 3 | Pendiente |
@@ -182,12 +181,12 @@ Se completa en cada fase con el módulo y los tests de cada regla. Detalle de lo
 | RN-08 | `engine/suggestions.py` | 5 | Pendiente |
 | RN-09 | `domain/`, `engine/` | 1, 4 | Modelo hecho (`test_domain.py`); uso en el motor pendiente |
 | RN-10 | `domain/` (`TypeChart`, tipos por generación) | 1 | Hecho (`test_type_chart.py`, `test_domain.py`) |
-| RN-11 | `breeding.py`, `rules/candidate.py` | 2 | Pendiente |
+| RN-11 | `breeding.py`, `rules/candidate.py` | 2 | Hecho (`test_breeding.py`, `rules/test_candidate.py`) |
 | RN-12 | `rules/team.py` | 4 | Pendiente |
 | RN-13 | `rules/team.py` | 4 | Pendiente |
 | RN-14 | `rules/team.py` | 4 | Pendiente |
 | RN-15 | `evolution.py`, `rules/soft.py` | 3 | Pendiente |
-| RN-16 | `journey.py`, `rules/candidate.py` | 2 | Pendiente |
+| RN-16 | `journey.py`, `rules/candidate.py` | 2 | Hecho (`test_journey.py`, `rules/test_candidate.py`) |
 | RN-17 | `rules/soft.py` | 3 | Pendiente |
 | RN-18 | `review.py` | 6 | Pendiente |
 | RN-19 | `scoring.py`, `engine/suggestions.py` | 3, 5 | Pendiente |

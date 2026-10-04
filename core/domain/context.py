@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 
 from core.domain.game import GameInfo, KeyBattle
+from core.domain.journey import HallOfFameEntry
 from core.domain.pokemon import Candidate, PokemonData, PoolEntry
 from core.domain.types import TypeChart
 from core.rules.catalog import RuleSettings
@@ -17,8 +18,8 @@ class GameContext:
     """Data of one target game, the user's favourites and settings, already resolved.
 
     Built by ``api/services/`` from both databases. Every value is already confirmed (RN-18):
-    the engine does not know where data comes from. ``journey_exclusions`` are the forms
-    excluded by the user's journey, computed by ``core.journey`` (RN-16).
+    the engine does not know where data comes from. ``journey`` are the user's Hall of Fame
+    entries; ``core.journey`` decides which forms they exclude (RN-16).
     """
 
     game: GameInfo
@@ -27,7 +28,7 @@ class GameContext:
     pool: tuple[PoolEntry, ...]
     key_battles: tuple[KeyBattle, ...]
     settings: RuleSettings
-    journey_exclusions: frozenset[str] = frozenset()
+    journey: tuple[HallOfFameEntry, ...] = ()
 
     def __post_init__(self) -> None:
         if self.type_chart.generation != self.game.generation:
@@ -42,6 +43,9 @@ class GameContext:
         in_both = sorted(set(favorites) & {entry.pokemon.slug for entry in self.pool})
         if in_both:
             raise GameContextError(f"Pokémon a la vez en favoritos y en el pool: {in_both}")
+        sequences = [entry.sequence for entry in self.journey]
+        if len(set(sequences)) != len(sequences):
+            raise GameContextError(f"registros del Hall of Fame con el mismo orden: {sequences}")
         self._check_types()
 
     def _check_types(self) -> None:

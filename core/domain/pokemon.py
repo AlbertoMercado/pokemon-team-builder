@@ -19,11 +19,10 @@ class PokemonDataError(ValueError):
 
 @dataclass(frozen=True)
 class Stage:
-    """A stage of an evolution line, used to decide breeding and the egg stage (RN-11)."""
+    """A stage of an evolution line, used to decide the stage that hatches (CA-25, CA-36)."""
 
     pokemon: str
     species: str
-    egg_groups: frozenset[str]
     is_baby: bool = False
     requires_incense: bool = False
 
@@ -52,18 +51,22 @@ class EvolutionStep:
 class PokemonData:
     """A form with its data in the target game's generation (RN-10).
 
-    ``types`` are ordered: the first is the primary type (RN-13). ``stages`` go from the
-    first stage of the line to this form, and ``evolution_steps`` link consecutive stages
-    (several steps for the same pair are alternative methods).
+    ``generation`` is the one in which the form appeared (RN-03). ``types`` are ordered: the
+    first is the primary type (RN-13). ``stages`` go from the first stage of the line to this
+    form, and ``evolution_steps`` link consecutive stages (several steps for the same pair
+    are alternative methods). ``line_egg_groups`` are the egg groups of every species of the
+    evolution line, later evolutions included, to decide whether it can be bred (RN-11).
     """
 
     slug: str
     species: str
     dex_number: int
     name: str
+    generation: int
     types: tuple[str, ...]
     evolution_chain: int
     stages: tuple[Stage, ...]
+    line_egg_groups: frozenset[str]
     evolution_steps: tuple[EvolutionStep, ...] = ()
     region: str | None = None
     is_legendary: bool = False

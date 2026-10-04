@@ -14,6 +14,8 @@ from core.domain import (
     EvolutionStep,
     GameContext,
     GameInfo,
+    HallOfFameEntry,
+    JourneyMember,
     KeyBattle,
     PokemonData,
     PoolEntry,
@@ -60,14 +62,8 @@ def step(
     return EvolutionStep(from_pokemon, to_pokemon, trigger, tuple(conditions.items()))
 
 
-def stage(
-    slug: str,
-    egg_groups: Iterable[str] = ("monster",),
-    *,
-    is_baby: bool = False,
-    requires_incense: bool = False,
-) -> Stage:
-    return Stage(slug, slug, frozenset(egg_groups), is_baby, requires_incense)
+def stage(slug: str, *, is_baby: bool = False, requires_incense: bool = False) -> Stage:
+    return Stage(slug, slug, is_baby, requires_incense)
 
 
 def pokemon(
@@ -78,7 +74,9 @@ def pokemon(
     steps: Sequence[EvolutionStep] | None = None,
     stages: Sequence[Stage] | None = None,
     dex_number: int = 1,
+    generation: int = 1,
     chain: int = 1,
+    egg_groups: Iterable[str] = ("monster",),
     species: str | None = None,
     region: str | None = None,
     legendary: bool = False,
@@ -86,8 +84,8 @@ def pokemon(
 ) -> PokemonData:
     """A form whose line is ``line`` (earlier stages) plus itself.
 
-    Without ``steps``, consecutive stages evolve by level; without ``stages``, every stage
-    is in the monster egg group.
+    Without ``steps``, consecutive stages evolve by level; without ``stages``, they are
+    plain stages. ``egg_groups`` are those of the whole line.
     """
     slugs = (*line, slug)
     if stages is None:
@@ -99,9 +97,11 @@ def pokemon(
         species=species or slug,
         dex_number=dex_number,
         name=slug.capitalize(),
+        generation=generation,
         types=tuple(types),
         evolution_chain=chain,
         stages=tuple(stages),
+        line_egg_groups=frozenset(egg_groups),
         evolution_steps=tuple(steps),
         region=region,
         is_legendary=legendary,
@@ -138,7 +138,7 @@ def context(
     chart: TypeChart | None = None,
     game: GameInfo | None = None,
     settings: RuleSettings | None = None,
-    journey_exclusions: Iterable[str] = (),
+    journey: Sequence[HallOfFameEntry] = (),
 ) -> GameContext:
     chart = chart or type_chart()
     return GameContext(
@@ -148,5 +148,15 @@ def context(
         pool=tuple(pool),
         key_battles=tuple(key_battles),
         settings=settings or RuleSettings.defaults(),
-        journey_exclusions=frozenset(journey_exclusions),
+        journey=tuple(journey),
+    )
+
+
+def completed(game: str, generation: int, sequence: int, *members: PokemonData) -> HallOfFameEntry:
+    """A Hall of Fame entry whose team is ``members``."""
+    return HallOfFameEntry(
+        game=game,
+        generation=generation,
+        sequence=sequence,
+        members=tuple(JourneyMember(m.slug, m.evolution_chain, m.region) for m in members),
     )
