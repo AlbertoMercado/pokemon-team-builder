@@ -4,7 +4,8 @@ Some data cannot be loaded reliably and is *inferred* (with a proposal) or *pend
 one). Before generating, the user confirms every such value that takes part in the
 generation (RF-15, CA-30):
 
-- the target game's data: its mechanics and its key battles;
+- the target game's data: its mechanics and, if RN-17 is active, its key battles (they are
+  used nowhere else);
 - the data of each favourite that is not already discarded with known data, such as whether
   it can arrive at the game before completing it (RN-03).
 
@@ -109,10 +110,16 @@ def pending_facts(
 ) -> tuple[Fact, ...]:
     """The inferred or pending values that take part in a generation, to confirm first.
 
-    First the game's (in the given order), then each favourite's, existence before arrival,
-    in canonical order of the favourites. Empty means the generation can go ahead.
+    First the game's (in the given order; key battles only with RN-17), then each
+    favourite's, existence before arrival, in canonical order of the favourites. Empty means
+    the generation can go ahead.
     """
-    pending = [fact for fact in game_facts if not fact.is_known]
+    key_battles_count = settings.is_enabled("RN-17")
+    pending = [
+        fact
+        for fact in game_facts
+        if not fact.is_known and (fact.kind is not FactKind.KEY_BATTLE or key_battles_count)
+    ]
     for favorite in sorted(favorites, key=lambda f: (f.pokemon.dex_number, f.pokemon.slug)):
         if _discarded_with_known_data(favorite, game, settings, entries):
             continue

@@ -111,6 +111,19 @@ def test_game_data_comes_first_and_only_if_unverified() -> None:
 
 
 @pytest.mark.rn("RN-18")
+@pytest.mark.rn("RN-17")
+def test_key_battles_are_not_asked_without_rn17() -> None:
+    """The key battles only take part in RN-17; the mechanics are still asked."""
+    game_facts = [
+        Fact("mechanic:firered:day_night_cycle", FactKind.MECHANIC, Origin.INFERRED, False),
+        Fact("battle:firered:misty", FactKind.KEY_BATTLE, Origin.PENDING),
+    ]
+    without_rn17 = DEFAULTS.with_changes(enabled={"RN-17": False})
+    found = pending_facts(FIRERED, game_facts, (), without_rn17)
+    assert [fact.key for fact in found] == ["mechanic:firered:day_night_cycle"]
+
+
+@pytest.mark.rn("RN-18")
 def test_favourites_in_canonical_order() -> None:
     pikachu = pokemon("pikachu", ("electric",), dex_number=25)
     assert _keys(_favorite(RAICHU), _favorite(pikachu)) == [

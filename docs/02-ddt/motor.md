@@ -448,7 +448,9 @@ pending_facts(juego, datos_del_juego, favoritos, configuración, recorrido) -> t
 
 Devuelve, en este orden:
 
-1. Los datos del juego sin verificar: mecánicas y combates clave.
+1. Los datos del juego sin verificar: sus mecánicas y, si [RN-17](../01-ddf/reglas-negocio.md#rn-17)
+   está activa, sus combates clave. Las mecánicas se piden siempre, porque RN-15 las usa también
+   para puntuar las sugerencias; los combates clave no se usan en ningún otro sitio.
 2. Por cada favorito, en orden canónico, su existencia y su llegada si no son conocidas,
    **salvo que ya esté descartado con datos conocidos**. Un favorito está descartado si
    apareció en una generación posterior, si su existencia o su llegada son conocidas y valen
@@ -461,6 +463,7 @@ Devuelve, en este orden:
 | Raichu, con la llegada ya confirmada | Nada. |
 | Zapdos, con llegada inferida | Nada: no se puede criar, así que su llegada no importa. |
 | Gengar, tras usarlo en Verde Hoja | Nada: el recorrido lo excluye. |
+| Un combate clave inferido, con RN-17 desactivada | Nada: no interviene. |
 
 Si la lista está vacía, se puede generar. La API la usa para `GET /api/games/{game}/review` y
 para responder `409` al generar si queda algo ([API](api.md#generacion)).
@@ -483,7 +486,7 @@ para responder `409` al generar si queda algo ([API](api.md#generacion)).
 | `tests/core/engine/test_grouping.py` | CA-33 y CA-49: Lapras o Cloyster, Vaporeon que no se agrupa con RN-14 activa y sí sin ella, los equipos que no se agrupan porque una combinación incumpliría RN-07, y que los grupos cubren todos los empates. |
 | `tests/core/test_engine_properties.py` | Con hypothesis, contextos aleatorios de hasta 12 favoritos con un pool para sugerencias: el motor devuelve exactamente los mejores equipos de una búsqueda por fuerza bruta que aplica RN-08 y CA-48, todos cumplen las reglas duras activas, las sugerencias encajan, cumplen su hueco, aportan lo que dicen y están ordenadas, cada grupo son exactamente sus combinaciones, el resultado es reproducible y `Scorer.ranking_key` coincide con la puntuación completa. |
 | `tests/core/test_scenario_firered.py` | Escenario real de Rojo Fuego: los equipos esperados con las reglas por defecto y sus grupos, los descartes, las reglas de presencia, RN-12, que tarda menos de un segundo y que sin RN-12 la cobertura es completa. |
-| `tests/core/test_review.py` | RN-18: Raichu en Rojo Fuego (el ejemplo del DDF) antes y después de confirmar, Zapdos con y sin RN-11, Treecko en Oro, una forma que no existe, el recorrido con y sin RN-16, los datos del juego y el orden. |
+| `tests/core/test_review.py` | RN-18: Raichu en Rojo Fuego (el ejemplo del DDF) antes y después de confirmar, Zapdos con y sin RN-11, Treecko en Oro, una forma que no existe, el recorrido con y sin RN-16, los datos del juego, los combates clave sin RN-17 y el orden. |
 | `tests/core/rules/test_candidate.py` | Los tres niveles de RN-03 (Vulpix, Treecko, Growlithe de Hisui y Raichu), RN-11 y RN-16 con su motivo, las reglas desactivadas, el orden entre filtros y el orden canónico. |
 
 `tests/core/builders.py` tiene constructores de datos de prueba legibles, que usarán todas las
