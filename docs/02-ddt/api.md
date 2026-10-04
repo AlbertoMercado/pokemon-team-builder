@@ -46,7 +46,7 @@ publica como OpenAPI en `/api/openapi.json`, del que se genera el cliente del fr
 |--------|------|-------------|------------|
 | `GET` | `/api/games` | Juegos que pueden ser juego objetivo. | RF-05 |
 | `GET` | `/api/games/{game}/review` | Datos sin verificar que intervienen, con su propuesta y estado. | RF-15 |
-| `PUT` | `/api/games/{game}/review/{fact_key}` | Confirma un dato, con el valor propuesto o corregido. | RF-15 |
+| `PUT` | `/api/games/{game}/review/{fact_key}` | Confirma un dato, con el valor propuesto o corregido: un booleano, o la lista de Pokémon del equipo si es un combate clave. | RF-15 |
 | `POST` | `/api/games/{game}/review/accept-proposals` | Acepta de una vez todas las propuestas inferidas. Los datos pendientes, sin propuesta, se siguen tratando uno a uno. | RF-15 |
 
 ### Generación
@@ -54,6 +54,11 @@ publica como OpenAPI en `/api/openapi.json`, del que se genera el cliente del fr
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
 | `POST` | `/api/games/{game}/generations` | Genera los equipos con los favoritos, las reglas y las confirmaciones actuales. `409` con la lista de datos pendientes si queda alguno sin confirmar. | RF-08, RF-09, RF-10 |
+
+!!! note "Esquema provisional"
+    Este ejemplo es anterior al motor y a [CA-51](../01-ddf/cuestiones-abiertas.md#resueltas).
+    El esquema definitivo, con los grupos, los huecos y las puntuaciones enteras, se fija en la
+    fase 4 del [plan de la API](plan-api.md#fases).
 
 La generación no se guarda: es un cálculo sin estado. Ejemplo de respuesta, abreviado (solo 3
 de los 6 miembros):
@@ -88,8 +93,10 @@ de los 6 miembros):
 }
 ```
 
-- Las puntuaciones se envían como cadenas decimales, porque el motor trabaja con fracciones
-  exactas ([ADR-0006](../03-adr/0006-algoritmo-busqueda-exacta.md)).
+- Las puntuaciones se envían como **enteros redondeados**; las aportaciones se reparten con el
+  método del mayor resto para que sigan sumando el total
+  ([CA-51](../01-ddf/cuestiones-abiertas.md#resueltas)). El motor decide el orden y los empates
+  con fracciones exactas ([ADR-0006](../03-adr/0006-algoritmo-busqueda-exacta.md)).
 - `groups` agrupa los equipos empatados por miembros intercambiables
   ([RN-04](../01-ddf/reglas-negocio.md#rn-04)), ya desempatados con
   [RN-19](../01-ddf/reglas-negocio.md#rn-19).

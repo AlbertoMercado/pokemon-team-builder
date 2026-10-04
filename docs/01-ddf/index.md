@@ -16,6 +16,7 @@ las reglas de negocio (**RN-XX**).
 | 0.8 | 2026-10-04 | Casos de RN-15, RN-17 y RN-20 que el DDF no cubría (CA-42 a CA-46): los métodos de evolución sin catalogar detienen la carga y los cataloga el usuario (RF-16, nuevo); el sexo y el objeto equipado no son tediosos; con varios métodos cuenta el más fácil; sin movimientos por nivel o sin combates clave la carga se detiene. La carga se lanza desde la aplicación (RF-11). |
 | 0.9 | 2026-10-04 | CA-47: la carga sigue siendo una tarea manual del administrador. Si queda bloqueada, genera un informe para el arquitecto, que la resuelve con una nueva versión (RF-11; RF-16 pasa a ser «Informar de las cargas bloqueadas»). |
 | 0.10 | 2026-10-04 | CA-48: si RN-13 y RN-14 no caben juntas, RN-13 tiene prioridad y RN-14 reserva un hueco. CA-49: solo se agrupan los empates si todas sus combinaciones son válidas. CA-50: se dan todas las sugerencias, ordenadas (RN-04, RN-08). |
+| 0.11 | 2026-10-04 | CA-51: las puntuaciones se muestran como enteros redondeados que siguen sumando el total (RF-09). |
 
 ## Propósito
 
