@@ -28,6 +28,39 @@ class RuleDefinition:
     kind: RuleKind
     configurable: bool
     default_weight: int | None = None
+    description: str = ""
+
+
+# What each rule does, in one sentence for the interface (RF-06, RF-07). Full text in the DDF.
+_DESCRIPTIONS = {
+    "RN-01": "El equipo generado tiene exactamente 6 Pokémon.",
+    "RN-02": "Todos los miembros del equipo son favoritos.",
+    "RN-03": "Solo cuentan los Pokémon de la generación del juego objetivo que existen en él y "
+    "pueden llegar y evolucionar antes de completarlo.",
+    "RN-04": "Se recomiendan los equipos con mayor puntuación: la suma de cada regla blanda "
+    "activa por su peso.",
+    "RN-05": "Cada forma regional es un Pokémon distinto.",
+    "RN-06": "Puntúa en contra que el equipo tenga varias formas de la misma especie, como "
+    "Vulpix y Vulpix de Alola.",
+    "RN-07": "El equipo no tiene dos miembros de la misma línea evolutiva.",
+    "RN-08": "Si no se llega a 6, se muestra el equipo incompleto con sugerencias para los huecos.",
+    "RN-09": "Cada favorito es la evolución hasta la que se quiere llegar.",
+    "RN-10": "Los tipos, las eficacias y las evoluciones son los del juego objetivo.",
+    "RN-11": "Solo se eligen Pokémon cuya línea se puede criar.",
+    "RN-12": "Ningún tipo aparece en más de un miembro del equipo.",
+    "RN-13": "El equipo incluye a Dragonite o, si no es posible, un Pokémon de tipo primario "
+    "Dragón.",
+    "RN-14": "El equipo incluye una evolución de Eevee, y solo una.",
+    "RN-15": "Puntúa en contra los miembros que necesitan una evolución tediosa, como el "
+    "intercambio.",
+    "RN-16": "Se excluyen los Pokémon ya usados en el recorrido del Hall of Fame.",
+    "RN-17": "Puntúa a favor que los tipos del equipo sean eficaces, en ataque y en defensa, "
+    "frente a los combates clave del juego.",
+    "RN-18": "Los datos que no se han podido cargar con certeza los confirma el usuario antes "
+    "de generar.",
+    "RN-19": "A igual puntuación, se prefieren los equipos con más Pokémon de dos tipos.",
+    "RN-20": "Puntúa en contra los miembros que necesitan una evolución aleatoria, como Wurmple.",
+}
 
 
 def _rule(
@@ -38,7 +71,7 @@ def _rule(
     configurable: bool = False,
     default_weight: int | None = None,
 ) -> RuleDefinition:
-    return RuleDefinition(rule_id, name, kind, configurable, default_weight)
+    return RuleDefinition(rule_id, name, kind, configurable, default_weight, _DESCRIPTIONS[rule_id])
 
 
 _HARD, _PRESENCE, _SOFT, _MECHANISM = (
