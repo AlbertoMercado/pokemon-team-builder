@@ -18,6 +18,7 @@ from db.reference import (
     GamePokemon,
     Generation,
     KeyBattle,
+    KeyBattlePokemon,
     Origin,
     Pokemon,
     PokemonType,
@@ -35,6 +36,7 @@ TARGET_GAMES = frozenset({"ruby", "sapphire", "emerald", "firered", "leafgreen"}
 # Games with curated data so far (phase 4): mechanics, arrival rule and key battles.
 CURATED_GAMES = frozenset({"firered", "leafgreen"})
 KEY_BATTLES_PER_GAME = 15
+RIVAL_TEAM_SIZE = 5  # the champion's 6 Pokémon minus the starter (CA-26)
 SPECIES_COUNT = 386
 EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     Generation: 3,
@@ -210,8 +212,17 @@ def check_arrival_proposals(session: Session) -> list[str]:
     return problems
 
 
+def _team(session: Session, battle: str, variant: int = 1) -> list[str]:
+    query = (
+        select(KeyBattlePokemon.pokemon)
+        .where(KeyBattlePokemon.battle == battle, KeyBattlePokemon.variant == variant)
+        .order_by(col(KeyBattlePokemon.position))
+    )
+    return list(session.exec(query).all())
+
+
 def check_key_battles(session: Session) -> list[str]:
-    """The list of key battles (RN-17); teams are pending until phase 5."""
+    """Key battles and their teams (RN-17, CA-26)."""
     problems = []
     for game in CURATED_GAMES:
         battles = session.exec(
@@ -220,6 +231,20 @@ def check_key_battles(session: Session) -> list[str]:
         first, last = (battles[0].trainer_name, battles[-1].trainer_name) if battles else ("", "")
         if (first, last) != ("Brock", "Azul"):
             problems.append(f"{game}: combates de {first!r} a {last!r}, se esperaba Brock y Azul")
+        for battle in battles:
+            if not _team(session, battle.slug):
+                problems.append(f"{battle.slug}: no tiene Pokémon")
+            expected = Origin.INFERRED if battle.category == "champion" else Origin.AUTOMATIC
+            if battle.origin is not expected:
+                problems.append(f"{battle.slug}: origen {battle.origin}, se esperaba {expected}")
+
+    if _team(session, "firered-brock") != ["geodude", "onix"]:
+        problems.append(f"equipo de firered-brock: {_team(session, 'firered-brock')}")
+    starters = {"venusaur", "charizard", "blastoise", "ivysaur", "charmeleon", "wartortle"}
+    for variant in (1, 2, 3):
+        team = _team(session, "firered-champion", variant)
+        if len(team) != RIVAL_TEAM_SIZE or starters & set(team):
+            problems.append(f"firered-champion, variante {variant}: {team}")
     return problems
 
 

@@ -35,7 +35,7 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Rojo Fuego, Verde Hoja |
 | [`breeding.yaml`](#breedingyaml) | Bebés que solo nacen con incienso. | `species.requires_incense` | — |
 | [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Rojo Fuego, Verde Hoja |
-| [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego. | `key_battle` | Rojo Fuego, Verde Hoja |
+| [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Rojo Fuego, Verde Hoja |
 
 Rubí, Zafiro y Esmeralda se completan en la fase 6 del
 [plan de carga](plan-carga-datos.md#fases). Mientras tanto, sus datos quedan pendientes.
@@ -127,19 +127,37 @@ carga.
 
 **Por qué existe**: [RN-17](../01-ddf/reglas-negocio.md#rn-17) puntúa los tipos del equipo
 frente a los combates clave, y PokeAPI no tiene entrenadores. La lista de combates de cada
-juego se mantiene a mano; los equipos se leen de WikiDex (fase 5).
+juego se mantiene a mano; los equipos se leen de WikiDex
+([ingesta](../05-operacion/ingesta.md#wikidex)).
 
 Un fichero por grupo de versiones, porque sus juegos comparten los combates
 (`firered-leafgreen.yaml`):
 
 ```yaml
 games: [firered, leafgreen]
+wikidex_section: Pokémon Rojo Fuego y Pokémon Verde Hoja   # sección con sus equipos
 battles:                      # en el orden habitual del juego
   - id: brock                 # único en el fichero; minúsculas y guiones
     category: gym_leader      # gym_leader, elite_four, champion, villain_boss o rival_final
     trainer: Brock            # nombre que se muestra
-    wikidex_page: Brock       # página de WikiDex con su equipo
+    wikidex_page: Brock       # página de WikiDex del entrenador (no de desambiguación)
+    wikidex_team: …           # opcional: rótulo del combate si la sección tiene varios
+    rival_starter_lines: […]  # opcional: líneas de los iniciales del rival, que se quitan
     note: …                   # opcional
+```
+
+**Dónde está cada equipo en WikiDex**: en la página del entrenador, la sección cuyo título es
+exactamente `wikidex_section` tiene una plantilla `{{Equipo}}` por equipo. Si la sección
+tiene varios combates, cada uno va precedido de un rótulo (una línea `; En Silph S.A.`), y
+`wikidex_team` dice cuál usar. Los rótulos cambian de una página a otra: en Lorelei, Agatha y
+Lance el primer combate es «Primer combate», y en Bruno, «Primera vez». Varias plantillas
+bajo el mismo rótulo (a menudo en pestañas, una por inicial) son **variantes** del combate.
+
+Si la página, la sección, el rótulo o algún Pokémon no se encuentran, la carga falla con un
+mensaje que dice qué combate y qué falta, p. ej.:
+
+```text
+WikidexDataError: lorelei (Lorelei): la sección tiene varios combates ['Primer combate', 'Revanchas']: falta wikidex_team
 ```
 
 Cada combate se carga, para cada juego, como una fila de `key_battle` con:
@@ -147,33 +165,67 @@ Cada combate se carga, para cada juego, como una fila de `key_battle` con:
 - `slug`: `<juego>-<id>` (`firered-brock`).
 - `order`: su posición en la lista.
 - `fact_key`: `battle:<juego>:<id>` (`battle:firered:brock`).
-- `origin`: `pending` hasta que la fase 5 cargue su equipo.
+- `origin`: `automatic` si tiene un solo equipo e `inferred` si tiene variantes, porque
+  dependen de una elección del jugador y las confirma el usuario
+  ([RN-18](../01-ddf/reglas-negocio.md#rn-18)).
+- `source_page` y `source_revision`: la página y la revisión de WikiDex.
+
+Y sus Pokémon como filas de `key_battle_pokemon`, con su variante, su posición y su nivel. Los
+nombres en español de WikiDex se traducen a formas cargadas con los nombres de PokeAPI. Con
+`rival_starter_lines`, de cada variante se quita el único Pokémon de esas líneas (el inicial
+del rival, [CA-26](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 Los combates de Rojo Fuego y Verde Hoja son 15: los 8 líderes de gimnasio (Giovanni es el
 octavo), Giovanni como jefe del Team Rocket en el Escondite Rocket y en Silph S.A., el Alto
 Mando y Azul, que es el rival y el Campeón (cuenta una vez y sin su inicial,
 [CA-26](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
+Equipos cargados en Rojo Fuego (iguales en Verde Hoja):
+
+| # | Combate | Equipo |
+|---|---------|--------|
+| 1 | Brock | Geodude 12, Onix 14 |
+| 2 | Misty | Staryu 18, Starmie 21 |
+| 3 | Teniente Surge | Voltorb 21, Pikachu 18, Raichu 24 |
+| 4 | Erika | Victreebel 29, Tangela 24, Vileplume 29 |
+| 5 | Giovanni (Escondite Rocket) | Onix 25, Rhyhorn 24, Kangaskhan 29 |
+| 6 | Koga | Koffing 37, Koffing 37, Muk 39, Weezing 43 |
+| 7 | Giovanni (Silph S.A.) | Nidorino 37, Rhyhorn 37, Kangaskhan 35, Nidoqueen 41 |
+| 8 | Sabrina | Kadabra 38, Venomoth 38, Mr. Mime 37, Alakazam 43 |
+| 9 | Blaine | Growlithe 42, Ponyta 40, Rapidash 42, Arcanine 47 |
+| 10 | Giovanni (Gimnasio) | Rhyhorn 45, Dugtrio 42, Nidoking 45, Nidoqueen 44, Rhyhorn 50 |
+| 11 | Lorelei | Dewgong 52, Cloyster 51, Slowbro 52, Jynx 54, Lapras 54 |
+| 12 | Bruno | Onix 51, Hitmonchan 53, Hitmonlee 53, Onix 54, Machamp 56 |
+| 13 | Agatha | Gengar 54, Golbat 54, Haunter 53, Arbok 56, Gengar 58 |
+| 14 | Lance | Gyarados 56, Dragonair 54, Dragonair 54, Aerodactyl 58, Dragonite 60 |
+| 15 | Azul (Campeón) | Pidgeot 59, Alakazam 57, Rhydon 59 y, según el inicial: Exeggutor y Gyarados, Arcanine y Exeggutor, o Gyarados y Arcanine |
+
 !!! warning "Pendiente de confirmar"
-    Que el combate contra Giovanni en Silph S.A. sea obligatorio. Si no lo es, se quita de la
-    lista, porque los combates clave son solo los obligatorios.
+    - Que el combate contra Giovanni en Silph S.A. sea obligatorio. Si no lo es, se quita de
+      la lista, porque los combates clave son solo los obligatorios.
+    - Cómo puntúan las variantes del Campeón en RN-17
+      ([CA-38](../01-ddf/cuestiones-abiertas.md#abiertas)). La carga guarda las tres.
 
 ## Implementación
 
 | Fichero | Qué hace |
 |---------|----------|
 | `ingest/sources/curated/schemas.py` | Un modelo pydantic por fichero, con las validaciones de esta página. |
-| `ingest/sources/curated/__init__.py` | `read_curated(directorio)` lee y valida todos los ficheros (`CuratedData`). `CuratedSource` carga las mecánicas y los combates clave. |
+| `ingest/sources/curated/__init__.py` | `read_curated(directorio)` lee y valida todos los ficheros (`CuratedData`). `CuratedSource` carga las mecánicas. |
 | `ingest/sources/pokeapi/transform.py` | Usa `CuratedData` para marcar los bebés de incienso y proponer la llegada. |
+| `ingest/sources/wikidex/` | Usa la lista de combates de `CuratedData` para leer sus equipos de WikiDex y cargarlos ([ingesta](../05-operacion/ingesta.md#wikidex)). |
 
 Tests en `tests/ingest/test_curated.py` (los ficheros reales del repositorio, los esquemas y la
-fuente) y en `tests/ingest/test_pokeapi.py` (bebés de incienso y propuestas de llegada).
+fuente), en `tests/ingest/test_pokeapi.py` (bebés de incienso y propuestas de llegada) y en
+`tests/ingest/test_wikidex.py` (equipos de los combates clave).
 
 ## Añadir los datos de un juego
 
 1. Añadir sus mecánicas a `games.yaml` y su regla a `arrival.yaml`. Si no se conoce la regla,
    no añadirla: la llegada queda pendiente y la confirma el usuario.
-2. Crear `key_battles/<grupo-de-versiones>.yaml` con sus combates clave, comprobando que cada
-   `wikidex_page` existe en WikiDex.
+2. Crear `key_battles/<grupo-de-versiones>.yaml` con sus combates clave y la sección de
+   WikiDex de sus equipos. Ejecutar la ingesta: los errores dicen qué página es de
+   desambiguación o qué rótulos hay en cada sección, para completar `wikidex_page` y
+   `wikidex_team`.
 3. Actualizar las comprobaciones de la carga (`ingest/checks.py`) y esta página.
 4. Ejecutar la ingesta y revisar el informe.

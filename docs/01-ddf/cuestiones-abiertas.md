@@ -12,6 +12,7 @@ afectadas.
 | ID | Cuestión | Afecta a | Propuesta |
 |----|----------|----------|-----------|
 | CA-28 | ¿Qué Pokémon pueden llegar al juego objetivo y evolucionar antes de completarlo? | RN-03, RN-14, RN-15, RF-11 | Solo son candidatos los Pokémon cuya etapa de entrada (la que nace del huevo) se puede recibir en el juego objetivo y evolucionar hasta la evolución de favoritos antes de completarlo. Estos datos se cargan como inferidos y los confirma el usuario (RN-18), así que no bloquean la implementación. Investigar cada juego sirve para que las propuestas sean correctas. Ver [lo comprobado en Rojo Fuego y Verde Hoja](../02-ddt/datos-requeridos.md#restricciones-de-llegada-por-juego). |
+| CA-38 | ¿Cómo puntúa RN-17 un combate cuyo equipo depende del inicial que elige el jugador, cuando las variantes no se diferencian solo en el inicial? En Rojo Fuego, sin su inicial, el Campeón tiene Pidgeot, Alakazam y Rhydon en las tres variantes, y además Exeggutor y Gyarados, Arcanine y Exeggutor, o Gyarados y Arcanine. | RN-17 | La puntuación del combate es la media de las puntuaciones de sus variantes: el jugador puede elegir cualquier inicial, y así cada variante pesa lo mismo sin pedir más datos. Alternativas: usar todos los Pokémon distintos de las variantes como un único equipo, o preguntar al usuario qué inicial elegirá. La carga guarda todas las variantes, así que no bloquea la implementación ([datos curados](../02-ddt/datos-curados.md#key_battlesyaml)). |
 
 ## Aplazadas
 

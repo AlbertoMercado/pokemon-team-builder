@@ -38,5 +38,5 @@ Pokédex…) y los grandes filtrados a unas 50 especies elegidas por sus casos e
 1. Ejecutar una carga real para tener el volcado completo en la caché:
    `uv run python -m ingest --data-dir /tmp/datos`.
 2. Generar el extracto:
-   `uv run python tests/ingest/fixtures/pokeapi/extract.py /tmp/datos/cache/pokeapi/<commit>`.
-3. Si cambia el commit, actualizar también `COMMIT` en `extract.py` y en los tests.
+   `uv run python tests/ingest/fixtures/pokeapi/extract_pokeapi.py /tmp/datos/cache/pokeapi/<commit>`.
+3. Si cambia el commit, actualizar también `COMMIT` en `extract_pokeapi.py` y en los tests.

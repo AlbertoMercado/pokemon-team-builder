@@ -5,13 +5,12 @@ juegos y los combates clave ([RF-11](../01-ddf/requisitos-funcionales.md#rf-11))
 es una tarea del administrador que se ejecuta de forma puntual, no al arrancar la aplicación.
 
 !!! note "Estado"
-    Implementadas las fases 2 a 4 del [plan de carga](../02-ddt/plan-carga-datos.md#fases):
-    el comando, el informe, la sustitución segura, la fuente **PokeAPI** (especies, formas,
-    tipos, eficacias, grupos huevo, evoluciones y juegos) y los
-    **[datos curados](../02-ddt/datos-curados.md)** de Rojo Fuego y Verde Hoja (mecánicas,
-    bebés de incienso, propuestas de llegada y lista de combates clave). Faltan los equipos
-    de los combates clave, que se leen de WikiDex (fase 5): por eso `key_battle_pokemon` está
-    vacía y los combates clave quedan pendientes.
+    Implementadas las fases 2 a 5 del [plan de carga](../02-ddt/plan-carga-datos.md#fases):
+    el comando, el informe, la sustitución segura y las tres fuentes: **PokeAPI** (especies,
+    formas, tipos, eficacias, grupos huevo, evoluciones y juegos), los
+    **[datos curados](../02-ddt/datos-curados.md)** de Rojo Fuego y Verde Hoja y los equipos
+    de sus combates clave desde **WikiDex**. Rubí, Zafiro y Esmeralda se completan en la
+    fase 6.
 
 ## Uso
 
@@ -24,7 +23,7 @@ uv run python -m ingest --data-dir otra/   # escribe otra/reference.sqlite y usa
 | Opción | Por defecto | Qué hace |
 |--------|-------------|----------|
 | `--data-dir DIR` | `data` | Directorio donde se escriben `reference.sqlite` y la caché de descargas. Se crea si no existe. |
-| `--offline` | No | No descarga nada. Si falta algún fichero en la caché, la carga falla. |
+| `--offline` | No | No descarga nada, ni de PokeAPI ni de WikiDex. Si falta algún fichero en la caché, la carga falla. |
 | `-h`, `--help` | | Muestra la ayuda. |
 
 | Código de salida | Significado |
@@ -48,6 +47,26 @@ nunca deja un fichero a medias en la caché.
 
 **Actualizar los datos de PokeAPI** es cambiar el commit de `data/curated/pokeapi.yaml`
 (siempre el SHA completo, de 40 caracteres) en un PR y volver a ejecutar la ingesta.
+
+### WikiDex
+
+Los equipos de los combates clave se leen de la página de WikiDex de cada entrenador, con su
+API MediaWiki (`action=parse&prop=wikitext`). WikiDex es una wiki comunitaria, así que la
+ingesta la trata con cuidado:
+
+- **Caché permanente**: cada página se descarga una sola vez y se guarda en
+  `<data-dir>/cache/wikidex/<título>.json`, con su revisión. Las siguientes cargas no hacen
+  ninguna petición.
+- **Límite de peticiones**: como mucho una por segundo. La primera carga de Rojo Fuego y Verde
+  Hoja descarga 13 páginas en unos 13 segundos.
+- **`User-Agent` descriptivo** del proyecto, como con PokeAPI.
+
+**Actualizar un equipo** (si WikiDex lo corrige): borrar su página de la caché y volver a
+ejecutar la ingesta. La revisión usada queda en `key_battle.source_revision`.
+
+**Licencia**: el contenido de WikiDex es [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/deed.es).
+La aplicación es sin ánimo de lucro y guarda la página y la revisión de cada equipo para
+mostrar la atribución ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)).
 
 ## Qué hace
 
@@ -93,8 +112,8 @@ Si algo falla en los pasos 1 a 7, se borra el temporal y `reference.sqlite` qued
 
 ## Informe
 
-Informe real de la carga del 2026-10-04, con el commit `bc92d3b` de PokeAPI y los datos
-curados de Rojo Fuego y Verde Hoja:
+Informe real de la carga del 2026-10-04, con el commit `bc92d3b` de PokeAPI, los datos
+curados y los equipos de WikiDex de Rojo Fuego y Verde Hoja:
 
 ```text
 Carga de data/reference.sqlite
@@ -112,11 +131,11 @@ Filas cargadas por tabla:
   game_pokemon           1930
   key_battle               30
   pokemon_type           1131
-  key_battle_pokemon        0
+  key_battle_pokemon      138
 Datos revisables por origen:
   game_mechanic        inferred 4
   game_pokemon         automatic 1930, inferred 772, pending 1158
-  key_battle           pending 30
+  key_battle           automatic 28, inferred 2
 Comprobaciones superadas: 9
 Carga completada.
 ```
@@ -127,7 +146,8 @@ Carga completada.
   confirmar el usuario antes de generar ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). En
   `game_pokemon` hay dos valores por fila: la existencia (automática) y la llegada (inferida
   en Rojo Fuego y Verde Hoja, pendiente en Rubí, Zafiro y Esmeralda). Los combates clave
-  quedan pendientes hasta que se carguen sus equipos (fase 5).
+  son automáticos, salvo los del Campeón, que son inferidos porque su equipo tiene variantes
+  según el inicial.
 - **Comprobaciones superadas**: número de comprobaciones de la carga que se han cumplido.
 
 Ejemplos de cargas fallidas:
@@ -159,6 +179,10 @@ Código en `ingest/` ([estructura del código](../02-ddt/estructura-codigo.md)):
 | `sources/__init__.py` | `Source`, la interfaz de una fuente: `name`, `pokeapi_commit` y `rows()`, que entrega filas ya validadas. |
 | `sources/curated/__init__.py` | `read_curated`, que lee y valida los ficheros de `data/curated/`, y `CuratedSource`, la fuente de las mecánicas y los combates clave. |
 | `sources/curated/schemas.py` | Un modelo pydantic por fichero curado ([datos curados](../02-ddt/datos-curados.md)). |
+| `sources/wikidex/__init__.py` | `WikidexSource`: lee el equipo de cada combate de la lista curada, traduce los nombres y quita el inicial del rival. |
+| `sources/wikidex/fetch.py` | `PageCache`: descarga con caché y límite de peticiones de las páginas de WikiDex. |
+| `sources/wikidex/parse.py` | Busca la sección, el rótulo y las plantillas `{{Equipo}}` en el wikitexto. |
+| `sources/pokeapi/index.py` | Índice de los Pokémon cargados por su nombre en español, para traducir los nombres de WikiDex. |
 | `sources/pokeapi/__init__.py` | `PokeapiCsvSource`, la fuente de PokeAPI. Recibe los datos curados para los bebés de incienso y las propuestas de llegada. |
 | `sources/pokeapi/download.py` | `CsvCache`: descarga con caché de los CSV de un commit. |
 | `sources/pokeapi/rows.py` | Un modelo pydantic por fichero CSV y `read_rows`, que valida cada fila. |
@@ -174,12 +198,15 @@ Tests en `tests/ingest/`:
   crianza, tipos y eficacias por generación, evoluciones y existencia.
 - `test_curated.py`: los ficheros curados reales del repositorio, sus esquemas, la fuente
   de datos curados y el error del CLI con un fichero inválido.
+- `test_wikidex.py`: la fuente de WikiDex sobre páginas reales recortadas: caché y límite
+  de peticiones, respuesta de la API, rótulos, variantes, desambiguación y filas de los
+  combates.
 
 Ningún test usa la red: `tests/conftest.py` hace fallar cualquier petición HTTP.
 
 ## Pendiente
 
-- **Fuentes**: WikiDex (fase 5), para los equipos de los combates clave.
+- **Rubí, Zafiro y Esmeralda** (fase 6): mecánicas, regla de llegada y combates clave.
 - **Claves de `user.sqlite`**: cuando exista, la carga comprobará que los favoritos, el *Hall
   of Fame* y las confirmaciones siguen apuntando a datos que existen
   ([arquitectura](../02-ddt/arquitectura.md#ingest-carga-de-datos)).

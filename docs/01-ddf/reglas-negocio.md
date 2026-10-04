@@ -372,7 +372,8 @@ parámetros son fijos.
   Campeón, jefes del equipo malvado y el último combate obligatorio contra el rival
   ([CA-26](cuestiones-abiertas.md#resueltas)).
 - **Rival**: solo cuenta su equipo en el último combate obligatorio, sin el Pokémon inicial,
-  que depende de la elección del jugador. Si el rival es también el Campeón, como en Rojo
+  que depende de la elección del jugador. Si el resto del equipo también cambia según el
+  inicial, hay varias variantes (pendiente de [CA-38](cuestiones-abiertas.md#abiertas)). Si el rival es también el Campeón, como en Rojo
   Fuego, ese combate cuenta una sola vez y también sin su inicial. Se usan solo los tipos de los miembros y de los Pokémon
   rivales, con la tabla de eficacias del juego objetivo ([RN-10](#rn-10)). No se tienen en
   cuenta movimientos, niveles ni estadísticas.

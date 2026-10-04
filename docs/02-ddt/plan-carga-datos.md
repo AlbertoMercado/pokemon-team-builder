@@ -152,16 +152,19 @@ esquemas, su significado y cómo se cargan están en [Datos curados](datos-curad
 
 ## WikiDex
 
-- Una petición por página de entrenador (`action=parse&prop=wikitext`), unas 30 en total:
-  13 para Rojo Fuego y Verde Hoja (8 líderes, 4 del Alto Mando y el Campeón) y unas 18 para
-  Rubí, Zafiro y Esmeralda.
-- Caché en `data/cache/wikidex/`, como mucho una petición por segundo y un `User-Agent`
-  descriptivo. Una segunda ejecución no hace peticiones.
-- Las plantillas `{{Equipo}}` se procesan con mwparserfromhell. Las secciones que no se
-  puedan procesar con certeza (variantes según el inicial, revanchas) se cargan como
-  inferidas.
-- Antes de publicar datos derivados de WikiDex hay que revisar su licencia (CC BY-NC-SA) y
-  añadir la atribución ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)).
+- Una petición por página de entrenador (`action=parse&prop=wikitext`): 13 para Rojo Fuego y
+  Verde Hoja (los 15 combates comparten la página de Giovanni) y unas 18 para Rubí, Zafiro y
+  Esmeralda.
+- Caché permanente en `data/cache/wikidex/`, como mucho una petición por segundo y un
+  `User-Agent` descriptivo. Una segunda ejecución no hace peticiones
+  ([ingesta](../05-operacion/ingesta.md#wikidex)).
+- Las plantillas `{{Equipo}}` se procesan con mwparserfromhell. La lista curada dice en qué
+  sección y bajo qué rótulo está cada equipo; las revanchas no se cargan. Las variantes según
+  el inicial se cargan todas, sin el inicial del rival, y el combate queda inferido
+  ([datos curados](datos-curados.md#key_battlesyaml)). Lo que no se encuentre hace fallar la
+  carga con un mensaje que dice qué falta.
+- Licencia CC BY-NC-SA: cada combate guarda la página y la revisión de WikiDex de su equipo,
+  para la atribución ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)).
 
 ## Fases
 
@@ -183,7 +186,7 @@ flowchart LR
 | 2 ✅ | `feat/ingest-esqueleto` | CLI `uv run python -m ingest`, informe de la carga, tabla `ingest_run` y sustitución atómica del fichero. | Nueva página de Operación: «Ingesta de datos» (uso, opciones, informe y errores). Tabla de comandos de `CLAUDE.md`. |
 | 3 ✅ | `feat/ingest-pokeapi` | Descarga de los CSV del commit fijado a `data/cache/pokeapi/<commit>/`, validación de cada fila con pydantic, transformaciones y carga. Tests con extractos reales de los CSV. | Detalle de cada transformación en esta página o en una de la ingesta. |
 | 4 ✅ | `feat/ingest-curados` | Esquemas pydantic de los YAML y datos de Rojo Fuego y Verde Hoja: juego, mecánicas, llegada y lista de combates clave. | Esquema de cada fichero YAML. |
-| 5 | `feat/ingest-wikidex` | Adaptador de WikiDex con caché y límite de peticiones, y equipos de los combates clave de Rojo Fuego y Verde Hoja. Tests con wikitexto real guardado. | Cómo se procesan las plantillas y qué se marca como inferido. |
+| 5 ✅ | `feat/ingest-wikidex` | Adaptador de WikiDex con caché y límite de peticiones, y equipos de los combates clave de Rojo Fuego y Verde Hoja. Tests con wikitexto real guardado. | Cómo se procesan las plantillas y qué se marca como inferido. |
 | 6 | `feat/ingest-hoenn` | Datos curados y combates clave de Rubí, Zafiro y Esmeralda, después de investigar su llegada (issue #8). | Restricciones de llegada en [datos requeridos](datos-requeridos.md#restricciones-de-llegada-por-juego). |
 
 Las fases 1 a 3 no dependen de `core/`, así que se pueden hacer en paralelo con el motor.
@@ -218,14 +221,20 @@ Implementadas (fase 4):
   Casos conocidos en Rojo Fuego: llegan Bulbasaur, Vaporeon, Golbat y Chansey, y no llegan
   Pikachu, Raichu, Clefairy, Crobat, Espeon ni Blissey.
 
-Pendientes:
+Implementadas (fase 5):
 
-- Fase 5: cada combate clave de Rojo Fuego y Verde Hoja tiene al menos un Pokémon rival y
-  todos sus Pokémon son formas cargadas. El equipo de Brock en Rojo Fuego es Geodude y Onix.
+- **Equipos de los combates clave**: cada combate de Rojo Fuego y Verde Hoja tiene Pokémon
+  (las claves foráneas garantizan que son formas cargadas). Todos son automáticos salvo el del
+  Campeón, que es inferido. El equipo de Brock en Rojo Fuego es Geodude y Onix, y el Campeón
+  tiene tres variantes de 5 Pokémon, sin ningún inicial.
 
 ### Resultado de la carga real
 
-Carga del 2026-10-04 con el commit `bc92d3b` y los datos curados de la fase 4: las 9
+Carga del 2026-10-04 con los equipos de WikiDex de la fase 5: las 9 comprobaciones
+superadas, 30 combates clave (28 automáticos y 2 inferidos) y 138 Pokémon rivales, leídos de
+13 páginas de WikiDex ([equipos](datos-curados.md#key_battlesyaml)).
+
+Carga con el commit `bc92d3b` y los datos curados de la fase 4: las 9
 comprobaciones superadas. Pueden llegar a Rojo Fuego y Verde Hoja 140 Pokémon
 ([detalle](datos-curados.md#arrivalyaml)).
 

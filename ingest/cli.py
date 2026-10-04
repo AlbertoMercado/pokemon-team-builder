@@ -13,6 +13,8 @@ from ingest.sources import Source
 from ingest.sources.curated import CuratedDataError, CuratedSource, read_curated
 from ingest.sources.pokeapi import PokeapiCsvSource
 from ingest.sources.pokeapi.download import CsvCache, download
+from ingest.sources.wikidex import WikidexSource
+from ingest.sources.wikidex.fetch import PageCache, fetch_page
 
 DEFAULT_DATA_DIR = Path("data")
 REFERENCE_FILE_NAME = "reference.sqlite"
@@ -25,7 +27,9 @@ def default_sources(data_dir: Path, *, offline: bool) -> list[Source]:
     curated = read_curated(CURATED_DIR)
     downloader = None if offline else download
     cache = CsvCache(data_dir / "cache" / "pokeapi", curated.pokeapi_commit, downloader)
-    return [PokeapiCsvSource(cache, curated), CuratedSource(curated)]
+    pokeapi = PokeapiCsvSource(cache, curated)
+    pages = PageCache(data_dir / "cache" / "wikidex", None if offline else fetch_page)
+    return [pokeapi, CuratedSource(curated), WikidexSource(curated, pages, pokeapi.index)]
 
 
 def main(argv: Sequence[str] | None = None) -> int:

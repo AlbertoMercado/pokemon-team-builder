@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from db.reference import BattleCategory, GameMechanic, KeyBattle, Origin
+from db.reference import BattleCategory, GameMechanic, Origin
 from ingest import cli
 from ingest.sources.curated import CuratedDataError, CuratedSource, read_curated
 from ingest.sources.curated.schemas import (
@@ -71,10 +71,12 @@ def test_arrival_rule_pokedex_matches_its_origin(rule: dict[str, str]) -> None:
 def test_key_battle_ids_are_unique_and_valid() -> None:
     battle = {"id": "brock", "category": "gym_leader", "trainer": "Brock", "wikidex_page": "Brock"}
     with pytest.raises(ValidationError, match="repetidos"):
-        KeyBattlesFile.model_validate({"games": ["firered"], "battles": [battle, battle]})
+        KeyBattlesFile.model_validate(
+            {"games": ["firered"], "wikidex_section": "S", "battles": [battle, battle]}
+        )
     with pytest.raises(ValidationError):
         KeyBattlesFile.model_validate(
-            {"games": ["firered"], "battles": [{**battle, "id": "Brock Pewter"}]}
+            {"games": ["firered"], "wikidex_section": "S", "battles": [{**battle, "id": "B P"}]}
         )
 
 
@@ -90,21 +92,24 @@ def test_invalid_file_names_the_file(tmp_path: Path) -> None:
 
 
 def test_curated_source_rows() -> None:
+    """Game mechanics; key battles are loaded by the WikiDex source with their teams."""
     rows = list(CuratedSource(read_curated(CURATED_DIR)).rows())
     mechanics = [row for row in rows if isinstance(row, GameMechanic)]
-    battles = [row for row in rows if isinstance(row, KeyBattle)]
 
-    assert len(mechanics) == 4
+    assert len(mechanics) == len(rows) == 4
     day_night = next(m for m in mechanics if m.fact_key == "mechanic:firered:day_night_cycle")
     assert (day_night.value, day_night.origin) == (False, Origin.INFERRED)
 
-    assert len(battles) == 30
-    firered = sorted((b for b in battles if b.game == "firered"), key=lambda b: b.order)
-    assert [b.order for b in firered] == list(range(1, 16))
-    assert (firered[0].slug, firered[0].fact_key) == ("firered-brock", "battle:firered:brock")
-    assert firered[-1].category is BattleCategory.CHAMPION
-    # Teams are read from WikiDex in phase 5: until then every battle is pending (RN-18).
-    assert all(b.origin is Origin.PENDING for b in battles)
+
+def test_key_battles_point_to_their_wikidex_team() -> None:
+    [battles_file] = read_curated(CURATED_DIR).key_battles
+    battles = {battle.id: battle for battle in battles_file.battles}
+
+    assert battles_file.wikidex_section == "Pokémon Rojo Fuego y Pokémon Verde Hoja"
+    assert battles["giovanni-silph-co"].wikidex_team == "En Silph S.A."
+    assert battles["bruno"].wikidex_page == "Bruno (Alto Mando)"  # «Bruno» is a disambiguation
+    assert battles["champion"].category is BattleCategory.CHAMPION
+    assert battles["champion"].rival_starter_lines == ["bulbasaur", "charmander", "squirtle"]
 
 
 def test_cli_reports_invalid_curated_data(

@@ -6,10 +6,12 @@ arrival proposals. See docs/02-ddt/plan-carga-datos.md.
 """
 
 from collections.abc import Iterable
+from functools import cached_property
 
 from db.reference import ReferenceModel
 from ingest.sources.curated import CuratedData
 from ingest.sources.pokeapi.download import CsvCache
+from ingest.sources.pokeapi.index import PokemonIndex, build_index
 from ingest.sources.pokeapi.rows import (
     DexNumberRow,
     EggGroupRow,
@@ -50,7 +52,16 @@ class PokeapiCsvSource:
         return self._cache.commit
 
     def rows(self) -> Iterable[ReferenceModel]:
-        return build_rows(self.read_tables(), self._curated)
+        return build_rows(self.tables, self._curated)
+
+    def index(self) -> PokemonIndex:
+        """Loaded Pokémon by Spanish name, for the WikiDex source."""
+        return build_index(self.tables)
+
+    @cached_property
+    def tables(self) -> PokeapiTables:
+        """The CSV files, read once per load."""
+        return self.read_tables()
 
     def read_tables(self) -> PokeapiTables:
         """Read (downloading if needed) and validate every CSV file the load uses."""
