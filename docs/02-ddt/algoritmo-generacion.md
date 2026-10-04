@@ -53,6 +53,8 @@ flowchart TD
     - Implementación: en lugar de ramificar, la búsqueda exige que el equipo contenga al menos
       uno de cada conjunto de presencia y poda en cuanto ya no puede. Es equivalente y no
       repite equipos cuando RN-12 está desactivada ([motor](motor.md#busqueda-coreenginesearchpy)).
+    - Si ningún equipo puede cumplir RN-13 y RN-14 a la vez, RN-13 tiene prioridad y RN-14 pasa
+      a reservar un hueco ([CA-48](../01-ddf/cuestiones-abiertas.md#resueltas)).
 4. **Buscar con retroceso** (*backtracking*) todos los conjuntos independientes de tamaño
    `k = 6 − huecos reservados` que contienen los miembros fijados. Los candidatos se recorren
    en un orden canónico (número de la Pokédex nacional y forma) para que el resultado sea
@@ -117,7 +119,10 @@ suelen ser intercambiables, así que los equipos que siguen empatados se muestra
 1. Se toman los equipos que siguen empatados, ya validados con las reglas duras.
 2. Se agrupan los que coinciden en todos los miembros salvo en posiciones cuyos candidatos
    tienen los mismos tipos en el juego objetivo (p. ej., Lapras o Cloyster).
-3. Como cada equipo del grupo ya es válido, no hace falta comprobar de nuevo las reglas de
+3. Solo se forma el grupo si todas las combinaciones de sus alternativas son equipos del
+   empate; si no, sus equipos se muestran por separado
+   ([CA-49](../01-ddf/cuestiones-abiertas.md#resueltas)).
+4. Como cada equipo del grupo ya es válido, no hace falta comprobar de nuevo las reglas de
    presencia: una evolución de Eevee nunca queda agrupada con un Pokémon que no lo sea, porque
    el equipo resultante no cumpliría [RN-14](../01-ddf/reglas-negocio.md#rn-14) y no estaría
    entre los empatados.

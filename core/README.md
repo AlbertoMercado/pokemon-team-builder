@@ -9,7 +9,7 @@ cualquier biblioteca de terceros, para poder probarlas a fondo con hypothesis
 **Qué hace**: implementa las reglas y el motor de generación de equipos a partir de un
 `GameContext` inmutable ([algoritmo](../docs/02-ddt/algoritmo-generacion.md)).
 
-**Contenido** (fases 1 a 4 de 6 del [plan del motor](../docs/02-ddt/plan-motor.md)):
+**Contenido** (fases 1 a 5 de 6 del [plan del motor](../docs/02-ddt/plan-motor.md)):
 
 | Ruta | Qué hace |
 |------|----------|
@@ -17,7 +17,7 @@ cualquier biblioteca de terceros, para poder probarlas a fondo con hypothesis
 | `rules/catalog.py` | Catálogo de las 20 reglas (`CATALOG`) y configuración del usuario (`RuleSettings`). |
 | `rules/candidate.py` | Filtros por candidato (RN-03, RN-11, RN-16) con el motivo de cada descarte. |
 | `rules/team.py` | Restricciones entre miembros (RN-07, RN-12, RN-14) y reglas de presencia (RN-13, RN-14). |
-| `engine/` | `generate(ctx)`: filtros, presencia, búsqueda con retroceso (`search.py`) y resultado (`result.py`). |
+| `engine/` | `generate(ctx)`: filtros, presencia, búsqueda con retroceso (`search.py`), sugerencias para los huecos (`suggestions.py`), agrupación de empates (`grouping.py`) y resultado (`result.py`). |
 | `rules/soft.py` | Reglas blandas (RN-06, RN-15, RN-17, RN-20), cada una con una puntuación entre 0 y 1. |
 | `evolution.py` | Si un paso de evolución es tedioso, aleatorio o imposible en el juego. |
 | `scoring.py` | Puntuación ponderada, desglose por regla y clave de desempate (RN-04, RN-19); `Scorer` guarda el perfil de cada miembro para puntuar muchos equipos. |

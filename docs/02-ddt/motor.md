@@ -5,12 +5,12 @@ equipos, y cómo se usa. El plan completo, con las fases y la interpretación de
 está en el [plan de implementación del motor](plan-motor.md).
 
 !!! note "Estado"
-    Fases 1 a 4 de 6: modelos del dominio, tabla de tipos, catálogo de reglas con la
+    Fases 1 a 5 de 6: modelos del dominio, tabla de tipos, catálogo de reglas con la
     configuración del usuario, filtros por candidato (RN-03, RN-11 y RN-16), dificultad de
     las evoluciones, reglas blandas y puntuación (RN-04, RN-06, RN-15, RN-17, RN-19 y RN-20),
-    reglas de equipo (RN-07, RN-12, RN-13 y RN-14) y `generate()` con los equipos completos.
-    El equipo incompleto con sugerencias, la agrupación de empates y la revisión de datos
-    llegan en las fases 5 y 6.
+    reglas de equipo (RN-07, RN-12, RN-13 y RN-14) y `generate()`, con el equipo incompleto,
+    sus sugerencias (RN-08) y la agrupación de empates (CA-33). La revisión de datos sin
+    verificar (RN-18) llega en la fase 6.
 
 ## Restricciones
 
@@ -326,14 +326,26 @@ restricción de RN-14.
 ([algoritmo](algoritmo-generacion.md#procedimiento)):
 
 1. **Filtros por candidato** (`valid_candidates`): candidatos válidos y descartes.
-2. **Presencia** (`presence_requirements`): el nivel de RN-13 y RN-14, si están activas. Si
-   alguna reserva un hueco, el resultado es incompleto.
-3. **Búsqueda** (`search.teams`): todos los equipos de 6 candidatos sin conflictos entre ellos
-   que incluyen al menos uno de cada `options` con estado `candidates`.
+2. **Presencia** (`presence_requirements`): el nivel de RN-13 y RN-14, si están activas. Un
+   nivel `reserved` reserva un hueco.
+3. **Búsqueda** (`search.teams`): los equipos sin conflictos entre sus miembros que incluyen
+   al menos uno de cada `options` con estado `candidates`. Se prueba primero con 6 menos los
+   huecos reservados y, si no hay ninguno, con un miembro menos cada vez: la presencia va
+   antes que el tamaño ([RN-08](../01-ddf/reglas-negocio.md#rn-08),
+   [CA-19](../01-ddf/cuestiones-abiertas.md#resueltas)).
 4. **Puntuación** (`search.best_teams` con un `Scorer`): se quedan los de mayor clave
    `(puntuación, miembros con dos tipos)`, es decir, la mejor puntuación con el desempate de
    [RN-19](../01-ddf/reglas-negocio.md#rn-19) ya aplicado. Si siguen empatados, se devuelven
    todos ([RN-04](../01-ddf/reglas-negocio.md#rn-04)).
+5. **Huecos** (`Suggester`): si los equipos tienen menos de 6 miembros, sugerencias para sus
+   huecos.
+6. **Grupos** (`group_teams`): los equipos empatados que solo se diferencian en miembros
+   intercambiables.
+
+Si ningún tamaño permite cumplir a la vez RN-13 y RN-14, RN-14 cede (`displace`): pasa a su
+nivel siguiente, como si ninguna evolución de Eevee favorita la cumpliera, y se repite la
+búsqueda ([CA-48](../01-ddf/cuestiones-abiertas.md#resueltas)). Su `detail` explica qué
+candidatos no cabían.
 
 ### Búsqueda (`core/engine/search.py`)
 
@@ -353,16 +365,55 @@ favoritos no importa.
 | Campo | Qué es |
 |-------|--------|
 | `status` | `complete` si hay equipos de 6 favoritos; si no, `incomplete` ([RN-08](../01-ddf/reglas-negocio.md#rn-08)). |
-| `teams` | Los equipos empatados en cabeza (`RankedTeam`: miembros en orden canónico y su `TeamScore`), en orden canónico. Vacío si el resultado es incompleto. |
+| `teams` | Los equipos empatados en cabeza, en orden canónico. Cada `RankedTeam` tiene sus miembros en orden canónico, su `TeamScore` y, si tiene menos de 6, sus huecos (`open_slots`). Con un resultado incompleto, son los equipos con el mayor número posible de favoritos. |
+| `groups` | Los mismos equipos agrupados (`TeamGroup`, [CA-33](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `discards` | Los favoritos descartados por los filtros, con su motivo ([RF-10](../01-ddf/requisitos-funcionales.md#rf-10)). |
 | `presence` | El `PresenceRequirement` de cada regla de presencia activa. |
 | `valid_candidates` | Los candidatos válidos, en orden canónico. |
 | `incomplete_reason` | Si es incompleto: `reserved_slot` (una regla de presencia necesita un Pokémon que no es favorito), `not_enough_candidates` (menos de 6 válidos) o `no_valid_team` (hay 6 o más, pero no 6 que cumplan juntos las reglas). |
 
-!!! note "Fase 5"
-    Con un resultado incompleto, `teams` está vacío. El equipo incompleto con el mayor número
-    de favoritos, las sugerencias para los huecos y la agrupación de empates llegan en la
-    fase 5 del [plan](plan-motor.md#fases).
+Cada hueco (`OpenSlots`) tiene cuántos huecos son (`count`), la regla de presencia que lo
+reserva (`rule_id`, o nada si es libre) y sus sugerencias. Cada `Suggestion` tiene el Pokémon,
+lo que aportaría a la puntuación (`gain`) y si sus datos están verificados (`verified`).
+
+### Sugerencias (`core/engine/suggestions.py`)
+
+`Suggester` sugiere Pokémon para los huecos de los equipos de un contexto
+([RN-08](../01-ddf/reglas-negocio.md#rn-08)):
+
+- **Qué se sugiere**: los Pokémon del juego que no son favoritos y pasan los filtros por
+  candidato (`suggestible_entries`, [CA-40](../01-ddf/cuestiones-abiertas.md#resueltas)) y que,
+  además, no chocan con ningún miembro del equipo según las restricciones activas.
+- **Huecos reservados**: uno por regla de presencia en estado `reserved`. Solo admiten los
+  Pokémon de sus `options` que encajan.
+- **Huecos libres**: los que faltan hasta 6, juntos en un solo `OpenSlots`. Admiten cualquier
+  sugerencia que encaje.
+- **Orden**: por lo que aportarían (puntuación del equipo con la sugerencia menos la del equipo
+  sin ella), luego las de dos tipos ([RN-19](../01-ddf/reglas-negocio.md#rn-19)) y luego en orden
+  canónico. Se devuelven todas ([CA-50](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- **Sin verificar**: una sugerencia con datos sin confirmar lleva `verified = False`
+  ([CA-31](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+Las sugerencias de los huecos libres encajan cada una con el equipo, pero no necesariamente
+entre ellas: con dos huecos libres, la interfaz debe comprobarlo si el usuario elige dos.
+
+### Agrupación de empates (`core/engine/grouping.py`)
+
+`group_teams(equipos)` agrupa los equipos empatados que solo se diferencian en miembros con
+los mismos tipos en el juego objetivo ([CA-33](../01-ddf/cuestiones-abiertas.md#resueltas)):
+
+1. Los equipos con los mismos tipos en cada posición se reúnen. Un equipo con dos miembros de
+   los mismos tipos (posible sin RN-12) queda solo.
+2. Cada posición (`positions`) tiene las alternativas que la ocupan, por ejemplo
+   `(cloyster, lapras)`.
+3. El grupo solo se forma si todas las combinaciones de las alternativas son equipos del
+   empate. Si alguna no lo es, porque incumpliría una regla dura, sus equipos se muestran por
+   separado ([CA-49](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+Una evolución de Eevee nunca se agrupa con otro Pokémon mientras RN-14 está activa: el equipo
+con el otro no la cumpliría y no estaría en el empate. En Rojo Fuego, con las reglas por defecto,
+los 3 equipos empatados forman 2 grupos (uno con «Cloyster o Lapras»); sin RN-12, RN-13 ni
+RN-14, los 51 empates forman 20.
 
 ### Rendimiento
 
@@ -392,9 +443,11 @@ puntuación ([algoritmo](algoritmo-generacion.md#tamano-de-la-busqueda)).
 | `tests/core/rules/test_soft.py` | RN-06 (Vulpix y Vulpix de Alola), RN-15, RN-20 y RN-17 con el ejemplo de Brock, el peso de cada combate y de cada rival, y la tabla de tipos de la generación. Que cada regla blanda del catálogo esté implementada. |
 | `tests/core/test_scoring.py` | Pesos por defecto en el desglose, el ejemplo de Beautifly y Gengar, reglas desactivadas y con peso 0, desempate de Lapras y Blastoise (RN-19) y, con hypothesis, que el total sea la suma del desglose, esté entre 0 y la suma de pesos y no dependa del orden de los miembros. |
 | `tests/core/rules/test_team.py` | RN-07 (Jolteon y Vaporeon, Rhydon y Rhyperior), RN-12 (Charizard y Pidgeot, Gengar y Nidoking), RN-14 como restricción y los niveles de RN-13 (Kingdra y Garchomp) y de RN-14. |
-| `tests/core/engine/test_generate.py` | `generate` con los ejemplos del DDF: equipos de 6 favoritos (RN-01, RN-02), resultado incompleto y su motivo, todos los empatados (RN-04), Lapras antes que Blastoise (RN-19), Dragonite antes que un equipo de 6 (RN-13), una sola de Vaporeon, Jolteon y Flareon elegida por puntuación (RN-14) y determinismo. |
-| `tests/core/test_engine_properties.py` | Con hypothesis, contextos aleatorios de hasta 12 favoritos: el motor devuelve exactamente los mejores equipos de una búsqueda por fuerza bruta, todos cumplen las reglas duras activas, el resultado es reproducible y `Scorer.ranking_key` coincide con la puntuación completa. |
-| `tests/core/test_scenario_firered.py` | Escenario real de Rojo Fuego: los equipos esperados con las reglas por defecto, los descartes, las reglas de presencia, RN-12, que tarda menos de un segundo y que sin RN-12 la cobertura es completa. |
+| `tests/core/engine/test_generate.py` | `generate` con los ejemplos del DDF: equipos de 6 favoritos (RN-01, RN-02), resultado incompleto con su motivo y el equipo más grande posible, todos los empatados (RN-04), Lapras antes que Blastoise (RN-19), Dragonite antes que un equipo de 6 (RN-13), una sola de Vaporeon, Jolteon y Flareon elegida por puntuación (RN-14) y determinismo. |
+| `tests/core/engine/test_incomplete.py` | RN-08: los 4 candidatos en Rojo Fuego con 2 huecos libres, el orden de las sugerencias (RN-19), las sin verificar (CA-31), el equipo vacío con 6 huecos, el hueco reservado que solo admite lo que encaja y CA-48 (Zekrom y Jolteon). |
+| `tests/core/engine/test_grouping.py` | CA-33 y CA-49: Lapras o Cloyster, Vaporeon que no se agrupa con RN-14 activa y sí sin ella, los equipos que no se agrupan porque una combinación incumpliría RN-07, y que los grupos cubren todos los empates. |
+| `tests/core/test_engine_properties.py` | Con hypothesis, contextos aleatorios de hasta 12 favoritos con un pool para sugerencias: el motor devuelve exactamente los mejores equipos de una búsqueda por fuerza bruta que aplica RN-08 y CA-48, todos cumplen las reglas duras activas, las sugerencias encajan, cumplen su hueco, aportan lo que dicen y están ordenadas, cada grupo son exactamente sus combinaciones, el resultado es reproducible y `Scorer.ranking_key` coincide con la puntuación completa. |
+| `tests/core/test_scenario_firered.py` | Escenario real de Rojo Fuego: los equipos esperados con las reglas por defecto y sus grupos, los descartes, las reglas de presencia, RN-12, que tarda menos de un segundo y que sin RN-12 la cobertura es completa. |
 | `tests/core/rules/test_candidate.py` | Los tres niveles de RN-03 (Vulpix, Treecko, Growlithe de Hisui y Raichu), RN-11 y RN-16 con su motivo, las reglas desactivadas, el orden entre filtros y el orden canónico. |
 
 `tests/core/builders.py` tiene constructores de datos de prueba legibles, que usarán todas las
