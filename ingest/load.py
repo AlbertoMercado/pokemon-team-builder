@@ -1,32 +1,41 @@
 """Load phase of the ingest: build reference.sqlite safely and replace the previous one.
 
 The new database is built in a temporary file next to the target. Only when every row is
-stored and the integrity checks pass does it replace the previous file, in a single atomic
-rename. If anything fails, the previous database is kept untouched (RF-11).
+stored, the integrity checks pass and the data checks of the load (``ingest/checks.py``)
+pass does it replace the previous file, in a single atomic rename. If anything fails, the
+previous database is kept untouched (RF-11).
 """
 
+from collections import defaultdict
 from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
-from sqlalchemy import Engine, Table, func, select, text
+from sqlalchemy import Connection, Engine, Row, Table, func, select, text
 from sqlmodel import Session, col
 from sqlmodel import select as select_model
 
 from db.reference import Game, IngestRun, ReferenceModel, create_reference_schema
 from db.sqlite import create_sqlite_engine
+from ingest.checks import Check
 from ingest.report import LoadReport
 from ingest.sources import Source
 
 ORIGIN_COLUMN_SUFFIX = "origin"
+MAX_DANGLING_VALUES = 5
 
 
 class IntegrityCheckError(Exception):
     """The freshly built database is not consistent."""
 
 
-def build_reference(sources: Sequence[Source], target: Path) -> LoadReport:
-    """Build reference.sqlite at ``target`` from ``sources`` and report the outcome."""
+def build_reference(
+    sources: Sequence[Source], target: Path, checks: Sequence[Check] = ()
+) -> LoadReport:
+    """Build reference.sqlite at ``target`` from ``sources`` and report the outcome.
+
+    ``checks`` run on the new database; any problem they report rejects the load.
+    """
     report = LoadReport(target=target)
     temporary = target.with_name(f"{target.name}.tmp")
     temporary.unlink(missing_ok=True)
@@ -36,9 +45,14 @@ def build_reference(sources: Sequence[Source], target: Path) -> LoadReport:
         create_reference_schema(engine)
         _store_rows(engine, sources)
         _check_integrity(engine)
-        _record_run(engine, sources, started_at)
-        report.rows_by_table = _count_rows(engine)
-        report.origins_by_table = _count_origins(engine)
+        problems = _run_checks(engine, checks)
+        if problems:
+            report.errors.extend(f"Comprobación fallida: {problem}" for problem in problems)
+        else:
+            report.checks_passed = len(checks)
+            _record_run(engine, sources, started_at)
+            report.rows_by_table = _count_rows(engine)
+            report.origins_by_table = _count_origins(engine)
     except Exception as error:  # any failure must keep the previous database
         report.errors.append(f"{type(error).__name__}: {error}")
     finally:
@@ -52,16 +66,21 @@ def build_reference(sources: Sequence[Source], target: Path) -> LoadReport:
 
 
 def _store_rows(engine: Engine, sources: Sequence[Source]) -> None:
-    """Store every row in one transaction, checking foreign keys only at commit.
+    """Store every row in one transaction, with foreign keys checked afterwards.
 
-    Deferring the checks lets sources yield rows in any order, even within a table (an
-    evolution before its pre-evolution), while still rejecting dangling references.
+    Foreign keys are switched off while inserting, so sources can yield rows in any order,
+    even within a table (an evolution before its pre-evolution). ``_check_integrity`` then
+    lists every dangling reference with its table, column and value.
     """
     with Session(engine) as session:
-        session.execute(text("PRAGMA defer_foreign_keys = ON"))
-        for source in sources:
-            session.add_all(source.rows())
-        session.commit()
+        # Must run before the transaction starts: SQLite ignores it inside one.
+        session.execute(text("PRAGMA foreign_keys = OFF"))
+        try:
+            for source in sources:
+                session.add_all(source.rows())
+            session.commit()
+        finally:
+            session.execute(text("PRAGMA foreign_keys = ON"))
 
 
 def _check_integrity(engine: Engine) -> None:
@@ -71,7 +90,33 @@ def _check_integrity(engine: Engine) -> None:
             raise IntegrityCheckError(f"integrity_check: {integrity}")
         dangling = connection.execute(text("PRAGMA foreign_key_check")).all()
         if dangling:
-            raise IntegrityCheckError(f"claves foráneas rotas: {dangling}")
+            raise IntegrityCheckError(_describe_dangling(connection, dangling))
+
+
+def _describe_dangling(
+    connection: Connection, dangling: Sequence[Row[tuple[str, int, str, int]]]
+) -> str:
+    """Summarise dangling references as ``table.column → parent: values``."""
+    # Rows of PRAGMA foreign_key_check: (table, rowid, parent table, foreign key id).
+    missing: dict[str, set[str]] = defaultdict(set)
+    for table, rowid, parent, key_id in dangling:
+        keys = connection.execute(text(f"PRAGMA foreign_key_list({table})")).all()
+        column = next(key[3] for key in keys if key[0] == key_id)
+        value = connection.execute(
+            text(f'SELECT "{column}" FROM {table} WHERE rowid = :rowid'), {"rowid": rowid}
+        ).scalar_one()
+        missing[f"{table}.{column} → {parent}"].add(str(value))
+    details = "; ".join(
+        f"{reference}: {', '.join(sorted(values)[:MAX_DANGLING_VALUES])}"
+        + (" …" if len(values) > MAX_DANGLING_VALUES else "")
+        for reference, values in sorted(missing.items())
+    )
+    return f"{len(dangling)} referencias a filas que no existen ({details})"
+
+
+def _run_checks(engine: Engine, checks: Sequence[Check]) -> list[str]:
+    with Session(engine) as session:
+        return [problem for check in checks for problem in check(session)]
 
 
 def _record_run(engine: Engine, sources: Sequence[Source], started_at: datetime) -> None:

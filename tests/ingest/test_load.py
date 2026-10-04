@@ -1,6 +1,7 @@
 """Load phase of the ingest: build reference.sqlite, report it and replace the previous file
 only when everything is consistent (RF-11, docs/05-operacion/ingesta.md)."""
 
+import shutil
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -20,8 +21,10 @@ from db.reference import (
     VersionGroup,
 )
 from db.sqlite import create_sqlite_engine
-from ingest.cli import main
+from ingest import cli
 from ingest.load import build_reference
+
+POKEAPI_FIXTURES = Path(__file__).resolve().parent / "fixtures" / "pokeapi"
 
 
 @dataclass
@@ -139,7 +142,7 @@ def test_dangling_reference_keeps_the_previous_database(tmp_path: Path) -> None:
     report = build_reference([FakeSource([*_firered_rows(), orphan])], target)
 
     assert not report.succeeded
-    assert "FOREIGN KEY" in report.errors[0]
+    assert "pokemon.species → species: missingno" in report.errors[0]
     assert target.read_bytes() == previous
     assert not (tmp_path / "reference.sqlite.tmp").exists()
 
@@ -168,13 +171,41 @@ def test_sources_from_different_pokeapi_commits_are_rejected(tmp_path: Path) -> 
     assert "varios commits de PokeAPI" in report.errors[0]
 
 
-def test_cli_builds_reference_in_the_data_dir(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
+def _data_dir_with_fixture_cache(tmp_path: Path) -> Path:
+    """Data directory whose PokeAPI cache already has the test extract (no download)."""
     data_dir = tmp_path / "data"
+    shutil.copytree(POKEAPI_FIXTURES, data_dir / "cache" / "pokeapi")
+    return data_dir
 
-    exit_code = main(["--data-dir", str(data_dir)])
+
+def test_cli_builds_reference_in_the_data_dir(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The extract has ~45 species, so the checks of the full first load are disabled here.
+    monkeypatch.setattr(cli, "FIRST_LOAD_CHECKS", ())
+    data_dir = _data_dir_with_fixture_cache(tmp_path)
+
+    exit_code = cli.main(["--data-dir", str(data_dir), "--offline"])
 
     assert exit_code == 0
     assert (data_dir / "reference.sqlite").exists()
     assert "Carga completada." in capsys.readouterr().out
+
+
+def test_cli_fails_when_the_checks_fail(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    data_dir = _data_dir_with_fixture_cache(tmp_path)
+
+    exit_code = cli.main(["--data-dir", str(data_dir), "--offline"])
+
+    assert exit_code == 1
+    assert not (data_dir / "reference.sqlite").exists()
+    assert "Comprobación fallida: species" in capsys.readouterr().out
+
+
+def test_cli_offline_without_cache_fails(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = cli.main(["--data-dir", str(tmp_path / "data"), "--offline"])
+
+    assert exit_code == 1
+    assert "no está en la caché" in capsys.readouterr().out

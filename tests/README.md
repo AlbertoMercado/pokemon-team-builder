@@ -12,6 +12,9 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
   y escritura, y restricciones de integridad).
 - `ingest/test_load.py`: carga de `reference.sqlite` (filas desordenadas, registro de la
   carga, recuento por origen, conservación de la base de datos anterior si algo falla) y CLI.
+- `ingest/test_pokeapi.py`: fuente de PokeAPI sobre un extracto real del volcado
+  (`ingest/fixtures/pokeapi/`, con su README y el script que lo genera).
+- `conftest.py`: hace fallar cualquier petición HTTP. **Los tests nunca usan la red.**
 - Los tests de cada paquete van en `tests/<paquete>/` (`core/`, `db/`, `ingest/`, `api/`).
 
 pytest importa los paquetes desde la raíz del repositorio (`pythonpath` en `pyproject.toml`).
