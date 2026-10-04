@@ -5,12 +5,11 @@ equipos, y cómo se usa. El plan completo, con las fases y la interpretación de
 está en el [plan de implementación del motor](plan-motor.md).
 
 !!! note "Estado"
-    Fases 1 a 5 de 6: modelos del dominio, tabla de tipos, catálogo de reglas con la
-    configuración del usuario, filtros por candidato (RN-03, RN-11 y RN-16), dificultad de
-    las evoluciones, reglas blandas y puntuación (RN-04, RN-06, RN-15, RN-17, RN-19 y RN-20),
-    reglas de equipo (RN-07, RN-12, RN-13 y RN-14) y `generate()`, con el equipo incompleto,
-    sus sugerencias (RN-08) y la agrupación de empates (CA-33). La revisión de datos sin
-    verificar (RN-18) llega en la fase 6.
+    Motor completo (fases 1 a 6): modelos del dominio, tabla de tipos, catálogo de reglas con
+    la configuración del usuario, filtros por candidato, dificultad de las evoluciones, reglas
+    blandas y puntuación, reglas de equipo, `generate()` con el equipo incompleto, sus
+    sugerencias y la agrupación de empates, y la revisión de los datos sin verificar (RN-18).
+    Lo siguiente es construir el `GameContext` desde las bases de datos, en la API.
 
 ## Restricciones
 
@@ -430,6 +429,45 @@ RN-12 y las reglas de presencia podan la mayor parte de la búsqueda. Sin ellas 
 unos 300 000 equipos; si llega a hacer falta, se añadirá ramificación y poda con una cota de la
 puntuación ([algoritmo](algoritmo-generacion.md#tamano-de-la-busqueda)).
 
+## Revisión de datos (`core/review.py`)
+
+Antes de generar, el usuario confirma los datos inferidos o pendientes que intervienen
+([RN-18](../01-ddf/reglas-negocio.md#rn-18), [RF-15](../01-ddf/requisitos-funcionales.md#rf-15)).
+`generate` nunca los recibe: el contexto solo lleva datos confirmados. Por eso la revisión es
+una función aparte, que sí conoce el origen de cada dato:
+
+```python
+pending_facts(juego, datos_del_juego, favoritos, configuración, recorrido) -> tuple[Fact, ...]
+```
+
+| Modelo | Qué es |
+|--------|--------|
+| `Fact` | Un dato revisable: su clave estable (`fact_key`, [modelo de datos](modelo-datos.md#datos-revisables-fact_key)), su clase (`mechanic`, `key_battle`, `exists` o `arrival`), su origen y su valor. Solo un dato pendiente no tiene valor. |
+| `Origin` | `automatic`, `inferred`, `pending` o `confirmed`. Los **conocidos** son los automáticos y los confirmados. |
+| `FavoriteFacts` | Un favorito con los datos de su disponibilidad en el juego: si existe y si puede llegar a tiempo ([RN-03](../01-ddf/reglas-negocio.md#rn-03)). |
+
+Devuelve, en este orden:
+
+1. Los datos del juego sin verificar: sus mecánicas y, si [RN-17](../01-ddf/reglas-negocio.md#rn-17)
+   está activa, sus combates clave. Las mecánicas se piden siempre, porque RN-15 las usa también
+   para puntuar las sugerencias; los combates clave no se usan en ningún otro sitio.
+2. Por cada favorito, en orden canónico, su existencia y su llegada si no son conocidas,
+   **salvo que ya esté descartado con datos conocidos**. Un favorito está descartado si
+   apareció en una generación posterior, si su existencia o su llegada son conocidas y valen
+   «no», si su línea no se puede criar ([RN-11](../01-ddf/reglas-negocio.md#rn-11)) o si el
+   recorrido lo excluye ([RN-16](../01-ddf/reglas-negocio.md#rn-16)), con esas reglas activas.
+
+| Ejemplo en Rojo Fuego | Qué se pide |
+|-----------------------|-------------|
+| Raichu, con llegada inferida («no», porque nace como Pichu) | Su llegada. Si el usuario la confirma, se descarta al generar. |
+| Raichu, con la llegada ya confirmada | Nada. |
+| Zapdos, con llegada inferida | Nada: no se puede criar, así que su llegada no importa. |
+| Gengar, tras usarlo en Verde Hoja | Nada: el recorrido lo excluye. |
+| Un combate clave inferido, con RN-17 desactivada | Nada: no interviene. |
+
+Si la lista está vacía, se puede generar. La API la usa para `GET /api/games/{game}/review` y
+para responder `409` al generar si queda algo ([API](api.md#generacion)).
+
 ## Pruebas
 
 | Fichero | Qué comprueba |
@@ -448,6 +486,7 @@ puntuación ([algoritmo](algoritmo-generacion.md#tamano-de-la-busqueda)).
 | `tests/core/engine/test_grouping.py` | CA-33 y CA-49: Lapras o Cloyster, Vaporeon que no se agrupa con RN-14 activa y sí sin ella, los equipos que no se agrupan porque una combinación incumpliría RN-07, y que los grupos cubren todos los empates. |
 | `tests/core/test_engine_properties.py` | Con hypothesis, contextos aleatorios de hasta 12 favoritos con un pool para sugerencias: el motor devuelve exactamente los mejores equipos de una búsqueda por fuerza bruta que aplica RN-08 y CA-48, todos cumplen las reglas duras activas, las sugerencias encajan, cumplen su hueco, aportan lo que dicen y están ordenadas, cada grupo son exactamente sus combinaciones, el resultado es reproducible y `Scorer.ranking_key` coincide con la puntuación completa. |
 | `tests/core/test_scenario_firered.py` | Escenario real de Rojo Fuego: los equipos esperados con las reglas por defecto y sus grupos, los descartes, las reglas de presencia, RN-12, que tarda menos de un segundo y que sin RN-12 la cobertura es completa. |
+| `tests/core/test_review.py` | RN-18: Raichu en Rojo Fuego (el ejemplo del DDF) antes y después de confirmar, Zapdos con y sin RN-11, Treecko en Oro, una forma que no existe, el recorrido con y sin RN-16, los datos del juego, los combates clave sin RN-17 y el orden. |
 | `tests/core/rules/test_candidate.py` | Los tres niveles de RN-03 (Vulpix, Treecko, Growlithe de Hisui y Raichu), RN-11 y RN-16 con su motivo, las reglas desactivadas, el orden entre filtros y el orden canónico. |
 
 `tests/core/builders.py` tiene constructores de datos de prueba legibles, que usarán todas las

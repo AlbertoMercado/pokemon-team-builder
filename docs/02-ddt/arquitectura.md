@@ -169,7 +169,7 @@ sequenceDiagram
     participant C as core
     U->>W: Elige el juego objetivo
     W->>A: GET /api/games/{game}/review
-    A->>C: review.pending_facts(ctx)
+    A->>C: review.pending_facts(juego, datos del juego, favoritos)
     C-->>A: Datos sin verificar que intervienen
     A-->>W: Datos con su propuesta
     U->>W: Confirma o corrige

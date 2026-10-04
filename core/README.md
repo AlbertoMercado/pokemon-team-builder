@@ -9,7 +9,7 @@ cualquier biblioteca de terceros, para poder probarlas a fondo con hypothesis
 **Qué hace**: implementa las reglas y el motor de generación de equipos a partir de un
 `GameContext` inmutable ([algoritmo](../docs/02-ddt/algoritmo-generacion.md)).
 
-**Contenido** (fases 1 a 5 de 6 del [plan del motor](../docs/02-ddt/plan-motor.md)):
+**Contenido** (fases 1 a 6 de 6 del [plan del motor](../docs/02-ddt/plan-motor.md)):
 
 | Ruta | Qué hace |
 |------|----------|
@@ -22,6 +22,7 @@ cualquier biblioteca de terceros, para poder probarlas a fondo con hypothesis
 | `evolution.py` | Si un paso de evolución es tedioso, aleatorio o imposible en el juego. |
 | `scoring.py` | Puntuación ponderada, desglose por regla y clave de desempate (RN-04, RN-19); `Scorer` guarda el perfil de cada miembro para puntuar muchos equipos. |
 | `breeding.py` | Si una línea se puede criar y qué etapa nace del huevo. |
+| `review.py` | Qué datos sin verificar intervienen en una generación y hay que confirmar antes (RN-18). |
 | `journey.py` | Qué excluye el recorrido del *Hall of Fame*. |
 
 **Restricciones**: solo biblioteca estándar y ningún otro paquete del proyecto. Lo comprueban

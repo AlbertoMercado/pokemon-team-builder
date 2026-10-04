@@ -192,4 +192,8 @@ Es la única entrada de `core/`. Lo construye `api/services/` a partir de las do
 | `key_battles` | Combates clave con los tipos de cada Pokémon rival. |
 | `journey` | Registros del *Hall of Fame* en orden. `core/journey.py` calcula con ellos las exclusiones. |
 | `settings` | Reglas activas y pesos. |
-| `unverified_facts` | Datos sin verificar que intervienen, para bloquear la generación ([RF-15](../01-ddf/requisitos-funcionales.md#rf-15)). |
+
+El contexto solo lleva datos ya confirmados. Los datos sin verificar que intervienen se
+calculan antes, con `core.review.pending_facts`, a partir de los favoritos y de los datos con
+su origen; mientras quede alguno, la API no genera
+([RF-15](../01-ddf/requisitos-funcionales.md#rf-15), [motor](motor.md#revision-de-datos-corereviewpy)).
