@@ -40,6 +40,10 @@ Al terminar, la carga muestra un informe y sale con un código que dice cómo ha
 
 Para ver el código después de ejecutarla: `echo $?`.
 
+La carga lee tus datos (`data/user.sqlite`) para comprobar que tus favoritos y tu *Hall of
+Fame* siguen existiendo en los datos nuevos; si alguno no, no sustituye nada y te dice cuál
+([errores habituales](#errores-habituales)). Nunca los modifica.
+
 Los datos que confirmaste en la aplicación se conservan. Si una carga cambia el valor que se
 proponía para alguno, la aplicación te lo volverá a pedir
 ([RN-18](../01-ddf/reglas-negocio.md#rn-18)).
@@ -79,6 +83,9 @@ una nueva versión de la aplicación ([RF-16](../01-ddf/requisitos-funcionales.m
 | `ERROR en los datos curados; no se ha cargado nada.` | Un fichero de `data/curated/` no es válido (una errata, un campo que falta…). | El mensaje dice el fichero y el motivo. Si no lo has tocado tú, avisa al arquitecto. |
 | Error de red o de descarga | Sin conexión, o PokeAPI o WikiDex no responden. | Repetir más tarde, o usar `--offline` si la caché está completa. |
 | `Comprobación fallida: …` | Los datos cargados no son los esperados (por ejemplo, faltan especies). | No es algo que se arregle en local: avisa al arquitecto con el mensaje. |
+| `Datos del usuario: Favoritos que no existen en la nueva carga: …` | Tienes en favoritos una forma que la nueva carga ya no tiene. | Quítala de favoritos (`DELETE /api/favorites/{pokemon}`) y repite la carga. Si es un Pokémon que debería seguir existiendo, avisa al arquitecto. |
+| `Datos del usuario: Registros del Hall of Fame con …` | Un registro de tu *Hall of Fame* usa un juego o un Pokémon que la nueva carga ya no tiene. El número es el `id` del registro. | Corrige o elimina ese registro (`PATCH` o `DELETE /api/hall-of-fame/{id}`) y repite la carga. |
+| Aviso `Confirmaciones de datos que ya no existen…` | Confirmaste datos que la nueva carga ya no tiene. | Nada: la carga se completa y esas confirmaciones se ignoran. |
 
 ## Consultar los datos cargados
 

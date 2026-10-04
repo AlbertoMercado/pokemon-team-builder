@@ -162,8 +162,10 @@ erDiagram
 | `fact_confirmation` | `fact_key` PK, `game`, `confirmed_value`, `proposed_value_hash`, `confirmed_at` | Si una nueva carga propone un valor con otro hash, la confirmación deja de valer ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). |
 
 Las columnas que apuntan a `reference.sqlite` (`pokemon`, `game`, `fact_key`) no pueden ser
-claves foráneas, porque están en otro fichero. Las comprobará la ingesta antes de sustituir la
-base de datos de referencia (fase 7 del [plan de la API](plan-api.md#fases)).
+claves foráneas, porque están en otro fichero. Las comprueba la ingesta antes de sustituir la
+base de datos de referencia ([ingesta](../05-operacion/ingesta.md#que-hace)): un favorito o un
+dato del *Hall of Fame* que ya no existe rechaza la carga, y una confirmación de un dato que ya
+no existe es un aviso.
 
 ### Implementación de `user.sqlite`
 

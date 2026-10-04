@@ -107,7 +107,8 @@ flowchart LR
 
 La fase de carga construye `reference.sqlite` en un fichero temporal, comprueba su
 integridad y que las claves que usa `user.sqlite` (favoritos, *Hall of Fame*, confirmaciones)
-siguen existiendo, y solo entonces sustituye el fichero anterior. Si algo falla, se conserva
+siguen existiendo, y solo entonces sustituye el fichero anterior. Las de los favoritos y del
+*Hall of Fame* rechazan la carga; las de las confirmaciones solo son avisos. Si algo falla, se conserva
 la base de datos anterior y el informe explica el motivo. Uso, informe y detalle de la
 implementación en [Ingesta de datos](../05-operacion/ingesta.md).
 

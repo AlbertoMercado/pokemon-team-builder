@@ -18,6 +18,8 @@ from ingest.sources.wikidex.fetch import PageCache, fetch_page
 
 DEFAULT_DATA_DIR = Path("data")
 REFERENCE_FILE_NAME = "reference.sqlite"
+# Written by the API in the same data directory; its keys are checked before replacing.
+USER_FILE_NAME = "user.sqlite"
 # Curated data is versioned with the code, so it is found next to it, not in --data-dir.
 CURATED_DIR = Path(__file__).resolve().parent.parent / "data" / "curated"
 
@@ -58,6 +60,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     except CuratedDataError as error:
         print(f"ERROR en los datos curados; no se ha cargado nada.\n  - {error}")
         return 1
-    report = build_reference(sources, data_dir / REFERENCE_FILE_NAME, FIRST_LOAD_CHECKS)
+    report = build_reference(
+        sources, data_dir / REFERENCE_FILE_NAME, FIRST_LOAD_CHECKS, data_dir / USER_FILE_NAME
+    )
     print(report.render())
     return 0 if report.succeeded else 1
