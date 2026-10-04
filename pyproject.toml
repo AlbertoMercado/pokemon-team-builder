@@ -10,6 +10,7 @@ dependencies = []
 [dependency-groups]
 dev = [
     "hypothesis>=6.100",
+    "import-linter>=2.1",
     "mkdocs-material>=9.5",
     "mypy>=1.13",
     "pre-commit>=4.0",
@@ -50,9 +51,43 @@ quote-style = "double"
 [tool.mypy]
 python_version = "3.13"
 strict = true
-files = ["ingest", "core", "api", "tests"]
+files = ["core", "db", "ingest", "api", "tests"]
 warn_unreachable = true
 pretty = true
+
+# Dependency contracts between project packages (ADR-0002).
+# Allowed: api -> core, db; ingest -> db. Documented in docs/02-ddt/estructura-codigo.md.
+# That core/ uses only the standard library is checked by tests/test_architecture.py.
+[tool.importlinter]
+root_packages = ["core", "db", "ingest", "api"]
+
+[[tool.importlinter.contracts]]
+id = "core-pure"
+name = "core no depende de ningún otro paquete del proyecto"
+type = "forbidden"
+source_modules = ["core"]
+forbidden_modules = ["db", "ingest", "api"]
+
+[[tool.importlinter.contracts]]
+id = "db-base"
+name = "db no depende de ningún otro paquete del proyecto"
+type = "forbidden"
+source_modules = ["db"]
+forbidden_modules = ["core", "ingest", "api"]
+
+[[tool.importlinter.contracts]]
+id = "ingest-only-db"
+name = "ingest solo depende de db"
+type = "forbidden"
+source_modules = ["ingest"]
+forbidden_modules = ["core", "api"]
+
+[[tool.importlinter.contracts]]
+id = "api-not-ingest"
+name = "api no depende de ingest"
+type = "forbidden"
+source_modules = ["api"]
+forbidden_modules = ["ingest"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

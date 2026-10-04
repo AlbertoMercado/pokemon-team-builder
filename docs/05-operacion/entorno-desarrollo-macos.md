@@ -172,7 +172,9 @@ Crea el entorno virtual `.venv` con Python 3.13 e instala todas las dependencias
 uv run pre-commit install
 ```
 
-A partir de aquí, cada `git commit` ejecuta automáticamente ruff, mypy, gitleaks y las comprobaciones básicas.
+A partir de aquí, cada `git commit` ejecuta automáticamente ruff, mypy, import-linter
+([contratos de dependencia](../02-ddt/estructura-codigo.md#reglas-de-dependencia)), gitleaks y las
+comprobaciones básicas.
 
 ### Frontend (cuando exista la carpeta `web/` con su `package.json`)
 
@@ -198,7 +200,7 @@ uv run pytest
 uv run pre-commit run --all-files
 ```
 
-Los tres comandos deben terminar sin errores. Mientras no haya tests, `pytest` termina con «no tests ran» (código de salida 5); es el comportamiento esperado.
+Los tres comandos deben terminar sin errores.
 
 ---
 

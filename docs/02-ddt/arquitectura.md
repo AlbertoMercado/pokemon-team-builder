@@ -146,11 +146,13 @@ flowchart TD
 ```
 
 - `core/` no importa nada del proyecto ni bibliotecas de terceros.
-- `db/` no importa `api/` ni `ingest/`.
-- `api/` e `ingest/` no se importan entre sí.
+- `db/` no importa ningún otro paquete del proyecto.
+- `ingest/` solo importa `db/`, y `api/` no importa `ingest/`.
 
-Se comprueban en CI con `import-linter`
-([ADR-0002](../03-adr/0002-monolito-modular-nucleo-puro.md)).
+Se comprueban con contratos de `import-linter` y con un test que vigila que `core/` solo use la
+biblioteca estándar, en pre-commit y en CI
+([ADR-0002](../03-adr/0002-monolito-modular-nucleo-puro.md)). Detalle en la
+[estructura del código](estructura-codigo.md#reglas-de-dependencia).
 
 ## Flujos principales
 

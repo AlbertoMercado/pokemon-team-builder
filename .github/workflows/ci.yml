@@ -28,31 +28,22 @@ jobs:
       - name: Instalar dependencias
         run: uv sync --locked
 
-      # gitleaks se ejecuta en su propio job (el hook solo revisa lo staged) y mypy
-      # se ejecuta abajo con el entorno del proyecto, que tiene todas las dependencias.
+      # gitleaks se ejecuta en su propio job (el hook solo revisa lo staged); mypy y
+      # lint-imports se ejecutan abajo como pasos propios con el entorno del proyecto.
       - name: pre-commit
         run: uv run pre-commit run --all-files --show-diff-on-failure
         env:
-          SKIP: gitleaks,mypy
+          SKIP: gitleaks,mypy,lint-imports
 
       - name: mypy
-        run: |
-          if git ls-files '*.py' | grep -q .; then
-            uv run mypy
-          else
-            echo "::notice::Sin ficheros .py todavía; se omite mypy."
-          fi
+        run: uv run mypy
+
+      # Reglas de dependencia entre paquetes (ADR-0002); contratos en pyproject.toml.
+      - name: Contratos de dependencia
+        run: uv run lint-imports
 
       - name: pytest
-        run: |
-          # Código 5 = no se han encontrado tests (proyecto sin código todavía).
-          status=0
-          uv run pytest || status=$?
-          if [ "$status" -eq 5 ]; then
-            echo "::notice::Sin tests todavía."
-            exit 0
-          fi
-          exit "$status"
+        run: uv run pytest
 
   docs:
     name: Documentación

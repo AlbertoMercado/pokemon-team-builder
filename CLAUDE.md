@@ -19,7 +19,7 @@ de Pokémon favoritos y un juego objetivo, genera un equipo de 6 según reglas c
 | Motor y API | FastAPI, SQLModel |
 | Base de datos | SQLite |
 | Frontend | React + Vite + TypeScript + Tailwind |
-| Calidad (Python) | ruff, mypy (strict), pytest, hypothesis, pre-commit, gitleaks |
+| Calidad (Python) | ruff, mypy (strict), import-linter, pytest, hypothesis, pre-commit, gitleaks |
 | Calidad (web) | ESLint, Prettier, Vitest, Playwright |
 | Documentación | MkDocs Material (docs-as-code en Markdown), diagramas Mermaid |
 | Gestión de entorno | uv |
@@ -55,7 +55,11 @@ tests/                Tests de Python (pytest + hypothesis)
 
 `core/` debe mantenerse puro (sin acceso a red ni BD, solo biblioteca estándar) para poder
 testearlo con hypothesis. Dependencias permitidas: `api → core, db` e `ingest → db`
-([arquitectura](docs/02-ddt/arquitectura.md), ADR-0002).
+([arquitectura](docs/02-ddt/arquitectura.md), ADR-0002). Se comprueban con los contratos de
+`import-linter` de `pyproject.toml` y con `tests/test_architecture.py`.
+
+Qué es, por qué existe y qué hace cada directorio: [estructura del código](docs/02-ddt/estructura-codigo.md).
+Cada directorio de código tiene un `README.md` y cada paquete un *docstring* en su `__init__.py`.
 
 ## Convenciones
 
@@ -69,6 +73,11 @@ testearlo con hypothesis. Dependencias permitidas: `api → core, db` e `ingest 
 - **Decisiones de arquitectura**: toda decisión relevante se registra como ADR en
   `docs/03-adr/` a partir de `0000-plantilla.md`, con numeración correlativa.
 - **Tipado**: mypy en modo `strict`; no usar `Any` ni `# type: ignore` sin justificar.
+- **Documentación del código**: todo código o cambio de base de datos se documenta **en el
+  mismo PR**: qué es, por qué existe y qué hace (docstring de módulo, `README.md` en
+  directorios nuevos), tablas y migraciones en el [modelo de datos](docs/02-ddt/modelo-datos.md),
+  y el DDT u Operación afectados. Si hace falta, se crea una página nueva y se enlaza en
+  `mkdocs.yml`. Detalle en [estructura del código](docs/02-ddt/estructura-codigo.md#documentacion-del-codigo).
 
 ### Reglas de negocio (RN-XX)
 
@@ -92,6 +101,7 @@ tests e issues.**
 | Lint | `uv run ruff check .` | ✅ |
 | Formatear | `uv run ruff format .` | ✅ |
 | Tipos | `uv run mypy` | ✅ |
+| Contratos de dependencia | `uv run lint-imports` | ✅ |
 | Tests | `uv run pytest` | ✅ |
 | Hooks de pre-commit | `uv run pre-commit install` / `uv run pre-commit run --all-files` | ✅ |
 | Documentación en local | `uv run mkdocs serve` | ✅ |
@@ -103,16 +113,14 @@ tests e issues.**
 | Tests unitarios web | `cd web && npm run test` | ⏳ Pendiente |
 | Tests E2E | `cd web && npm run test:e2e` | ⏳ Pendiente |
 
-Mientras no haya ficheros `.py`, `mypy` termina con «There are no .py[i] files» y `pytest` con
-código 5 («no tests ran»); es el comportamiento esperado.
-
 Actualiza esta tabla cuando un comando pendiente pase a existir.
 
 ### CI
 
 `.github/workflows/ci.yml` se ejecuta en cada PR y en cada push a `main` con tres jobs:
 
-- **Python**: pre-commit (sin gitleaks ni mypy), `mypy` con el entorno del proyecto y `pytest`.
+- **Python**: pre-commit (sin gitleaks, mypy ni lint-imports), `mypy` con el entorno del
+  proyecto, contratos de dependencia (`lint-imports`) y `pytest`.
 - **Documentación**: `mkdocs build --strict`.
 - **Secretos**: gitleaks sobre todo el historial.
 
