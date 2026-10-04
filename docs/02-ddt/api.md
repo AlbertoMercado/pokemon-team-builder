@@ -161,6 +161,7 @@ confirmado.
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
 | `POST` | `/api/games/{game}/generations` | Genera los equipos con los favoritos, las reglas y las confirmaciones actuales. `409` con la lista de datos pendientes si queda alguno sin confirmar; `404` si el juego no es juego objetivo. ✅ | RF-08, RF-09, RF-10 |
+| `POST` | `/api/games/{game}/team-checks` | Comprueba un equipo elegido en el selector del resultado (`{"members": [...]}`, de 1 a 6 formas) contra las reglas activas: `{"valid": ..., "problems": [...]}`. `409` si quedan datos sin confirmar. ⏳ Fase 6 del [plan de la web](plan-web.md#comprobacion-del-equipo). | RF-12, CA-53 |
 
 La generación no se guarda: es un cálculo sin estado, y con los mismos datos da siempre la misma
 respuesta. Ejemplo con los favoritos del escenario de Rojo Fuego, abreviado:

@@ -69,6 +69,7 @@ nav:
       - Plan de la primera carga: 02-ddt/plan-carga-datos.md
       - Plan del motor: 02-ddt/plan-motor.md
       - Plan de la API: 02-ddt/plan-api.md
+      - Plan de la web: 02-ddt/plan-web.md
   - Decisiones (ADR):
       - 03-adr/index.md
       - Plantilla: 03-adr/0000-plantilla.md

@@ -194,7 +194,9 @@ Hay dos excepciones:
       ([RN-19](reglas-negocio.md#rn-19)).
     - Las sugerencias que dependen de datos sin confirmar se marcan como «sin verificar»
       ([RN-18](reglas-negocio.md#rn-18)).
-    - El usuario puede añadir una sugerencia a favoritos desde ahí.
+    - El usuario puede añadir una sugerencia a favoritos desde ahí, o elegirla para un hueco al
+      seleccionar el equipo que registra en el *Hall of Fame* ([RF-12](#rf-12),
+      [CA-53](cuestiones-abiertas.md#resueltas)).
 
 ## Datos
 
@@ -267,8 +269,10 @@ Hay dos excepciones:
       en ese juego ([RN-05](reglas-negocio.md#rn-05), [RN-10](reglas-negocio.md#rn-10)).
     - Queda claro qué registro es el último juego completado: se ordenan por fecha y, si dos
       coinciden, por orden de registro.
-    - Se puede crear a partir de un equipo generado, que el usuario puede modificar antes de
-      guardarlo.
+    - Se puede crear a partir de un equipo generado: en el resultado, un selector permite elegir
+      uno de los equipos (una alternativa por posición y una sugerencia por hueco) y registrarlo
+      para ese juego, o descartarlos sin registrar nada. Antes de registrarlo se comprueba que
+      cumple las reglas activas ([CA-53](cuestiones-abiertas.md#resueltas)).
 
 ### RF-13 · Consultar el Hall of Fame { #rf-13 }
 

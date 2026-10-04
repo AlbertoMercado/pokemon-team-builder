@@ -20,6 +20,8 @@ arquitectura se registran como [ADR](../03-adr/index.md).
   fuente salen, su origen y las restricciones de llegada por juego.
 - [Datos curados](datos-curados.md): los ficheros YAML de `data/curated/`, su esquema y cómo se
   cargan.
+- [Plan de implementación de la web](plan-web.md): alcance, principios, pantallas y rutas,
+  estructura de `web/`, fases, pruebas y CI.
 - [Plan de implementación de la API](plan-api.md): alcance, `user.sqlite`, construcción del
   contexto, datos revisables, fases y estrategia de pruebas.
 - [Plan de implementación del motor](plan-motor.md): alcance, interfaz, módulos, cómo se
