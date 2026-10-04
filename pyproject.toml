@@ -51,6 +51,8 @@ select = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["PLR2004"] # magic values are fine in assertions
+# Test data builders take many optional keyword arguments so each test states only what it needs.
+"tests/core/builders.py" = ["PLR2004", "PLR0913", "PLR0917"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -59,6 +61,10 @@ quote-style = "double"
 python_version = "3.13"
 strict = true
 files = ["core", "db", "ingest", "api", "tests"]
+# Module names come from the repository root (tests/core/builders.py is tests.core.builders),
+# because tests/ is not a package: the project is not installed (tool.uv.package = false).
+mypy_path = "."
+explicit_package_bases = true
 warn_unreachable = true
 pretty = true
 

@@ -8,6 +8,8 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
 **Qué contiene**:
 
 - `test_architecture.py`: comprueba que `core/` solo importa la biblioteca estándar.
+- `core/`: tests del motor de reglas. `core/builders.py` tiene constructores de datos de prueba
+  legibles (`pokemon(...)`, `type_chart(...)`, `context(...)`) que usan todos sus tests.
 - `db/test_reference_schema.py`: esquema de `reference.sqlite` (tablas documentadas, lectura
   y escritura, y restricciones de integridad).
 - `ingest/test_load.py`: carga de `reference.sqlite` (filas desordenadas, registro de la
