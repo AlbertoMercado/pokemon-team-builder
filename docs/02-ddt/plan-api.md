@@ -125,8 +125,7 @@ usa la propuesta; si es pendiente, se trata como posible y va marcado.
    enteros (mayor resto), huecos con sus sugerencias, descartes con su motivo, reglas de
    presencia y datos confirmados usados.
 
-El esquema de la respuesta sustituye al ejemplo actual de la [API](api.md#generacion), que es
-anterior al motor.
+El esquema de la respuesta está en la [API](api.md#generacion).
 
 ### Decisiones tomadas al implementar la fase 3
 
@@ -154,6 +153,23 @@ anterior al motor.
 - **Caché**: `GameReferences` guarda la parte de referencia de cada juego en
   `app.state.game_references`. Con los datos reales se construye en unos 0,03 s por juego.
 
+### Decisiones tomadas al implementar la fase 4
+
+- **Redondeo**: la puntuación de un equipo se redondea al entero más cercano, con las mitades
+  hacia arriba, y es la suma de las aportaciones repartidas por el mayor resto; a igualdad de
+  parte decimal, la unidad va a la primera regla del catálogo (`api/services/rounding.py`).
+- **`409` con datos**: el `detail` del `409` es un objeto con `message` y `pending`, los mismos
+  datos con el mismo formato que la revisión, para que la interfaz pueda llevar al usuario a
+  confirmarlos. `ConflictError` admite esos campos extra y el OpenAPI declara el esquema
+  (`PendingDataOut`).
+- **Datos confirmados usados**: los que devuelve `core.review.involved_facts` con origen
+  confirmado. Un descarte solo lleva `fact_key` si lo decidió un dato confirmado; con un dato
+  automático, es nulo.
+- **Respuesta**: solo `groups`, con los equipos dentro de cada grupo, para no repetir los
+  equipos. Los Pokémon de `positions` y de las sugerencias llevan su nombre, su número y sus
+  tipos en el juego; los de `members`, solo su identificador. Con los datos reales de Rojo
+  Fuego, la generación tarda unos 0,04 s.
+
 ## Fases
 
 Cada fase es un PR con sus tests y su documentación.
@@ -177,7 +193,7 @@ contexto incorpora el recorrido (RN-16).
 | 1 ✅ | `feat/api-base` | Dependencias (`fastapi`, `uvicorn`, `alembic`), configuración, `create_app`, modelos de `db/user/` y migración inicial con todas las tablas, migraciones al arrancar, `503` sin `reference.sqlite`, `GET /api/meta` y la infraestructura de tests. | Arranque con y sin `reference.sqlite`, migraciones sobre una base vacía, `/api/meta`, OpenAPI generado. |
 | 2 ✅ | `feat/api-favoritos-reglas` | `GET`, `PUT` y `DELETE` de favoritos; `GET` y `PATCH` de reglas con los errores de `RuleSettings`; `GET /api/games` (juegos objetivo con crianza, RF-05). | Favoritos idempotentes y forma inexistente (`404`); regla no configurable (`409`) y peso fuera de rango (`422`); valores por defecto (CA-41); juegos ofrecidos. |
 | 3 ✅ | `feat/api-contexto` | Repositorios de `reference.sqlite`, construcción del contexto y de los datos revisables con sus confirmaciones, caché por juego, función de `core.review` con todos los datos que intervienen, y `GET`/`PUT /review` y `POST /review/accept-proposals`. | El contexto de Rojo Fuego coincide con el del escenario del motor; confirmar, corregir y aceptar propuestas; una confirmación deja de valer si cambia la propuesta; valores no válidos (`422`). |
-| 4 | `feat/api-generacion` | `POST /generations`, esquemas de respuesta, enteros con mayor resto y `409` con datos pendientes. | Generación de Rojo Fuego de principio a fin con datos reales; `409`; las aportaciones suman el total; equipo incompleto con sugerencias. |
+| 4 ✅ | `feat/api-generacion` | `POST /generations`, esquemas de respuesta, enteros con mayor resto y `409` con datos pendientes. | Generación de Rojo Fuego de principio a fin con datos reales; `409`; las aportaciones suman el total; equipo incompleto con sugerencias. |
 | 5 | `feat/api-hall-of-fame` | CRUD del *Hall of Fame* (RF-12, RF-13) y el recorrido en el contexto (RN-16). | Orden del recorrido por fecha y orden de registro; tipos copiados del juego; validaciones; un equipo registrado excluye su línea al generar. |
 | 6 | `feat/api-catalogo` | `GET /api/pokemon` con filtros y `GET /api/pokemon/{pokemon}` con la línea y el método de cada evolución (RF-01, RF-02). | Búsqueda por nombre, filtro por tipo y por favorito, formas regionales, ficha. |
 | 7 | `feat/ingest-claves-usuario` | La ingesta comprueba, antes de sustituir `reference.sqlite`, que los favoritos, los miembros del *Hall of Fame* y las confirmaciones apuntan a datos que siguen existiendo; si no, la carga falla y lo explica (ADR-0003). | Carga rechazada con una clave que desaparece; carga aceptada sin `user.sqlite`. |

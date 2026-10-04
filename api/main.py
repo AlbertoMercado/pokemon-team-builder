@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from api import errors
 from api.config import Settings
 from api.database import Databases
-from api.routers import favorites, games, meta, review, rules
+from api.routers import favorites, games, generations, meta, review, rules
 from api.services.context import GameReferences
 from api.services.meta import app_version
 
@@ -41,7 +41,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         redoc_url=None,
     )
     errors.register(app)
-    for router in (favorites.router, rules.router, games.router, review.router, meta.router):
+    for router in (
+        favorites.router,
+        rules.router,
+        games.router,
+        review.router,
+        generations.router,
+        meta.router,
+    ):
         app.include_router(router, prefix="/api")
     return app
 

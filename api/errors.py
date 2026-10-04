@@ -15,7 +15,15 @@ class NotFoundError(Exception):
 
 
 class ConflictError(Exception):
-    """The operation cannot be done in the current state: 409."""
+    """The operation cannot be done in the current state: 409.
+
+    With ``extra``, the body's ``detail`` is an object with the ``message`` and those fields
+    (e.g. the data still to confirm before generating); without it, the message alone.
+    """
+
+    def __init__(self, message: str, extra: dict[str, object] | None = None) -> None:
+        super().__init__(message)
+        self.extra = extra
 
 
 class InvalidValueError(Exception):
@@ -31,7 +39,9 @@ type Handler = Callable[[Request, Exception], Awaitable[JSONResponse]]
 
 def _handler(code: int) -> Handler:
     async def handle(request: Request, exc: Exception) -> JSONResponse:
-        return JSONResponse({"detail": str(exc)}, status_code=code)
+        extra = exc.extra if isinstance(exc, ConflictError) else None
+        detail: object = {"message": str(exc), **extra} if extra else str(exc)
+        return JSONResponse({"detail": detail}, status_code=code)
 
     return handle
 
