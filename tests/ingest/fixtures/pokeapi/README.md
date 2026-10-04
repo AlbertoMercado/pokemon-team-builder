@@ -9,14 +9,15 @@ de la ingesta (`<commit>/<fichero>.csv`).
 datos reales, los tests comprueban las transformaciones con los mismos casos que la carga
 completa, pero en milisegundos.
 
-**Qué contiene**: los ficheros pequeños completos (generaciones, versiones, tipos, eficacias…)
-y los grandes filtrados a unas 45 especies elegidas por sus casos especiales:
+**Qué contiene**: los ficheros pequeños completos (generaciones, versiones, tipos, eficacias,
+Pokédex…) y los grandes filtrados a unas 50 especies elegidas por sus casos especiales:
 
 | Especies | Caso |
 |----------|------|
 | Bulbasaur, Ivysaur, Venusaur | Subir de nivel |
 | Pichu, Pikachu, Raichu | Bebé, amistad, objeto y filas de Raichu de Alola (forma no cargada) |
 | Cleffa, Clefairy, Clefable | Tipo Normal hasta la 5.ª generación |
+| Zubat, Golbat, Crobat | Crobat es una evolución de la 2.ª generación: no llega a Rojo Fuego |
 | Slowpoke, Slowbro, Slowking | Intercambio con objeto y filas de formas de Galar |
 | Magnemite, Magneton | Solo Eléctrico en la 1.ª generación |
 | Gastly, Haunter, Gengar | Intercambio |
@@ -25,6 +26,7 @@ y los grandes filtrados a unas 45 especies elegidas por sus casos especiales:
 | Eevee y sus evoluciones hasta la 2.ª generación | Piedras, amistad y hora del día |
 | Mewtwo | Legendario |
 | Azurill, Marill, Azumarill | Bebé de incienso de la 3.ª generación |
+| Wynaut, Wobbuffet | El otro bebé de incienso de la 3.ª generación |
 | Tyrogue y sus evoluciones | Comparación de estadísticas |
 | Wurmple y sus evoluciones | Evolución aleatoria |
 | Nincada, Ninjask, Shedinja | Muda (`shed`) |

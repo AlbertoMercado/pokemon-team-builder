@@ -6,6 +6,8 @@ id,identifier,form_identifier,pokemon_id,introduced_in_version_group_id,is_defau
 26,raichu,,26,28,1,0,0,1,52
 35,clefairy,,35,28,1,0,0,1,67
 36,clefable,,36,28,1,0,0,1,68
+41,zubat,,41,28,1,0,0,1,77
+42,golbat,,42,28,1,0,0,1,78
 79,slowpoke,,79,28,1,0,0,1,130
 80,slowbro,,80,28,1,0,0,1,132
 81,magnemite,,81,28,1,0,0,1,137
@@ -22,6 +24,7 @@ id,identifier,form_identifier,pokemon_id,introduced_in_version_group_id,is_defau
 135,jolteon,,135,28,1,0,0,1,224
 136,flareon,,136,28,1,0,0,1,225
 150,mewtwo,,150,28,1,0,0,1,252
+169,crobat,,169,3,1,0,0,1,79
 172,pichu,,172,3,1,0,0,1,34
 173,cleffa,,173,3,1,0,0,1,66
 183,marill,,183,3,1,0,0,1,287
@@ -29,6 +32,7 @@ id,identifier,form_identifier,pokemon_id,introduced_in_version_group_id,is_defau
 196,espeon,,196,3,1,0,0,1,226
 197,umbreon,,197,3,1,0,0,1,227
 199,slowking,,199,3,1,0,0,1,135
+202,wobbuffet,,202,3,1,0,0,1,335
 236,tyrogue,,236,3,1,0,0,1,172
 237,hitmontop,,237,3,1,0,0,1,175
 242,blissey,,242,3,1,0,0,1,186
@@ -43,6 +47,7 @@ id,identifier,form_identifier,pokemon_id,introduced_in_version_group_id,is_defau
 298,azurill,,298,5,1,0,0,1,286
 349,feebas,,349,5,1,0,0,1,499
 350,milotic,,350,5,1,0,0,1,500
+360,wynaut,,360,5,1,0,0,1,334
 386,deoxys-normal,normal,386,5,1,0,0,1,554
 440,happiny,,440,8,1,0,0,1,184
 10031,deoxys-attack,attack,10001,7,1,0,0,2,555

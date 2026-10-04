@@ -14,8 +14,11 @@ from sqlmodel import Session, col, select
 from db.reference import (
     EvolutionStep,
     Game,
+    GameMechanic,
     GamePokemon,
     Generation,
+    KeyBattle,
+    Origin,
     Pokemon,
     PokemonType,
     ReferenceModel,
@@ -29,6 +32,9 @@ from db.reference import (
 type Check = Callable[[Session], list[str]]
 
 TARGET_GAMES = frozenset({"ruby", "sapphire", "emerald", "firered", "leafgreen"})
+# Games with curated data so far (phase 4): mechanics, arrival rule and key battles.
+CURATED_GAMES = frozenset({"firered", "leafgreen"})
+KEY_BATTLES_PER_GAME = 15
 SPECIES_COUNT = 386
 EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     Generation: 3,
@@ -38,6 +44,8 @@ EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     Species: SPECIES_COUNT,
     Pokemon: SPECIES_COUNT,
     GamePokemon: len(TARGET_GAMES) * SPECIES_COUNT,
+    GameMechanic: len(CURATED_GAMES) * 2,  # day_night_cycle and contests
+    KeyBattle: len(CURATED_GAMES) * KEY_BATTLES_PER_GAME,
 }
 # 15 types in the 1st generation, 17 from the 2nd: one factor per pair.
 EFFICACY_PAIRS_BY_GENERATION = {1: 15 * 15, 2: 17 * 17, 3: 17 * 17}
@@ -163,6 +171,58 @@ def check_breeding_data(session: Session) -> list[str]:
     return problems
 
 
+def check_incense_babies(session: Session) -> list[str]:
+    """Babies that only hatch with an incense (CA-36)."""
+    marked = set(session.exec(select(Species.slug).where(col(Species.requires_incense))).all())
+    if marked != {"azurill", "wynaut"}:
+        return [f"bebés de incienso {sorted(marked)}, se esperaban ['azurill', 'wynaut']"]
+    return []
+
+
+def check_arrival_proposals(session: Session) -> list[str]:
+    """Arrival proposals (CA-28): inferred where there is a rule, pending elsewhere."""
+    problems = []
+    for game in TARGET_GAMES:
+        expected = Origin.INFERRED if game in CURATED_GAMES else Origin.PENDING
+        query = select(func.count()).select_from(GamePokemon)
+        wrong = session.exec(
+            query.where(GamePokemon.game == game, GamePokemon.arrival_origin != expected)
+        ).one()
+        if wrong:
+            problems.append(f"{game}: {wrong} propuestas de llegada no son {expected.value}")
+    expected_arrival = {
+        "bulbasaur": True,
+        "vaporeon": True,
+        "golbat": True,
+        "chansey": True,  # Happiny is not loaded: Chansey hatches as Chansey
+        "raichu": False,  # hatches as Pichu, not in the Kanto Pokédex
+        "pikachu": False,
+        "clefairy": False,  # hatches as Cleffa
+        "crobat": False,  # 2nd generation evolution
+        "espeon": False,
+        "blissey": False,
+    }
+    for pokemon, can_arrive in expected_arrival.items():
+        row = session.get(GamePokemon, ("firered", pokemon))
+        if row is None or row.can_arrive is not can_arrive:
+            found = None if row is None else row.can_arrive
+            problems.append(f"llegada de {pokemon} a firered: {found}, se esperaba {can_arrive}")
+    return problems
+
+
+def check_key_battles(session: Session) -> list[str]:
+    """The list of key battles (RN-17); teams are pending until phase 5."""
+    problems = []
+    for game in CURATED_GAMES:
+        battles = session.exec(
+            select(KeyBattle).where(KeyBattle.game == game).order_by(col(KeyBattle.order))
+        ).all()
+        first, last = (battles[0].trainer_name, battles[-1].trainer_name) if battles else ("", "")
+        if (first, last) != ("Brock", "Azul"):
+            problems.append(f"{game}: combates de {first!r} a {last!r}, se esperaba Brock y Azul")
+    return problems
+
+
 FIRST_LOAD_CHECKS: Sequence[Check] = (
     check_counts,
     check_target_games,
@@ -170,4 +230,7 @@ FIRST_LOAD_CHECKS: Sequence[Check] = (
     check_type_chart,
     check_evolutions,
     check_breeding_data,
+    check_incense_babies,
+    check_arrival_proposals,
+    check_key_battles,
 )

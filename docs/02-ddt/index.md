@@ -16,6 +16,8 @@ arquitectura se registran como [ADR](../03-adr/index.md).
   empates.
 - [Datos requeridos por las reglas](datos-requeridos.md): qué datos necesita cada regla, de qué
   fuente salen, su origen y las restricciones de llegada por juego.
+- [Datos curados](datos-curados.md): los ficheros YAML de `data/curated/`, su esquema y cómo se
+  cargan.
 - [Plan de la primera carga de datos](plan-carga-datos.md): alcance (generaciones 1 a 3),
   revisión del volcado de PokeAPI, datos curados, WikiDex y fases de implementación.
 

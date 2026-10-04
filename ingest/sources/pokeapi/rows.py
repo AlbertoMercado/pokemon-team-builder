@@ -149,6 +149,19 @@ class SpeciesEggGroupRow(CsvRow):
     egg_group_id: int
 
 
+# --- Pokédexes ----------------------------------------------------------------------------
+
+
+class PokedexRow(CsvRow):
+    id: int
+    identifier: str
+
+
+class DexNumberRow(CsvRow):
+    species_id: int
+    pokedex_id: int
+
+
 # --- Evolutions ----------------------------------------------------------------------------
 
 

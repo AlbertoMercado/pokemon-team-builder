@@ -20,3 +20,9 @@ Más detalle en [Estructura del código](../docs/02-ddt/estructura-codigo.md).
 | Fichero | Qué contiene |
 |---------|--------------|
 | `curated/pokeapi.yaml` | Commit fijado del volcado CSV de PokeAPI ([ADR-0004](../docs/03-adr/0004-pokeapi-volcado-csv.md)). Cambiarlo es actualizar los datos. |
+| `curated/games.yaml` | Mecánicas de cada juego objetivo (reloj, concursos) que condicionan las evoluciones. |
+| `curated/breeding.yaml` | Bebés que solo nacen con incienso (Azurill, Wynaut). |
+| `curated/arrival.yaml` | Regla con la que se propone qué Pokémon pueden llegar a cada juego objetivo. |
+| `curated/key_battles/*.yaml` | Lista de combates clave de cada grupo de versiones, con su página de WikiDex. |
+
+Esquema, significado y cómo añadir un juego: [Datos curados](../docs/02-ddt/datos-curados.md).

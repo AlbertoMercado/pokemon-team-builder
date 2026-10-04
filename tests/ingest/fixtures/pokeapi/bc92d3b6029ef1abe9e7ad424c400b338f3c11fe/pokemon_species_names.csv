@@ -13,6 +13,10 @@ pokemon_species_id,local_language_id,name,genus
 35,9,Clefairy,Fairy Pokémon
 36,7,Clefable,Pokémon Hada
 36,9,Clefable,Fairy Pokémon
+41,7,Zubat,Pokémon Murciélago
+41,9,Zubat,Bat Pokémon
+42,7,Golbat,Pokémon Murciélago
+42,9,Golbat,Bat Pokémon
 79,7,Slowpoke,Pokémon Atontado
 79,9,Slowpoke,Dopey Pokémon
 80,7,Slowbro,Pokémon Ermitaño
@@ -45,6 +49,8 @@ pokemon_species_id,local_language_id,name,genus
 136,9,Flareon,Flame Pokémon
 150,7,Mewtwo,Pokémon Genético
 150,9,Mewtwo,Genetic Pokémon
+169,7,Crobat,Pokémon Murciélago
+169,9,Crobat,Bat Pokémon
 172,7,Pichu,Pokémon Ratoncito
 172,9,Pichu,Tiny Mouse Pokémon
 173,7,Cleffa,Pokémon Estrella
@@ -59,6 +65,8 @@ pokemon_species_id,local_language_id,name,genus
 197,9,Umbreon,Moonlight Pokémon
 199,7,Slowking,Pokémon Regio
 199,9,Slowking,Royal Pokémon
+202,7,Wobbuffet,Pokémon Paciente
+202,9,Wobbuffet,Patient Pokémon
 236,7,Tyrogue,Pokémon Peleón
 236,9,Tyrogue,Scuffle Pokémon
 237,7,Hitmontop,Pokémon Boca Abajo
@@ -87,6 +95,8 @@ pokemon_species_id,local_language_id,name,genus
 349,9,Feebas,Fish Pokémon
 350,7,Milotic,Pokémon Tierno
 350,9,Milotic,Tender Pokémon
+360,7,Wynaut,Pokémon Radiante
+360,9,Wynaut,Bright Pokémon
 386,7,Deoxys,Pokémon ADN
 386,9,Deoxys,DNA Pokémon
 440,7,Happiny,Pokémon Casita

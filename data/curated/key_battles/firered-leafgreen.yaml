@@ -1,0 +1,74 @@
+# Combates clave de Rojo Fuego y Verde Hoja (RN-17), en su orden habitual.
+# Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# Los equipos se leen de la página de WikiDex de cada entrenador (fase 5 del plan de
+# carga). Hasta entonces, cada combate queda pendiente. El rival es también el Campeón: ese
+# combate cuenta una vez y sin su Pokémon inicial (CA-26).
+games: [firered, leafgreen]
+battles:
+  - id: brock
+    category: gym_leader
+    trainer: Brock
+    wikidex_page: Brock
+  - id: misty
+    category: gym_leader
+    trainer: Misty
+    wikidex_page: Misty
+  - id: lt-surge
+    category: gym_leader
+    trainer: Teniente Surge
+    wikidex_page: Teniente Surge
+  - id: erika
+    category: gym_leader
+    trainer: Erika
+    wikidex_page: Erika
+  - id: giovanni-rocket-hideout
+    category: villain_boss
+    trainer: Giovanni
+    wikidex_page: Giovanni
+    note: >-
+      Escondite Rocket de Ciudad Azulona. Obligatorio: da el Scope Silph, sin el que no se
+      completa la Torre Pokémon ni se consigue la Poké Flauta.
+  - id: koga
+    category: gym_leader
+    trainer: Koga
+    wikidex_page: Koga
+  - id: giovanni-silph-co
+    category: villain_boss
+    trainer: Giovanni
+    wikidex_page: Giovanni
+    note: Silph S.A. de Ciudad Azafrán. Pendiente de confirmar que es obligatorio.
+  - id: sabrina
+    category: gym_leader
+    trainer: Sabrina
+    wikidex_page: Sabrina
+  - id: blaine
+    category: gym_leader
+    trainer: Blaine
+    wikidex_page: Blaine
+  - id: giovanni-gym
+    category: gym_leader
+    trainer: Giovanni
+    wikidex_page: Giovanni
+    note: Líder del Gimnasio de Ciudad Verde.
+  - id: lorelei
+    category: elite_four
+    trainer: Lorelei
+    wikidex_page: Lorelei
+  - id: bruno
+    category: elite_four
+    trainer: Bruno
+    wikidex_page: Bruno
+  - id: agatha
+    category: elite_four
+    trainer: Agatha
+    wikidex_page: Agatha
+  - id: lance
+    category: elite_four
+    trainer: Lance
+    wikidex_page: Lance
+  - id: champion
+    category: champion
+    trainer: Azul
+    wikidex_page: Azul (personaje)
+    note: Rival y Campeón. Cuenta una vez y sin su Pokémon inicial (CA-26).

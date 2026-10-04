@@ -1,0 +1,22 @@
+# Regla con la que la ingesta propone qué Pokémon pueden llegar a cada juego objetivo y
+# evolucionar antes de completarlo (CA-28, RN-03).
+# Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# Con regional_pokedex, un Pokémon puede llegar si la etapa que nace del huevo y todas las
+# etapas hasta él están en esa Pokédex. Las propuestas son inferidas: las confirma el
+# usuario (RN-18). Los juegos objetivo que no aparecen aquí quedan pendientes.
+games:
+  firered:
+    regional_pokedex: kanto
+    origin: inferred
+    note: >-
+      Antes de la Pokédex Nacional solo se pueden recibir por intercambio Pokémon de la
+      Pokédex de Kanto, y las evoluciones a especies de la 2.ª generación fallan (Golbat a
+      Crobat). Comprobado en docs/02-ddt/datos-requeridos.md.
+  leafgreen:
+    regional_pokedex: kanto
+    origin: inferred
+    note: >-
+      Antes de la Pokédex Nacional solo se pueden recibir por intercambio Pokémon de la
+      Pokédex de Kanto, y las evoluciones a especies de la 2.ª generación fallan (Golbat a
+      Crobat). Comprobado en docs/02-ddt/datos-requeridos.md.

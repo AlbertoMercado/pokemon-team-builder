@@ -20,9 +20,10 @@ que solo sustituye al anterior si todo es correcto.
 | `load.py` | `build_reference`: fichero temporal, filas, comprobaciones, registro en `ingest_run` y sustitución atómica. |
 | `report.py` | Informe de la carga: filas por tabla, datos por origen y errores. |
 | `sources/` | Interfaz `Source` de las fuentes. |
+| `sources/curated/` | Datos curados: esquemas de los YAML (`schemas.py`), lectura (`read_curated`) y la fuente de mecánicas y combates clave. |
 | `sources/pokeapi/` | Fuente de PokeAPI: descarga con caché (`download.py`), validación de cada fila (`rows.py`) y transformación (`transform.py`). |
 
-Los datos curados y WikiDex llegan en las fases 4 y 5 del
+WikiDex llega en la fase 5 del
 [plan de carga](../docs/02-ddt/plan-carga-datos.md).
 
 **Restricciones**: solo puede importar `db/` (`lint-imports`).
