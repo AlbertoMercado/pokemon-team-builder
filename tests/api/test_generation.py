@@ -238,3 +238,46 @@ def test_the_409_is_in_the_openapi_contract(client: TestClient) -> None:
     assert operation["post"]["responses"]["409"]["content"]["application/json"]["schema"] == {
         "$ref": "#/components/schemas/PendingDataOut"
     }
+
+
+def _register_leafgreen(client: TestClient, *members: str) -> int:
+    body = {"game": "leafgreen", "completed_on": "2026-05-01", "members": list(members)}
+    response = client.post("/api/hall-of-fame", json=body)
+    assert response.status_code == 201
+    entry_id: int = response.json()["id"]
+    return entry_id
+
+
+@pytest.mark.rn("RN-16")
+def test_a_registered_team_excludes_its_lines(client: TestClient) -> None:
+    """The DDF example: after Leaf Green, Gengar's line and Vaporeon are excluded in Fire Red,
+    but not Dragonite (CA-21) nor the other Eevee evolutions."""
+    _register_leafgreen(client, "dragonite", "vaporeon", "gengar", "charizard")
+    body = _ready(client, *FAVORITES)
+    journey = {d["pokemon"]: d["detail"] for d in body["discards"] if d["reason"] == "journey"}
+    assert sorted(journey) == ["charizard", "gengar", "vaporeon"]
+    assert "leafgreen" in journey["gengar"]
+    members = {slug for team in _teams(body) for slug in team}
+    assert {"dragonite", "flareon"} <= members
+    assert not members & set(journey)
+
+
+@pytest.mark.rn("RN-16")
+def test_without_rn16_the_journey_excludes_nothing(client: TestClient) -> None:
+    _register_leafgreen(client, "gengar")
+    client.patch("/api/rules/RN-16", json={"enabled": False})
+    body = _ready(client, *FAVORITES)
+    assert "journey" not in [d["reason"] for d in body["discards"]]
+
+
+@pytest.mark.rn("RN-16")
+@pytest.mark.rn("RN-18")
+def test_the_journey_changes_what_has_to_be_confirmed(client: TestClient) -> None:
+    """A favourite excluded by the journey is not asked about; removing the entry asks again."""
+    _favorites(client, "gengar")
+    entry_id = _register_leafgreen(client, "haunter")  # same line, same form (CA-18)
+    subjects = [f["subject"] for f in client.get(REVIEW).json()["facts"]]
+    assert "gengar" not in subjects
+    client.delete(f"/api/hall-of-fame/{entry_id}")
+    subjects = [f["subject"] for f in client.get(REVIEW).json()["facts"]]
+    assert "gengar" in subjects

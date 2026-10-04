@@ -25,6 +25,7 @@ from api.schemas.generation import (
 )
 from api.schemas.meta import DataVersion
 from api.schemas.review import ReviewStatus
+from api.services import hall_of_fame
 from api.services import review as review_service
 from api.services.context import GameReference, build_context, to_stored
 from api.services.rounding import largest_remainder, percentage, round_half_up
@@ -41,7 +42,7 @@ PENDING_MESSAGE = "Antes de generar hay que confirmar los datos sin verificar qu
 
 def generate_teams(user: Session, reference: Session, game: GameReference) -> GenerationOut:
     """``ConflictError`` (409) with the pending data if some value is still unverified."""
-    review = review_service.review(user, game)
+    review = review_service.review(user, reference, game)
     if review.pending:
         pending = [f for f in review.facts if f.status is ReviewStatus.PENDING]
         raise ConflictError(
@@ -49,11 +50,12 @@ def generate_teams(user: Session, reference: Session, game: GameReference) -> Ge
         )
     confirmations = user_repo.confirmations(user, game.slug)
     favorites = [favorite.pokemon for favorite in user_repo.favorites(user)]
-    ctx = build_context(game, favorites, current_settings(user), confirmations)
+    journey = hall_of_fame.journey(user, reference, game)
+    ctx = build_context(game, favorites, current_settings(user), confirmations, journey)
     result = generate(ctx)
 
     confirmed = []
-    for value in review_service.involved_values(user, game):
+    for value in review_service.involved_values(user, reference, game):
         fact = value.fact(confirmations)
         stored = to_stored(fact.value)
         if fact.origin is Origin.CONFIRMED and stored is not None:

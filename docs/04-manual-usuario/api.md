@@ -7,8 +7,8 @@ ejemplo para probarla o automatizar algo. Qué hace cada endpoint, en detalle, e
 
 !!! note "Disponible por ahora"
     Arrancar la API, consultar su versión y la de los datos, gestionar los favoritos y las
-    reglas, ver los juegos objetivo, revisar sus datos y generar equipos. El *Hall of Fame* y
-    el catálogo se irán añadiendo a esta guía según se implementen
+    reglas, ver los juegos objetivo, revisar sus datos, generar equipos y registrar tu *Hall of
+    Fame*. El catálogo se añadirá a esta guía cuando se implemente
     ([plan de la API](../02-ddt/plan-api.md#fases)).
 
 ## Antes de empezar
@@ -180,6 +180,41 @@ Las puntuaciones son números enteros redondeados. Dos equipos con la misma cifr
 qué estar empatados: el orden se decide con los valores exactos. El resultado no se guarda;
 generar otra vez con lo mismo da el mismo resultado.
 
+## Hall of Fame: tu recorrido
+
+Cuando completes un juego, registra el equipo con el que lo hiciste. Los registros forman tu
+**recorrido**, y al generar un equipo se excluyen las líneas evolutivas que ya usaste
+([RN-16](../01-ddf/reglas-negocio.md#rn-16)): las del último juego completado y las de los
+juegos de la misma generación que el que vas a jugar. La línea de Dragonite nunca se excluye y,
+de la de Eevee, solo la evolución que usaste.
+
+```bash
+# Registrar un equipo (las notas son opcionales)
+curl -X POST http://127.0.0.1:8000/api/hall-of-fame \
+     -H "Content-Type: application/json" \
+     -d '{"game": "leafgreen", "completed_on": "2026-05-01", "members": ["dragonite", "vaporeon", "gengar"]}'
+
+curl http://127.0.0.1:8000/api/hall-of-fame                  # todo el recorrido
+curl "http://127.0.0.1:8000/api/hall-of-fame?game=leafgreen"   # solo un juego
+
+# Corregir un registro (por ejemplo, la fecha) o eliminarlo
+curl -X PATCH http://127.0.0.1:8000/api/hall-of-fame/1 \
+     -H "Content-Type: application/json" -d '{"completed_on": "2026-05-03"}'
+curl -X DELETE http://127.0.0.1:8000/api/hall-of-fame/1
+```
+
+- Puedes registrar cualquier juego cargado, aunque no se pueda elegir como juego objetivo
+  (por ejemplo, Rojo o Oro).
+- El equipo tiene de 1 a 6 Pokémon. Usa la forma concreta: `vulpix-alola` para Vulpix de Alola.
+- Se guardan los tipos que tenía cada Pokémon **en ese juego** (Magneton era solo Eléctrico en
+  Rojo).
+- El recorrido se ordena por fecha y, si dos coinciden, por el orden en que los registraste.
+  `last` marca el último juego completado. Si te equivocas de fecha, corrígela: cambia qué se
+  excluye.
+- Si un Pokémon queda descartado por el recorrido, la generación lo dice en `discards`, con el
+  motivo `journey` y el juego en que lo usaste. Para no aplicar esta regla, desactiva RN-16 en
+  [reglas](#reglas).
+
 ## Errores habituales
 
 | Respuesta | Causa | Solución |
@@ -189,6 +224,7 @@ generar otra vez con lo mismo da el mismo resultado.
 | `409` al cambiar una regla | La regla no se puede desactivar, o no es blanda y le has dado peso. | El mensaje dice cuál de las dos. |
 | `404` al revisar un juego | El juego no es juego objetivo, o el dato no es de ese juego. | Consulta los juegos con `GET /api/games` y las claves con `GET …/review`. |
 | `409` al confirmar un dato | El dato se cargó sin ambigüedad (automático): no se revisa. | Nada. |
+| `422` al registrar en el *Hall of Fame* | El juego o algún Pokémon no existen en los datos cargados, o el Pokémon no existía en la generación de ese juego (Treecko en Rojo). El equipo tiene que tener de 1 a 6. | Revisa los identificadores y el juego. |
 | `409` al generar | Quedan datos sin confirmar. | Confírmalos con la revisión; `detail.pending` dice cuáles. |
 | `422` al confirmar un dato | El valor no es del tipo del dato (un booleano, o una lista en un combate clave) o el equipo incluye Pokémon que no existen en la generación del juego. | Revisa el valor y los identificadores. |
 | `Address already in use` al arrancar | Ya hay otra API (u otro programa) en el puerto 8000. | Para la otra o arranca en otro puerto: `--port 8001`. |
