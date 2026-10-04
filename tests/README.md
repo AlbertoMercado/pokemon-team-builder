@@ -10,6 +10,8 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
 - `test_architecture.py`: comprueba que `core/` solo importa la biblioteca estándar.
 - `db/test_reference_schema.py`: esquema de `reference.sqlite` (tablas documentadas, lectura
   y escritura, y restricciones de integridad).
+- `ingest/test_load.py`: carga de `reference.sqlite` (filas desordenadas, registro de la
+  carga, recuento por origen, conservación de la base de datos anterior si algo falla) y CLI.
 - Los tests de cada paquete van en `tests/<paquete>/` (`core/`, `db/`, `ingest/`, `api/`).
 
 pytest importa los paquetes desde la raíz del repositorio (`pythonpath` en `pyproject.toml`).

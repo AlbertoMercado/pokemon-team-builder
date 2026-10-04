@@ -106,7 +106,8 @@ flowchart LR
 La fase de carga construye `reference.sqlite` en un fichero temporal, comprueba su
 integridad y que las claves que usa `user.sqlite` (favoritos, *Hall of Fame*, confirmaciones)
 siguen existiendo, y solo entonces sustituye el fichero anterior. Si algo falla, se conserva
-la base de datos anterior y el informe explica el motivo.
+la base de datos anterior y el informe explica el motivo. Uso, informe y detalle de la
+implementación en [Ingesta de datos](../05-operacion/ingesta.md).
 
 ### `api/`: capa de aplicación
 
@@ -215,7 +216,7 @@ Uso local y personal:
 ```
 core/      domain/, rules/, engine/, journey.py, review.py, evolution.py, breeding.py
 db/        reference/ (SQLModel), user/ (SQLModel + migraciones Alembic)
-ingest/    sources/ (pokeapi_csv, wikidex, curated), transform/, load/, __main__.py
+ingest/    sources/ (pokeapi_csv, wikidex, curated), cli.py, load.py, report.py, __main__.py
 api/       routers/, services/, repositories/, main.py
 data/      curated/*.yaml (en git), cache/ y *.sqlite (fuera de git)
 web/       src/ (pages, components, api/ con el cliente generado)

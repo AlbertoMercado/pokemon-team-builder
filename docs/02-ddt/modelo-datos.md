@@ -96,7 +96,7 @@ Módulo `db/reference/meta.py`.
 
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
-| `ingest_run` | `id` PK, `started_at`, `finished_at`, `pokeapi_commit`, `games` (JSON), `summary` (JSON) | Una fila: la carga que generó el fichero. `games` es la lista de juegos cargados y `summary`, el número de filas por tabla. La API la expone para saber con qué datos se trabaja. |
+| `ingest_run` | `id` PK, `started_at`, `finished_at`, `pokeapi_commit`?, `games` (JSON), `summary` (JSON) | Una fila: la carga que generó el fichero. `games` es la lista de juegos cargados y `summary`, el número de filas por tabla. `pokeapi_commit` solo es nulo si la carga no incluye datos de PokeAPI. La API la expone para saber con qué datos se trabaja. |
 
 ### Implementación de `reference.sqlite`
 
@@ -123,8 +123,10 @@ Decisiones de implementación:
   impiden guardar datos incoherentes: un valor revisable es nulo **solo** si su origen es
   `pending` (RN-18), `factor` solo admite 0, 50, 100 y 200, y `slot` solo 1 o 2.
 - **Orden de inserción**: los modelos declaran claves foráneas pero no relaciones
-  (`Relationship`), así que SQLAlchemy no reordena las inserciones. La ingesta carga las
-  tablas en orden de dependencias (`ReferenceModel.metadata.sorted_tables`).
+  (`Relationship`), así que SQLAlchemy no reordena las inserciones. La ingesta guarda todas
+  las filas en una sola transacción con `PRAGMA defer_foreign_keys`, que comprueba las claves
+  al confirmarla: el orden no importa, ni siquiera dentro de una tabla
+  ([ingesta](../05-operacion/ingesta.md#que-hace)).
 - **JSON**: `conditions`, `games` y `summary` son columnas JSON, porque su contenido es
   variable y nunca se filtra por él en SQL.
 

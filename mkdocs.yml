@@ -79,3 +79,4 @@ nav:
   - Operación:
       - 05-operacion/index.md
       - Entorno de desarrollo en macOS: 05-operacion/entorno-desarrollo-macos.md
+      - Ingesta de datos: 05-operacion/ingesta.md

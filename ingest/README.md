@@ -1,14 +1,25 @@
 # ingest/
 
-**Qué es**: la CLI de carga de datos (`uv run python -m ingest ...`), pendiente de implementar.
+**Qué es**: la CLI de carga de datos (`uv run python -m ingest`).
 
 **Por qué existe**: los datos de referencia vienen de fuentes externas y se cargan de forma
 puntual, no en cada arranque (RF-11).
 
 **Qué hace**: extrae PokeAPI (volcado CSV), WikiDex (con caché y límite de peticiones) y los
-datos curados, los valida y normaliza, y construye `reference.sqlite`
-([arquitectura](../docs/02-ddt/arquitectura.md#ingest-carga-de-datos)).
+datos curados, los valida y normaliza, y construye `reference.sqlite` en un fichero temporal
+que solo sustituye al anterior si todo es correcto.
+
+**Contenido**:
+
+| Ruta | Qué hace |
+|------|----------|
+| `__main__.py` | Punto de entrada de `python -m ingest`. |
+| `cli.py` | Opciones (`--data-dir`) y fuentes de una carga completa. |
+| `load.py` | `build_reference`: fichero temporal, filas, comprobaciones, registro en `ingest_run` y sustitución atómica. |
+| `report.py` | Informe de la carga: filas por tabla, datos por origen y errores. |
+| `sources/` | Interfaz `Source` de las fuentes. Los adaptadores (PokeAPI, curados, WikiDex) llegan en las fases 3 a 5 del [plan de carga](../docs/02-ddt/plan-carga-datos.md). |
 
 **Restricciones**: solo puede importar `db/` (`lint-imports`).
 
-Más detalle en [Estructura del código](../docs/02-ddt/estructura-codigo.md).
+Uso e informe en [Ingesta de datos](../docs/05-operacion/ingesta.md). Más detalle en
+[Estructura del código](../docs/02-ddt/estructura-codigo.md).
