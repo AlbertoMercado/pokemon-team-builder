@@ -36,6 +36,7 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`breeding.yaml`](#breedingyaml) | Bebés que solo nacen con incienso. | `species.requires_incense` | — |
 | [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Rojo Fuego, Verde Hoja |
 | [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Rojo Fuego, Verde Hoja |
+| [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). **Pendiente de implementar.** | `evolution_method` | — |
 
 Rubí, Zafiro y Esmeralda se completan en la fase 6 del
 [plan de carga](plan-carga-datos.md#fases). Mientras tanto, sus datos quedan pendientes.
@@ -204,6 +205,54 @@ Equipos cargados en Rojo Fuego (iguales en Verde Hoja):
 En WikiDex, el Campeón tiene tres variantes según el inicial. Sin el inicial, además de los
 tres Pokémon comunes tiene Exeggutor y Gyarados, Arcanine y Exeggutor, o Gyarados y Arcanine:
 esos no cuentan ([CA-38](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+### `evolution_methods.yaml`
+
+!!! note "Pendiente de implementar"
+    Diseño de la fase 7 del [plan de carga](plan-carga-datos.md#fases). Hasta entonces, la
+    clasificación está en el código de `core/evolution.py` ([motor](motor.md#evoluciones-coreevolutionpy)).
+
+**Qué es**: la categoría de cada disparador (`trigger`) y de cada condición de evolución de
+PokeAPI: no tedioso, tedioso con su motivo, o aleatorio
+([RN-15](../01-ddf/reglas-negocio.md#rn-15), [RN-20](../01-ddf/reglas-negocio.md#rn-20)).
+
+**Por qué existe**: decidir qué es tedioso es una regla de negocio que depende de cómo se
+juega, no un dato de PokeAPI. Tenerlo como dato permite que la carga detecte lo que no está
+catalogado y se detenga, en lugar de que el motor tenga que adivinarlo
+([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+**Esquema** (orientativo; se fija al implementarlo):
+
+```yaml
+triggers:
+  level-up: {category: easy}
+  use-item: {category: easy}
+  trade: {category: tedious, reason: trade}
+  shed: {category: tedious, reason: shed}
+  spin: {category: tedious, reason: other}
+conditions:
+  minimum_level: {category: easy}
+  gender_id: {category: easy, note: "Se cría hasta que sale el sexo necesario (CA-43)."}
+  held_item: {category: easy, note: "Como usar un objeto (CA-43)."}
+  time_of_day: {category: tedious, reason: time_of_day, requires_mechanic: day_night_cycle}
+  minimum_beauty: {category: tedious, reason: beauty, requires_mechanic: contests}
+  percentage_chance: {category: random}
+  known_move: {category: tedious, reason: move, unless_learnt_by_level: true}
+```
+
+| Campo | Significado |
+|-------|-------------|
+| `category` | `easy`, `tedious` o `random`. Un método aleatorio también es tedioso. |
+| `reason` | Motivo del tedio, para explicarlo en el desglose: `trade`, `shed`, `stats`, `time_of_day`, `beauty`, `location`, `party`, `move` u `other`. |
+| `requires_mechanic` | Mecánica del juego sin la cual el paso es imposible en él y, por tanto, tedioso (`games.yaml`). |
+| `unless_learnt_by_level` | El paso no es tedioso si el Pokémon aprende el movimiento por nivel a partir del nivel 2 ([CA-32](../01-ddf/cuestiones-abiertas.md#resueltas)). Exige los movimientos por nivel ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+
+Se catalogan los 18 disparadores y todas las condiciones del volcado de PokeAPI, también los
+que aún no aparecen en los juegos cargados, con la categoría que les da RN-15. Si la carga
+encuentra un disparador o una condición que no está ni aquí ni en lo que el usuario ha
+catalogado desde la web (`evolution_method_classification` en `user.sqlite`), se detiene y
+los lista ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)). Lo que el usuario catalogue
+se puede pasar después a este fichero mediante PR.
 
 ## Implementación
 

@@ -112,9 +112,9 @@ corrige primero en el DDF.
 | RN-12 | Dos miembros chocan si comparten algún tipo en la generación del juego, como primario o como secundario. |
 | RN-13 | Dragonite se identifica por su forma (`dragonite`). El nivel 2 son los candidatos válidos con tipo primario Dragón; el 3, los Pokémon del juego con tipo primario Dragón que no son candidatos válidos. |
 | RN-14 | Evolución de Eevee = cualquier forma de la cadena de Eevee salvo Eevee. Como restricción entre miembros, dos evoluciones de Eevee chocan; como presencia, el equipo necesita una. |
-| RN-15 | Un miembro es tedioso si lo es alguno de los pasos desde la etapa que nace del huevo hasta él. Tediosos: intercambio, muda (Shedinja), aleatorio, comparación de estadísticas, hora del día, belleza, lugar, equipo, movimiento no aprendido por nivel, otros raros; y cualquier paso imposible en el juego: hora del día sin `day_night_cycle` o belleza sin `contests`. No tediosos: nivel, amistad, objeto y piedras, y llevar un objeto equipado si no hay otra condición. Una condición o un disparador desconocidos cuentan como tediosos, para que una condición nueva de PokeAPI nunca haga parecer fácil una evolución. Si una pareja de etapas tiene varios métodos, cuenta el más fácil, porque el jugador lo elige. Sin la tabla `level_move`, conocer un movimiento cuenta siempre como tedioso; hasta la 3.ª generación ninguna evolución lo exige. Un equipo vacío puntúa 1. |
+| RN-15 | Un miembro es tedioso si lo es alguno de los pasos desde la etapa que nace del huevo hasta él. Tediosos: intercambio, muda (Shedinja), aleatorio, comparación de estadísticas, hora del día, belleza, lugar, equipo, movimiento no aprendido por nivel, otros raros; y cualquier paso imposible en el juego: hora del día sin `day_night_cycle` o belleza sin `contests`. No tediosos: nivel, amistad, objeto y piedras, objeto equipado y sexo (CA-43). Si una pareja de etapas tiene varios métodos, cuenta el más fácil (CA-44). Los métodos sin catalogar y las evoluciones por movimiento sin datos de `level_move` no llegan al motor: detienen la carga (CA-42, CA-45). Un equipo vacío puntúa 1. |
 | RN-16 | Se excluyen las formas de la misma cadena y región que cada miembro de los equipos afectados, salvo la cadena de Dragonite; de la de Eevee, solo la evolución usada. |
-| RN-17 | Por cada Pokémon rival: **ataque** = algún miembro tiene un tipo cuyo factor contra el rival (producto de sus tipos) es ×2 o más; **defensa** = algún miembro tiene un factor ×0,5 o menos (inmunidad incluida) frente a al menos un tipo del rival y menos de ×2 frente a todos. La puntuación del rival es la media de los dos; la del combate, la media de sus rivales; la de la regla, la media de los combates. Sin combates clave, la regla puntúa 0. |
+| RN-17 | Por cada Pokémon rival: **ataque** = algún miembro tiene un tipo cuyo factor contra el rival (producto de sus tipos) es ×2 o más; **defensa** = algún miembro tiene un factor ×0,5 o menos (inmunidad incluida) frente a al menos un tipo del rival y menos de ×2 frente a todos. La puntuación del rival es la media de los dos; la del combate, la media de sus rivales; la de la regla, la media de los combates. Un juego objetivo siempre tiene combates clave (CA-46). |
 | RN-19 | La clave de comparación es `(puntuación, miembros con dos tipos)`. |
 | RN-20 | Un miembro es aleatorio si alguno de sus pasos tiene `percentage_chance` o `condition_expression` (Wurmple). Puntúa 0 si hay alguno en el equipo. |
 
@@ -125,6 +125,23 @@ corrige primero en el DDF.
   diferencian en que no son favoritos.
 - **[CA-41](../01-ddf/cuestiones-abiertas.md#resueltas)**: todas las reglas activables están
   activas por defecto, con los pesos de CA-05 y CA-37.
+
+Revisadas tras la fase 3, sobre las interpretaciones que fijó su implementación:
+
+- **[CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)**: un método de evolución sin
+  catalogar detiene la carga y lo cataloga el usuario. La clasificación pasa a ser un dato
+  ([`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml)) y el motor la recibe
+  en el contexto (fase 7 del [plan de carga](plan-carga-datos.md#fases)).
+- **[CA-43](../01-ddf/cuestiones-abiertas.md#resueltas)**: el sexo y el objeto equipado no
+  son tediosos. Hoy `core/evolution.py` trata el sexo como tedioso (`other`); se corrige en
+  la fase 7. No afecta a las generaciones 1 a 3.
+- **[CA-44](../01-ddf/cuestiones-abiertas.md#resueltas)**: con varios métodos, cuenta el más
+  fácil. Ya implementado.
+- **[CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)**: una evolución por movimiento sin
+  los movimientos por nivel detiene la carga.
+- **[CA-46](../01-ddf/cuestiones-abiertas.md#resueltas)**: un juego objetivo sin combates
+  clave no se carga. Hasta la fase 7, RN-17 puntúa 0 sin combates clave; después, el motor lo
+  tratará como un error.
 
 ## Estrategia de pruebas
 

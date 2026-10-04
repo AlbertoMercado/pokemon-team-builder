@@ -325,3 +325,12 @@ Ningún test usa la red: `tests/conftest.py` hace fallar cualquier petición HTT
   of Fame* y las confirmaciones siguen apuntando a datos que existen
   ([arquitectura](../02-ddt/arquitectura.md#ingest-carga-de-datos)).
 - **Elegir juegos**: cargar solo algunos juegos objetivo, cuando haya más de una generación.
+- **Catálogo de métodos de evolución** (fase 7): la carga se detendrá si encuentra un método de
+  evolución sin catalogar, una evolución por movimiento sin los movimientos por nivel o un
+  juego objetivo sin combates clave, con un informe de lo que falta
+  ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas),
+  [CA-45](../01-ddf/cuestiones-abiertas.md#resueltas),
+  [CA-46](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- **Lanzarla desde la web** ([RF-11](../01-ddf/requisitos-funcionales.md#rf-11)) y catalogar
+  ahí lo desconocido ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)): pendiente de un ADR
+  sobre cómo la invoca la API.
