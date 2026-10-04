@@ -205,13 +205,15 @@ es, el dato está sin verificar.
 
 ## Contexto del motor (`GameContext`)
 
-Es la única entrada de `core/`. Lo construye `api/services/` a partir de las dos bases de datos:
+Es la única entrada de `core/`. Lo construye `api/services/context.py` a partir de las dos bases
+de datos: la parte de referencia de cada juego se guarda en memoria y la del usuario se lee en
+cada petición ([plan de la API](plan-api.md#construccion-del-gamecontext)).
 
 | Campo | Contenido |
 |-------|-----------|
 | `game` | Juego, generación y mecánicas resueltas. |
 | `type_chart` | Tabla de eficacias de la generación. |
-| `favorites` | Candidatos con forma, especie, generación, línea evolutiva con sus etapas y los grupos huevo de toda la línea, tipos ordenados en el juego, pasos de evolución con su método y disponibilidad. El motor decide si se pueden criar y qué etapa nace del huevo ([motor](motor.md)). |
+| `favorites` | Candidatos con forma, especie, generación, línea evolutiva con sus etapas (desde la primera que existe en la generación del juego) y los grupos huevo de toda la línea, tipos ordenados en el juego, pasos de evolución con su método y disponibilidad. El motor decide si se pueden criar y qué etapa nace del huevo ([motor](motor.md)). |
 | `pool` | Los demás Pokémon del juego, para las sugerencias de [RN-08](../01-ddf/reglas-negocio.md#rn-08), cada uno marcado como verificado o no ([CA-31](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `key_battles` | Combates clave con los tipos de cada Pokémon rival. |
 | `journey` | Registros del *Hall of Fame* en orden. `core/journey.py` calcula con ellos las exclusiones. |

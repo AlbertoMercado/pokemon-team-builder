@@ -15,8 +15,10 @@ arrival is known to be false, its line cannot be bred (RN-11) or the journey exc
 (RN-16). Nothing about it is asked then: Zapdos is not bred, so whether it can arrive does not
 matter.
 
-``engine.generate`` never receives unverified data: the API calls ``pending_facts`` first and
-does not generate while it returns something (docs/02-ddt/api.md).
+``involved_facts`` returns every value that takes part, whatever its origin, so the API can
+show the reviewable ones with their state and say which confirmed data a generation used
+(RF-09). ``engine.generate`` never receives unverified data: the API calls ``pending_facts``
+first and does not generate while it returns something (docs/02-ddt/api.md).
 """
 
 from collections.abc import Sequence
@@ -24,8 +26,12 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from core import breeding, journey
-from core.domain import ConditionValue, GameInfo, HallOfFameEntry, PokemonData
+from core.domain import GameInfo, HallOfFameEntry, PokemonData
 from core.rules.catalog import RuleSettings
+
+# A yes/no value (a mechanic, whether a form exists or can arrive) or the Pokémon of a key
+# battle, in the order of its team.
+type FactValue = bool | tuple[str, ...]
 
 
 class Origin(StrEnum):
@@ -59,7 +65,7 @@ class Fact:
     key: str
     kind: FactKind
     origin: Origin
-    value: ConditionValue | None = None
+    value: FactValue | None = None
 
     def __post_init__(self) -> None:
         if (self.value is None) != (self.origin is Origin.PENDING):
@@ -83,22 +89,54 @@ class FavoriteFacts:
     arrival: Fact
 
 
-def _discarded_with_known_data(
+def _favorite_facts(
     favorite: FavoriteFacts,
     game: GameInfo,
     settings: RuleSettings,
     entries: Sequence[HallOfFameEntry],
-) -> bool:
+) -> tuple[Fact, ...]:
+    """The values of a favourite that take part: none if known data already discards it.
+
+    Mirrors the order of the candidate filters: when its existence or its arrival is known to
+    be false, that value is what discards it, so it takes part (and so does the existence
+    checked before the arrival).
+    """
     pokemon = favorite.pokemon
     if pokemon.generation > game.generation:
-        return True
-    if favorite.exists.known_false or favorite.arrival.known_false:
-        return True
+        return ()
+    if favorite.exists.known_false:
+        return (favorite.exists,)
+    if favorite.arrival.known_false:
+        return (favorite.exists, favorite.arrival)
     if settings.is_enabled("RN-11") and not breeding.can_be_bred(pokemon):
-        return True
-    return settings.is_enabled("RN-16") and (
+        return ()
+    if settings.is_enabled("RN-16") and (
         journey.excluding_entry(pokemon, entries, game.generation) is not None
-    )
+    ):
+        return ()
+    return (favorite.exists, favorite.arrival)
+
+
+def involved_facts(
+    game: GameInfo,
+    game_facts: Sequence[Fact],
+    favorites: Sequence[FavoriteFacts],
+    settings: RuleSettings,
+    entries: Sequence[HallOfFameEntry] = (),
+) -> tuple[Fact, ...]:
+    """Every reviewable value that takes part in a generation, whatever its origin.
+
+    First the game's (in the given order; key battles only with RN-17), then each
+    favourite's, existence before arrival, in canonical order of the favourites. A favourite
+    already discarded with known data only brings the known value that discards it, if any.
+    """
+    key_battles_count = settings.is_enabled("RN-17")
+    involved = [
+        fact for fact in game_facts if fact.kind is not FactKind.KEY_BATTLE or key_battles_count
+    ]
+    for favorite in sorted(favorites, key=lambda f: (f.pokemon.dex_number, f.pokemon.slug)):
+        involved.extend(_favorite_facts(favorite, game, settings, entries))
+    return tuple(involved)
 
 
 def pending_facts(
@@ -110,18 +148,8 @@ def pending_facts(
 ) -> tuple[Fact, ...]:
     """The inferred or pending values that take part in a generation, to confirm first.
 
-    First the game's (in the given order; key battles only with RN-17), then each
-    favourite's, existence before arrival, in canonical order of the favourites. Empty means
-    the generation can go ahead.
+    The unknown values of ``involved_facts``, in the same order. Empty means the generation
+    can go ahead.
     """
-    key_battles_count = settings.is_enabled("RN-17")
-    pending = [
-        fact
-        for fact in game_facts
-        if not fact.is_known and (fact.kind is not FactKind.KEY_BATTLE or key_battles_count)
-    ]
-    for favorite in sorted(favorites, key=lambda f: (f.pokemon.dex_number, f.pokemon.slug)):
-        if _discarded_with_known_data(favorite, game, settings, entries):
-            continue
-        pending.extend(f for f in (favorite.exists, favorite.arrival) if not f.is_known)
-    return tuple(pending)
+    involved = involved_facts(game, game_facts, favorites, settings, entries)
+    return tuple(fact for fact in involved if not fact.is_known)

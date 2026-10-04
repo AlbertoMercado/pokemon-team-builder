@@ -54,9 +54,68 @@ defecto del catálogo ([CA-41](../01-ddf/cuestiones-abiertas.md#resueltas)).
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
 | `GET` | `/api/games` | Juegos que pueden ser juego objetivo: los marcados como objetivo y con crianza, en orden de lanzamiento. ✅ | RF-05 |
-| `GET` | `/api/games/{game}/review` | Datos sin verificar que intervienen, con su propuesta y estado. | RF-15 |
-| `PUT` | `/api/games/{game}/review/{fact_key}` | Confirma un dato, con el valor propuesto o corregido: un booleano, o la lista de Pokémon del equipo si es un combate clave. | RF-15 |
-| `POST` | `/api/games/{game}/review/accept-proposals` | Acepta de una vez todas las propuestas inferidas. Los datos pendientes, sin propuesta, se siguen tratando uno a uno. | RF-15 |
+| `GET` | `/api/games/{game}/review` | Datos inferidos o pendientes que intervienen en la generación, con su propuesta y su estado, y cuántos faltan por confirmar. `404` si el juego no es juego objetivo. ✅ | RF-15 |
+| `PUT` | `/api/games/{game}/review/{fact_key}` | Confirma un dato con el valor propuesto o corregido (`{"value": ...}`): un booleano, o la lista de Pokémon del equipo si es un combate clave. Devuelve el dato. `404` si el dato no existe en el juego; `409` si es automático; `422` si el valor no es del tipo del dato o el equipo tiene Pokémon que no existen en la generación del juego. ✅ | RF-15 |
+| `POST` | `/api/games/{game}/review/accept-proposals` | Acepta de una vez las propuestas inferidas que intervienen y aún no están confirmadas, y devuelve la revisión. Los datos pendientes, sin propuesta, se siguen tratando uno a uno. ✅ | RF-15 |
+
+Qué datos intervienen lo decide `core.review.involved_facts`
+([motor](motor.md#revision-de-datos-corereviewpy)): las mecánicas del juego, sus combates clave
+si [RN-17](../01-ddf/reglas-negocio.md#rn-17) está activa y la existencia y la llegada de cada
+favorito que no esté ya descartado con datos conocidos. De ellos, la revisión muestra los que
+la carga dejó **inferidos** o **pendientes**; los automáticos no se revisan. Ejemplo con Raichu
+de favorito en Rojo Fuego, tras confirmar su llegada:
+
+```json
+{
+  "game": "firered",
+  "pending": 2,
+  "facts": [
+    {
+      "fact_key": "mechanic:firered:contests",
+      "kind": "mechanic",
+      "subject": "contests",
+      "name": "Concursos",
+      "origin": "inferred",
+      "proposal": false,
+      "status": "pending",
+      "value": null,
+      "confirmed_at": null,
+      "outdated": false
+    },
+    {"fact_key": "mechanic:firered:day_night_cycle", "...": "..."},
+    {
+      "fact_key": "pokemon:firered:raichu:arrival",
+      "kind": "arrival",
+      "subject": "raichu",
+      "name": "Raichu",
+      "origin": "inferred",
+      "proposal": false,
+      "status": "confirmed",
+      "value": false,
+      "confirmed_at": "2026-10-04T20:15:02Z",
+      "outdated": false
+    }
+  ]
+}
+```
+
+| Campo | Qué es |
+|-------|--------|
+| `pending` | Datos con `status` `pending`. Con 0 se puede generar. |
+| `kind` | `mechanic`, `key_battle`, `exists` (la forma se puede tener en el juego) o `arrival` (puede llegar y evolucionar antes de completarlo, [RN-03](../01-ddf/reglas-negocio.md#rn-03)). |
+| `subject`, `name` | La mecánica, el combate clave o la forma, y su nombre en español (el del entrenador en un combate). |
+| `origin` | Origen en la carga: `inferred` (con propuesta) o `pending` (sin ella). |
+| `proposal`, `value` | Lo que propone la carga y lo que confirmó el usuario: booleanos o, en un combate clave, la lista de Pokémon de su equipo en orden. |
+| `status` | `confirmed` si hay una confirmación para la propuesta actual; si no, `pending`. |
+| `outdated` | Había una confirmación, pero una carga posterior propone otro valor: se vuelve a pedir ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). |
+
+Los datos salen en el orden en que se piden: primero los del juego (mecánicas, combates clave)
+y después los de cada favorito en orden de la Pokédex Nacional, la existencia antes que la
+llegada. Una confirmación guarda el hash de la propuesta a la que respondió
+([modelo de datos](modelo-datos.md#implementacion-de-usersqlite)), así que una corrección del
+usuario se mantiene mientras la carga proponga lo mismo. Se puede confirmar cualquier dato
+revisable del juego, intervenga o no ahora: si después se añade el favorito, ya está
+confirmado.
 
 ### Generación
 

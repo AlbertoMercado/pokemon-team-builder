@@ -98,8 +98,8 @@ se combina con su confirmación:
 
 Con eso se construyen los `Fact` de `core.review` y se calcula qué datos faltan por confirmar
 (`pending_facts`). Para indicar qué datos confirmados se usaron
-([RF-09](../01-ddf/requisitos-funcionales.md#rf-09)), `core.review` añadirá una función que
-devuelva todos los datos que intervienen, sea cual sea su origen.
+([RF-09](../01-ddf/requisitos-funcionales.md#rf-09)), `core.review.involved_facts` devuelve
+todos los datos que intervienen, sea cual sea su origen.
 
 ### Construcción del `GameContext`
 
@@ -128,6 +128,32 @@ usa la propuesta; si es pendiente, se trata como posible y va marcado.
 El esquema de la respuesta sustituye al ejemplo actual de la [API](api.md#generacion), que es
 anterior al motor.
 
+### Decisiones tomadas al implementar la fase 3
+
+- **Valor de un combate clave en `core/`**: `Fact.value` pasa a ser `FactValue`, un booleano o
+  una tupla con los Pokémon del equipo en orden. En `user.sqlite` el equipo se guarda como lista
+  JSON; la API convierte entre los dos.
+- **Los datos automáticos no se revisan**: `PUT` sobre uno responde `409`. Si una carga
+  posterior deja automático un dato que el usuario había confirmado, se usa el valor cargado.
+- **Se puede confirmar cualquier dato revisable del juego**, intervenga o no en ese momento.
+  `accept-proposals`, en cambio, solo acepta los que intervienen.
+- **`involved_facts` incluye el dato conocido que descarta un favorito**: si se confirmó que
+  Raichu no puede llegar, esa confirmación decide su descarte y la fase 4 la contará entre los
+  datos confirmados usados.
+- **Formas de una generación posterior**: no tienen tipos en la generación del juego, así que
+  conservan los de la generación en que aparecieron y no tienen pasos de evolución. `GameContext`
+  no comprueba sus tipos, porque RN-03 las descarta antes de usarlos, y no entran en el `pool`.
+- **Etapas en el juego**: la línea empieza en la primera etapa que existe en la generación del
+  juego (en Rojo Fuego, Snorlax no tiene a Munchlax, de la 4.ª). La forma de cada etapa anterior
+  es aquella de la que salen los pasos de evolución, para que una línea regional siga siendo
+  regional, o la forma por defecto de su especie.
+- **Valores sin verificar en el contexto**: una propuesta inferida se usa tal cual y un dato
+  pendiente se trata como posible (una mecánica pendiente, como ausente). Solo afecta a las
+  sugerencias, que van marcadas como no verificadas, porque no se genera mientras quede algún
+  dato que intervenga sin confirmar.
+- **Caché**: `GameReferences` guarda la parte de referencia de cada juego en
+  `app.state.game_references`. Con los datos reales se construye en unos 0,03 s por juego.
+
 ## Fases
 
 Cada fase es un PR con sus tests y su documentación.
@@ -150,7 +176,7 @@ contexto incorpora el recorrido (RN-16).
 |------|------|-----------|-------|
 | 1 ✅ | `feat/api-base` | Dependencias (`fastapi`, `uvicorn`, `alembic`), configuración, `create_app`, modelos de `db/user/` y migración inicial con todas las tablas, migraciones al arrancar, `503` sin `reference.sqlite`, `GET /api/meta` y la infraestructura de tests. | Arranque con y sin `reference.sqlite`, migraciones sobre una base vacía, `/api/meta`, OpenAPI generado. |
 | 2 ✅ | `feat/api-favoritos-reglas` | `GET`, `PUT` y `DELETE` de favoritos; `GET` y `PATCH` de reglas con los errores de `RuleSettings`; `GET /api/games` (juegos objetivo con crianza, RF-05). | Favoritos idempotentes y forma inexistente (`404`); regla no configurable (`409`) y peso fuera de rango (`422`); valores por defecto (CA-41); juegos ofrecidos. |
-| 3 | `feat/api-contexto` | Repositorios de `reference.sqlite`, construcción del contexto y de los datos revisables con sus confirmaciones, caché por juego, función de `core.review` con todos los datos que intervienen, y `GET`/`PUT /review` y `POST /review/accept-proposals`. | El contexto de Rojo Fuego coincide con el del escenario del motor; confirmar, corregir y aceptar propuestas; una confirmación deja de valer si cambia la propuesta; valores no válidos (`422`). |
+| 3 ✅ | `feat/api-contexto` | Repositorios de `reference.sqlite`, construcción del contexto y de los datos revisables con sus confirmaciones, caché por juego, función de `core.review` con todos los datos que intervienen, y `GET`/`PUT /review` y `POST /review/accept-proposals`. | El contexto de Rojo Fuego coincide con el del escenario del motor; confirmar, corregir y aceptar propuestas; una confirmación deja de valer si cambia la propuesta; valores no válidos (`422`). |
 | 4 | `feat/api-generacion` | `POST /generations`, esquemas de respuesta, enteros con mayor resto y `409` con datos pendientes. | Generación de Rojo Fuego de principio a fin con datos reales; `409`; las aportaciones suman el total; equipo incompleto con sugerencias. |
 | 5 | `feat/api-hall-of-fame` | CRUD del *Hall of Fame* (RF-12, RF-13) y el recorrido en el contexto (RN-16). | Orden del recorrido por fecha y orden de registro; tipos copiados del juego; validaciones; un equipo registrado excluye su línea al generar. |
 | 6 | `feat/api-catalogo` | `GET /api/pokemon` con filtros y `GET /api/pokemon/{pokemon}` con la línea y el método de cada evolución (RF-01, RF-02). | Búsqueda por nombre, filtro por tipo y por favorito, formas regionales, ficha. |
@@ -165,7 +191,7 @@ los datos reales; con la 5, teniendo en cuenta el recorrido.
 |------|-----------|-------|
 | **Endpoints** | Cada endpoint con `TestClient`, sobre un directorio de datos temporal: respuestas, códigos de error y esquemas. | `tests/api/` |
 | **Datos de referencia de prueba** | Un `reference.sqlite` temporal creado con los modelos de `db/reference/` y constructores legibles, como `tests/core/builders.py`. | `tests/api/factories.py` |
-| **Escenario real** | El extracto de Rojo Fuego del motor (`tests/core/fixtures/firered.json`) cargado en un `reference.sqlite` temporal: la generación de la API da los mismos equipos que el motor. | `tests/api/` |
+| **Escenario real** | El extracto de Rojo Fuego del motor (`tests/core/fixtures/firered.json`) cargado en un `reference.sqlite` temporal con `write_firered`: el contexto de la API es el del escenario del motor y da los mismos equipos. `Load` cambia el origen o la propuesta de algunos datos. | `tests/api/scenario.py` |
 | **Migraciones** | La migración inicial crea exactamente las tablas de los modelos (sin diferencias en la autogeneración de Alembic). | `tests/db/` |
 
 Los tests siguen sin red. `tests/conftest.py` bloquea los transportes de red de `httpx` y de

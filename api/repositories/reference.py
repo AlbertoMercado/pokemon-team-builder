@@ -1,11 +1,25 @@
-"""Reads of reference.sqlite: forms, their current types and the target games."""
+"""Reads of reference.sqlite: forms, their current types, the target games and what a game's
+context needs (docs/02-ddt/plan-api.md, "Construcción del GameContext")."""
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 
 from sqlmodel import Session, col, func, select
 
-from db.reference import Game, Pokemon, PokemonType, Species
+from db.reference import (
+    EvolutionStep,
+    Game,
+    GameMechanic,
+    GamePokemon,
+    KeyBattle,
+    KeyBattlePokemon,
+    Pokemon,
+    PokemonType,
+    Species,
+    SpeciesEggGroup,
+    Type,
+    TypeEfficacy,
+)
 
 
 @dataclass(frozen=True)
@@ -64,3 +78,75 @@ def target_games(reference: Session) -> list[Game]:
             .order_by(col(Game.release_order))
         )
     )
+
+
+def target_game(reference: Session, slug: str) -> Game | None:
+    """The game ``slug`` if it can be the target (RF-05, CA-29)."""
+    game = reference.get(Game, slug)
+    if game is None or not (game.is_target and game.has_breeding):
+        return None
+    return game
+
+
+def types_until(reference: Session, generation: int) -> Sequence[Type]:
+    """The types that exist in ``generation`` (Steel and Dark appear in the 2nd)."""
+    return reference.exec(
+        select(Type).where(col(Type.generation) <= generation).order_by(col(Type.slug))
+    ).all()
+
+
+def type_efficacies(reference: Session, generation: int) -> Sequence[TypeEfficacy]:
+    return reference.exec(select(TypeEfficacy).where(TypeEfficacy.generation == generation)).all()
+
+
+def all_species(reference: Session) -> Sequence[Species]:
+    return reference.exec(select(Species)).all()
+
+
+def all_forms(reference: Session) -> Sequence[Pokemon]:
+    return reference.exec(select(Pokemon)).all()
+
+
+def all_form_types(reference: Session) -> Sequence[PokemonType]:
+    """The types of every form in every generation, by slot."""
+    return reference.exec(select(PokemonType).order_by(col(PokemonType.slot))).all()
+
+
+def all_egg_groups(reference: Session) -> Sequence[SpeciesEggGroup]:
+    return reference.exec(select(SpeciesEggGroup)).all()
+
+
+def evolution_steps(reference: Session, version_group: str) -> Sequence[EvolutionStep]:
+    """The evolution steps that apply in ``version_group``, in load order."""
+    return reference.exec(
+        select(EvolutionStep)
+        .where(EvolutionStep.version_group == version_group)
+        .order_by(col(EvolutionStep.id))
+    ).all()
+
+
+def game_pokemon(reference: Session, game: str) -> Sequence[GamePokemon]:
+    return reference.exec(select(GamePokemon).where(GamePokemon.game == game)).all()
+
+
+def game_mechanics(reference: Session, game: str) -> Sequence[GameMechanic]:
+    return reference.exec(
+        select(GameMechanic).where(GameMechanic.game == game).order_by(col(GameMechanic.mechanic))
+    ).all()
+
+
+def key_battles(reference: Session, game: str) -> Sequence[KeyBattle]:
+    """The key battles of ``game`` in their order."""
+    return reference.exec(
+        select(KeyBattle).where(KeyBattle.game == game).order_by(col(KeyBattle.order))
+    ).all()
+
+
+def key_battle_pokemon(reference: Session, game: str) -> Sequence[KeyBattlePokemon]:
+    """The Pokémon of every key battle of ``game``, in the order of each team."""
+    return reference.exec(
+        select(KeyBattlePokemon)
+        .join(KeyBattle, col(KeyBattle.slug) == col(KeyBattlePokemon.battle))
+        .where(KeyBattle.game == game)
+        .order_by(col(KeyBattlePokemon.battle), col(KeyBattlePokemon.position))
+    ).all()

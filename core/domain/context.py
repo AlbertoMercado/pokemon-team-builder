@@ -49,10 +49,14 @@ class GameContext:
         self._check_types()
 
     def _check_types(self) -> None:
-        """Every type must exist in the game's generation (RN-10)."""
+        """Every type must exist in the game's generation (RN-10).
+
+        Forms of a later generation are left out: they have no types in the game's generation
+        (they keep the ones they appeared with) and RN-03 discards them before using them.
+        """
         pokemon: list[PokemonData] = [c.pokemon for c in self.favorites]
         pokemon += [entry.pokemon for entry in self.pool]
-        named = [(p.slug, p.types) for p in pokemon]
+        named = [(p.slug, p.types) for p in pokemon if p.generation <= self.game.generation]
         named += [(r.pokemon, r.types) for b in self.key_battles for r in b.rivals]
         unknown = sorted(
             {

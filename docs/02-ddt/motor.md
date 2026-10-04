@@ -9,7 +9,8 @@ está en el [plan de implementación del motor](plan-motor.md).
     la configuración del usuario, filtros por candidato, dificultad de las evoluciones, reglas
     blandas y puntuación, reglas de equipo, `generate()` con el equipo incompleto, sus
     sugerencias y la agrupación de empates, y la revisión de los datos sin verificar (RN-18).
-    Lo siguiente es construir el `GameContext` desde las bases de datos, en la API.
+    La API construye el `GameContext` desde las bases de datos (fase 3 del
+    [plan de la API](plan-api.md#fases)).
 
 ## Restricciones
 
@@ -90,7 +91,7 @@ Preguntar por un tipo que no existe en la generación (Hada en la 3.ª) es un er
 | `TypeChart` | Que estén todas las parejas de tipos y que cada factor sea 0, 50, 100 o 200. |
 | `PokemonData` | Uno o dos tipos distintos; que la última etapa sea el propio Pokémon; que los pasos de evolución unan exactamente sus etapas consecutivas (puede haber varios pasos para la misma pareja: métodos alternativos). |
 | `KeyBattle` | Que tenga al menos un rival. |
-| `GameContext` | Que la tabla de tipos sea de la generación del juego, que no haya favoritos repetidos, que ningún favorito esté también en el `pool`, que no haya dos registros del *Hall of Fame* con el mismo orden y que todos los tipos existan en la generación del juego ([RN-10](../01-ddf/reglas-negocio.md#rn-10)). |
+| `GameContext` | Que la tabla de tipos sea de la generación del juego, que no haya favoritos repetidos, que ningún favorito esté también en el `pool`, que no haya dos registros del *Hall of Fame* con el mismo orden y que todos los tipos existan en la generación del juego ([RN-10](../01-ddf/reglas-negocio.md#rn-10)), salvo los de formas de una generación posterior, que no tienen tipos en ella y que RN-03 descarta antes de usarlos. |
 
 Los modelos son *hashables* para poder usarlos en conjuntos, salvo `TypeChart`, `RuleSettings`
 y `GameContext`, que contienen diccionarios de solo lectura.
@@ -438,12 +439,13 @@ Antes de generar, el usuario confirma los datos inferidos o pendientes que inter
 una función aparte, que sí conoce el origen de cada dato:
 
 ```python
+involved_facts(juego, datos_del_juego, favoritos, configuración, recorrido) -> tuple[Fact, ...]
 pending_facts(juego, datos_del_juego, favoritos, configuración, recorrido) -> tuple[Fact, ...]
 ```
 
 | Modelo | Qué es |
 |--------|--------|
-| `Fact` | Un dato revisable: su clave estable (`fact_key`, [modelo de datos](modelo-datos.md#datos-revisables-fact_key)), su clase (`mechanic`, `key_battle`, `exists` o `arrival`), su origen y su valor. Solo un dato pendiente no tiene valor. |
+| `Fact` | Un dato revisable: su clave estable (`fact_key`, [modelo de datos](modelo-datos.md#datos-revisables-fact_key)), su clase (`mechanic`, `key_battle`, `exists` o `arrival`), su origen y su valor (`FactValue`): un booleano o, en un combate clave, la tupla de Pokémon de su equipo en orden. Solo un dato pendiente no tiene valor. |
 | `Origin` | `automatic`, `inferred`, `pending` o `confirmed`. Los **conocidos** son los automáticos y los confirmados. |
 | `FavoriteFacts` | Un favorito con los datos de su disponibilidad en el juego: si existe y si puede llegar a tiempo ([RN-03](../01-ddf/reglas-negocio.md#rn-03)). |
 
@@ -466,8 +468,16 @@ Devuelve, en este orden:
 | Gengar, tras usarlo en Verde Hoja | Nada: el recorrido lo excluye. |
 | Un combate clave inferido, con RN-17 desactivada | Nada: no interviene. |
 
-Si la lista está vacía, se puede generar. La API la usa para `GET /api/games/{game}/review` y
-para responder `409` al generar si queda algo ([API](api.md#generacion)).
+Si la lista está vacía, se puede generar.
+
+`involved_facts` devuelve los datos que intervienen, sea cual sea su origen, en el mismo orden;
+`pending_facts` son los que de ellos no son conocidos. Un favorito ya descartado solo aporta el
+dato conocido que lo descarta, si lo hay: si se confirmó que Raichu no puede llegar, aporta su
+existencia y su llegada, porque esa confirmación decide el descarte
+([RF-09](../01-ddf/requisitos-funcionales.md#rf-09)); Zapdos, que no se puede criar, no aporta
+nada. La API usa `involved_facts` para `GET /api/games/{game}/review` (muestra los inferidos y
+pendientes con su estado) y `pending_facts` para responder `409` al generar si queda algo
+([API](api.md#generacion)).
 
 ## Pruebas
 
@@ -475,7 +485,7 @@ para responder `409` al generar si queda algo ([API](api.md#generacion)).
 |---------|---------------|
 | `tests/core/test_type_chart.py` | Factores contra uno y dos tipos, inmunidades, tablas distintas por generación (RN-10) y tablas incompletas o con factores no válidos. |
 | `tests/core/test_catalog.py` | Que el catálogo tenga las 20 reglas, cuáles son configurables, los pesos por defecto (RN-04), que todas empiecen activas (CA-41) y los cambios válidos y no válidos. |
-| `tests/core/test_domain.py` | Formas regionales como Pokémon distintos (RN-05), el favorito como evolución con sus etapas (RN-09), validaciones de los modelos y del contexto, y tipos que no existen en la generación (RN-10). |
+| `tests/core/test_domain.py` | Formas regionales como Pokémon distintos (RN-05), el favorito como evolución con sus etapas (RN-09), validaciones de los modelos y del contexto, tipos que no existen en la generación (RN-10) y formas de una generación posterior con sus propios tipos. |
 | `tests/core/test_breeding.py` | Crianza por grupos huevo con los ejemplos de RN-11 (Zapdos, Mew, Ditto, Dragonite, Pikachu y Pichu), etapa que nace del huevo (CA-25) y bebés de incienso (CA-36). |
 | `tests/core/test_journey.py` | Qué equipos se excluyen en cada ejemplo del recorrido de RN-16, el equipo de Verde Hoja en Rojo Fuego con las excepciones de Dragonite y Eevee, y que la exclusión es por forma (CA-18). |
 | `tests/core/test_evolution.py` | Gengar, Raichu, Milotic, Espeon y Beautifly en Rojo Fuego y en Esmeralda, cada método de CA-20, condiciones desconocidas, métodos alternativos y pasos anteriores a la etapa que nace del huevo (RN-15, RN-20). |
@@ -487,7 +497,7 @@ para responder `409` al generar si queda algo ([API](api.md#generacion)).
 | `tests/core/engine/test_grouping.py` | CA-33 y CA-49: Lapras o Cloyster, Vaporeon que no se agrupa con RN-14 activa y sí sin ella, los equipos que no se agrupan porque una combinación incumpliría RN-07, y que los grupos cubren todos los empates. |
 | `tests/core/test_engine_properties.py` | Con hypothesis, contextos aleatorios de hasta 12 favoritos con un pool para sugerencias: el motor devuelve exactamente los mejores equipos de una búsqueda por fuerza bruta que aplica RN-08 y CA-48, todos cumplen las reglas duras activas, las sugerencias encajan, cumplen su hueco, aportan lo que dicen y están ordenadas, cada grupo son exactamente sus combinaciones, el resultado es reproducible y `Scorer.ranking_key` coincide con la puntuación completa. |
 | `tests/core/test_scenario_firered.py` | Escenario real de Rojo Fuego: los equipos esperados con las reglas por defecto y sus grupos, los descartes, las reglas de presencia, RN-12, que tarda menos de un segundo y que sin RN-12 la cobertura es completa. |
-| `tests/core/test_review.py` | RN-18: Raichu en Rojo Fuego (el ejemplo del DDF) antes y después de confirmar, Zapdos con y sin RN-11, Treecko en Oro, una forma que no existe, el recorrido con y sin RN-16, los datos del juego, los combates clave sin RN-17 y el orden. |
+| `tests/core/test_review.py` | RN-18: Raichu en Rojo Fuego (el ejemplo del DDF) antes y después de confirmar, Zapdos con y sin RN-11, Treecko en Oro, una forma que no existe, el recorrido con y sin RN-16, los datos del juego, los combates clave sin RN-17 y el orden. Con `involved_facts`, que los datos conocidos también intervienen y que el dato que descarta un favorito interviene. |
 | `tests/core/rules/test_candidate.py` | Los tres niveles de RN-03 (Vulpix, Treecko, Growlithe de Hisui y Raichu), RN-11 y RN-16 con su motivo, las reglas desactivadas, el orden entre filtros y el orden canónico. |
 
 `tests/core/builders.py` tiene constructores de datos de prueba legibles, que usarán todas las
