@@ -83,8 +83,10 @@ nav:
   - Manual de usuario:
       - 04-manual-usuario/index.md
       - Cargar y actualizar los datos: 04-manual-usuario/cargar-datos.md
+      - Usar la API: 04-manual-usuario/api.md
   - Operación:
       - 05-operacion/index.md
       - Entorno de desarrollo en macOS: 05-operacion/entorno-desarrollo-macos.md
       - Ingesta de datos: 05-operacion/ingesta.md
+      - Arrancar la API: 05-operacion/api.md
       - Informes de carga: 05-operacion/informes-carga/index.md

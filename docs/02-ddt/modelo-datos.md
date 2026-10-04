@@ -162,8 +162,32 @@ erDiagram
 | `fact_confirmation` | `fact_key` PK, `game`, `confirmed_value`, `proposed_value_hash`, `confirmed_at` | Si una nueva carga propone un valor con otro hash, la confirmación deja de valer ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). |
 
 Las columnas que apuntan a `reference.sqlite` (`pokemon`, `game`, `fact_key`) no pueden ser
-claves foráneas, porque están en otro fichero. Las comprueba la ingesta antes de sustituir la
-base de datos de referencia.
+claves foráneas, porque están en otro fichero. Las comprobará la ingesta antes de sustituir la
+base de datos de referencia (fase 7 del [plan de la API](plan-api.md#fases)).
+
+### Implementación de `user.sqlite`
+
+| Fichero | Qué hace |
+|---------|----------|
+| `db/user/models.py` | `UserModel`, la clase base, con su propio `MetaData` y una convención de nombres para las restricciones (Alembic las necesita con nombre para alterarlas en SQLite), y los modelos de las cinco tablas. |
+| `db/user/values.py` | `ConfirmedValue`, el tipo del valor de una confirmación, y `value_hash(propuesta)`, el hash estable (SHA-256 del JSON) de un valor propuesto. |
+| `db/user/__init__.py` | `upgrade(path)`: crea el fichero si no existe y aplica las migraciones pendientes. La llama la API al arrancar. |
+| `db/user/migrations/` | Entorno de Alembic (`env.py`, en *batch mode*), plantilla y migraciones (`versions/`). `db/user/alembic.ini` sirve para ejecutarlas a mano ([Operación](../05-operacion/api.md#migraciones)). |
+
+Decisiones de implementación:
+
+- **`fact_confirmation.confirmed_value`** es JSON: un booleano para mecánicas, existencia y
+  llegada, o la lista de Pokémon del equipo para un combate clave.
+- **`proposed_value_hash`** es `value_hash` del valor que se proponía al confirmar (de `null`
+  si estaba pendiente). Una confirmación vale mientras la carga actual proponga el mismo valor.
+- **`hall_of_fame_member.types`** es JSON con los tipos ordenados que tenía en el juego.
+- **Restricciones**: `rule_setting.weight` es nulo o de 0 a 10; `hall_of_fame_member.position`,
+  de 1 a 6; `hall_of_fame_entry.sequence` es único; borrar un registro borra sus miembros.
+- **Fechas** con zona horaria (UTC), como en `reference.sqlite`.
+
+| Migración | Qué hace |
+|-----------|----------|
+| `0001_initial_tables` | Crea las cinco tablas. |
 
 ## Datos revisables (`fact_key`)
 

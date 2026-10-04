@@ -15,7 +15,7 @@
 |------|----------|
 | `sqlite.py` | `create_sqlite_engine(path)`: motor de SQLite con las claves foráneas activadas. |
 | `reference/` | Modelos de `reference.sqlite` y `create_reference_schema(engine)`. Uno por grupo de tablas: `games.py`, `pokemon.py`, `evolution.py`, `battles.py` y `meta.py`; `base.py` tiene la clase base, los enums y las restricciones comunes. |
-| `user/` | Modelos y migraciones de `user.sqlite`. Pendiente. |
+| `user/` | Modelos de `user.sqlite` (`models.py`), el hash de los valores propuestos (`values.py`), `upgrade(path)` y las migraciones de Alembic (`migrations/`, `alembic.ini`). |
 
 **Restricciones**: no importa ningún otro paquete del proyecto (`lint-imports`).
 
