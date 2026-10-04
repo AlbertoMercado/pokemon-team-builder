@@ -110,6 +110,7 @@ tests e issues.**
 | Documentación en local | `uv run mkdocs serve` | ✅ |
 | Construir documentación | `uv run mkdocs build --strict` | ✅ |
 | Ejecutar ingesta | `uv run python -m ingest [--data-dir DIR] [--offline]` ([detalle](docs/05-operacion/ingesta.md)) | ✅ Rojo Fuego y Verde Hoja completos |
+| Ver la base de datos | `uvx datasette data/reference.sqlite` ([otras opciones](docs/05-operacion/ingesta.md#consultar-los-datos)) | ✅ |
 | Arrancar API | `uv run uvicorn api.main:app --reload` | ⏳ Pendiente |
 | Frontend en desarrollo | `cd web && npm run dev` | ⏳ Pendiente |
 | Lint / formato web | `cd web && npm run lint` / `npm run format` | ⏳ Pendiente |
