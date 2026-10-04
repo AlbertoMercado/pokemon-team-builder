@@ -21,7 +21,7 @@ flowchart LR
         CORE["core/<br/>dominio puro"]
         WEBB["web/ compilado<br/>ficheros estáticos"]
     end
-    ING["ingest/<br/>CLI puntual"]
+    ING["ingest/<br/>CLI manual"]
     REF[("reference.sqlite<br/>se reconstruye")]
     USR[("user.sqlite<br/>con migraciones")]
     UI["Navegador<br/>React SPA"]
@@ -187,15 +187,14 @@ pendientes ([RF-08](../01-ddf/requisitos-funcionales.md#rf-08),
 
 ### Ingesta
 
-1. El usuario lanza la ingesta para uno o varios juegos. Hoy se hace desde la terminal; está
-   previsto lanzarla desde la web ([RF-11](../01-ddf/requisitos-funcionales.md#rf-11)), lo
-   que exige decidir en un ADR cómo la invoca la API sin romper el contrato «`api` no depende
-   de `ingest`» ([ADR-0002](../03-adr/0002-monolito-modular-nucleo-puro.md)).
-2. Si encuentra un método de evolución sin catalogar, se detiene sin cambiar los datos y lo
-   informa, para que el usuario lo catalogue ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)).
-3. Se descargan o se leen de caché las fuentes.
-4. Se genera `reference.sqlite` nuevo y se comprueba.
-5. Se sustituye el anterior. La aplicación lee la base de datos nueva al reiniciarse.
+1. El administrador ejecuta la ingesta desde la terminal, aparte de la aplicación. La API
+   nunca la lanza ([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)).
+2. Se descargan o se leen de caché las fuentes.
+3. Se genera `reference.sqlite` nuevo y se comprueba.
+4. Si hay **bloqueos** (algo que la aplicación no sabe tratar), se recogen todos, no se
+   sustituye nada y se genera un informe para el arquitecto, que prepara una nueva versión
+   ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)).
+5. Si no, se sustituye el anterior. La aplicación lee la base de datos nueva al reiniciarse.
 6. Las confirmaciones cuyo valor propuesto ha cambiado dejan de valer y se vuelven a pedir
    ([RN-18](../01-ddf/reglas-negocio.md#rn-18)).
 

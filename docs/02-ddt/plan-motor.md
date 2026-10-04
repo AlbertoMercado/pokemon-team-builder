@@ -112,7 +112,7 @@ corrige primero en el DDF.
 | RN-12 | Dos miembros chocan si comparten algún tipo en la generación del juego, como primario o como secundario. |
 | RN-13 | Dragonite se identifica por su forma (`dragonite`). El nivel 2 son los candidatos válidos con tipo primario Dragón; el 3, los Pokémon del juego con tipo primario Dragón que no son candidatos válidos. |
 | RN-14 | Evolución de Eevee = cualquier forma de la cadena de Eevee salvo Eevee. Como restricción entre miembros, dos evoluciones de Eevee chocan; como presencia, el equipo necesita una. |
-| RN-15 | Un miembro es tedioso si lo es alguno de los pasos desde la etapa que nace del huevo hasta él. Tediosos: intercambio, muda (Shedinja), aleatorio, comparación de estadísticas, hora del día, belleza, lugar, equipo, movimiento no aprendido por nivel, otros raros; y cualquier paso imposible en el juego: hora del día sin `day_night_cycle` o belleza sin `contests`. No tediosos: nivel, amistad, objeto y piedras, objeto equipado y sexo (CA-43). Si una pareja de etapas tiene varios métodos, cuenta el más fácil (CA-44). Los métodos sin catalogar y las evoluciones por movimiento sin datos de `level_move` no llegan al motor: detienen la carga (CA-42, CA-45). Un equipo vacío puntúa 1. |
+| RN-15 | Un miembro es tedioso si lo es alguno de los pasos desde la etapa que nace del huevo hasta él. Tediosos: intercambio, muda (Shedinja), aleatorio, comparación de estadísticas, hora del día, belleza, lugar, equipo, movimiento no aprendido por nivel, otros raros; y cualquier paso imposible en el juego: hora del día sin `day_night_cycle` o belleza sin `contests`. No tediosos: nivel, amistad, objeto y piedras, objeto equipado y sexo (CA-43). Si una pareja de etapas tiene varios métodos, cuenta el más fácil (CA-44). Los métodos sin catalogar y las evoluciones por movimiento sin datos de `level_move` no llegan al motor: bloquean la carga (CA-42, CA-45, CA-47). Un equipo vacío puntúa 1. |
 | RN-16 | Se excluyen las formas de la misma cadena y región que cada miembro de los equipos afectados, salvo la cadena de Dragonite; de la de Eevee, solo la evolución usada. |
 | RN-17 | Por cada Pokémon rival: **ataque** = algún miembro tiene un tipo cuyo factor contra el rival (producto de sus tipos) es ×2 o más; **defensa** = algún miembro tiene un factor ×0,5 o menos (inmunidad incluida) frente a al menos un tipo del rival y menos de ×2 frente a todos. La puntuación del rival es la media de los dos; la del combate, la media de sus rivales; la de la regla, la media de los combates. Un juego objetivo siempre tiene combates clave (CA-46). |
 | RN-19 | La clave de comparación es `(puntuación, miembros con dos tipos)`. |
@@ -128,8 +128,9 @@ corrige primero en el DDF.
 
 Revisadas tras la fase 3, sobre las interpretaciones que fijó su implementación:
 
-- **[CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)**: un método de evolución sin
-  catalogar detiene la carga y lo cataloga el usuario. La clasificación pasa a ser un dato
+- **[CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)** y
+  **[CA-47](../01-ddf/cuestiones-abiertas.md#resueltas)**: un método de evolución sin
+  catalogar bloquea la carga y lo cataloga el arquitecto en una nueva versión. La clasificación pasa a ser un dato
   ([`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml)) y el motor la recibe
   en el contexto (fase 7 del [plan de carga](plan-carga-datos.md#fases)).
 - **[CA-43](../01-ddf/cuestiones-abiertas.md#resueltas)**: el sexo y el objeto equipado no
@@ -138,7 +139,7 @@ Revisadas tras la fase 3, sobre las interpretaciones que fijó su implementació
 - **[CA-44](../01-ddf/cuestiones-abiertas.md#resueltas)**: con varios métodos, cuenta el más
   fácil. Ya implementado.
 - **[CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)**: una evolución por movimiento sin
-  los movimientos por nivel detiene la carga.
+  los movimientos por nivel bloquea la carga.
 - **[CA-46](../01-ddf/cuestiones-abiertas.md#resueltas)**: un juego objetivo sin combates
   clave no se carga. Hasta la fase 7, RN-17 puntúa 0 sin combates clave; después, el motor lo
   tratará como un error.

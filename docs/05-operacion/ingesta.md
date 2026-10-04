@@ -163,6 +163,114 @@ ERROR: la carga ha fallado; se conserva la base de datos anterior.
   - Comprobación fallida: species: 50 filas, se esperaban 386
 ```
 
+## Carga bloqueada
+
+!!! note "Pendiente de implementar"
+    Diseño de la fase 7 del [plan de carga](../02-ddt/plan-carga-datos.md#fases)
+    ([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)). Hasta entonces, estos casos son errores
+    que cortan la carga.
+
+Una carga queda **bloqueada** cuando encuentra algo que la aplicación no sabe tratar y que no
+se puede resolver sin decidir cómo lo interpretan las reglas
+([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)). A diferencia de un error, no se corta:
+sigue hasta el final para recoger **todos** los bloqueos, no sustituye `reference.sqlite` y
+termina con el código de salida **2**.
+
+| Código de salida | Significado | Qué hacer |
+|------------------|-------------|-----------|
+| 0 | Carga completada. | Nada; si es la primera carga de una versión nueva, registrar el informe. |
+| 1 | Error: red, ficheros, validación de filas, integridad o comprobaciones. | Leer el error, corregir y repetir. |
+| 2 | Carga bloqueada: hace falta que el arquitecto revise el modelo. | Seguir el [protocolo](#protocolo-de-registro). |
+
+### Bloqueos
+
+| Bloqueo (`kind`) | Cuándo | Qué decide el arquitecto |
+|------------------|--------|--------------------------|
+| `unknown_evolution_trigger` | Un disparador de evolución que no está en [`evolution_methods.yaml`](../02-ddt/datos-curados.md#evolution_methodsyaml) ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)). | Su categoría para RN-15 y RN-20. |
+| `unknown_evolution_condition` | Una condición de evolución que no está en ese fichero. | Igual. |
+| `missing_level_moves` | Un paso exige conocer un movimiento y no se cargan los movimientos por nivel ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). | Activar la carga de `level_move`. |
+| `target_game_without_key_battles` | Un juego objetivo sin combates clave ([CA-46](../01-ddf/cuestiones-abiertas.md#resueltas)). | Completar su lista curada o, si no tiene, cómo puntúa RN-17. |
+| `wikidex_team_not_found` | La lista curada de combates no encuentra un equipo en WikiDex. | Corregir la página, la sección o el rótulo en `key_battles/*.yaml`. |
+
+### Informe
+
+La CLI escribe dos ficheros con el mismo nombre en `data/reports/`, que está fuera de git:
+`AAAA-MM-DDTHHMMSS-<estado>.json` y `.md`, donde `<estado>` es `completada` o `bloqueada`. El
+JSON es la fuente; el Markdown se genera a partir de él para leerlo o pegarlo en un PR.
+
+```json
+{
+  "format": 1,
+  "status": "blocked",
+  "started_at": "2026-11-02T10:15:00",
+  "finished_at": "2026-11-02T10:16:40",
+  "pokeapi_commit": "bc92d3b",
+  "games": ["firered", "leafgreen", "ruby", "sapphire", "emerald"],
+  "blockers": [
+    {
+      "kind": "unknown_evolution_trigger",
+      "subject": "spin",
+      "occurrences": ["milcery → alcremie (sword-shield)"],
+      "rules": ["RN-15", "RN-20"],
+      "action": "Catalogar el disparador en data/curated/evolution_methods.yaml",
+      "template": "spin: {category: ???, reason: ???}"
+    }
+  ],
+  "summary": {"rows": {}, "origins": {}, "checks_passed": 9}
+}
+```
+
+El Markdown tiene una cabecera (fecha, estado, commit de PokeAPI y juegos), un resumen con
+el número de bloqueos de cada tipo y una sección por bloqueo con lo mismo que el JSON y la
+plantilla en un bloque de código, lista para copiar. Si la carga se completa, incluye el
+informe de siempre (filas, orígenes y comprobaciones).
+
+El informe no lleva rutas absolutas del equipo ni contenido copiado de las fuentes: de
+WikiDex solo nombra la página y la sección, por su licencia
+([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)).
+
+### Protocolo de registro
+
+La CLI **nunca** escribe en git. Los informes se registran después, a mano, en
+[Informes de carga](informes-carga/index.md), que es el historial de las cargas que importan.
+
+```mermaid
+sequenceDiagram
+    actor Adm as Administrador
+    participant CLI as ingest (CLI)
+    participant Git as GitHub
+    actor Arq as Arquitecto
+    Adm->>CLI: uv run python -m ingest
+    CLI-->>Adm: código 2 e informe en data/reports/
+    Adm->>Git: PR chore/informe-carga-AAAA-MM-DD con el informe (estado «abierta»)
+    Git-->>Arq: revisión del PR
+    Arq->>Git: PR de resolución: datos curados, DDF, ADR o código y estado «resuelta»
+    Adm->>CLI: repite la carga con la nueva versión
+    CLI-->>Adm: código 0 e informe
+    Adm->>Git: PR con el informe de la carga completada
+```
+
+1. **Carga bloqueada** (código 2). El administrador crea una rama
+   `chore/informe-carga-AAAA-MM-DD` desde `main` y:
+    1. Copia los dos ficheros a `docs/05-operacion/informes-carga/`, con el nombre
+       `AAAA-MM-DD-bloqueada-<commit-de-pokeapi>.md` y `.json`.
+    2. Añade una fila a la tabla de [Informes de carga](informes-carga/index.md) con estado
+       **abierta**.
+    3. Revisa que no haya rutas locales ni datos personales; gitleaks también lo comprueba.
+    4. Abre el PR `chore(ingesta): registrar la carga bloqueada del AAAA-MM-DD`, con el
+       resumen del informe en la descripción. El PR es el aviso al arquitecto y se fusiona sin
+       esperar a la solución, para que el informe quede en `main`.
+2. **Resolución**. El arquitecto revisa el informe y prepara uno o varios PR (`fix/`, `feat/`
+   o `docs/`) que resuelven los bloqueos: completa los datos curados con las plantillas y,
+   si hace falta, cambia el DDF (nuevos `CA-XX`), un ADR o el código. El PR que resuelve el
+   último bloqueo cambia el estado de la fila a **resuelta** y enlaza los PR de la solución.
+3. **Nueva carga**. Con la nueva versión en `main`, el administrador repite la carga. Si
+   vuelve a quedar bloqueada, se registra como un informe nuevo (paso 1).
+4. **Carga completada** (código 0). Se registra su informe, con estado **completada**, en un
+   PR `chore(ingesta): registrar la carga del AAAA-MM-DD`, si es la que cierra un bloqueo o la
+   primera con un commit de PokeAPI o unos juegos distintos. Las cargas que solo repiten la
+   anterior no se registran.
+
 ## Consultar los datos
 
 `reference.sqlite` es un fichero SQLite normal: se puede abrir con cualquier herramienta de
@@ -325,12 +433,5 @@ Ningún test usa la red: `tests/conftest.py` hace fallar cualquier petición HTT
   of Fame* y las confirmaciones siguen apuntando a datos que existen
   ([arquitectura](../02-ddt/arquitectura.md#ingest-carga-de-datos)).
 - **Elegir juegos**: cargar solo algunos juegos objetivo, cuando haya más de una generación.
-- **Catálogo de métodos de evolución** (fase 7): la carga se detendrá si encuentra un método de
-  evolución sin catalogar, una evolución por movimiento sin los movimientos por nivel o un
-  juego objetivo sin combates clave, con un informe de lo que falta
-  ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas),
-  [CA-45](../01-ddf/cuestiones-abiertas.md#resueltas),
-  [CA-46](../01-ddf/cuestiones-abiertas.md#resueltas)).
-- **Lanzarla desde la web** ([RF-11](../01-ddf/requisitos-funcionales.md#rf-11)) y catalogar
-  ahí lo desconocido ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)): pendiente de un ADR
-  sobre cómo la invoca la API.
+- **Cargas bloqueadas** (fase 7): bloqueos, informe en JSON y Markdown y código de salida 2
+  ([carga bloqueada](#carga-bloqueada)).

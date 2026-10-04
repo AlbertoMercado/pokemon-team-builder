@@ -226,6 +226,8 @@ test-results/
 # Caché local de ingesta
 .cache/
 data/cache/
+# Informes de la ingesta: se registran a mano en docs/05-operacion/informes-carga/
+data/reports/
 *.sqlite
 *.sqlite.tmp
 *.db

@@ -331,8 +331,9 @@ parámetros son fijos.
   elige. Solo es tedioso si todas lo son.
 - **Métodos sin catalogar** ([CA-42](cuestiones-abiertas.md#resueltas)): cada disparador y
   cada condición de evolución de las fuentes tiene una categoría (no tedioso, tedioso o
-  aleatorio). Si la carga de datos encuentra uno sin catalogar, se detiene y el usuario lo
-  cataloga ([RF-16](requisitos-funcionales.md#rf-16)). Lo mismo si una evolución exige un
+  aleatorio). Si la carga de datos encuentra uno sin catalogar, queda bloqueada y el
+  arquitecto lo cataloga en una nueva versión ([RF-16](requisitos-funcionales.md#rf-16),
+  [CA-47](cuestiones-abiertas.md#resueltas)). Lo mismo si una evolución exige un
   movimiento y no se sabe qué movimientos aprende por nivel
   ([CA-45](cuestiones-abiertas.md#resueltas)). Así la regla nunca evalúa un método que no
   conoce.

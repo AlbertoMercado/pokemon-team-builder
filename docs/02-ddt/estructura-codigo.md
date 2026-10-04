@@ -15,7 +15,7 @@ paquete de Python un *docstring* de módulo en su `__init__.py`.
 | `db/` | Paquete de Python: persistencia. | Un único lugar para los modelos de las dos bases de datos ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md)). | Define los modelos SQLModel de `reference.sqlite` (`db/reference/`) y `user.sqlite` y las migraciones de esta última. `db/sqlite.py` crea los motores con las claves foráneas activadas. | `reference.sqlite` implementada ([detalle](modelo-datos.md#implementacion-de-referencesqlite)) |
 | `ingest/` | Paquete de Python: CLI de ingesta. | Los datos de referencia vienen de fuentes externas y se cargan de forma puntual ([RF-11](../01-ddf/requisitos-funcionales.md#rf-11)). | Descarga (con caché), valida y normaliza PokeAPI, WikiDex y los datos curados, y construye `reference.sqlite`. | CLI, carga, comprobaciones y fuentes PokeAPI, datos curados y WikiDex implementados ([detalle](../05-operacion/ingesta.md)) |
 | `api/` | Paquete de Python: capa de aplicación. | Exponer los casos de uso al frontend por HTTP ([API](api.md)). | Routers de FastAPI, servicios que montan el `GameContext` y llaman a `core/`, y repositorios sobre `db/`. | Vacío |
-| `data/` | Datos, no código. | Separar los datos versionados de los generados ([ADR-0005](../03-adr/0005-datos-curados-yaml.md)). | `curated/`: YAML curados a mano, en git. `cache/` y `*.sqlite`: generados, fuera de git. | `curated/` con los datos de Rojo Fuego y Verde Hoja ([detalle](datos-curados.md)) |
+| `data/` | Datos, no código. | Separar los datos versionados de los generados ([ADR-0005](../03-adr/0005-datos-curados-yaml.md)). | `curated/`: YAML curados a mano, en git. `cache/`, `reports/` y `*.sqlite`: generados, fuera de git. | `curated/` con los datos de Rojo Fuego y Verde Hoja ([detalle](datos-curados.md)) |
 | `tests/` | Tests de Python (pytest + hypothesis). | Verificar cada regla y las propiedades del motor ([estrategia de pruebas](arquitectura.md#estrategia-de-pruebas)). | Contiene el guardián de arquitectura (`test_architecture.py`) y los tests de cada paquete en `tests/<paquete>/` (`tests/core/`, `tests/db/` y `tests/ingest/`). Los tests importan módulos de prueba como `tests.core.builders`: mypy calcula los nombres de módulo desde la raíz del repositorio (`explicit_package_bases`). `tests/conftest.py` hace fallar cualquier petición HTTP, porque los tests nunca usan la red; los datos de ejemplo están en `tests/<paquete>/fixtures/`. pytest añade la raíz del repositorio al `sys.path` (`pythonpath` en `pyproject.toml`), porque el proyecto no se instala como paquete. | En uso |
 | `web/` | Frontend React + Vite + TypeScript + Tailwind. | Interfaz de la aplicación ([ADR-0001](../03-adr/0001-stack-tecnologico.md)). | Pantallas de catálogo, favoritos, reglas, nuevo juego, resultado y *Hall of Fame*. | Vacío |
 | `docs/` | Documentación MkDocs. | Docs-as-code: el diseño se versiona con el código. | DDF, DDT, ADR, manual de usuario y operación. | En uso |
@@ -27,10 +27,13 @@ data/
   curated/    YAML curados a mano (combates clave, mecánicas de juego…). En git.
   cache/      Respuestas descargadas por la ingesta (WikiDex, volcado de PokeAPI). Fuera de git.
   *.sqlite    reference.sqlite y user.sqlite. Fuera de git.
+  reports/    Informes de cada carga en JSON y Markdown. Fuera de git.
 ```
 
-`data/cache/` y `*.sqlite` están en `.gitignore`: se pueden regenerar y no deben subirse al
-repositorio.
+`data/cache/`, `data/reports/` y `*.sqlite` están en `.gitignore`: se pueden regenerar y no
+deben subirse al repositorio. Los informes de carga que importan se registran a mano en
+[Informes de carga](../05-operacion/informes-carga/index.md)
+([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)).
 
 ## Reglas de dependencia
 

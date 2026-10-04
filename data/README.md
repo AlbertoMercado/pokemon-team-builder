@@ -12,6 +12,7 @@ no ([ADR-0005](../docs/03-adr/0005-datos-curados-yaml.md)).
 | `curated/` | YAML curados a mano (combates clave, mecánicas de juego…), validados con pydantic por la ingesta. | Sí |
 | `cache/` | Descargas de la ingesta: `pokeapi/<commit>/` (CSV) y `wikidex/` (páginas). Se pueden regenerar. | No |
 | `*.sqlite` | `reference.sqlite` y `user.sqlite`. | No |
+| `reports/` | Informes de cada carga en JSON y Markdown (fase 7). Los que importan se registran a mano en [Informes de carga](../docs/05-operacion/informes-carga/index.md) ([ADR-0008](../docs/03-adr/0008-cargas-bloqueadas.md)). | No |
 
 Más detalle en [Estructura del código](../docs/02-ddt/estructura-codigo.md).
 

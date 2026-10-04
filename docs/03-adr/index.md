@@ -12,3 +12,4 @@ Cada decisión de arquitectura relevante se registra como un ADR numerado a part
 | [0005](0005-datos-curados-yaml.md) | Datos curados en YAML versionado | Aceptado |
 | [0006](0006-algoritmo-busqueda-exacta.md) | Búsqueda exacta con retroceso y fracciones exactas | Aceptado |
 | [0007](0007-cliente-generado-openapi.md) | Cliente del frontend generado desde OpenAPI | Aceptado |
+| [0008](0008-cargas-bloqueadas.md) | Cargas bloqueadas: informe para el arquitecto y resolución por nueva versión | Aceptado |

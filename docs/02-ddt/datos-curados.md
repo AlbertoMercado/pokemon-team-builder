@@ -218,8 +218,9 @@ PokeAPI: no tedioso, tedioso con su motivo, o aleatorio
 
 **Por qué existe**: decidir qué es tedioso es una regla de negocio que depende de cómo se
 juega, no un dato de PokeAPI. Tenerlo como dato permite que la carga detecte lo que no está
-catalogado y se detenga, en lugar de que el motor tenga que adivinarlo
-([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)).
+catalogado y quede bloqueada, en lugar de que el motor tenga que adivinarlo
+([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas),
+[ADR-0008](../03-adr/0008-cargas-bloqueadas.md)).
 
 **Esquema** (orientativo; se fija al implementarlo):
 
@@ -249,10 +250,10 @@ conditions:
 
 Se catalogan los 18 disparadores y todas las condiciones del volcado de PokeAPI, también los
 que aún no aparecen en los juegos cargados, con la categoría que les da RN-15. Si la carga
-encuentra un disparador o una condición que no está ni aquí ni en lo que el usuario ha
-catalogado desde la web (`evolution_method_classification` en `user.sqlite`), se detiene y
-los lista ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)). Lo que el usuario catalogue
-se puede pasar después a este fichero mediante PR.
+encuentra un disparador o una condición que no está aquí, queda bloqueada y el informe lo
+lista con una plantilla para añadirlo a este fichero
+([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)). El arquitecto lo completa mediante PR
+([protocolo](../05-operacion/ingesta.md#carga-bloqueada)).
 
 ## Implementación
 
