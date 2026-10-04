@@ -307,9 +307,13 @@ parámetros son fijos.
       Cuenta como no aprendido por nivel el movimiento que la evolución anterior solo tiene
       a nivel 1, porque en la práctica hay que recurrir al recordador
       ([CA-32](cuestiones-abiertas.md#resueltas)).
+    - Evoluciones con resultado **aleatorio**, que no se puede elegir (Wurmple → Silcoon o
+      Cascoon, según la personalidad). No exigen nada especial, pero pueden dar una evolución
+      distinta de la de favoritos y romper el equipo planificado
+      ([CA-35](cuestiones-abiertas.md#resueltas)).
     - Otros requisitos poco habituales: clima, girar la consola, golpes críticos, daño recibido,
-      etc. Wurmple y Shedinja están pendientes de
-      [CA-35](cuestiones-abiertas.md#abiertas).
+      etc. Por ejemplo, Nincada → Shedinja, que exige un hueco libre en el equipo y una Poké
+      Ball ([CA-35](cuestiones-abiertas.md#resueltas)).
     - Cualquier evolución que **no se puede hacer en el juego objetivo** y obliga a evolucionar
       al Pokémon en otro juego y transferirlo, siempre que la transferencia sea posible antes
       de completar el juego. Si no lo es, el Pokémon no es candidato ([RN-03](#rn-03)).
@@ -319,6 +323,8 @@ parámetros son fijos.
 - **Ejemplos**:
     - Gengar puntúa en contra, porque Haunter evoluciona por intercambio.
     - Raichu no puntúa en contra, porque evoluciona con la Piedra Trueno.
+    - Beautifly y Dustox puntúan en contra, porque Wurmple evoluciona al azar en Silcoon o
+      Cascoon.
     - Milotic puntúa en contra en Pokémon Esmeralda (belleza), pero en Pokémon Negro evoluciona
       por intercambio con Escama Bella, que también es tedioso.
 

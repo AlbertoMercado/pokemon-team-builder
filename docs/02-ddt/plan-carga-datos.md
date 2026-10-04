@@ -95,8 +95,8 @@ Casos de las especies 1 a 386 hasta Rojo Fuego y Verde Hoja, con la clasificaci�
 | Subir de nivel con belleza | Feebas → Milotic | Sí |
 | Usar un objeto | Pikachu → Raichu, Eevee → Vaporeon | No |
 | Intercambio, con o sin objeto | Haunter → Gengar, Onix → Steelix, Clamperl → Huntail | Sí |
-| Subir de nivel según la personalidad (al azar) | Wurmple → Silcoon o Cascoon | Pendiente ([CA-35](../01-ddf/cuestiones-abiertas.md#abiertas)) |
-| Muda (`shed`) | Nincada → Shedinja | Pendiente ([CA-35](../01-ddf/cuestiones-abiertas.md#abiertas)) |
+| Subir de nivel según la personalidad (al azar) | Wurmple → Silcoon o Cascoon | Sí, por ser aleatoria ([CA-35](../01-ddf/cuestiones-abiertas.md#resueltas)) |
+| Muda (`shed`) | Nincada → Shedinja | Sí ([CA-35](../01-ddf/cuestiones-abiertas.md#resueltas)) |
 
 La ingesta guarda el disparador y las condiciones tal como vienen. Decidir si un paso es
 tedioso lo hace `core/evolution.py` ([modelo de datos](modelo-datos.md#evoluciones)).
