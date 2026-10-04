@@ -129,13 +129,13 @@ Filas cargadas por tabla:
   evolution_step          940
   game_mechanic             4
   game_pokemon           1930
-  key_battle               30
+  key_battle               26
   pokemon_type           1131
-  key_battle_pokemon      138
+  key_battle_pokemon      100
 Datos revisables por origen:
   game_mechanic        inferred 4
   game_pokemon         automatic 1930, inferred 772, pending 1158
-  key_battle           automatic 28, inferred 2
+  key_battle           automatic 26
 Comprobaciones superadas: 9
 Carga completada.
 ```
@@ -146,8 +146,7 @@ Carga completada.
   confirmar el usuario antes de generar ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). En
   `game_pokemon` hay dos valores por fila: la existencia (automática) y la llegada (inferida
   en Rojo Fuego y Verde Hoja, pendiente en Rubí, Zafiro y Esmeralda). Los combates clave
-  son automáticos, salvo los del Campeón, que son inferidos porque su equipo tiene variantes
-  según el inicial.
+  son automáticos.
 - **Comprobaciones superadas**: número de comprobaciones de la carga que se han cumplido.
 
 Ejemplos de cargas fallidas:
@@ -179,7 +178,7 @@ Código en `ingest/` ([estructura del código](../02-ddt/estructura-codigo.md)):
 | `sources/__init__.py` | `Source`, la interfaz de una fuente: `name`, `pokeapi_commit` y `rows()`, que entrega filas ya validadas. |
 | `sources/curated/__init__.py` | `read_curated`, que lee y valida los ficheros de `data/curated/`, y `CuratedSource`, la fuente de las mecánicas y los combates clave. |
 | `sources/curated/schemas.py` | Un modelo pydantic por fichero curado ([datos curados](../02-ddt/datos-curados.md)). |
-| `sources/wikidex/__init__.py` | `WikidexSource`: lee el equipo de cada combate de la lista curada, traduce los nombres y quita el inicial del rival. |
+| `sources/wikidex/__init__.py` | `WikidexSource`: lee el equipo de cada combate de la lista curada, traduce los nombres, quita el inicial del rival y, si hay variantes, se queda con los Pokémon comunes. |
 | `sources/wikidex/fetch.py` | `PageCache`: descarga con caché y límite de peticiones de las páginas de WikiDex. |
 | `sources/wikidex/parse.py` | Busca la sección, el rótulo y las plantillas `{{Equipo}}` en el wikitexto. |
 | `sources/pokeapi/index.py` | Índice de los Pokémon cargados por su nombre en español, para traducir los nombres de WikiDex. |
@@ -199,8 +198,8 @@ Tests en `tests/ingest/`:
 - `test_curated.py`: los ficheros curados reales del repositorio, sus esquemas, la fuente
   de datos curados y el error del CLI con un fichero inválido.
 - `test_wikidex.py`: la fuente de WikiDex sobre páginas reales recortadas: caché y límite
-  de peticiones, respuesta de la API, rótulos, variantes, desambiguación y filas de los
-  combates.
+  de peticiones, respuesta de la API, rótulos, variantes y Pokémon comunes, desambiguación y
+  filas de los combates.
 
 Ningún test usa la red: `tests/conftest.py` hace fallar cualquier petición HTTP.
 

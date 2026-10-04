@@ -11,7 +11,7 @@ incluidos los casos difíciles.
 | Página | Revisión | Caso |
 |--------|----------|------|
 | Brock | 3562807 | Un solo equipo, sin rótulos. |
-| Giovanni | 3530484 | Tres combates en la misma sección, cada uno con su rótulo (`; En Silph S.A.`). |
+| Giovanni | 3530484 | Tres combates en la misma sección, cada uno con su rótulo (`; En Silph S.A.`); en la carga solo se usa el de líder de gimnasio (CA-39). |
 | Azul (personaje) | 3557514 | Varios combates con rótulo; el de Campeón con tres variantes según el inicial dentro de `<tabber>`. |
 | Bruno | 2451940 | Página de desambiguación, completa. |
 

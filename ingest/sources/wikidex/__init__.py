@@ -1,8 +1,9 @@
 """WikiDex source: teams of the key battles listed in the curated data (RN-17).
 
 For each curated battle, reads its trainer page (cached, rate limited), finds the team in
-the games' section, translates the Spanish names to loaded forms and leaves out the rival's
-starter (CA-26). See docs/02-ddt/plan-carga-datos.md and docs/02-ddt/datos-curados.md.
+the games' section, translates the Spanish names to loaded forms, leaves out the rival's
+starter (CA-26) and, if the team has variants, keeps the Pokémon common to all of them
+(CA-38). See docs/02-ddt/plan-carga-datos.md and docs/02-ddt/datos-curados.md.
 """
 
 from collections.abc import Callable, Iterable, Iterator
@@ -53,7 +54,7 @@ class WikidexSource:
                     _without_starter(_resolve(team, battle, index), battle, index)
                     for team in variants
                 ]
-                read = _ReadBattle(order, battle, teams, page.revision)
+                read = _ReadBattle(order, battle, _common_members(teams, battle), page.revision)
                 for game in battles_file.games:
                     yield from read.rows(game)
 
@@ -88,13 +89,33 @@ def _without_starter(team: ResolvedTeam, battle: BattleEntry, index: PokemonInde
     return [entry for entry in team if entry[2] not in chains]
 
 
+def _common_members(teams: list[ResolvedTeam], battle: BattleEntry) -> ResolvedTeam:
+    """Pokémon present in every variant, in the order of the first one (CA-38).
+
+    A team with variants depends on the player's choice (the rival's on the starter), so
+    only what the player meets whatever they choose is kept.
+    """
+    common = list(teams[0])
+    for team in teams[1:]:
+        remaining = [pokemon for _member, pokemon, _chain in team]
+        kept = []
+        for entry in common:
+            if entry[1] in remaining:
+                remaining.remove(entry[1])  # repeated Pokémon count once per variant
+                kept.append(entry)
+        common = kept
+    if not common:
+        raise WikidexDataError(f"{battle.id}: sus variantes no tienen ningún Pokémon en común")
+    return common
+
+
 @dataclass(frozen=True)
 class _ReadBattle:
-    """A curated battle with its team (or variants) already read from WikiDex."""
+    """A curated battle with its team already read from WikiDex."""
 
     order: int
     battle: BattleEntry
-    teams: list[ResolvedTeam]
+    team: ResolvedTeam
     revision: int
 
     def rows(self, game: str) -> Iterator[ReferenceModel]:
@@ -105,18 +126,12 @@ class _ReadBattle:
             category=self.battle.category,
             trainer_name=self.battle.trainer,
             order=self.order,
-            # Variants depend on the player's choice: the user confirms them (RN-18).
-            origin=Origin.AUTOMATIC if len(self.teams) == 1 else Origin.INFERRED,
+            origin=Origin.AUTOMATIC,
             fact_key=f"battle:{game}:{self.battle.id}",
             source_page=self.battle.wikidex_page,
             source_revision=self.revision,
         )
-        for variant, team in enumerate(self.teams, start=1):
-            for member, pokemon, _chain in team:
-                yield KeyBattlePokemon(
-                    battle=slug,
-                    variant=variant,
-                    position=member.position,
-                    pokemon=pokemon,
-                    level=member.level,
-                )
+        for member, pokemon, _chain in self.team:
+            yield KeyBattlePokemon(
+                battle=slug, position=member.position, pokemon=pokemon, level=member.level
+            )

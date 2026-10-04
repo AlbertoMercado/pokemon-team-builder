@@ -4,6 +4,7 @@
 # Los equipos se leen de la sección wikidex_section de la página de WikiDex de cada
 # entrenador. Si la sección tiene varios combates, wikidex_team es el rótulo del bueno. El
 # rival es también el Campeón: ese combate cuenta una vez y sin su Pokémon inicial (CA-26).
+# Giovanni solo cuenta como líder de gimnasio, no como jefe del Team Rocket (CA-39).
 games: [firered, leafgreen]
 wikidex_section: Pokémon Rojo Fuego y Pokémon Verde Hoja
 battles:
@@ -23,24 +24,10 @@ battles:
     category: gym_leader
     trainer: Erika
     wikidex_page: Erika
-  - id: giovanni-rocket-hideout
-    category: villain_boss
-    trainer: Giovanni
-    wikidex_page: Giovanni
-    wikidex_team: En el Casino Rocket
-    note: >-
-      Escondite Rocket de Ciudad Azulona. Obligatorio: da el Scope Silph, sin el que no se
-      completa la Torre Pokémon ni se consigue la Poké Flauta.
   - id: koga
     category: gym_leader
     trainer: Koga
     wikidex_page: Koga
-  - id: giovanni-silph-co
-    category: villain_boss
-    trainer: Giovanni
-    wikidex_page: Giovanni
-    wikidex_team: En Silph S.A.
-    note: Silph S.A. de Ciudad Azafrán. Pendiente de confirmar que es obligatorio.
   - id: sabrina
     category: gym_leader
     trainer: Sabrina
@@ -83,4 +70,5 @@ battles:
     rival_starter_lines: [bulbasaur, charmander, squirtle]
     note: >-
       Rival y Campeón. Cuenta una vez y sin su Pokémon inicial (CA-26). Su equipo depende
-      del inicial que elige el jugador: hay tres variantes.
+      del inicial que elige el jugador: solo cuentan los Pokémon comunes a las tres
+      variantes (CA-38).

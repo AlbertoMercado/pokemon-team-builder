@@ -373,7 +373,10 @@ parámetros son fijos.
   ([CA-26](cuestiones-abiertas.md#resueltas)).
 - **Rival**: solo cuenta su equipo en el último combate obligatorio, sin el Pokémon inicial,
   que depende de la elección del jugador. Si el resto del equipo también cambia según el
-  inicial, hay varias variantes (pendiente de [CA-38](cuestiones-abiertas.md#abiertas)). Si el rival es también el Campeón, como en Rojo
+  inicial, solo cuentan los Pokémon que tiene en todas las variantes
+  ([CA-38](cuestiones-abiertas.md#resueltas)).
+- **Giovanni en Kanto**: en Rojo Fuego y Verde Hoja solo cuenta su combate como líder de
+  gimnasio, no los de jefe del Team Rocket ([CA-39](cuestiones-abiertas.md#resueltas)). Si el rival es también el Campeón, como en Rojo
   Fuego, ese combate cuenta una sola vez y también sin su inicial. Se usan solo los tipos de los miembros y de los Pokémon
   rivales, con la tabla de eficacias del juego objetivo ([RN-10](#rn-10)). No se tienen en
   cuenta movimientos, niveles ni estadísticas.

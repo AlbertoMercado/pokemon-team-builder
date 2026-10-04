@@ -171,9 +171,7 @@ def test_round_trip_of_a_minimal_firered_dataset(session: Session) -> None:
                 origin=Origin.AUTOMATIC,
                 fact_key="battle:firered:brock",
             ),
-            KeyBattlePokemon(
-                battle="firered-brock", variant=1, position=1, pokemon="bulbasaur", level=12
-            ),
+            KeyBattlePokemon(battle="firered-brock", position=1, pokemon="bulbasaur", level=12),
             IngestRun(
                 started_at=datetime(2026, 10, 4, tzinfo=UTC),
                 finished_at=datetime(2026, 10, 4, tzinfo=UTC),

@@ -35,8 +35,7 @@ type Check = Callable[[Session], list[str]]
 TARGET_GAMES = frozenset({"ruby", "sapphire", "emerald", "firered", "leafgreen"})
 # Games with curated data so far (phase 4): mechanics, arrival rule and key battles.
 CURATED_GAMES = frozenset({"firered", "leafgreen"})
-KEY_BATTLES_PER_GAME = 15
-RIVAL_TEAM_SIZE = 5  # the champion's 6 Pokémon minus the starter (CA-26)
+KEY_BATTLES_PER_GAME = 13
 SPECIES_COUNT = 386
 EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     Generation: 3,
@@ -212,17 +211,17 @@ def check_arrival_proposals(session: Session) -> list[str]:
     return problems
 
 
-def _team(session: Session, battle: str, variant: int = 1) -> list[str]:
+def _team(session: Session, battle: str) -> list[str]:
     query = (
         select(KeyBattlePokemon.pokemon)
-        .where(KeyBattlePokemon.battle == battle, KeyBattlePokemon.variant == variant)
+        .where(KeyBattlePokemon.battle == battle)
         .order_by(col(KeyBattlePokemon.position))
     )
     return list(session.exec(query).all())
 
 
 def check_key_battles(session: Session) -> list[str]:
-    """Key battles and their teams (RN-17, CA-26)."""
+    """Key battles and their teams (RN-17, CA-26, CA-38, CA-39)."""
     problems = []
     for game in CURATED_GAMES:
         battles = session.exec(
@@ -234,17 +233,18 @@ def check_key_battles(session: Session) -> list[str]:
         for battle in battles:
             if not _team(session, battle.slug):
                 problems.append(f"{battle.slug}: no tiene Pokémon")
-            expected = Origin.INFERRED if battle.category == "champion" else Origin.AUTOMATIC
-            if battle.origin is not expected:
-                problems.append(f"{battle.slug}: origen {battle.origin}, se esperaba {expected}")
+            if battle.origin is not Origin.AUTOMATIC:
+                problems.append(f"{battle.slug}: origen {battle.origin}, se esperaba automatic")
+        giovanni = [b.category for b in battles if b.trainer_name == "Giovanni"]
+        if giovanni != ["gym_leader"]:
+            problems.append(f"{game}: Giovanni {giovanni}, se esperaba solo como líder (CA-39)")
 
     if _team(session, "firered-brock") != ["geodude", "onix"]:
         problems.append(f"equipo de firered-brock: {_team(session, 'firered-brock')}")
-    starters = {"venusaur", "charizard", "blastoise", "ivysaur", "charmeleon", "wartortle"}
-    for variant in (1, 2, 3):
-        team = _team(session, "firered-champion", variant)
-        if len(team) != RIVAL_TEAM_SIZE or starters & set(team):
-            problems.append(f"firered-champion, variante {variant}: {team}")
+    # Without the starter (CA-26) and only what all three variants share (CA-38).
+    champion = _team(session, "firered-champion")
+    if champion != ["pidgeot", "alakazam", "rhydon"]:
+        problems.append(f"equipo de firered-champion: {champion}")
     return problems
 
 

@@ -29,7 +29,7 @@ def test_repository_curated_files_are_valid() -> None:
     assert set(curated.arrival.games) == {"firered", "leafgreen"}
     [firered_leafgreen] = curated.key_battles
     assert firered_leafgreen.games == ["firered", "leafgreen"]
-    assert len(firered_leafgreen.battles) == 15
+    assert len(firered_leafgreen.battles) == 13  # Giovanni only as gym leader (CA-39)
 
 
 # --- Schemas -------------------------------------------------------------------------------
@@ -106,7 +106,8 @@ def test_key_battles_point_to_their_wikidex_team() -> None:
     battles = {battle.id: battle for battle in battles_file.battles}
 
     assert battles_file.wikidex_section == "Pokémon Rojo Fuego y Pokémon Verde Hoja"
-    assert battles["giovanni-silph-co"].wikidex_team == "En Silph S.A."
+    assert battles["giovanni-gym"].wikidex_team == "En el Gimnasio de Ciudad Verde"
+    assert "giovanni-silph-co" not in battles  # CA-39
     assert battles["bruno"].wikidex_page == "Bruno (Alto Mando)"  # «Bruno» is a disambiguation
     assert battles["champion"].category is BattleCategory.CHAMPION
     assert battles["champion"].rival_starter_lines == ["bulbasaur", "charmander", "squirtle"]

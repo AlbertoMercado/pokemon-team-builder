@@ -165,20 +165,23 @@ Cada combate se carga, para cada juego, como una fila de `key_battle` con:
 - `slug`: `<juego>-<id>` (`firered-brock`).
 - `order`: su posición en la lista.
 - `fact_key`: `battle:<juego>:<id>` (`battle:firered:brock`).
-- `origin`: `automatic` si tiene un solo equipo e `inferred` si tiene variantes, porque
-  dependen de una elección del jugador y las confirma el usuario
-  ([RN-18](../01-ddf/reglas-negocio.md#rn-18)).
+- `origin`: `automatic`, porque el equipo se lee sin ambigüedad o la carga falla.
 - `source_page` y `source_revision`: la página y la revisión de WikiDex.
 
-Y sus Pokémon como filas de `key_battle_pokemon`, con su variante, su posición y su nivel. Los
-nombres en español de WikiDex se traducen a formas cargadas con los nombres de PokeAPI. Con
-`rival_starter_lines`, de cada variante se quita el único Pokémon de esas líneas (el inicial
-del rival, [CA-26](../01-ddf/cuestiones-abiertas.md#resueltas)).
+Y sus Pokémon como filas de `key_battle_pokemon`, con su posición y su nivel. Los nombres en
+español de WikiDex se traducen a formas cargadas con los nombres de PokeAPI. Antes:
 
-Los combates de Rojo Fuego y Verde Hoja son 15: los 8 líderes de gimnasio (Giovanni es el
-octavo), Giovanni como jefe del Team Rocket en el Escondite Rocket y en Silph S.A., el Alto
-Mando y Azul, que es el rival y el Campeón (cuenta una vez y sin su inicial,
-[CA-26](../01-ddf/cuestiones-abiertas.md#resueltas)).
+1. Con `rival_starter_lines`, de cada variante se quita el único Pokémon de esas líneas, el
+   inicial del rival ([CA-26](../01-ddf/cuestiones-abiertas.md#resueltas)).
+2. Si hay variantes, solo se guardan los Pokémon que están en **todas**
+   ([CA-38](../01-ddf/cuestiones-abiertas.md#resueltas)): los demás dependen del inicial que
+   elija el jugador. Un Pokémon repetido cuenta una vez por variante. Si las variantes no
+   tienen nada en común, la carga falla.
+
+Los combates de Rojo Fuego y Verde Hoja son 13: los 8 líderes de gimnasio, el Alto Mando y
+Azul, que es el rival y el Campeón y cuenta una vez. Giovanni solo cuenta como líder del
+Gimnasio de Ciudad Verde; sus combates como jefe del Team Rocket (Casino Rocket y Silph S.A.)
+no son combates clave en Kanto ([CA-39](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 Equipos cargados en Rojo Fuego (iguales en Verde Hoja):
 
@@ -188,23 +191,19 @@ Equipos cargados en Rojo Fuego (iguales en Verde Hoja):
 | 2 | Misty | Staryu 18, Starmie 21 |
 | 3 | Teniente Surge | Voltorb 21, Pikachu 18, Raichu 24 |
 | 4 | Erika | Victreebel 29, Tangela 24, Vileplume 29 |
-| 5 | Giovanni (Escondite Rocket) | Onix 25, Rhyhorn 24, Kangaskhan 29 |
-| 6 | Koga | Koffing 37, Koffing 37, Muk 39, Weezing 43 |
-| 7 | Giovanni (Silph S.A.) | Nidorino 37, Rhyhorn 37, Kangaskhan 35, Nidoqueen 41 |
-| 8 | Sabrina | Kadabra 38, Venomoth 38, Mr. Mime 37, Alakazam 43 |
-| 9 | Blaine | Growlithe 42, Ponyta 40, Rapidash 42, Arcanine 47 |
-| 10 | Giovanni (Gimnasio) | Rhyhorn 45, Dugtrio 42, Nidoking 45, Nidoqueen 44, Rhyhorn 50 |
-| 11 | Lorelei | Dewgong 52, Cloyster 51, Slowbro 52, Jynx 54, Lapras 54 |
-| 12 | Bruno | Onix 51, Hitmonchan 53, Hitmonlee 53, Onix 54, Machamp 56 |
-| 13 | Agatha | Gengar 54, Golbat 54, Haunter 53, Arbok 56, Gengar 58 |
-| 14 | Lance | Gyarados 56, Dragonair 54, Dragonair 54, Aerodactyl 58, Dragonite 60 |
-| 15 | Azul (Campeón) | Pidgeot 59, Alakazam 57, Rhydon 59 y, según el inicial: Exeggutor y Gyarados, Arcanine y Exeggutor, o Gyarados y Arcanine |
+| 5 | Koga | Koffing 37, Koffing 37, Muk 39, Weezing 43 |
+| 6 | Sabrina | Kadabra 38, Venomoth 38, Mr. Mime 37, Alakazam 43 |
+| 7 | Blaine | Growlithe 42, Ponyta 40, Rapidash 42, Arcanine 47 |
+| 8 | Giovanni | Rhyhorn 45, Dugtrio 42, Nidoking 45, Nidoqueen 44, Rhyhorn 50 |
+| 9 | Lorelei | Dewgong 52, Cloyster 51, Slowbro 52, Jynx 54, Lapras 54 |
+| 10 | Bruno | Onix 51, Hitmonchan 53, Hitmonlee 53, Onix 54, Machamp 56 |
+| 11 | Agatha | Gengar 54, Golbat 54, Haunter 53, Arbok 56, Gengar 58 |
+| 12 | Lance | Gyarados 56, Dragonair 54, Dragonair 54, Aerodactyl 58, Dragonite 60 |
+| 13 | Azul (Campeón) | Pidgeot 59, Alakazam 57, Rhydon 59 |
 
-!!! warning "Pendiente de confirmar"
-    - Que el combate contra Giovanni en Silph S.A. sea obligatorio. Si no lo es, se quita de
-      la lista, porque los combates clave son solo los obligatorios.
-    - Cómo puntúan las variantes del Campeón en RN-17
-      ([CA-38](../01-ddf/cuestiones-abiertas.md#abiertas)). La carga guarda las tres.
+En WikiDex, el Campeón tiene tres variantes según el inicial. Sin el inicial, además de los
+tres Pokémon comunes tiene Exeggutor y Gyarados, Arcanine y Exeggutor, o Gyarados y Arcanine:
+esos no cuentan ([CA-38](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 ## Implementación
 

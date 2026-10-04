@@ -229,28 +229,39 @@ def test_battle_rows_for_each_game() -> None:
     ]
     assert battles[0].fact_key == "battle:firered:brock"
     assert (battles[0].source_page, battles[0].source_revision) == ("Brock", 3562807)
-    firered = [
-        (p.variant, p.position, p.pokemon, p.level) for p in pokemon if p.battle == "firered-brock"
-    ]
-    assert firered == [(1, 1, "geodude", 12), (1, 2, "onix", 14)]
+    firered = [(p.position, p.pokemon, p.level) for p in pokemon if p.battle == "firered-brock"]
+    assert firered == [(1, "geodude", 12), (2, "onix", 14)]
 
 
 @pytest.mark.rn("RN-17")
-def test_rival_variants_without_starter() -> None:
-    """CA-26: the starter is left out of every variant; variants are inferred (CA-38)."""
+def test_rival_keeps_only_what_every_variant_shares() -> None:
+    """CA-26: the starter is left out. CA-38: of the rest, only what is in all variants."""
     rows = _rows(CHAMPION)
     [battle, _] = [row for row in rows if isinstance(row, KeyBattle)]
-    variants: dict[int, list[str]] = {}
-    for row in rows:
-        if isinstance(row, KeyBattlePokemon) and row.battle == "firered-champion":
-            variants.setdefault(row.variant, []).append(row.pokemon)
+    team = [
+        row.pokemon
+        for row in rows
+        if isinstance(row, KeyBattlePokemon) and row.battle == "firered-champion"
+    ]
 
-    assert battle.origin is Origin.INFERRED
-    assert variants == {
-        1: ["pidgeot", "alakazam", "rhydon", "exeggutor", "gyarados"],
-        2: ["pidgeot", "alakazam", "rhydon", "arcanine", "exeggutor"],
-        3: ["pidgeot", "alakazam", "rhydon", "gyarados", "arcanine"],
-    }
+    assert battle.origin is Origin.AUTOMATIC
+    # Exeggutor, Gyarados and Arcanine depend on the starter: they do not count.
+    assert team == ["pidgeot", "alakazam", "rhydon"]
+
+
+def test_variants_without_common_pokemon_fail(tmp_path: Path) -> None:
+    wikitext = (
+        f"== {SECTION} ==\n; Final\n<tabber>\nA=\n{{{{Equipo|P1=Onix|NvP1=10}}}}\n"
+        "|-|\nB=\n{{Equipo|P1=Geodude|NvP1=10}}\n</tabber>\n"
+    )
+    pages = PageCache(tmp_path, fetcher=None)
+    page = WikiPage(title="Final", revision=1, wikitext=wikitext)
+    pages.path("Final").write_text(page.model_dump_json(), encoding="utf-8")
+    battle = BROCK.model_copy(update={"wikidex_page": "Final", "wikidex_team": "Final"})
+    source = WikidexSource(_curated_with(battle), pages, _index)
+
+    with pytest.raises(WikidexDataError, match="ningún Pokémon en común"):
+        list(source.rows())
 
 
 def test_unknown_pokemon_name_fails() -> None:
