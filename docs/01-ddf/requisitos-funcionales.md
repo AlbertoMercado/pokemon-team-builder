@@ -106,7 +106,8 @@ Hay dos excepciones:
     - Las reglas duras activables ([RN-07](reglas-negocio.md#rn-07),
       [RN-11](reglas-negocio.md#rn-11), [RN-12](reglas-negocio.md#rn-12),
       [RN-13](reglas-negocio.md#rn-13), [RN-14](reglas-negocio.md#rn-14) y
-      [RN-16](reglas-negocio.md#rn-16)) se pueden activar y desactivar.
+      [RN-16](reglas-negocio.md#rn-16)) se pueden activar y desactivar. Por defecto están
+      todas activas ([CA-41](cuestiones-abiertas.md#resueltas)).
     - La configuración se conserva entre sesiones.
 
 ### RF-07 · Configurar las reglas blandas y sus pesos { #rf-07 }
@@ -120,7 +121,8 @@ Hay dos excepciones:
     - Cada regla blanda muestra una descripción de lo que puntúa.
     - La configuración se conserva entre sesiones.
 - **Nota**: los pesos son enteros de 0 a 10, con valores por defecto
-  ([CA-05](cuestiones-abiertas.md#resueltas), [RN-04](reglas-negocio.md#rn-04)).
+  ([CA-05](cuestiones-abiertas.md#resueltas), [RN-04](reglas-negocio.md#rn-04)). Por defecto,
+  todas las reglas blandas están activas ([CA-41](cuestiones-abiertas.md#resueltas)).
 
 ### RF-15 · Revisar los datos del juego objetivo { #rf-15 }
 

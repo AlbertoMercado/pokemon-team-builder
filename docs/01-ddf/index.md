@@ -12,6 +12,7 @@ las reglas de negocio (**RN-XX**).
 | 0.4 | 2026-10-04 | Alcance de la primera carga: generaciones 1 a 3 y juegos objetivo de la 3.ª (CA-11). Evoluciones aleatorias y Shedinja como tediosas en RN-15 (CA-35). Penalización propia de las evoluciones aleatorias (RN-20, CA-37). Etapa que nace del huevo con bebés de incienso (CA-36). |
 | 0.5 | 2026-10-04 | Nueva cuestión CA-38: variantes del equipo del rival según el inicial (RN-17). |
 | 0.6 | 2026-10-04 | CA-38 resuelta: del rival solo cuentan los Pokémon comunes a todas las variantes. CA-39: en Kanto, Giovanni solo cuenta como líder de gimnasio (RN-17). |
+| 0.7 | 2026-10-04 | CA-40: las sugerencias de RN-08 pasan los mismos filtros por candidato que los favoritos. CA-41: todas las reglas activables están activas por defecto. |
 
 ## Propósito
 

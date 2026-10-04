@@ -66,6 +66,7 @@ nav:
       - Datos requeridos: 02-ddt/datos-requeridos.md
       - Datos curados: 02-ddt/datos-curados.md
       - Plan de la primera carga: 02-ddt/plan-carga-datos.md
+      - Plan del motor: 02-ddt/plan-motor.md
   - Decisiones (ADR):
       - 03-adr/index.md
       - Plantilla: 03-adr/0000-plantilla.md
