@@ -34,6 +34,7 @@ juego y se transfiere al juego objetivo en su etapa inicial.
 | [RN-17](#rn-17) | Primar los tipos más eficaces frente a los combates clave del juego | Blanda | Activable y peso | Vigente |
 | [RN-18](#rn-18) | Los datos sin verificar los confirma el usuario | Mecanismo | No | Vigente |
 | [RN-19](#rn-19) | A igual puntuación, se prefieren los Pokémon con dos tipos | Mecanismo | No | Vigente |
+| [RN-20](#rn-20) | Penalizar las evoluciones aleatorias | Blanda | Activable y peso | Vigente |
 
 Estados posibles:
 
@@ -73,7 +74,7 @@ favoritos ([RN-18](#rn-18)). Después, las reglas se aplican en este orden:
    presencia activas ([RN-13](#rn-13), [RN-14](#rn-14)).
 5. **Puntuación**. Entre los equipos de 6 que cumplen todo lo anterior, se eligen los de mayor
    puntuación ([RN-04](#rn-04)) según las reglas blandas activas ([RN-06](#rn-06),
-   [RN-15](#rn-15), [RN-17](#rn-17)). Los empates se resuelven prefiriendo a los Pokémon con
+   [RN-15](#rn-15), [RN-17](#rn-17), [RN-20](#rn-20)). Los empates se resuelven prefiriendo a los Pokémon con
    dos tipos ([RN-19](#rn-19)). Los tipos, la tabla de eficacias y los métodos de evolución
    son los del juego objetivo ([RN-10](#rn-10)).
 6. Si no hay ningún equipo de 6, se explica el motivo y se muestra el equipo incompleto más
@@ -84,7 +85,7 @@ flowchart LR
     F[Favoritos] -- "RN-03 · RN-11 · RN-16<br/>filtros por candidato" --> V[Candidatos<br/>válidos]
     V -- "RN-01 · RN-07 · RN-12 · RN-14<br/>restricciones de equipo" --> C[Combinaciones<br/>válidas]
     C -- "RN-13 · RN-14<br/>presencia obligatoria" --> P[Equipos<br/>admisibles]
-    P -- "RN-04: RN-06 · RN-15 · RN-17<br/>puntuación · RN-19 desempate" --> E[Mejores<br/>equipos de 6]
+    P -- "RN-04: RN-06 · RN-15 · RN-17 · RN-20<br/>puntuación · RN-19 desempate" --> E[Mejores<br/>equipos de 6]
     P -. "ninguno de 6<br/>RN-08" .-> A[Equipo incompleto<br/>y sugerencias]
 ```
 
@@ -307,8 +308,14 @@ parámetros son fijos.
       Cuenta como no aprendido por nivel el movimiento que la evolución anterior solo tiene
       a nivel 1, porque en la práctica hay que recurrir al recordador
       ([CA-32](cuestiones-abiertas.md#resueltas)).
+    - Evoluciones con resultado **aleatorio**, que no se puede elegir (Wurmple → Silcoon o
+      Cascoon, según la personalidad). No exigen nada especial, pero pueden dar una evolución
+      distinta de la de favoritos y romper el equipo planificado
+      ([CA-35](cuestiones-abiertas.md#resueltas)). Además, [RN-20](#rn-20) las penaliza
+      aparte, con más fuerza.
     - Otros requisitos poco habituales: clima, girar la consola, golpes críticos, daño recibido,
-      etc.
+      etc. Por ejemplo, Nincada → Shedinja, que exige un hueco libre en el equipo y una Poké
+      Ball ([CA-35](cuestiones-abiertas.md#resueltas)).
     - Cualquier evolución que **no se puede hacer en el juego objetivo** y obliga a evolucionar
       al Pokémon en otro juego y transferirlo, siempre que la transferencia sea posible antes
       de completar el juego. Si no lo es, el Pokémon no es candidato ([RN-03](#rn-03)).
@@ -318,6 +325,8 @@ parámetros son fijos.
 - **Ejemplos**:
     - Gengar puntúa en contra, porque Haunter evoluciona por intercambio.
     - Raichu no puntúa en contra, porque evoluciona con la Piedra Trueno.
+    - Beautifly y Dustox puntúan en contra, porque Wurmple evoluciona al azar en Silcoon o
+      Cascoon.
     - Milotic puntúa en contra en Pokémon Esmeralda (belleza), pero en Pokémon Negro evoluciona
       por intercambio con Escama Bella, que también es tedioso.
 
@@ -381,6 +390,30 @@ parámetros son fijos.
   tipo Agua cubre el ataque (×4). Uno de tipo Lucha cubre la defensa: resiste Roca y no es
   débil a Tierra.
 
+### RN-20 · Penalizar las evoluciones aleatorias { #rn-20 }
+
+- **Tipo**: blanda. Se recomienda un peso alto, para que un miembro con evolución aleatoria
+  solo se elija si no hay alternativa razonable ([CA-37](cuestiones-abiertas.md#resueltas)).
+- **Descripción**: puntúa en contra los miembros que necesitan una **evolución aleatoria**
+  para llegar a la evolución de favoritos ([RN-09](#rn-09)): una evolución cuyo resultado no
+  puede elegir el jugador. Se revisan los mismos pasos que en [RN-15](#rn-15), desde la etapa
+  que nace del huevo y con los métodos del juego objetivo ([RN-10](#rn-10)).
+- **Motivo**: el equipo se planifica antes de empezar el juego. Si se cría un Wurmple para
+  llegar a Beautifly y evoluciona en Cascoon, se acaba con Dustox y el plan del equipo se
+  rompe. Por eso se penaliza mucho más que una evolución tediosa, que se puede completar con
+  esfuerzo.
+- **Relación con [RN-15](#rn-15)**: las evoluciones aleatorias también son tediosas, así que
+  un miembro con evolución aleatoria puntúa en contra en las dos reglas. Las penalizaciones se
+  suman.
+- **Puntuación**: 1 si ningún miembro necesita una evolución aleatoria; 0 en caso contrario.
+- **Ejemplos**:
+    - Un equipo con Beautifly o Dustox puntúa 0, porque Wurmple evoluciona al azar en Silcoon
+      o Cascoon.
+    - Un equipo con Gengar puntúa 1: Haunter evoluciona por intercambio, que es tedioso
+      ([RN-15](#rn-15)), pero no aleatorio.
+    - Con los pesos por defecto, Beautifly resta 5,5 puntos al equipo (0,5 por RN-15 y 5 por
+      RN-20), y Gengar, 0,5.
+
 ## Mecanismos
 
 ### RN-04 · Se eligen los equipos con mayor puntuación ponderada { #rn-04 }
@@ -404,7 +437,7 @@ parámetros son fijos.
 - **Fórmula**: `P(equipo) = Σ peso(r) · s(r, equipo)` para cada regla blanda activa `r`,
   con `s(r, equipo)` entre 0 y 1.
 - **Pesos** ([CA-05](cuestiones-abiertas.md#resueltas)): enteros de 0 a 10. Por defecto,
-  [RN-17](#rn-17) = 10, [RN-15](#rn-15) = 3 y [RN-06](#rn-06) = 1.
+  [RN-17](#rn-17) = 10, [RN-20](#rn-20) = 5, [RN-15](#rn-15) = 3 y [RN-06](#rn-06) = 1.
 
 ### RN-08 · Equipo incompleto y sugerencias cuando no se llega a 6 { #rn-08 }
 

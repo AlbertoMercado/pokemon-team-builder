@@ -15,12 +15,7 @@ afectadas.
 
 ## Aplazadas
 
-Dependen de la planificación de la ingesta, que queda fuera del alcance de esta versión del
-DDF.
-
-| ID | Cuestión | Afecta a | Cuándo se decide |
-|----|----------|----------|------------------|
-| CA-11 | Qué generaciones y juegos incluye la carga inicial. Los juegos objetivo empiezan en la 2.ª generación (CA-29), aunque se necesitan datos de especies de la 1.ª. | RF-05, RF-11 | Al planificar la ingesta de datos. |
+Ninguna por ahora.
 
 ## Resueltas
 
@@ -34,8 +29,9 @@ DDF.
 | CA-07 | ¿Qué se guarda de cada miembro en el Hall of Fame? | Nombre y tipo o tipos (RF-12). |
 | CA-08 | ¿Qué significa «disponible en el juego»? | Un Pokémon es candidato si existe en el juego, aunque no se pueda atrapar en él. Ver CA-12 (RN-03). |
 | CA-09 | ¿Cómo se desempata? | Se recomiendan todos los equipos empatados (RN-04). Modificada por CA-34: antes se desempata por el número de miembros con dos tipos. |
-| CA-05 | Escala de los pesos de las reglas blandas y valores por defecto. | Pesos enteros de 0 a 10. Por defecto: RN-17 = 10, RN-15 = 3 y RN-06 = 1 (RN-04). |
+| CA-05 | Escala de los pesos de las reglas blandas y valores por defecto. | Pesos enteros de 0 a 10. Por defecto: RN-17 = 10, RN-15 = 3 y RN-06 = 1 (RN-04). Ampliada por CA-37: RN-20 = 5. |
 | CA-10 | ¿Qué reglas forman el catálogo de la primera versión y de qué tipo es cada una? | Un catálogo estático: las reglas RN-01 a RN-10 y las nuevas RN-11 a RN-17. El usuario solo las activa o desactiva y ajusta los pesos de las blandas; los parámetros (Dragonite, Eevee…) son fijos. |
+| CA-11 | ¿Qué generaciones y juegos incluye la carga inicial? | Las 386 especies de las generaciones 1 a 3 (de #0001 Bulbasaur a #0386 Deoxys), solo en su forma por defecto, y los 11 juegos de esas generaciones. Son juego objetivo los 5 de la 3.ª generación (Rubí, Zafiro, Esmeralda, Rojo Fuego y Verde Hoja), empezando por Rojo Fuego y Verde Hoja. Los de la 1.ª y la 2.ª se cargan para el recorrido. Las formas regionales se cargarán con la generación que las introduce ([plan de carga](../02-ddt/plan-carga-datos.md), RF-05, RF-11). |
 | CA-12 | ¿Qué Pokémon «existen» en una generación? | Los que aparecen en alguno de sus juegos. El filtro es doble: primero por generación y después por el juego, aunque el Pokémon no se pueda atrapar en él (RN-03). |
 | CA-13 | ¿Qué otras formas cuentan como Pokémon distintos? | Ninguna aparte de las regionales. Las formas que cambian de forma dinámica en el juego (megaevolución, Gigamax, Rotom, Deoxys…) no se tienen en cuenta (RN-05). |
 | CA-14 | ¿Vulpix y Vulpix de Alola cuentan como la misma especie? | Sí, pero no se descartan: tener varias formas de la misma especie solo resta puntuación, con un peso pequeño (RN-06). |
@@ -58,3 +54,6 @@ DDF.
 | CA-32 | ¿Es tediosa una evolución que exige conocer un movimiento que la evolución anterior solo aprende a nivel 1? | Sí. Aunque las fuentes lo registren como aprendizaje por nivel, en la práctica hay que enseñárselo con el recordador (RN-15). |
 | CA-33 | ¿Cómo se muestran los empates, que se multiplican porque la puntuación depende sobre todo de los tipos? | Se agrupan los equipos que solo se diferencian en miembros intercambiables: mismos tipos en el juego objetivo y ambos equipos válidos. Por ejemplo, Lapras o Cloyster (Agua/Hielo). Una evolución de Eevee nunca es intercambiable con otro Pokémon, porque es obligatoria por RN-14 (RN-04). |
 | CA-34 | ¿Hay algún criterio de desempate antes de mostrar todos los equipos empatados? | Sí: a igual puntuación, se prefieren los equipos con más miembros con dos tipos en el juego objetivo, y entre sugerencias que aportan lo mismo, primero las de dos tipos. Es un desempate, no una regla blanda: no suma puntuación y solo actúa cuando hay empate (RN-19). |
+| CA-35 | ¿Son tediosas las evoluciones de Wurmple (Silcoon o Cascoon, al azar según la personalidad) y de Nincada a Shedinja? | Ambas. Shedinja exige un hueco libre en el equipo y una Poké Ball, y con un equipo de 6 obliga a dejar un miembro en la caja. Wurmple no es tediosa en sentido estricto, pero su resultado es aleatorio: criar un Wurmple para llegar a Beautifly y acabar con Dustox arruina la planificación del equipo, así que se penaliza como tediosa (RN-15). |
+| CA-36 | ¿Qué etapa nace del huevo en las líneas con bebé de incienso, como Azurill (Marill) y Wynaut (Wobbuffet), en las que el bebé solo nace si un progenitor lleva un incienso? | La que nace sin incienso (Marill, Wobbuffet), porque no exige ningún objeto. Se guarda como dato curado (RN-03, RN-15, CA-25). |
+| CA-37 | ¿Deben penalizarse las evoluciones aleatorias más que el resto de evoluciones tediosas? | Sí, con una regla blanda propia, RN-20, que se suma a RN-15. Puntúa 0 si algún miembro necesita una evolución aleatoria, y su peso por defecto es 5: con los pesos por defecto, un miembro con evolución aleatoria resta unas 11 veces más que uno que evoluciona por intercambio. |

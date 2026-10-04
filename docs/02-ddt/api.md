@@ -61,7 +61,7 @@ de los 6 miembros):
 ```json
 {
   "status": "complete",
-  "score": "13.5",
+  "score": "18.5",
   "groups": [
     {
       "members": [
@@ -71,6 +71,7 @@ de los 6 miembros):
       ],
       "breakdown": [
         {"rule_id": "RN-17", "weight": 10, "score": "0.95", "contribution": "9.5"},
+        {"rule_id": "RN-20", "weight": 5, "score": "1", "contribution": "5"},
         {"rule_id": "RN-15", "weight": 3, "score": "1", "contribution": "3"},
         {"rule_id": "RN-06", "weight": 1, "score": "1", "contribution": "1"}
       ],
