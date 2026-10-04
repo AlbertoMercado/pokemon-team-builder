@@ -163,6 +163,121 @@ ERROR: la carga ha fallado; se conserva la base de datos anterior.
   - Comprobación fallida: species: 50 filas, se esperaban 386
 ```
 
+## Consultar los datos
+
+`reference.sqlite` es un fichero SQLite normal: se puede abrir con cualquier herramienta de
+SQLite, solo para leer. Las tablas y columnas están explicadas en el
+[modelo de datos](../02-ddt/modelo-datos.md).
+
+### En el navegador, con Datasette (recomendado)
+
+```bash
+uvx datasette data/reference.sqlite
+```
+
+Abre <http://127.0.0.1:8001>: todas las tablas con filtros por columna y orden, un recuadro
+para escribir consultas SQL y exportación a CSV o JSON. `uvx` ejecuta
+[Datasette](https://datasette.io/) aparte, sin instalarlo en el proyecto. Se para con
+`Ctrl+C`.
+
+### Con una aplicación de escritorio
+
+- [DB Browser for SQLite](https://sqlitebrowser.org/): `brew install --cask db-browser-for-sqlite`
+  y abrir el fichero.
+- VS Code, con una extensión de SQLite (p. ej., *SQLite Viewer*): basta con abrir el fichero
+  desde el explorador.
+
+### En la terminal, con `sqlite3`
+
+`sqlite3` viene con macOS:
+
+```bash
+sqlite3 -header -column data/reference.sqlite
+```
+
+`.tables` lista las tablas, `.schema <tabla>` muestra sus columnas y `.quit` sale. Los valores
+sí/no se ven como `1` y `0`.
+
+### Consultas de ejemplo
+
+Tipos de unos Pokémon en la 3.ª generación ([RN-10](../01-ddf/reglas-negocio.md#rn-10)):
+
+```sql
+SELECT s.dex_number AS num, p.name_es AS nombre, group_concat(t.name_es, '/') AS tipos
+FROM pokemon p
+JOIN species s ON s.slug = p.species
+JOIN pokemon_type pt ON pt.pokemon = p.slug AND pt.generation = 3
+JOIN type t ON t.slug = pt.type
+WHERE p.slug IN ('bulbasaur', 'clefairy', 'magnemite')
+GROUP BY p.slug ORDER BY s.dex_number;
+```
+
+```text
+num  nombre     tipos
+---  ---------  ---------------
+  1  Bulbasaur  Planta/Veneno
+ 35  Clefairy   Normal
+ 81  Magnemite  Eléctrico/Acero
+```
+
+Pokémon que, según la propuesta, no pueden llegar a Rojo Fuego antes de completarlo
+([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Son 246: los 11 de Kanto que nacen como
+bebé de la 2.ª generación y todos los de la 2.ª y la 3.ª:
+
+```sql
+SELECT p.name_es
+FROM game_pokemon g JOIN pokemon p ON p.slug = g.pokemon
+WHERE g.game = 'firered' AND NOT g.can_arrive;
+```
+
+Combates clave de Rojo Fuego con sus equipos ([RN-17](../01-ddf/reglas-negocio.md#rn-17)):
+
+```sql
+SELECT b."order", b.trainer_name, group_concat(p.pokemon || ' ' || p.level, ', ') AS equipo
+FROM key_battle b JOIN key_battle_pokemon p ON p.battle = b.slug
+WHERE b.game = 'firered'
+GROUP BY b.slug ORDER BY b."order";
+```
+
+```text
+order  trainer_name    equipo
+-----  --------------  ---------------------------------
+    1  Brock           geodude 12, onix 14
+    2  Misty           staryu 18, starmie 21
+    3  Teniente Surge  voltorb 21, pikachu 18, raichu 24
+  …
+```
+
+Cómo evolucionan unos Pokémon en Rojo Fuego y Verde Hoja
+([RN-15](../01-ddf/reglas-negocio.md#rn-15)):
+
+```sql
+SELECT from_pokemon, to_pokemon, trigger, conditions
+FROM evolution_step
+WHERE version_group = 'firered-leafgreen' AND to_pokemon IN ('gengar', 'slowking', 'raichu');
+```
+
+```text
+from_pokemon  to_pokemon  trigger   conditions
+------------  ----------  --------  ---------------------------------
+pikachu       raichu      use-item  {"trigger_item": "thunder-stone"}
+haunter       gengar      trade     {}
+slowpoke      slowking    trade     {"held_item": "kings-rock"}
+```
+
+Datos que tendrá que confirmar el usuario: las mecánicas de un juego
+([RN-18](../01-ddf/reglas-negocio.md#rn-18)):
+
+```sql
+SELECT fact_key, value, origin FROM game_mechanic WHERE game = 'firered';
+```
+
+Con qué datos se construyó el fichero:
+
+```sql
+SELECT pokeapi_commit, games, started_at, finished_at FROM ingest_run;
+```
+
 ## Implementación
 
 Código en `ingest/` ([estructura del código](../02-ddt/estructura-codigo.md)):
