@@ -4,6 +4,7 @@ They fill in sensible defaults so each test only states what matters to it, e.g.
 ``pokemon("gengar", ("ghost", "poison"), line=("gastly", "haunter"), steps=[...])``.
 """
 
+import zlib
 from collections.abc import Iterable, Mapping, Sequence
 from itertools import pairwise
 
@@ -75,7 +76,7 @@ def pokemon(
     stages: Sequence[Stage] | None = None,
     dex_number: int = 1,
     generation: int = 1,
-    chain: int = 1,
+    chain: int | None = None,
     egg_groups: Iterable[str] = ("monster",),
     species: str | None = None,
     region: str | None = None,
@@ -85,7 +86,8 @@ def pokemon(
     """A form whose line is ``line`` (earlier stages) plus itself.
 
     Without ``steps``, consecutive stages evolve by level; without ``stages``, they are
-    plain stages. ``egg_groups`` are those of the whole line.
+    plain stages. Without ``chain``, the line gets its own chain, derived from its first
+    stage. ``egg_groups`` are those of the whole line.
     """
     slugs = (*line, slug)
     if stages is None:
@@ -99,7 +101,7 @@ def pokemon(
         name=slug.capitalize(),
         generation=generation,
         types=tuple(types),
-        evolution_chain=chain,
+        evolution_chain=chain if chain is not None else zlib.crc32(slugs[0].encode()),
         stages=tuple(stages),
         line_egg_groups=frozenset(egg_groups),
         evolution_steps=tuple(steps),

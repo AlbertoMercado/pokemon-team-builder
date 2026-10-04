@@ -5,11 +5,12 @@ equipos, y cómo se usa. El plan completo, con las fases y la interpretación de
 está en el [plan de implementación del motor](plan-motor.md).
 
 !!! note "Estado"
-    Fases 1 a 3 de 6: modelos del dominio, tabla de tipos, catálogo de reglas con la
+    Fases 1 a 4 de 6: modelos del dominio, tabla de tipos, catálogo de reglas con la
     configuración del usuario, filtros por candidato (RN-03, RN-11 y RN-16), dificultad de
-    las evoluciones, reglas blandas (RN-06, RN-15, RN-17 y RN-20) y puntuación con su
-    desglose y su desempate (RN-04, RN-19). La búsqueda y las sugerencias llegan en las
-    fases 4 a 6.
+    las evoluciones, reglas blandas y puntuación (RN-04, RN-06, RN-15, RN-17, RN-19 y RN-20),
+    reglas de equipo (RN-07, RN-12, RN-13 y RN-14) y `generate()` con los equipos completos.
+    El equipo incompleto con sugerencias, la agrupación de empates y la revisión de datos
+    llegan en las fases 5 y 6.
 
 ## Restricciones
 
@@ -229,6 +230,20 @@ Wurmple, Nincada → Shedinja y, por ser imposibles en el juego, Espeon, Umbreon
 Cada regla blanda puntúa un equipo entre 0 y 1 y dice qué miembros cuentan en contra
 (`SoftScore`). `SOFT_RULES` las reúne por identificador.
 
+La puntuación no es aditiva por miembro, porque RN-17 depende de la combinación. Lo que cada
+regla necesita de un miembro se calcula una sola vez, en su **perfil** (`MemberProfile`), y las
+reglas puntúan el equipo a partir de los perfiles. Así la búsqueda puede puntuar miles de
+equipos sin repetir cálculos ([algoritmo](algoritmo-generacion.md#forma-del-problema)):
+
+| Campo del perfil | Para | Qué es |
+|------------------|------|--------|
+| `tedious`, `random` | RN-15, RN-20 | Lo que dice `evolution.assess` del miembro. |
+| `attack`, `defense` | RN-17 | Conjuntos de bits sobre los Pokémon rivales de todos los combates (`Rivals`): a cuáles ataca con superefectividad y frente a cuáles cubre la defensa. La cobertura de un equipo es la unión de los de sus miembros. |
+
+`Rivals.of(combates)` da un bit a cada aparición de un rival, la máscara de bits de cada combate
+y un denominador común, para que RN-17 sume los combates con enteros y cree una sola fracción
+por equipo.
+
 | Clase | Regla | Puntuación |
 |-------|-------|------------|
 | `SameSpeciesRule` | [RN-06](../01-ddf/reglas-negocio.md#rn-06) | 1 si no hay dos formas de la misma especie; si las hay, 0. |
@@ -250,7 +265,9 @@ también la defensa y se llega a 1.
 ## Puntuación (`core/scoring.py`)
 
 `score_team(equipo, ctx)` aplica las reglas blandas activas, en el orden del catálogo, y
-devuelve un `TeamScore`:
+devuelve un `TeamScore`. Para puntuar muchos equipos del mismo contexto, `Scorer(ctx)` guarda el
+perfil de cada miembro: `score(equipo)` devuelve el `TeamScore` y `ranking_key(equipo)` solo la
+clave de comparación, sin construir el desglose.
 
 | Campo | Qué es |
 |-------|--------|
@@ -266,6 +283,102 @@ orden en que llegan. Todo es exacto, con `Fraction`
 Con los pesos por defecto, en un equipo de 6, Beautifly resta 5,5 puntos (0,5 por RN-15 y 5
 por RN-20) y Gengar resta 0,5, como en el ejemplo de RN-20.
 
+## Reglas de equipo (`core/rules/team.py`)
+
+### Restricciones entre miembros
+
+Cada una dice si dos candidatos no pueden estar en el mismo equipo (`conflicts(a, b)`). Juntas
+forman el grafo de incompatibilidades de la búsqueda.
+
+| Clase | Regla | Dos miembros chocan si… |
+|-------|-------|-------------------------|
+| `SameLineConstraint` | [RN-07](../01-ddf/reglas-negocio.md#rn-07) | son de la misma cadena de evolución (Jolteon y Vaporeon, Rhydon y Rhyperior). |
+| `SharedTypeConstraint` | [RN-12](../01-ddf/reglas-negocio.md#rn-12) | comparten algún tipo en el juego objetivo, como primario o secundario (Charizard y Pidgeot, Gengar y Nidoking). |
+| `SingleEeveeEvolutionConstraint` | [RN-14](../01-ddf/reglas-negocio.md#rn-14) | los dos son evoluciones de Eevee. Eevee no cuenta como evolución. |
+
+`active_pair_constraints(settings)` devuelve las activas y `conflict(a, b, restricciones)`, la
+primera regla que impide que dos miembros vayan juntos, para explicarlo.
+
+### Reglas de presencia
+
+`requirement(válidos, sugeribles)` resuelve cada regla al primer nivel del DDF que se puede
+cumplir y devuelve un `PresenceRequirement` con el nivel, el estado y los Pokémon que la
+cumplen (`options`), en orden canónico. Los **sugeribles** son los Pokémon del juego que no
+son favoritos y pasan los filtros por candidato ([CA-40](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+| Regla | Nivel | Estado | `options` |
+|-------|-------|--------|-----------|
+| [RN-13](../01-ddf/reglas-negocio.md#rn-13) (`DragonPresence`) | 1 | `candidates` | Dragonite, si es candidato válido. |
+| | 2 | `candidates` | Los candidatos válidos de tipo primario Dragón (Garchomp sí, Kingdra no). |
+| | 3 | `reserved` | Los sugeribles de tipo primario Dragón: se reserva un hueco. |
+| | 4 | `unmet` | Ninguno: se genera el equipo sin la regla. |
+| [RN-14](../01-ddf/reglas-negocio.md#rn-14) (`EeveePresence`) | 1 | `candidates` | Las evoluciones de Eevee candidatas. |
+| | 2 | `reserved` | Las evoluciones de Eevee sugeribles. |
+| | 3 | `unmet` | Ninguna. |
+
+Con el estado `candidates`, el equipo tiene que incluir **al menos uno** de `options`. Que
+incluya solo uno lo garantizan RN-12 (dos de tipo primario Dragón comparten tipo) y la
+restricción de RN-14.
+
+## Motor (`core/engine/`)
+
+`generate(ctx)` devuelve un `GenerationResult`
+([algoritmo](algoritmo-generacion.md#procedimiento)):
+
+1. **Filtros por candidato** (`valid_candidates`): candidatos válidos y descartes.
+2. **Presencia** (`presence_requirements`): el nivel de RN-13 y RN-14, si están activas. Si
+   alguna reserva un hueco, el resultado es incompleto.
+3. **Búsqueda** (`search.teams`): todos los equipos de 6 candidatos sin conflictos entre ellos
+   que incluyen al menos uno de cada `options` con estado `candidates`.
+4. **Puntuación** (`search.best_teams` con un `Scorer`): se quedan los de mayor clave
+   `(puntuación, miembros con dos tipos)`, es decir, la mejor puntuación con el desempate de
+   [RN-19](../01-ddf/reglas-negocio.md#rn-19) ya aplicado. Si siguen empatados, se devuelven
+   todos ([RN-04](../01-ddf/reglas-negocio.md#rn-04)).
+
+### Búsqueda (`core/engine/search.py`)
+
+Los candidatos se numeran en orden canónico y cada uno tiene un conjunto de bits con los que
+choca. La búsqueda con retroceso añade candidatos en orden creciente y poda una rama en
+cuanto:
+
+- quedan menos candidatos compatibles que huecos por llenar, o
+- un conjunto obligatorio de presencia ya no puede cumplirse con lo elegido ni con lo que queda.
+
+Los equipos salen en orden lexicográfico de sus índices canónicos, así que el resultado solo
+depende de la entrada ([RF-08](../01-ddf/requisitos-funcionales.md#rf-08)): el orden de los
+favoritos no importa.
+
+### Resultado (`core/engine/result.py`)
+
+| Campo | Qué es |
+|-------|--------|
+| `status` | `complete` si hay equipos de 6 favoritos; si no, `incomplete` ([RN-08](../01-ddf/reglas-negocio.md#rn-08)). |
+| `teams` | Los equipos empatados en cabeza (`RankedTeam`: miembros en orden canónico y su `TeamScore`), en orden canónico. Vacío si el resultado es incompleto. |
+| `discards` | Los favoritos descartados por los filtros, con su motivo ([RF-10](../01-ddf/requisitos-funcionales.md#rf-10)). |
+| `presence` | El `PresenceRequirement` de cada regla de presencia activa. |
+| `valid_candidates` | Los candidatos válidos, en orden canónico. |
+| `incomplete_reason` | Si es incompleto: `reserved_slot` (una regla de presencia necesita un Pokémon que no es favorito), `not_enough_candidates` (menos de 6 válidos) o `no_valid_team` (hay 6 o más, pero no 6 que cumplan juntos las reglas). |
+
+!!! note "Fase 5"
+    Con un resultado incompleto, `teams` está vacío. El equipo incompleto con el mayor número
+    de favoritos, las sugerencias para los huecos y la agrupación de empates llegan en la
+    fase 5 del [plan](plan-motor.md#fases).
+
+### Rendimiento
+
+Escenario real de Rojo Fuego (28 candidatos válidos de 30 favoritos, 13 combates clave y 24
+Pokémon rivales), en un Mac con Apple Silicon:
+
+| Configuración | Tiempo | Equipos empatados |
+|---------------|--------|-------------------|
+| Por defecto | 0,04 s | 3 |
+| Sin RN-12 | 0,7 s | 6 |
+| Sin RN-12, RN-13 ni RN-14 | 5,6 s | 51 |
+
+RN-12 y las reglas de presencia podan la mayor parte de la búsqueda. Sin ellas se recorren
+unos 300 000 equipos; si llega a hacer falta, se añadirá ramificación y poda con una cota de la
+puntuación ([algoritmo](algoritmo-generacion.md#tamano-de-la-busqueda)).
+
 ## Pruebas
 
 | Fichero | Qué comprueba |
@@ -278,9 +391,20 @@ por RN-20) y Gengar resta 0,5, como en el ejemplo de RN-20.
 | `tests/core/test_evolution.py` | Gengar, Raichu, Milotic, Espeon y Beautifly en Rojo Fuego y en Esmeralda, cada método de CA-20, condiciones desconocidas, métodos alternativos y pasos anteriores a la etapa que nace del huevo (RN-15, RN-20). |
 | `tests/core/rules/test_soft.py` | RN-06 (Vulpix y Vulpix de Alola), RN-15, RN-20 y RN-17 con el ejemplo de Brock, el peso de cada combate y de cada rival, y la tabla de tipos de la generación. Que cada regla blanda del catálogo esté implementada. |
 | `tests/core/test_scoring.py` | Pesos por defecto en el desglose, el ejemplo de Beautifly y Gengar, reglas desactivadas y con peso 0, desempate de Lapras y Blastoise (RN-19) y, con hypothesis, que el total sea la suma del desglose, esté entre 0 y la suma de pesos y no dependa del orden de los miembros. |
+| `tests/core/rules/test_team.py` | RN-07 (Jolteon y Vaporeon, Rhydon y Rhyperior), RN-12 (Charizard y Pidgeot, Gengar y Nidoking), RN-14 como restricción y los niveles de RN-13 (Kingdra y Garchomp) y de RN-14. |
+| `tests/core/engine/test_generate.py` | `generate` con los ejemplos del DDF: equipos de 6 favoritos (RN-01, RN-02), resultado incompleto y su motivo, todos los empatados (RN-04), Lapras antes que Blastoise (RN-19), Dragonite antes que un equipo de 6 (RN-13), una sola de Vaporeon, Jolteon y Flareon elegida por puntuación (RN-14) y determinismo. |
+| `tests/core/test_engine_properties.py` | Con hypothesis, contextos aleatorios de hasta 12 favoritos: el motor devuelve exactamente los mejores equipos de una búsqueda por fuerza bruta, todos cumplen las reglas duras activas, el resultado es reproducible y `Scorer.ranking_key` coincide con la puntuación completa. |
+| `tests/core/test_scenario_firered.py` | Escenario real de Rojo Fuego: los equipos esperados con las reglas por defecto, los descartes, las reglas de presencia, RN-12, que tarda menos de un segundo y que sin RN-12 la cobertura es completa. |
 | `tests/core/rules/test_candidate.py` | Los tres niveles de RN-03 (Vulpix, Treecko, Growlithe de Hisui y Raichu), RN-11 y RN-16 con su motivo, las reglas desactivadas, el orden entre filtros y el orden canónico. |
 
 `tests/core/builders.py` tiene constructores de datos de prueba legibles, que usarán todas las
 fases: `pokemon("gengar", ("ghost", "poison"), line=("gastly", "haunter"), steps=[...])`,
 `type_chart(overrides={("water", "rock"): 200})`, `candidate(...)`, `battle(...)` y
-`context(...)`. Cada test solo indica lo que le importa.
+`context(...)`. Cada test solo indica lo que le importa. Sin `chain`, cada línea tiene su propia
+cadena de evolución, derivada de su primera etapa, para que RN-07 no relacione Pokémon que no
+tienen nada que ver.
+
+El escenario real (`tests/core/scenario.py`) construye el contexto de Rojo Fuego a partir de
+`tests/core/fixtures/firered.json`, un extracto de un `reference.sqlite` real con los 140
+Pokémon que pueden llegar al juego, la tabla de tipos de la 3.ª generación y los 13 combates
+clave. Cómo se regenera está en el README de ese directorio.
