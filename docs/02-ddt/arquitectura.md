@@ -48,7 +48,7 @@ a la base de datos ni al sistema de ficheros, y solo depende de la biblioteca es
 | `engine/` | Filtros, grafo de incompatibilidades, búsqueda con retroceso, ordenación, agrupación de empates y sugerencias ([algoritmo](algoritmo-generacion.md)). |
 | `journey.py` | Exclusiones del recorrido a partir del *Hall of Fame* ([RN-16](../01-ddf/reglas-negocio.md#rn-16)). |
 | `review.py` | Qué datos sin verificar intervienen en una generación ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). |
-| `evolution.py` | Clasificación de los métodos de evolución en tediosos o no, y si se pueden hacer en un juego ([RN-15](../01-ddf/reglas-negocio.md#rn-15)). |
+| `evolution.py` | Clasificación de los métodos de evolución en tediosos o no y en aleatorios o no, y si se pueden hacer en un juego ([RN-15](../01-ddf/reglas-negocio.md#rn-15), [RN-20](../01-ddf/reglas-negocio.md#rn-20)). |
 | `breeding.py` | Si una línea se puede criar y qué etapa nace del huevo ([RN-11](../01-ddf/reglas-negocio.md#rn-11), [CA-25](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 
 Cada regla implementa la interfaz de su clase y devuelve su resultado junto con su
@@ -61,7 +61,7 @@ identificador. Así salen solos los motivos de descarte
 | Filtro por candidato | `exclusion(candidate, ctx) -> Discard \| None` | RN-03, RN-11, RN-16 |
 | Restricción entre pares | `conflicts(a, b, ctx) -> bool` | RN-07, RN-12, RN-14 (máximo una) |
 | Presencia | `tiers(ctx) -> list[Tier]`, niveles por prioridad | RN-13, RN-14 (al menos una) |
-| Blanda | `score(team, ctx) -> Fraction` entre 0 y 1 | RN-06, RN-15, RN-17 |
+| Blanda | `score(team, ctx) -> Fraction` entre 0 y 1 | RN-06, RN-15, RN-17, RN-20 |
 | Desempate | `tie_break_key(team, ctx) -> int` | RN-19 |
 
 Las reglas estructurales (RN-01, RN-02, RN-05, RN-09) y los mecanismos (RN-04, RN-08, RN-10,

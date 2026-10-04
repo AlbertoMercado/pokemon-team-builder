@@ -113,8 +113,8 @@ Hay dos excepciones:
 
 - **Prioridad**: Must
 - **Descripción**: el usuario activa o desactiva las reglas blandas del catálogo predefinido
-  ([RN-06](reglas-negocio.md#rn-06), [RN-15](reglas-negocio.md#rn-15) y
-  [RN-17](reglas-negocio.md#rn-17)) y asigna un peso a cada una
+  ([RN-06](reglas-negocio.md#rn-06), [RN-15](reglas-negocio.md#rn-15),
+  [RN-17](reglas-negocio.md#rn-17) y [RN-20](reglas-negocio.md#rn-20)) y asigna un peso a cada una
   ([RN-04](reglas-negocio.md#rn-04)).
 - **Criterios de aceptación**:
     - Cada regla blanda muestra una descripción de lo que puntúa.

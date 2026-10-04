@@ -95,11 +95,13 @@ Casos de las especies 1 a 386 hasta Rojo Fuego y Verde Hoja, con la clasificaci�
 | Subir de nivel con belleza | Feebas → Milotic | Sí |
 | Usar un objeto | Pikachu → Raichu, Eevee → Vaporeon | No |
 | Intercambio, con o sin objeto | Haunter → Gengar, Onix → Steelix, Clamperl → Huntail | Sí |
-| Subir de nivel según la personalidad (al azar) | Wurmple → Silcoon o Cascoon | Sí, por ser aleatoria ([CA-35](../01-ddf/cuestiones-abiertas.md#resueltas)) |
+| Subir de nivel según la personalidad (al azar) | Wurmple → Silcoon o Cascoon | Sí, por ser aleatoria ([CA-35](../01-ddf/cuestiones-abiertas.md#resueltas)); además penaliza en [RN-20](../01-ddf/reglas-negocio.md#rn-20) |
 | Muda (`shed`) | Nincada → Shedinja | Sí ([CA-35](../01-ddf/cuestiones-abiertas.md#resueltas)) |
 
 La ingesta guarda el disparador y las condiciones tal como vienen. Decidir si un paso es
-tedioso lo hace `core/evolution.py` ([modelo de datos](modelo-datos.md#evoluciones)).
+tedioso o aleatorio lo hace `core/evolution.py` ([modelo de datos](modelo-datos.md#evoluciones)).
+En PokeAPI, las evoluciones aleatorias se reconocen por `percentage_chance` o
+`condition_expression`.
 
 ### Crianza
 
@@ -110,7 +112,8 @@ tedioso lo hace `core/evolution.py` ([modelo de datos](modelo-datos.md#evolucion
   los 10 bebés, Unown, Nidorina y Nidoqueen. Ditto es el único del grupo `ditto`.
 - La etapa que nace del huevo es la primera de la cadena (`evolves_from_species_id` vacío).
   Azurill y Wynaut solo nacen si un progenitor lleva un incienso; sin él nacen Marill y
-  Wobbuffet ([CA-36](../01-ddf/cuestiones-abiertas.md#abiertas)).
+  Wobbuffet. Se toma como etapa de entrada la que nace sin incienso (Marill y Wobbuffet), y se
+  guarda como dato curado ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 ### Existencia y llegada
 
@@ -134,6 +137,7 @@ esquemas se definen y documentan en la fase 4.
 |---------|-----------|---------------------|
 | `pokeapi.yaml` | Commit fijado del volcado de PokeAPI. | — |
 | `games.yaml` | Qué juegos son juego objetivo y sus mecánicas: ciclo de día y noche (Rubí, Zafiro y Esmeralda tienen reloj; Rojo Fuego y Verde Hoja, no) y concursos (solo Rubí, Zafiro y Esmeralda). | Inferido |
+| `breeding.yaml` | Etapa de entrada de las líneas con bebé de incienso: Marill y Wobbuffet en lugar de Azurill y Wynaut ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). | Automático (decisión funcional) |
 | `arrival.yaml` | Regla de llegada de cada juego objetivo (Pokédex regional de referencia, evoluciones bloqueadas antes de la Pokédex Nacional). | Inferido o pendiente |
 | `key_battles/<juego>.yaml` | Combates clave de cada juego: categoría, entrenador, orden y página de WikiDex. Los equipos se descargan de WikiDex. | Lista curada; equipos automáticos o inferidos |
 

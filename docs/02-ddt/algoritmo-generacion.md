@@ -20,6 +20,7 @@ combinación, así que se evalúa sobre el equipo completo. Sí se puede precalc
   a cuáles ataca con superefectividad y frente a cuáles cubre la defensa. La cobertura de un
   equipo es la unión (OR) de los conjuntos de sus miembros.
 - **RN-15**: si el candidato tiene alguna evolución tediosa (0 o 1).
+- **RN-20**: si el candidato tiene alguna evolución aleatoria (0 o 1).
 - **RN-06**: la especie de cada candidato.
 
 ## Procedimiento
