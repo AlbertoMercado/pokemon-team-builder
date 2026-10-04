@@ -109,7 +109,7 @@ tests e issues.**
 | Hooks de pre-commit | `uv run pre-commit install` / `uv run pre-commit run --all-files` | ✅ |
 | Documentación en local | `uv run mkdocs serve` | ✅ |
 | Construir documentación | `uv run mkdocs build --strict` | ✅ |
-| Ejecutar ingesta | `uv run python -m ingest [--data-dir DIR] [--offline]` ([detalle](docs/05-operacion/ingesta.md)) | ✅ PokeAPI y datos curados; falta WikiDex |
+| Ejecutar ingesta | `uv run python -m ingest [--data-dir DIR] [--offline]` ([detalle](docs/05-operacion/ingesta.md)) | ✅ Rojo Fuego y Verde Hoja completos |
 | Arrancar API | `uv run uvicorn api.main:app --reload` | ⏳ Pendiente |
 | Frontend en desarrollo | `cd web && npm run dev` | ⏳ Pendiente |
 | Lint / formato web | `cd web && npm run lint` / `npm run format` | ⏳ Pendiente |

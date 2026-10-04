@@ -100,7 +100,7 @@ flowchart LR
 | Fuente | Adaptador | Detalle |
 |--------|-----------|---------|
 | PokeAPI | `sources/pokeapi/` | Volcado CSV del repositorio de PokeAPI, fijado a un commit ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)). |
-| WikiDex | `sources/wikidex.py` | API MediaWiki (`action=parse&prop=wikitext`), plantillas `{{Equipo}}` con mwparserfromhell. Caché en disco, una petición por segundo como máximo y `User-Agent` descriptivo. |
+| WikiDex | `sources/wikidex/` | API MediaWiki (`action=parse&prop=wikitext`), plantillas `{{Equipo}}` con mwparserfromhell. Caché en disco, una petición por segundo como máximo y `User-Agent` descriptivo. |
 | Datos curados | `sources/curated/` | `data/curated/*.yaml`, validados con pydantic ([ADR-0005](../03-adr/0005-datos-curados-yaml.md), [datos curados](datos-curados.md)). |
 
 La fase de carga construye `reference.sqlite` en un fichero temporal, comprueba su
@@ -216,7 +216,7 @@ Uso local y personal:
 ```
 core/      domain/, rules/, engine/, journey.py, review.py, evolution.py, breeding.py
 db/        reference/ (SQLModel), user/ (SQLModel + migraciones Alembic)
-ingest/    sources/ (pokeapi/, curated/, wikidex), cli.py, scope.py, load.py, checks.py, report.py
+ingest/    sources/ (pokeapi/, curated/, wikidex/), cli.py, scope.py, load.py, checks.py, report.py
 api/       routers/, services/, repositories/, main.py
 data/      curated/*.yaml (en git), cache/ y *.sqlite (fuera de git)
 web/       src/ (pages, components, api/ con el cliente generado)

@@ -24,7 +24,7 @@ from db.reference import (
     TypeEfficacy,
 )
 from db.sqlite import create_sqlite_engine
-from ingest.checks import FIRST_LOAD_CHECKS, check_counts
+from ingest.checks import FIRST_LOAD_CHECKS, check_counts, check_key_battles
 from ingest.load import build_reference
 from ingest.sources.curated import (
     CuratedData,
@@ -376,7 +376,7 @@ def test_first_load_checks_reject_an_incomplete_load(tmp_path: Path) -> None:
 
 
 def test_known_case_checks_pass_on_the_extract(loaded: Session) -> None:
-    """Every problem of the extract is a count, not a known case."""
+    """Every problem of the extract is a count or a key battle (it has no WikiDex teams)."""
     problems = [problem for check in FIRST_LOAD_CHECKS for problem in check(loaded)]
     assert problems
-    assert set(problems) <= set(check_counts(loaded))
+    assert set(problems) <= set(check_counts(loaded)) | set(check_key_battles(loaded))

@@ -25,6 +25,7 @@ from ingest import cli
 from ingest.load import build_reference
 
 POKEAPI_FIXTURES = Path(__file__).resolve().parent / "fixtures" / "pokeapi"
+REPOSITORY_CURATED = Path(__file__).resolve().parents[2] / "data" / "curated"
 
 
 @dataclass
@@ -171,10 +172,17 @@ def test_sources_from_different_pokeapi_commits_are_rejected(tmp_path: Path) -> 
     assert "varios commits de PokeAPI" in report.errors[0]
 
 
-def _data_dir_with_fixture_cache(tmp_path: Path) -> Path:
-    """Data directory whose PokeAPI cache already has the test extract (no download)."""
+def _data_dir_with_fixture_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Data directory whose PokeAPI cache already has the test extract (no download).
+
+    The extract has no WikiDex pages, so the CLI uses the repository's curated data without
+    key battles.
+    """
     data_dir = tmp_path / "data"
     shutil.copytree(POKEAPI_FIXTURES, data_dir / "cache" / "pokeapi")
+    curated = tmp_path / "curated"
+    shutil.copytree(REPOSITORY_CURATED, curated, ignore=shutil.ignore_patterns("key_battles"))
+    monkeypatch.setattr(cli, "CURATED_DIR", curated)
     return data_dir
 
 
@@ -183,7 +191,7 @@ def test_cli_builds_reference_in_the_data_dir(
 ) -> None:
     # The extract has ~45 species, so the checks of the full first load are disabled here.
     monkeypatch.setattr(cli, "FIRST_LOAD_CHECKS", ())
-    data_dir = _data_dir_with_fixture_cache(tmp_path)
+    data_dir = _data_dir_with_fixture_cache(tmp_path, monkeypatch)
 
     exit_code = cli.main(["--data-dir", str(data_dir), "--offline"])
 
@@ -192,8 +200,10 @@ def test_cli_builds_reference_in_the_data_dir(
     assert "Carga completada." in capsys.readouterr().out
 
 
-def test_cli_fails_when_the_checks_fail(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    data_dir = _data_dir_with_fixture_cache(tmp_path)
+def test_cli_fails_when_the_checks_fail(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    data_dir = _data_dir_with_fixture_cache(tmp_path, monkeypatch)
 
     exit_code = cli.main(["--data-dir", str(data_dir), "--offline"])
 

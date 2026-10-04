@@ -3,7 +3,7 @@
 Usage (from the repository root, with the full CSV dump of the pinned commit cached by a
 real load):
 
-    uv run python tests/ingest/fixtures/pokeapi/extract.py <full-csv-dir>
+    uv run python tests/ingest/fixtures/pokeapi/extract_pokeapi.py <full-csv-dir>
 
 It writes ``tests/ingest/fixtures/pokeapi/<commit>/``: small files are copied whole and
 large ones are filtered to the species in ``SPECIES`` (and the rows they reference). The

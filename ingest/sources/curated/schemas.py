@@ -76,22 +76,32 @@ class ArrivalFile(CuratedModel):
 
 
 class BattleEntry(CuratedModel):
-    """A key battle of the list. Its team is read from ``wikidex_page`` (phase 5)."""
+    """A key battle of the list and where its team is on WikiDex.
+
+    The team is in ``wikidex_page``, in the file's ``wikidex_section``. If that section has
+    several teams, ``wikidex_team`` is the label that precedes the right one (the text of a
+    ``;`` line, e.g. ``En Silph S.A.``). ``rival_starter_lines`` lists the starter lines of
+    the rival, whose Pokémon are left out of the team (CA-26).
+    """
 
     id: Slug = Field(pattern=SLUG_PATTERN)
     category: BattleCategory
     trainer: str
     wikidex_page: str
+    wikidex_team: str | None = None
+    rival_starter_lines: list[Slug] = Field(default_factory=list)
     note: str | None = None
 
 
 class KeyBattlesFile(CuratedModel):
     """``key_battles/<file>.yaml``: key battles shared by the games of a version group.
 
-    The order of ``battles`` is the usual order in the game (RN-17).
+    The order of ``battles`` is the usual order in the game (RN-17). ``wikidex_section`` is
+    the title of the section with the games' teams on every trainer page.
     """
 
     games: list[Slug] = Field(min_length=1)
+    wikidex_section: str
     battles: list[BattleEntry] = Field(min_length=1)
 
     @model_validator(mode="after")

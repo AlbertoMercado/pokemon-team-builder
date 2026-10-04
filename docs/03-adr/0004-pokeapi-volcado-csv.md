@@ -61,7 +61,9 @@ que:
 - [x] Elegir el commit inicial de PokeAPI: `bc92d3b` (2026-09-30). El SHA completo está en
   `data/curated/pokeapi.yaml`, que es la referencia.
 - [ ] Revisar las condiciones de uso de los datos de PokeAPI y de WikiDex (CC BY-NC-SA) e
-  incluir la atribución en la aplicación.
+  incluir la atribución en la aplicación. La ingesta ya guarda la página y la revisión de
+  WikiDex de cada combate clave (`key_battle.source_page` y `source_revision`); falta
+  mostrarla en la interfaz.
 
 ## Referencias
 

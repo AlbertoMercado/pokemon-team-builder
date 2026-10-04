@@ -10,7 +10,9 @@ class KeyBattle(ReferenceModel, table=True):
     """A key battle: gym leader or equivalent, Elite Four, champion, villain boss or rival.
 
     The list of battles is curated; the teams come from WikiDex. A battle whose team could
-    not be parsed with certainty is ``inferred`` and the user confirms it (RN-18).
+    not be read with certainty is ``inferred`` and the user confirms it (RN-18).
+    ``source_page`` and ``source_revision`` say which WikiDex page and revision the team
+    comes from, for traceability and for the attribution its CC BY-NC-SA licence requires.
     """
 
     __tablename__ = "key_battle"
@@ -23,10 +25,17 @@ class KeyBattle(ReferenceModel, table=True):
     order: int
     origin: Origin = Field(sa_type=enum_column(Origin))
     fact_key: str = Field(unique=True)
+    source_page: str | None = None
+    source_revision: int | None = None
 
 
 class KeyBattlePokemon(ReferenceModel, table=True):
-    """A Pokémon of a key battle. The rival's starter is already left out (CA-26)."""
+    """A Pokémon of a key battle (RN-17).
+
+    The rival's starter is already left out (CA-26) and, when the team depends on the
+    player's starter, only the Pokémon common to every variant are kept (CA-38).
+    ``position`` is the Pokémon's position in WikiDex's team.
+    """
 
     __tablename__ = "key_battle_pokemon"
 

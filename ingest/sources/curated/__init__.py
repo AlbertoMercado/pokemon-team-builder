@@ -1,19 +1,19 @@
 """Curated data: versioned YAML files in ``data/curated/`` (ADR-0005).
 
 ``read_curated`` reads and validates every file. ``CuratedSource`` loads the rows that come
-only from curated data (game mechanics and the list of key battles); the PokeAPI source
-also uses the curated data for incense babies and arrival proposals. See
-docs/02-ddt/datos-curados.md.
+only from curated data (game mechanics). The PokeAPI source also uses the curated data for
+incense babies and arrival proposals, and the WikiDex source for the list of key battles.
+See docs/02-ddt/datos-curados.md.
 """
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
 from pydantic import BaseModel, ValidationError
 
-from db.reference import GameMechanic, KeyBattle, Origin, ReferenceModel
+from db.reference import GameMechanic, Origin, ReferenceModel
 from ingest.sources.curated.schemas import (
     ArrivalFile,
     ArrivalRule,
@@ -70,7 +70,7 @@ def read_curated(directory: Path) -> CuratedData:
 
 
 class CuratedSource:
-    """Ingest source of the rows that only come from curated data."""
+    """Ingest source of the rows that only come from curated data: game mechanics."""
 
     name = "curated"
     pokeapi_commit = None
@@ -79,10 +79,6 @@ class CuratedSource:
         self._curated = curated
 
     def rows(self) -> Iterable[ReferenceModel]:
-        yield from self._mechanics()
-        yield from self._key_battles()
-
-    def _mechanics(self) -> Iterator[GameMechanic]:
         for game, mechanics in self._curated.games.games.items():
             for mechanic, entry in mechanics.items():
                 yield GameMechanic(
@@ -92,18 +88,3 @@ class CuratedSource:
                     origin=Origin(entry.origin),
                     fact_key=f"mechanic:{game}:{mechanic}",
                 )
-
-    def _key_battles(self) -> Iterator[KeyBattle]:
-        """Key battles of each game; teams are pending until they are read (phase 5)."""
-        for battles_file in self._curated.key_battles:
-            for game in battles_file.games:
-                for order, battle in enumerate(battles_file.battles, start=1):
-                    yield KeyBattle(
-                        slug=f"{game}-{battle.id}",
-                        game=game,
-                        category=battle.category,
-                        trainer_name=battle.trainer,
-                        order=order,
-                        origin=Origin.PENDING,
-                        fact_key=f"battle:{game}:{battle.id}",
-                    )

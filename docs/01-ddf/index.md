@@ -10,6 +10,8 @@ las reglas de negocio (**RN-XX**).
 | 0.2 | 2026-10-03 | Forma de jugar (crianza y transferencia). Catálogo de reglas de la primera versión (RN-11 a RN-17). El *Hall of Fame* pasa a Must por el recorrido (RN-16). RN-08 y RN-10 se amplían. |
 | 0.3 | 2026-10-03 | Confirmación de los datos sin verificar por el usuario (RN-18, RF-15). Desempate por Pokémon con dos tipos (RN-19). |
 | 0.4 | 2026-10-04 | Alcance de la primera carga: generaciones 1 a 3 y juegos objetivo de la 3.ª (CA-11). Evoluciones aleatorias y Shedinja como tediosas en RN-15 (CA-35). Penalización propia de las evoluciones aleatorias (RN-20, CA-37). Etapa que nace del huevo con bebés de incienso (CA-36). |
+| 0.5 | 2026-10-04 | Nueva cuestión CA-38: variantes del equipo del rival según el inicial (RN-17). |
+| 0.6 | 2026-10-04 | CA-38 resuelta: del rival solo cuentan los Pokémon comunes a todas las variantes. CA-39: en Kanto, Giovanni solo cuenta como líder de gimnasio (RN-17). |
 
 ## Propósito
 
