@@ -255,6 +255,8 @@ parámetros son fijos.
       recorrido ([RN-16](#rn-16)).
 - **Nota**: Dragonite tiene que estar en favoritos para ser candidato ([RN-02](#rn-02),
   [CA-23](cuestiones-abiertas.md#resueltas)).
+- **Junto con [RN-14](#rn-14)**: si ningún equipo puede cumplir las dos a la vez, RN-13 tiene
+  prioridad ([CA-48](cuestiones-abiertas.md#resueltas)).
 
 ### RN-14 · Una evolución de Eevee obligatoria, y solo una { #rn-14 }
 
@@ -283,6 +285,12 @@ parámetros son fijos.
       conseguirse antes de completarlo: Eevee no puede evolucionar a ellos antes de la
       Pokédex Nacional, y el juego no tiene ciclo de día y noche ([RN-03](#rn-03),
       [CA-28](cuestiones-abiertas.md#abiertas)).
+- **Junto con [RN-13](#rn-13)** ([CA-48](cuestiones-abiertas.md#resueltas)): si ninguna
+  evolución de Eevee candidata cabe en un equipo con los candidatos que cumplen RN-13, RN-13
+  tiene prioridad. Esas evoluciones se descartan y la regla pasa al nivel 2: se reserva un
+  hueco para las demás evoluciones de Eevee del juego que encajan. Por ejemplo, con Zekrom
+  (Dragón/Eléctrico) como único Dragón y Jolteon como única evolución de Eevee en favoritos,
+  que comparten tipo ([RN-12](#rn-12)), se descarta Jolteon y se sugieren Vaporeon o Flareon.
 
 ### RN-15 · Penalizar evoluciones tediosas { #rn-15 }
 
@@ -459,6 +467,10 @@ parámetros son fijos.
       evolución de Eevee obligatoria ([RN-14](#rn-14)) y no se puede cambiar por Lapras sin
       romper esa regla. Si la evolución elegida es otra, Vaporeon ya no puede estar en el
       equipo. Además, sus tipos no coinciden (Agua frente a Agua/Hielo).
+    - Un grupo solo se forma si todas sus combinaciones son equipos válidos y empatados. Si
+      alguna incumpliera una regla dura (por ejemplo, dos alternativas de huecos distintos de la
+      misma línea evolutiva, [RN-07](#rn-07)), esos equipos se muestran por separado
+      ([CA-49](cuestiones-abiertas.md#resueltas)).
 - **Fórmula**: `P(equipo) = Σ peso(r) · s(r, equipo)` para cada regla blanda activa `r`,
   con `s(r, equipo)` entre 0 y 1.
 - **Pesos** ([CA-05](cuestiones-abiertas.md#resueltas)): enteros de 0 a 10. Por defecto,
@@ -486,6 +498,9 @@ parámetros son fijos.
        reservado por una regla de presencia solo admite sugerencias que la cumplan. Las
        sugerencias que dependen de datos sin confirmar se muestran marcadas como «sin
        verificar» ([RN-18](#rn-18)).
+- **Sugerencias**: lo que aporta una sugerencia es la diferencia entre la puntuación del
+  equipo con ella y sin ella. Se devuelven todas las que encajan, ordenadas; la interfaz
+  decide cuántas muestra ([CA-50](cuestiones-abiertas.md#resueltas)).
 - **Ejemplos**:
     - Si solo 4 favoritos son candidatos válidos para Pokémon Rojo Fuego, se muestra el equipo
       de esos 4 y, para los 2 huecos libres, una lista de Pokémon de Rojo Fuego que encajan con

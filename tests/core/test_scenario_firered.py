@@ -84,3 +84,24 @@ def test_without_rn12_the_coverage_is_complete() -> None:
     result = generate(firered_context(settings=settings))
     assert result.status is GenerationStatus.COMPLETE
     assert {team.score.total for team in result.teams} == {Fraction(19)}
+
+
+@pytest.mark.rn("RN-04")
+def test_tied_teams_are_grouped() -> None:
+    """CA-33: the teams with Cloyster and with Lapras (both Water/Ice) form one group."""
+    result = generate(firered_context())
+    positions = [
+        [tuple(p.slug for p in alternatives) for alternatives in group.positions]
+        for group in result.groups
+    ]
+    assert positions == [
+        [("tentacruel",), ("magneton",), ("exeggutor",), ("rhydon",), ("flareon",), ("dragonite",)],
+        [
+            ("magneton",),
+            ("cloyster", "lapras"),
+            ("exeggutor",),
+            ("rhydon",),
+            ("flareon",),
+            ("dragonite",),
+        ],
+    ]

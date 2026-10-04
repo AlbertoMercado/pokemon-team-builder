@@ -54,18 +54,23 @@ def test_teams_have_six_favourites() -> None:
 @pytest.mark.rn("RN-01")
 @pytest.mark.rn("RN-08")
 def test_fewer_than_six_candidates_is_incomplete() -> None:
+    """The incomplete team has the 5 candidates and one free slot."""
     result = _generate(FILLERS[:5])
-    assert (result.status, result.teams) == (GenerationStatus.INCOMPLETE, ())
+    assert result.status is GenerationStatus.INCOMPLETE
     assert result.incomplete_reason is IncompleteReason.NOT_ENOUGH_CANDIDATES
+    [team] = result.teams
+    assert team.slugs == tuple(f.slug for f in FILLERS[:5])
+    assert [(s.count, s.rule_id) for s in team.open_slots] == [(1, None)]
 
 
 @pytest.mark.rn("RN-01")
 @pytest.mark.rn("RN-12")
 def test_no_six_without_conflicts_is_incomplete() -> None:
-    """Seven candidates, but every one shares a type with the first: no team of 6."""
+    """Seven candidates, all of them Water: the largest team has one member (RN-08)."""
     clashing = [pokemon(f"water-{t}", ("water", t)) for t in FILLER_TYPES[:6]]
     result = _generate([LAPRAS, *clashing])
     assert result.incomplete_reason is IncompleteReason.NO_VALID_TEAM
+    assert {len(team.members) for team in result.teams} == {1}
 
 
 # --- RN-04 ---------------------------------------------------------------------------------
@@ -134,6 +139,9 @@ def test_dragonite_comes_before_a_team_of_six() -> None:
     settings = RuleSettings.defaults().with_changes(enabled={"RN-14": False})
     result = _generate(favorites, settings=settings)
     assert result.incomplete_reason is IncompleteReason.NO_VALID_TEAM
+    [team] = result.teams
+    assert team.slugs == ("dragonite", *(f.slug for f in FILLERS[1:5]))
+    assert [(s.count, s.rule_id) for s in team.open_slots] == [(1, None)]
 
 
 @pytest.mark.rn("RN-13")
@@ -153,6 +161,11 @@ def test_a_reserved_slot_makes_the_result_incomplete() -> None:
     settings = RuleSettings.defaults().with_changes(enabled={"RN-14": False})
     result = _generate(FILLERS[:6], settings=settings, pool=[DRAGONITE])
     assert result.incomplete_reason is IncompleteReason.RESERVED_SLOT
+    assert {len(team.members) for team in result.teams} == {5}
+    for team in result.teams:
+        [slot] = team.open_slots
+        assert (slot.count, slot.rule_id) == (1, "RN-13")
+        assert [s.pokemon.slug for s in slot.suggestions] == ["dragonite"]
 
 
 # --- RN-14 ---------------------------------------------------------------------------------
