@@ -81,6 +81,14 @@ Clasificar un paso como tedioso o aleatorio a partir de su disparador y sus cond
 regla de negocio y se hace en `core/evolution.py`, no en la base de datos. Por eso se guardan
 los datos de PokeAPI sin reducirlos a una categoría.
 
+Pendiente (fase 7 del [plan de carga](plan-carga-datos.md#fases)): la categoría de cada
+disparador y condición pasa a ser un dato
+([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)):
+
+| Tabla | Columnas | Notas |
+|-------|----------|-------|
+| `evolution_method` | `kind` (`trigger` o `condition`) y `name` PK, `category`, `reason`?, `requires_mechanic`?, `unless_learnt_by_level` | Desde [`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml). `core/evolution.py` la recibe en el contexto en lugar de tener la clasificación en el código. |
+
 ### Combates clave
 
 Módulo `db/reference/battles.py`.
@@ -152,6 +160,7 @@ erDiagram
 | `hall_of_fame_entry` | `id` PK, `game`, `completed_on`, `sequence`, `notes` | `sequence` es el orden de registro y desempata dos fechas iguales ([RF-12](../01-ddf/requisitos-funcionales.md#rf-12)). |
 | `hall_of_fame_member` | `entry`, `position`, `pokemon`, `types` | `types` guarda los tipos que tenía en ese juego, como copia ([CA-07](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `fact_confirmation` | `fact_key` PK, `game`, `confirmed_value`, `proposed_value_hash`, `confirmed_at` | Si una nueva carga propone un valor con otro hash, la confirmación deja de valer ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). |
+| `evolution_method_classification` | `kind` y `name` PK, `category`, `reason`?, `classified_at` | Pendiente. Métodos de evolución que el usuario ha catalogado porque no estaban en los datos curados ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)). Sobreviven a las recargas; la carga los une a los curados. |
 
 Las columnas que apuntan a `reference.sqlite` (`pokemon`, `game`, `fact_key`) no pueden ser
 claves foráneas, porque están en otro fichero. Las comprueba la ingesta antes de sustituir la

@@ -319,8 +319,23 @@ parámetros son fijos.
     - Cualquier evolución que **no se puede hacer en el juego objetivo** y obliga a evolucionar
       al Pokémon en otro juego y transferirlo, siempre que la transferencia sea posible antes
       de completar el juego. Si no lo es, el Pokémon no es candidato ([RN-03](#rn-03)).
-- **Métodos no tediosos**: subir de nivel, amistad o cariño, usar una piedra u otro objeto, y
-  conocer un movimiento que el Pokémon aprende solo subiendo de nivel a partir del nivel 2.
+- **Métodos no tediosos**: subir de nivel, amistad o cariño, usar una piedra u otro objeto,
+  subir de nivel con un objeto equipado, el sexo del Pokémon (Kirlia → Gallade, solo si es
+  macho) y conocer un movimiento que el Pokémon aprende solo subiendo de nivel a partir del
+  nivel 2.
+- **Criterio** ([CA-43](cuestiones-abiertas.md#resueltas)): es tedioso lo que dificulta
+  completar la evolución mientras se avanza en el juego objetivo. No lo es lo que se resuelve
+  antes, al criar: se cría hasta que sale un Pokémon del sexo necesario.
+- **Métodos alternativos** ([CA-44](cuestiones-abiertas.md#resueltas)): si un paso se puede
+  hacer de varias formas en el juego objetivo, cuenta la más fácil, porque el jugador la
+  elige. Solo es tedioso si todas lo son.
+- **Métodos sin catalogar** ([CA-42](cuestiones-abiertas.md#resueltas)): cada disparador y
+  cada condición de evolución de las fuentes tiene una categoría (no tedioso, tedioso o
+  aleatorio). Si la carga de datos encuentra uno sin catalogar, se detiene y el usuario lo
+  cataloga ([RF-16](requisitos-funcionales.md#rf-16)). Lo mismo si una evolución exige un
+  movimiento y no se sabe qué movimientos aprende por nivel
+  ([CA-45](cuestiones-abiertas.md#resueltas)). Así la regla nunca evalúa un método que no
+  conoce.
 - **Puntuación**: `1 − (miembros con alguna evolución tediosa / miembros del equipo)`.
 - **Ejemplos**:
     - Gengar puntúa en contra, porque Haunter evoluciona por intercambio.
@@ -390,6 +405,9 @@ parámetros son fijos.
   La puntuación de cada rival es la media de los dos aspectos (0, 0,5 o 1). La de cada combate
   es la media de sus rivales, y la de la regla es la media de todos los combates, de modo que
   cada combate pesa lo mismo.
+- **Juegos sin combates clave**: no hay ninguno entre los juegos conocidos. Si apareciera, la
+  carga de ese juego no se hace hasta que una nueva versión de la aplicación decida cómo
+  puntuarlo ([CA-46](cuestiones-abiertas.md#resueltas)).
 - **Ejemplo**: en Pokémon Rojo Fuego, contra Brock (Geodude y Onix, Roca/Tierra), un miembro de
   tipo Agua cubre el ataque (×4). Uno de tipo Lucha cubre la defensa: resiste Roca y no es
   débil a Tierra.
@@ -409,6 +427,8 @@ parámetros son fijos.
 - **Relación con [RN-15](#rn-15)**: las evoluciones aleatorias también son tediosas, así que
   un miembro con evolución aleatoria puntúa en contra en las dos reglas. Las penalizaciones se
   suman.
+- **Métodos alternativos**: si el paso se puede hacer también de una forma que no es
+  aleatoria, no cuenta como aleatorio ([CA-44](cuestiones-abiertas.md#resueltas)).
 - **Puntuación**: 1 si ningún miembro necesita una evolución aleatoria; 0 en caso contrario.
 - **Ejemplos**:
     - Un equipo con Beautifly o Dustox puntúa 0, porque Wurmple evoluciona al azar en Silcoon

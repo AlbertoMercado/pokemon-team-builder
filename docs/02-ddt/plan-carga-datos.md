@@ -178,6 +178,7 @@ flowchart LR
     F2 --> F4["4 · Datos curados<br/>Rojo Fuego y Verde Hoja"]
     F4 --> F5["5 · WikiDex<br/>Rojo Fuego y Verde Hoja"]
     F3 & F5 --> F6["6 · Rubí, Zafiro<br/>y Esmeralda"]
+    F3 & F4 --> F7["7 · Catálogo de<br/>métodos de evolución"]
 ```
 
 | Fase | Rama | Contenido | Documentación |
@@ -188,6 +189,7 @@ flowchart LR
 | 4 ✅ | `feat/ingest-curados` | Esquemas pydantic de los YAML y datos de Rojo Fuego y Verde Hoja: juego, mecánicas, llegada y lista de combates clave. | Esquema de cada fichero YAML. |
 | 5 ✅ | `feat/ingest-wikidex` | Adaptador de WikiDex con caché y límite de peticiones, y equipos de los combates clave de Rojo Fuego y Verde Hoja. Tests con wikitexto real guardado. | Cómo se procesan las plantillas y qué se marca como inferido. |
 | 6 | `feat/ingest-hoenn` | Datos curados y combates clave de Rubí, Zafiro y Esmeralda, después de investigar su llegada (issue #8). | Restricciones de llegada en [datos requeridos](datos-requeridos.md#restricciones-de-llegada-por-juego). |
+| 7 | `feat/catalogo-evoluciones` | [`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml) con los 18 disparadores y todas las condiciones de PokeAPI, tabla `evolution_method` y `core/evolution.py` leyendo la clasificación del contexto, con el sexo como no tedioso (CA-43). La carga se detiene si encuentra un método sin catalogar (CA-42), una evolución por movimiento sin los movimientos por nivel (CA-45) o un juego objetivo sin combates clave (CA-46), con un informe de lo que falta. Catalogar desde la web (RF-16) llega con la API. | Datos curados, modelo de datos, motor e ingesta (errores e informe). |
 
 Las fases 1 a 3 no dependen de `core/`, así que se pueden hacer en paralelo con el motor.
 
@@ -221,6 +223,18 @@ Implementadas (fase 4):
 - **Propuestas de llegada**: inferidas en Rojo Fuego y Verde Hoja y pendientes en el resto.
   Casos conocidos en Rojo Fuego: llegan Bulbasaur, Vaporeon, Golbat y Chansey, y no llegan
   Pikachu, Raichu, Clefairy, Crobat, Espeon ni Blissey.
+
+Previstas (fase 7), que detienen la carga en lugar de rechazarla sin más, con un informe de lo
+que falta:
+
+- **Métodos de evolución sin catalogar**: cada disparador y cada condición de los pasos
+  cargados está en `evolution_methods.yaml` o lo ha catalogado el usuario
+  ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- **Movimientos por nivel**: si algún paso exige conocer un movimiento, tienen que estar
+  cargados los movimientos que se aprenden por nivel
+  ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- **Combates clave**: cada juego objetivo tiene al menos uno
+  ([CA-46](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 Implementadas (fase 5):
 

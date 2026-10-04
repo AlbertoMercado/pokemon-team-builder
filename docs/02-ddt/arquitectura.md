@@ -187,11 +187,16 @@ pendientes ([RF-08](../01-ddf/requisitos-funcionales.md#rf-08),
 
 ### Ingesta
 
-1. El administrador ejecuta la ingesta para uno o varios juegos.
-2. Se descargan o se leen de caché las fuentes.
-3. Se genera `reference.sqlite` nuevo y se comprueba.
-4. Se sustituye el anterior. La aplicación lee la base de datos nueva al reiniciarse.
-5. Las confirmaciones cuyo valor propuesto ha cambiado dejan de valer y se vuelven a pedir
+1. El usuario lanza la ingesta para uno o varios juegos. Hoy se hace desde la terminal; está
+   previsto lanzarla desde la web ([RF-11](../01-ddf/requisitos-funcionales.md#rf-11)), lo
+   que exige decidir en un ADR cómo la invoca la API sin romper el contrato «`api` no depende
+   de `ingest`» ([ADR-0002](../03-adr/0002-monolito-modular-nucleo-puro.md)).
+2. Si encuentra un método de evolución sin catalogar, se detiene sin cambiar los datos y lo
+   informa, para que el usuario lo catalogue ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)).
+3. Se descargan o se leen de caché las fuentes.
+4. Se genera `reference.sqlite` nuevo y se comprueba.
+5. Se sustituye el anterior. La aplicación lee la base de datos nueva al reiniciarse.
+6. Las confirmaciones cuyo valor propuesto ha cambiado dejan de valer y se vuelven a pedir
    ([RN-18](../01-ddf/reglas-negocio.md#rn-18)).
 
 ## Despliegue

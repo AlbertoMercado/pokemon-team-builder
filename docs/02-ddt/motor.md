@@ -200,6 +200,16 @@ No son tediosos `level-up` y `use-item` con nivel, amistad, cariño, objeto o un
 equipado sin más condiciones. Todo lo que el módulo no conoce cuenta como tedioso, para que
 una condición nueva de PokeAPI nunca haga parecer fácil una evolución.
 
+!!! warning "Provisional hasta la fase 7 del plan de carga"
+    Tras revisar esta fase se decidió que la clasificación sea un dato
+    ([`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml)) y que lo que no esté
+    catalogado detenga la carga para que lo catalogue el usuario
+    ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)). Entonces el motor recibirá la
+    clasificación en el contexto y un método sin catalogar será un error. También cambia el
+    sexo (`gender_id`), que pasa a no ser tedioso
+    ([CA-43](../01-ddf/cuestiones-abiertas.md#resueltas)); hoy cuenta como `other`. Ninguno
+    de los dos cambios afecta a las generaciones 1 a 3.
+
 `assess(pokemon, juego)` revisa los pasos desde la etapa que nace del huevo
 ([CA-25](../01-ddf/cuestiones-abiertas.md#resueltas)) hasta el favorito y devuelve una
 `EvolutionAssessment` con los pasos tediosos, en el orden de la línea, y sus motivos:
@@ -207,7 +217,8 @@ una condición nueva de PokeAPI nunca haga parecer fácil una evolución.
 - `is_tedious`: algún paso es tedioso (RN-15).
 - `is_random`: algún paso es aleatorio (RN-20). Un paso aleatorio también es tedioso.
 
-Si una pareja de etapas tiene varios métodos, cuenta el más fácil, porque el jugador lo elige.
+Si una pareja de etapas tiene varios métodos, cuenta el más fácil, porque el jugador lo elige
+([CA-44](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 Con los datos reales de Rojo Fuego, 21 de los 184 pasos son tediosos: los intercambios, Tyrogue,
 Wurmple, Nincada → Shedinja y, por ser imposibles en el juego, Espeon, Umbreon y Milotic.
