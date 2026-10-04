@@ -456,7 +456,10 @@ parámetros son fijos.
        hueco. Entre los equipos de ese tamaño, se eligen los de mayor puntuación
        ([RN-04](#rn-04)), con el mismo desempate ([RN-19](#rn-19)).
     3. Sugiere **Pokémon que no son favoritos** para completar los huecos. Las sugerencias
-       existen en el juego objetivo ([RN-03](#rn-03)), cumplen las reglas duras activas junto
+       pasan los mismos filtros por candidato que los favoritos: existen en el juego objetivo y
+       pueden llegar a tiempo ([RN-03](#rn-03)), se pueden criar ([RN-11](#rn-11)) y no están
+       excluidas por el recorrido ([RN-16](#rn-16))
+       ([CA-40](cuestiones-abiertas.md#resueltas)). Además, cumplen las reglas duras activas junto
        con el equipo incompleto y se ordenan por lo que aportarían a la puntuación; a igual
        aportación, primero las de dos tipos ([RN-19](#rn-19)). Un hueco
        reservado por una regla de presencia solo admite sugerencias que la cumplan. Las

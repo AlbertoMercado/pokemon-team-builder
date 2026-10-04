@@ -119,14 +119,13 @@ corrige primero en el DDF.
 | RN-19 | La clave de comparación es `(puntuación, miembros con dos tipos)`. |
 | RN-20 | Un miembro es aleatorio si alguno de sus pasos tiene `percentage_chance` o `condition_expression` (Wurmple). Puntúa 0 si hay alguno en el equipo. |
 
-## Cuestión abierta
+## Decisiones tomadas al planificar
 
-**[CA-40](../01-ddf/cuestiones-abiertas.md#abiertas)**: las sugerencias de RN-08 tienen que
-existir en el juego objetivo, pero el DDF no dice si deben pasar también el resto de filtros
-por candidato: la llegada antes de completar el juego (RN-03), la crianza (RN-11) y el
-recorrido (RN-16). Propuesta: sí, todos, porque si no se sugerirían Pokémon con los que no se
-puede jugar (un legendario, o Raichu en Rojo Fuego). La única diferencia con los candidatos es
-que no son favoritos. Bloquea la fase 5.
+- **[CA-40](../01-ddf/cuestiones-abiertas.md#resueltas)**: las sugerencias de RN-08 pasan los
+  mismos filtros por candidato que los favoritos (llegada, crianza y recorrido). Solo se
+  diferencian en que no son favoritos.
+- **[CA-41](../01-ddf/cuestiones-abiertas.md#resueltas)**: todas las reglas activables están
+  activas por defecto, con los pesos de CA-05 y CA-37.
 
 ## Estrategia de pruebas
 
@@ -159,7 +158,7 @@ flowchart LR
 | 2 | `feat/core-filtros` | `breeding.py`, `journey.py` y los filtros RN-03, RN-11 y RN-16 con su motivo de descarte. | Ejemplos de RN-03, RN-11 y RN-16 del DDF, incluidas las excepciones de Dragonite y Eevee. |
 | 3 | `feat/core-puntuacion` | `evolution.py`, las reglas blandas RN-06, RN-15, RN-17 y RN-20, la puntuación ponderada con desglose y la clave de RN-19. | Ejemplos de RN-15 (Gengar, Raichu, Milotic), RN-20 (Wurmple) y RN-17 (Brock); suma del desglose. |
 | 4 | `feat/core-busqueda` | Restricciones RN-07, RN-12 y RN-14, niveles de presencia de RN-13 y RN-14, grafo de incompatibilidades, búsqueda con retroceso y `generate` para equipos completos. | Ejemplos de RN-07, RN-12, RN-13 y RN-14; propiedades con hypothesis y fuerza bruta; escenario real de Rojo Fuego. |
-| 5 | `feat/core-sugerencias` | Equipo incompleto con huecos reservados por las reglas de presencia, sugerencias ordenadas (RN-08, RN-19) y agrupación de empates (CA-33). Necesita resolver CA-40. | Ejemplos de RN-08 (4 candidatos en Rojo Fuego, Dragonite que deja un equipo de 5) y de CA-33 (Lapras o Cloyster). |
+| 5 | `feat/core-sugerencias` | Equipo incompleto con huecos reservados por las reglas de presencia, sugerencias que pasan los filtros por candidato y ordenadas (RN-08, RN-19, CA-40) y agrupación de empates (CA-33). | Ejemplos de RN-08 (4 candidatos en Rojo Fuego, Dragonite que deja un equipo de 5) y de CA-33 (Lapras o Cloyster). |
 | 6 | `feat/core-revision` | `review.py`: datos inferidos o pendientes que intervienen (RN-18), sin los de favoritos ya descartados con datos automáticos. | Ejemplo de RN-18 (Raichu en Rojo Fuego). |
 
 Después del motor, el siguiente paso es `user.sqlite` y la API, que construyen el
