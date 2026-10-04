@@ -116,6 +116,7 @@ corrige primero en el DDF.
 | RN-16 | Se excluyen las formas de la misma cadena y región que cada miembro de los equipos afectados, salvo la cadena de Dragonite; de la de Eevee, solo la evolución usada. |
 | RN-17 | Por cada Pokémon rival: **ataque** = algún miembro tiene un tipo cuyo factor contra el rival (producto de sus tipos) es ×2 o más; **defensa** = algún miembro tiene un factor ×0,5 o menos (inmunidad incluida) frente a al menos un tipo del rival y menos de ×2 frente a todos. La puntuación del rival es la media de los dos; la del combate, la media de sus rivales; la de la regla, la media de los combates. Un juego objetivo siempre tiene combates clave (CA-46). |
 | RN-19 | La clave de comparación es `(puntuación, miembros con dos tipos)`. |
+| RN-18 | Intervienen todos los datos sin verificar del juego (mecánicas y combates clave) y la existencia y la llegada de cada favorito que no queda ya descartado con datos conocidos (automáticos o confirmados): por generación, por una existencia o llegada conocida que vale «no», por crianza (RN-11) o por el recorrido (RN-16), si están activas. |
 | RN-20 | Un miembro es aleatorio si alguno de sus pasos tiene `percentage_chance` o `condition_expression` (Wurmple). Puntúa 0 si hay alguno en el equipo. |
 
 ## Decisiones tomadas al planificar
@@ -185,7 +186,7 @@ flowchart LR
 | 3 ✅ | `feat/core-puntuacion` | `evolution.py`, las reglas blandas RN-06, RN-15, RN-17 y RN-20, la puntuación ponderada con desglose y la clave de RN-19. | Ejemplos de RN-15 (Gengar, Raichu, Milotic), RN-20 (Wurmple) y RN-17 (Brock); suma del desglose. |
 | 4 ✅ | `feat/core-busqueda` | Restricciones RN-07, RN-12 y RN-14, niveles de presencia de RN-13 y RN-14, grafo de incompatibilidades, búsqueda con retroceso y `generate` para equipos completos. | Ejemplos de RN-07, RN-12, RN-13 y RN-14; propiedades con hypothesis y fuerza bruta; escenario real de Rojo Fuego. |
 | 5 ✅ | `feat/core-sugerencias` | Equipo incompleto con huecos reservados por las reglas de presencia, sugerencias que pasan los filtros por candidato y ordenadas (RN-08, RN-19, CA-40) y agrupación de empates (CA-33). | Ejemplos de RN-08 (4 candidatos en Rojo Fuego, Dragonite que deja un equipo de 5) y de CA-33 (Lapras o Cloyster). |
-| 6 | `feat/core-revision` | `review.py`: datos inferidos o pendientes que intervienen (RN-18), sin los de favoritos ya descartados con datos automáticos. | Ejemplo de RN-18 (Raichu en Rojo Fuego). |
+| 6 ✅ | `feat/core-revision` | `review.py`: datos inferidos o pendientes que intervienen (RN-18), sin los de favoritos ya descartados con datos automáticos. | Ejemplo de RN-18 (Raichu en Rojo Fuego). |
 
 Después del motor, el siguiente paso es `user.sqlite` y la API, que construyen el
 `GameContext` a partir de las dos bases de datos y permiten generar equipos con los datos
@@ -215,7 +216,7 @@ Se completa en cada fase con el módulo y los tests de cada regla. Detalle de lo
 | RN-15 | `evolution.py`, `rules/soft.py` | 3 | Hecho (`test_evolution.py`, `rules/test_soft.py`, `test_scoring.py`) |
 | RN-16 | `journey.py`, `rules/candidate.py` | 2 | Hecho (`test_journey.py`, `rules/test_candidate.py`) |
 | RN-17 | `rules/soft.py` | 3 | Hecho (`rules/test_soft.py`) |
-| RN-18 | `review.py` | 6 | Pendiente |
+| RN-18 | `review.py` | 6 | Hecho (`test_review.py`) |
 | RN-19 | `scoring.py`, `engine/suggestions.py` | 3, 5 | Hecho (`test_scoring.py`, `engine/test_generate.py`, `engine/test_incomplete.py`) |
 | RN-20 | `evolution.py`, `rules/soft.py` | 3 | Hecho (`test_evolution.py`, `rules/test_soft.py`, `test_scoring.py`) |
 
