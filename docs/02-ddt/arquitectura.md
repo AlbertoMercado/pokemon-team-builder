@@ -136,8 +136,11 @@ Aplicación de una sola página con React, Vite, TypeScript y Tailwind
 - Cliente de la API generado a partir del OpenAPI de FastAPI
   ([ADR-0007](../03-adr/0007-cliente-generado-openapi.md)).
 - TanStack Query para el estado que viene del servidor.
-- Pantallas: Catálogo y ficha, Favoritos, Reglas, **Nuevo juego** (elegir juego → revisar
-  datos → generar), Resultado y *Hall of Fame*.
+- Pantallas: Inicio, Catálogo y ficha, Favoritos, Reglas, **Nuevo juego** (elegir juego →
+  revisar datos → generar), Resultado y *Hall of Fame*.
+- No implementa reglas de negocio: muestra lo que calcula la API.
+
+Rutas, fases y pruebas en el [plan de la web](plan-web.md).
 
 ## Reglas de dependencia
 
@@ -180,10 +183,16 @@ sequenceDiagram
     A->>C: engine.generate(ctx)
     C-->>A: Equipos, explicación, descartes y sugerencias
     A-->>W: Resultado
+    U->>W: Elige un equipo en el selector
+    W->>A: POST /api/games/{game}/team-checks
+    A-->>W: Problemas con las reglas, si los hay
+    W->>A: POST /api/hall-of-fame
 ```
 
-Si quedan datos sin confirmar, la generación responde `409 Conflict` con la lista de datos
-pendientes ([RF-08](../01-ddf/requisitos-funcionales.md#rf-08),
+El usuario elige uno de los equipos (una alternativa por posición y una sugerencia por hueco)
+y se registra en el *Hall of Fame*, o los descarta y no se registra nada
+([CA-53](../01-ddf/cuestiones-abiertas.md#resueltas)). Si quedan datos sin confirmar, la
+generación responde `409 Conflict` con la lista de datos pendientes ([RF-08](../01-ddf/requisitos-funcionales.md#rf-08),
 [RF-15](../01-ddf/requisitos-funcionales.md#rf-15)).
 
 ### Ingesta
