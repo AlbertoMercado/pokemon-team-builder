@@ -1,8 +1,9 @@
 # api/
 
-**Qué es**: la capa de aplicación HTTP con FastAPI. Implementadas las fases 1 a 3
+**Qué es**: la capa de aplicación HTTP con FastAPI. Implementadas las fases 1 a 4
 del [plan](../docs/02-ddt/plan-api.md): arranque, configuración, metadatos, favoritos, reglas,
-juegos, construcción del `GameContext` y revisión de los datos sin verificar.
+juegos, construcción del `GameContext`, revisión de los datos sin verificar y generación de
+equipos.
 
 **Por qué existe**: expone los casos de uso al frontend ([API](../docs/02-ddt/api.md)).
 
@@ -19,7 +20,7 @@ partir de las dos bases de datos y llaman a `core/`, y los repositorios acceden 
 | `errors.py` | Errores de los casos de uso y su código HTTP (`404`, `409`, `422`). |
 | `dependencies.py` | Dependencias de los routers: sesiones de las bases de datos y datos de referencia del juego de la ruta (`404` si no es juego objetivo). |
 | `routers/` | Un router por grupo de endpoints de la [API](../docs/02-ddt/api.md). |
-| `services/` | Casos de uso. `context.py` construye el `GameContext` (con la parte de referencia de cada juego en caché) y `review.py`, la revisión de datos. |
+| `services/` | Casos de uso. `context.py` construye el `GameContext` (con la parte de referencia de cada juego en caché), `review.py` revisa los datos, `generation.py` genera los equipos y `rounding.py` redondea las puntuaciones con el método del mayor resto (CA-51). |
 | `repositories/` | Acceso a `db/`. |
 | `schemas/` | Modelos pydantic de las peticiones y respuestas (el contrato OpenAPI). |
 

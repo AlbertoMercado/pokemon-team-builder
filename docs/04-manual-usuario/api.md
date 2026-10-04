@@ -7,8 +7,8 @@ ejemplo para probarla o automatizar algo. Qué hace cada endpoint, en detalle, e
 
 !!! note "Disponible por ahora"
     Arrancar la API, consultar su versión y la de los datos, gestionar los favoritos y las
-    reglas, ver los juegos objetivo y revisar sus datos. La generación de equipos, el *Hall of
-    Fame* y el catálogo se irán añadiendo a esta guía según se implementen
+    reglas, ver los juegos objetivo, revisar sus datos y generar equipos. El *Hall of Fame* y
+    el catálogo se irán añadiendo a esta guía según se implementen
     ([plan de la API](../02-ddt/plan-api.md#fases)).
 
 ## Antes de empezar
@@ -145,6 +145,41 @@ curl -X PUT http://127.0.0.1:8000/api/games/firered/review/battle:firered:misty 
 - Los datos que la carga obtuvo sin ambigüedad (automáticos) no aparecen y no se pueden
   cambiar.
 
+## Generar un equipo
+
+Con tus favoritos y los datos del juego confirmados:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/games/firered/generations
+```
+
+Si queda algún dato por confirmar, la respuesta es `409` y `detail.pending` dice cuáles son:
+confírmalos ([revisar los datos](#revisar-los-datos-de-un-juego)) y vuelve a generar.
+
+Qué mirar en la respuesta:
+
+- **`status`**: `complete` si hay un equipo de 6 favoritos. Si es `incomplete`,
+  `incomplete_reason` dice por qué: una regla de presencia necesita un Pokémon que no tienes
+  en favoritos (`reserved_slot`), tienes menos de 6 favoritos válidos
+  (`not_enough_candidates`) o no hay 6 que cumplan juntos las reglas (`no_valid_team`).
+- **`groups`**: los equipos recomendados. Si varios empatan, aparecen todos; los que solo se
+  diferencian en Pokémon con los mismos tipos se agrupan, y `positions` dice qué Pokémon
+  puede ocupar cada puesto (por ejemplo, Cloyster o Lapras).
+- **`breakdown`** de cada equipo: lo que aporta cada regla blanda a la puntuación, que suma el
+  total. `score` es lo bien que el equipo cumple la regla, en porcentaje. Si una regla pesa
+  mucho y no te convence, cambia su peso en [reglas](#reglas) y vuelve a generar.
+- **`open_slots`**: si el equipo tiene menos de 6, los huecos y los Pokémon que encajan en
+  ellos, de mejor a peor. Los que tienen `verified` a `false` dependen de datos que no has
+  confirmado. Si te gusta alguno, añádelo a favoritos y vuelve a generar. Con varios huecos
+  libres, cada sugerencia encaja con el equipo, pero dos sugerencias pueden no encajar entre sí.
+- **`discards`**: los favoritos que no han podido entrar y por qué (por ejemplo, Zapdos no se
+  puede criar).
+- **`confirmed_facts`**: los datos que confirmaste y que se han usado.
+
+Las puntuaciones son números enteros redondeados. Dos equipos con la misma cifra no tienen por
+qué estar empatados: el orden se decide con los valores exactos. El resultado no se guarda;
+generar otra vez con lo mismo da el mismo resultado.
+
 ## Errores habituales
 
 | Respuesta | Causa | Solución |
@@ -154,5 +189,6 @@ curl -X PUT http://127.0.0.1:8000/api/games/firered/review/battle:firered:misty 
 | `409` al cambiar una regla | La regla no se puede desactivar, o no es blanda y le has dado peso. | El mensaje dice cuál de las dos. |
 | `404` al revisar un juego | El juego no es juego objetivo, o el dato no es de ese juego. | Consulta los juegos con `GET /api/games` y las claves con `GET …/review`. |
 | `409` al confirmar un dato | El dato se cargó sin ambigüedad (automático): no se revisa. | Nada. |
+| `409` al generar | Quedan datos sin confirmar. | Confírmalos con la revisión; `detail.pending` dice cuáles. |
 | `422` al confirmar un dato | El valor no es del tipo del dato (un booleano, o una lista en un combate clave) o el equipo incluye Pokémon que no existen en la generación del juego. | Revisa el valor y los identificadores. |
 | `Address already in use` al arrancar | Ya hay otra API (u otro programa) en el puerto 8000. | Para la otra o arranca en otro puerto: `--port 8001`. |

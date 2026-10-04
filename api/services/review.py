@@ -101,7 +101,7 @@ def _valid_value(game: GameReference, fact: Reviewable, value: ReviewValue) -> C
     return value
 
 
-def _name(game: GameReference, value: Reviewable) -> str:
+def fact_name(game: GameReference, value: Reviewable) -> str:
     if value.kind is FactKind.MECHANIC:
         return MECHANIC_NAMES.get(value.subject, value.subject)
     if value.kind is FactKind.KEY_BATTLE:
@@ -116,7 +116,7 @@ def _out(game: GameReference, value: Reviewable, confirmations: Confirmations) -
         fact_key=value.key,
         kind=value.kind,
         subject=value.subject,
-        name=_name(game, value),
+        name=fact_name(game, value),
         origin=LoadedOrigin(value.origin),
         proposal=to_stored(value.proposal),
         status=ReviewStatus.PENDING if confirmation is None else ReviewStatus.CONFIRMED,

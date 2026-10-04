@@ -112,7 +112,7 @@ tests e issues.**
 | Construir documentación | `uv run mkdocs build --strict` | ✅ |
 | Ejecutar ingesta | `uv run python -m ingest [--data-dir DIR] [--offline]` ([detalle](docs/05-operacion/ingesta.md)) | ✅ Rojo Fuego y Verde Hoja completos |
 | Ver la base de datos | `uvx datasette data/reference.sqlite` ([otras opciones](docs/05-operacion/ingesta.md#consultar-los-datos)) | ✅ |
-| Arrancar API | `uv run uvicorn api.main:app --reload` (`PTB_DATA_DIR` para otro directorio de datos; [detalle](docs/05-operacion/api.md)) | ✅ Metadatos, favoritos, reglas, juegos y revisión de datos |
+| Arrancar API | `uv run uvicorn api.main:app --reload` (`PTB_DATA_DIR` para otro directorio de datos; [detalle](docs/05-operacion/api.md)) | ✅ Metadatos, favoritos, reglas, juegos, revisión de datos y generación |
 | Migraciones de `user.sqlite` | `uv run alembic -c db/user/alembic.ini upgrade head` (la API las aplica al arrancar) | ✅ |
 | Frontend en desarrollo | `cd web && npm run dev` | ⏳ Pendiente |
 | Lint / formato web | `cd web && npm run lint` / `npm run format` | ⏳ Pendiente |

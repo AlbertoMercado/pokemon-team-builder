@@ -11,7 +11,9 @@ del [plan de la API](plan-api.md#fases). Cómo se arranca: [Operación](../05-op
 - JSON en peticiones y respuestas, con nombres de campo en `snake_case`.
 - Los recursos se identifican con las claves naturales del
   [modelo de datos](modelo-datos.md) (`firered`, `vulpix-alola`, `RN-07`).
-- Los errores usan el formato por defecto de FastAPI (`{"detail": ...}`) con estos códigos:
+- Los errores usan el formato por defecto de FastAPI (`{"detail": ...}`) con estos códigos.
+  `detail` es un texto, salvo en los `422` de validación de FastAPI (una lista) y en el `409`
+  de la generación, que es un objeto con el mensaje y los datos pendientes:
     - `404`: el recurso no existe.
     - `409`: la operación no se puede hacer en el estado actual (p. ej., generar con datos sin
       confirmar).
@@ -121,56 +123,93 @@ confirmado.
 
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
-| `POST` | `/api/games/{game}/generations` | Genera los equipos con los favoritos, las reglas y las confirmaciones actuales. `409` con la lista de datos pendientes si queda alguno sin confirmar. | RF-08, RF-09, RF-10 |
+| `POST` | `/api/games/{game}/generations` | Genera los equipos con los favoritos, las reglas y las confirmaciones actuales. `409` con la lista de datos pendientes si queda alguno sin confirmar; `404` si el juego no es juego objetivo. ✅ | RF-08, RF-09, RF-10 |
 
-!!! note "Esquema provisional"
-    Este ejemplo es anterior al motor y a [CA-51](../01-ddf/cuestiones-abiertas.md#resueltas).
-    El esquema definitivo, con los grupos, los huecos y las puntuaciones enteras, se fija en la
-    fase 4 del [plan de la API](plan-api.md#fases).
-
-La generación no se guarda: es un cálculo sin estado. Ejemplo de respuesta, abreviado (solo 3
-de los 6 miembros):
+La generación no se guarda: es un cálculo sin estado, y con los mismos datos da siempre la misma
+respuesta. Ejemplo con los favoritos del escenario de Rojo Fuego, abreviado:
 
 ```json
 {
+  "game": "firered",
   "status": "complete",
-  "score": "18.5",
+  "incomplete_reason": null,
+  "score": 19,
   "groups": [
     {
-      "members": [
-        {"options": ["dragonite"]},
-        {"options": ["jolteon"]},
-        {"options": ["lapras", "cloyster"]}
+      "positions": [
+        [{"pokemon": "magneton", "name": "Magneton", "dex_number": 82, "types": ["electric", "steel"]}],
+        [
+          {"pokemon": "cloyster", "name": "Cloyster", "dex_number": 91, "types": ["water", "ice"]},
+          {"pokemon": "lapras", "name": "Lapras", "dex_number": 131, "types": ["water", "ice"]}
+        ],
+        "…"
       ],
-      "breakdown": [
-        {"rule_id": "RN-17", "weight": 10, "score": "0.95", "contribution": "9.5"},
-        {"rule_id": "RN-20", "weight": 5, "score": "1", "contribution": "5"},
-        {"rule_id": "RN-15", "weight": 3, "score": "1", "contribution": "3"},
-        {"rule_id": "RN-06", "weight": 1, "score": "1", "contribution": "1"}
-      ],
-      "dual_type_members": 3
+      "teams": [
+        {
+          "members": ["magneton", "cloyster", "exeggutor", "rhydon", "flareon", "dragonite"],
+          "score": 19,
+          "dual_type_members": 5,
+          "breakdown": [
+            {"rule_id": "RN-06", "name": "Penalizar varias formas de la misma especie", "weight": 1, "score": 100, "contribution": 1, "penalized": []},
+            {"rule_id": "RN-15", "name": "Penalizar evoluciones tediosas", "weight": 3, "score": 100, "contribution": 3, "penalized": []},
+            {"rule_id": "RN-17", "name": "Tipos eficaces frente a los combates clave", "weight": 10, "score": 96, "contribution": 10, "penalized": []},
+            {"rule_id": "RN-20", "name": "Penalizar las evoluciones aleatorias", "weight": 5, "score": 100, "contribution": 5, "penalized": []}
+          ],
+          "open_slots": []
+        },
+        "…"
+      ]
     }
   ],
   "discards": [
-    {"pokemon": "raichu", "rule_id": "RN-03", "reason": "arrival", "fact_key": "pokemon:firered:raichu:arrival"}
+    {"pokemon": "zapdos", "name": "Zapdos", "rule_id": "RN-11", "reason": "breeding", "detail": "Zapdos no se puede criar (grupos huevo de su línea: no-eggs)", "fact_key": null}
   ],
-  "unmet_presence_rules": [],
-  "suggestions": [],
-  "confirmed_facts_used": ["pokemon:firered:raichu:arrival"],
-  "data_version": {"pokeapi_commit": "…", "ingested_at": "…"}
+  "presence": [
+    {"rule_id": "RN-13", "level": 1, "status": "candidates", "options": ["dragonite"], "detail": "…"},
+    {"rule_id": "RN-14", "level": 1, "status": "candidates", "options": ["vaporeon", "jolteon", "flareon"], "detail": "…"}
+  ],
+  "confirmed_facts": [
+    {"fact_key": "pokemon:firered:dragonite:arrival", "kind": "arrival", "name": "Dragonite", "value": true}
+  ],
+  "data_version": {"pokeapi_commit": "…", "ingested_at": "…", "games": ["…"]}
 }
 ```
 
-- Las puntuaciones se envían como **enteros redondeados**; las aportaciones se reparten con el
-  método del mayor resto para que sigan sumando el total
-  ([CA-51](../01-ddf/cuestiones-abiertas.md#resueltas)). El motor decide el orden y los empates
-  con fracciones exactas ([ADR-0006](../03-adr/0006-algoritmo-busqueda-exacta.md)).
-- `groups` agrupa los equipos empatados por miembros intercambiables
-  ([RN-04](../01-ddf/reglas-negocio.md#rn-04)), ya desempatados con
-  [RN-19](../01-ddf/reglas-negocio.md#rn-19).
-- Si `status` es `incomplete`, `suggestions` incluye cada hueco con la regla de presencia que
-  lo reserva, si la hay, y sus Pokémon ordenados, cada uno con `verified`
-  ([RN-08](../01-ddf/reglas-negocio.md#rn-08), [RN-18](../01-ddf/reglas-negocio.md#rn-18)).
+| Campo | Qué es |
+|-------|--------|
+| `status`, `incomplete_reason` | `complete` si hay equipos de 6 favoritos. Si no, `incomplete` y el motivo: `reserved_slot` (una regla de presencia necesita un Pokémon que no es favorito), `not_enough_candidates` (menos de 6 válidos) o `no_valid_team` (hay 6 o más, pero no 6 que cumplan juntos las reglas) ([RN-08](../01-ddf/reglas-negocio.md#rn-08)). |
+| `score` | Puntuación de los equipos recomendados, que empatan en cabeza. |
+| `groups` | Los equipos empatados, ya desempatados con [RN-19](../01-ddf/reglas-negocio.md#rn-19), agrupados por miembros intercambiables ([CA-33](../01-ddf/cuestiones-abiertas.md#resueltas)). `positions` tiene, por cada posición, los Pokémon que la pueden ocupar con sus tipos en el juego; cada combinación es uno de los `teams` del grupo. Un equipo que no se agrupa forma un grupo con una opción por posición. |
+| `teams[].breakdown` | Una entrada por regla blanda activa, en orden del catálogo: peso, puntuación de la regla en **porcentaje**, aportación y miembros que cuentan en contra ([RF-09](../01-ddf/requisitos-funcionales.md#rf-09)). Una regla con peso 0 aparece con aportación 0. |
+| `teams[].open_slots` | Si el equipo tiene menos de 6: los huecos reservados por una regla de presencia (`rule_id`), uno por regla, y después los libres juntos (`rule_id` nulo), cada uno con **todas** sus sugerencias de mejor a peor y si están verificadas ([CA-31](../01-ddf/cuestiones-abiertas.md#resueltas), [CA-50](../01-ddf/cuestiones-abiertas.md#resueltas)). Con varios huecos libres, cada sugerencia encaja con el equipo, pero no necesariamente con las demás. |
+| `discards` | Los favoritos descartados, en orden de la Pokédex Nacional, con la regla, el motivo (`generation`, `game`, `arrival`, `breeding` o `journey`) y su explicación ([RF-10](../01-ddf/requisitos-funcionales.md#rf-10)). `fact_key` es el dato confirmado por el usuario que decidió el descarte, si lo hay. |
+| `presence` | El nivel de cada regla de presencia activa ([RN-13](../01-ddf/reglas-negocio.md#rn-13), [RN-14](../01-ddf/reglas-negocio.md#rn-14)): `candidates`, `reserved` o `unmet`, con los Pokémon que la cumplen. |
+| `confirmed_facts` | Los datos que confirmó el usuario y que intervienen en la generación, con su valor ([RF-09](../01-ddf/requisitos-funcionales.md#rf-09)). |
+| `data_version` | La carga de datos usada, como en `/api/meta`. |
+
+**Puntuaciones enteras** ([CA-51](../01-ddf/cuestiones-abiertas.md#resueltas)): el motor
+calcula con fracciones exactas ([ADR-0006](../03-adr/0006-algoritmo-busqueda-exacta.md)) y
+decide con ellas el orden y los empates. La API redondea la puntuación de cada equipo al entero
+más cercano (las mitades, hacia arriba) y reparte las aportaciones con el **método del mayor
+resto**: cada regla recibe la parte entera de su aportación y las unidades que faltan para el
+total van a las de mayor parte decimal (a igualdad, a la primera del catálogo). Así siempre
+suman la puntuación del equipo. En el ejemplo, la puntuación exacta es 223/12 (18,58): RN-17
+aporta 9,58 y recibe la unidad que falta, así que se muestra 1 + 3 + 10 + 5 = 19. Lo que aporta
+cada sugerencia (`gain`) también se redondea. Dos equipos que se muestran con el mismo número
+no tienen por qué estar empatados.
+
+**Datos pendientes**: si queda algún dato sin confirmar que interviene, la respuesta es `409`
+con el mensaje y los mismos datos que muestra la [revisión](#juegos-y-revision-de-datos), con
+su estado:
+
+```json
+{
+  "detail": {
+    "message": "Antes de generar hay que confirmar los datos sin verificar que intervienen",
+    "pending": [{"fact_key": "mechanic:firered:contests", "status": "pending", "...": "..."}]
+  }
+}
+```
 
 ### Hall of Fame
 
