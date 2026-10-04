@@ -12,6 +12,7 @@ afectadas.
 | ID | Cuestión | Afecta a | Propuesta |
 |----|----------|----------|-----------|
 | CA-28 | ¿Qué Pokémon pueden llegar al juego objetivo y evolucionar antes de completarlo? | RN-03, RN-14, RN-15, RF-11 | Solo son candidatos los Pokémon cuya etapa de entrada (la que nace del huevo) se puede recibir en el juego objetivo y evolucionar hasta la evolución de favoritos antes de completarlo. Estos datos se cargan como inferidos y los confirma el usuario (RN-18), así que no bloquean la implementación. Investigar cada juego sirve para que las propuestas sean correctas. Ver [lo comprobado en Rojo Fuego y Verde Hoja](../02-ddt/datos-requeridos.md#restricciones-de-llegada-por-juego). |
+| CA-40 | ¿Tienen que pasar las sugerencias de RN-08 los mismos filtros por candidato que los favoritos: llegada antes de completar el juego (RN-03), crianza (RN-11) y recorrido (RN-16)? RN-08 solo dice que existan en el juego objetivo y cumplan las reglas duras junto con el equipo incompleto. | RN-08, RN-03, RN-11, RN-16 | Sí, todos. Si no, se sugerirían Pokémon con los que no se puede jugar, como un legendario o Raichu en Rojo Fuego. Lo único que distingue a una sugerencia de un candidato es que no es favorito. Sus datos sin confirmar se marcan como «sin verificar» (CA-31). Bloquea la fase 5 del [plan del motor](../02-ddt/plan-motor.md#cuestion-abierta). |
 
 ## Aplazadas
 
