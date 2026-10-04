@@ -5,7 +5,9 @@ description = "Generador de equipos Pokémon a partir de favoritos y reglas conf
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "sqlmodel>=0.0.47",
+]
 
 [dependency-groups]
 dev = [
@@ -91,6 +93,9 @@ forbidden_modules = ["ingest"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# The project is not installed as a package (tool.uv.package = false): tests import core, db,
+# ingest and api from the repository root.
+pythonpath = ["."]
 addopts = ["--strict-markers", "-ra"]
 markers = [
     "rn(id): verifica una regla de negocio del DDF, p. ej. rn(\"RN-01\")",

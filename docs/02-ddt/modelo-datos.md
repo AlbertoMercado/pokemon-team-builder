@@ -39,50 +39,98 @@ erDiagram
     TYPE ||--o{ TYPE_EFFICACY : ""
 ```
 
+Implementada en `db/reference/` ([implementación](#implementacion-de-referencesqlite)). En
+las columnas, **PK** es clave primaria, **FK →** clave foránea, **único** una restricción de
+unicidad y `?` un valor que puede ser nulo.
+
 ### Juegos
+
+Módulo `db/reference/games.py`.
 
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
-| `generation` | `number` PK, `slug` | 1 a 9. |
-| `version_group` | `slug` PK, `generation`, `order` | P. ej., `firered-leafgreen`. Los datos de evolución y movimientos van por grupo de versiones. |
-| `game` | `slug` PK, `name_es`, `version_group`, `generation`, `release_order`, `has_breeding`, `is_target` | `is_target` es falso en la 1.ª generación y en juegos sin crianza ([CA-29](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| `game_mechanic` | `game`, `mechanic`, `value`, `origin`, `fact_key` | P. ej., `day_night_cycle`. Datos curados, normalmente inferidos. |
-| `game_pokemon` | `game`, `pokemon`, `exists`, `exists_origin`, `can_arrive`, `arrival_origin` | Disponibilidad por forma ([RN-03](../01-ddf/reglas-negocio.md#rn-03)). `can_arrive`: si la etapa que nace del huevo puede llegar y evolucionar antes de completar el juego ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). |
+| `generation` | `number` PK, `slug` único | 1 a 9. |
+| `version_group` | `slug` PK, `generation` FK → `generation`, `order` único | P. ej., `firered-leafgreen`. `order` es el orden cronológico de PokeAPI y decide qué pasos de evolución se aplican a cada grupo ([plan de carga](plan-carga-datos.md#evoluciones)). |
+| `game` | `slug` PK, `name_es`, `version_group` FK, `generation` FK, `release_order`, `has_breeding`, `is_target` | `is_target` es falso en la 1.ª generación y en juegos sin crianza ([CA-29](../01-ddf/cuestiones-abiertas.md#resueltas)). En la primera carga, solo los 5 de la 3.ª generación ([CA-11](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `game_mechanic` | `game` FK y `mechanic` PK, `value` (sí/no)?, `origin`, `fact_key` único | P. ej., `day_night_cycle`. Datos curados, normalmente inferidos. `value` es nulo solo si `origin` es `pending`. |
+| `game_pokemon` | `game` FK y `pokemon` FK PK, `exists_in_game`?, `exists_origin`, `can_arrive`?, `arrival_origin` | Disponibilidad por forma ([RN-03](../01-ddf/reglas-negocio.md#rn-03)). `can_arrive`: si la etapa que nace del huevo puede llegar y evolucionar antes de completar el juego ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Cada valor es nulo solo si su origen es `pending`. La columna no se llama `exists` porque es palabra reservada de SQL. |
 
 ### Pokémon
 
+Módulo `db/reference/pokemon.py`.
+
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
-| `species` | `slug` PK, `dex_number`, `name_es`, `generation`, `evolves_from`, `evolution_chain`, `is_baby`, `is_legendary`, `is_mythical` | Del CSV `pokemon_species`. |
-| `species_egg_group` | `species`, `egg_group` | Para [RN-11](../01-ddf/reglas-negocio.md#rn-11). |
-| `pokemon` | `slug` PK, `species`, `name_es`, `is_default`, `region` | Solo la forma base y las regionales ([RN-05](../01-ddf/reglas-negocio.md#rn-05)); se descartan las megaevoluciones y las formas de combate. |
-| `pokemon_type` | `pokemon`, `generation`, `slot`, `type` | Una fila por generación y tipo, ya resuelta con `pokemon_types_past`. `slot` 1 es el tipo primario ([RN-13](../01-ddf/reglas-negocio.md#rn-13)). |
-| `type` | `slug` PK, `name_es`, `generation` | Generación en que aparece. |
-| `type_efficacy` | `generation`, `attacking`, `defending`, `factor` | Ya resuelta con `type_efficacy_past`. `factor` en centésimas (0, 50, 100, 200). |
+| `type` | `slug` PK, `name_es`, `generation` FK | Generación en que aparece. |
+| `type_efficacy` | `generation` FK, `attacking` FK → `type` y `defending` FK → `type` PK, `factor` | Ya resuelta con `type_efficacy_past`. `factor` en centésimas: solo 0, 50, 100 o 200. |
+| `species` | `slug` PK, `dex_number` único, `name_es`, `generation` FK, `evolves_from`? FK → `species`, `evolution_chain`, `is_baby`, `requires_incense`, `is_legendary`, `is_mythical` | Del CSV `pokemon_species`. `requires_incense` marca los bebés que solo nacen con incienso (Azurill, Wynaut), que se cargan de `data/curated/breeding.yaml` ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `species_egg_group` | `species` FK y `egg_group` PK | Para [RN-11](../01-ddf/reglas-negocio.md#rn-11). |
+| `pokemon` | `slug` PK, `species` FK, `name_es`, `is_default`, `region`? | Solo la forma base y las regionales ([RN-05](../01-ddf/reglas-negocio.md#rn-05)); se descartan las megaevoluciones y las formas de combate. `region` solo en las regionales. |
+| `pokemon_type` | `pokemon` FK, `generation` FK y `slot` PK, `type` FK | Una fila por generación y tipo, ya resuelta con `pokemon_types_past`. `slot` 1 es el tipo primario ([RN-13](../01-ddf/reglas-negocio.md#rn-13)); solo 1 o 2. |
 
 ### Evoluciones
 
+Módulo `db/reference/evolution.py`.
+
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
-| `evolution_step` | `version_group`, `from_pokemon`, `to_pokemon`, `trigger`, `conditions` | Paso aplicable en ese grupo de versiones, ya resuelto a partir del `version_group_id` del CSV, que indica el grupo en que se introdujo la evolución ([plan de carga](plan-carga-datos.md#evoluciones)). `trigger` es el disparador de PokeAPI (`level-up`, `trade`, `use-item`, `shed`…) y `conditions`, un JSON con las condiciones no vacías (amistad, hora del día, objeto, belleza, comparación de estadísticas…), tal como vienen. Puede haber varias filas si hay métodos alternativos. |
-| `level_move` | `pokemon`, `version_group`, `move`, `level` | Solo los movimientos que exige alguna evolución (`known_move`), para [RN-15](../01-ddf/reglas-negocio.md#rn-15) y [CA-32](../01-ddf/cuestiones-abiertas.md#resueltas). No se crea en la primera carga: no hace falta hasta la 4.ª generación. |
+| `evolution_step` | `id` PK, `version_group` FK, `from_pokemon` FK → `pokemon`, `to_pokemon` FK → `pokemon`, `trigger`, `conditions` (JSON) | Paso aplicable en ese grupo de versiones, ya resuelto a partir del `version_group_id` del CSV, que indica el grupo en que se introdujo la evolución ([plan de carga](plan-carga-datos.md#evoluciones)). `trigger` es el disparador de PokeAPI (`level-up`, `trade`, `use-item`, `shed`…) y `conditions`, un objeto JSON con las condiciones no vacías (amistad, hora del día, objeto, belleza, comparación de estadísticas…), tal como vienen. Puede haber varias filas si hay métodos alternativos, por eso la clave es un `id`. |
+| `level_move` | `pokemon`, `version_group`, `move`, `level` | Solo los movimientos que exige alguna evolución (`known_move`), para [RN-15](../01-ddf/reglas-negocio.md#rn-15) y [CA-32](../01-ddf/cuestiones-abiertas.md#resueltas). **No implementada**: no hace falta hasta la 4.ª generación. |
 
-Clasificar un paso como tedioso a partir de su disparador y sus condiciones es una regla de
-negocio y se hace en `core/evolution.py`, no en la base de datos. Por eso se guardan los datos
-de PokeAPI sin reducirlos a una categoría.
+Clasificar un paso como tedioso o aleatorio a partir de su disparador y sus condiciones es una
+regla de negocio y se hace en `core/evolution.py`, no en la base de datos. Por eso se guardan
+los datos de PokeAPI sin reducirlos a una categoría.
 
 ### Combates clave
 
+Módulo `db/reference/battles.py`.
+
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
-| `key_battle` | `slug` PK, `game`, `category`, `trainer_name`, `order`, `origin`, `fact_key` | `category`: `gym_leader`, `elite_four`, `champion`, `villain_boss` o `rival_final` ([RN-17](../01-ddf/reglas-negocio.md#rn-17)). La lista de combates de cada juego es curada; los equipos salen de WikiDex. |
-| `key_battle_pokemon` | `battle`, `position`, `pokemon`, `level` | Ya sin el inicial del rival ([CA-26](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `key_battle` | `slug` PK, `game` FK, `category`, `trainer_name`, `order`, `origin`, `fact_key` único | `category`: `gym_leader`, `elite_four`, `champion`, `villain_boss` o `rival_final` ([RN-17](../01-ddf/reglas-negocio.md#rn-17)). `order` es único dentro de cada juego. La lista de combates de cada juego es curada; los equipos salen de WikiDex. |
+| `key_battle_pokemon` | `battle` FK y `position` PK, `pokemon` FK, `level`? | Ya sin el inicial del rival ([CA-26](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 
 ### Metadatos
 
+Módulo `db/reference/meta.py`.
+
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
-| `ingest_run` | `started_at`, `finished_at`, `pokeapi_commit`, `games`, `summary` | Una fila: la carga que generó el fichero. La API la expone para saber con qué datos se trabaja. |
+| `ingest_run` | `id` PK, `started_at`, `finished_at`, `pokeapi_commit`, `games` (JSON), `summary` (JSON) | Una fila: la carga que generó el fichero. `games` es la lista de juegos cargados y `summary`, el número de filas por tabla. La API la expone para saber con qué datos se trabaja. |
+
+### Implementación de `reference.sqlite`
+
+Qué hay en `db/` y por qué:
+
+| Fichero | Qué hace |
+|---------|----------|
+| `db/sqlite.py` | `create_sqlite_engine(path)`: crea el motor de SQLAlchemy de un fichero SQLite y activa `PRAGMA foreign_keys` en cada conexión, porque SQLite no comprueba las claves foráneas si no se le pide. Lo usarán las dos bases de datos. |
+| `db/reference/base.py` | `ReferenceModel`, la clase base de todas las tablas, con su propio `MetaData`. Los enums `Origin` y `BattleCategory`, y las ayudas `enum_column` y `origin_check`. |
+| `db/reference/__init__.py` | Expone los modelos y `create_reference_schema(engine)`, que crea todas las tablas en una base de datos vacía. |
+| `db/reference/games.py`, `pokemon.py`, `evolution.py`, `battles.py`, `meta.py` | Los modelos SQLModel de cada grupo de tablas de esta página. |
+
+Decisiones de implementación:
+
+- **Metadatos separados**: las tablas de `reference.sqlite` cuelgan de `ReferenceModel.metadata`
+  y no del `MetaData` global de SQLModel. Así, crear el esquema de una base de datos nunca crea
+  las tablas de la otra ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md)).
+- **Sin migraciones**: el fichero se reconstruye entero en cada carga, así que el esquema se
+  crea con `create_reference_schema` y no con Alembic.
+- **Enums como texto**: `origin` y `category` se guardan con su valor (`inferred`,
+  `gym_leader`), no con el nombre del miembro de Python, porque es el que usan las claves de
+  los datos revisables y la API.
+- **Integridad en la base de datos**: además de las claves foráneas, restricciones `CHECK`
+  impiden guardar datos incoherentes: un valor revisable es nulo **solo** si su origen es
+  `pending` (RN-18), `factor` solo admite 0, 50, 100 y 200, y `slot` solo 1 o 2.
+- **Orden de inserción**: los modelos declaran claves foráneas pero no relaciones
+  (`Relationship`), así que SQLAlchemy no reordena las inserciones. La ingesta carga las
+  tablas en orden de dependencias (`ReferenceModel.metadata.sorted_tables`).
+- **JSON**: `conditions`, `games` y `summary` son columnas JSON, porque su contenido es
+  variable y nunca se filtra por él en SQL.
+
+Los tests están en `tests/db/test_reference_schema.py`: comprueban que existen las tablas
+documentadas, guardan y leen un conjunto mínimo de Rojo Fuego y verifican que se rechazan los
+datos incoherentes.
 
 ## Base de datos del usuario (`user.sqlite`)
 
