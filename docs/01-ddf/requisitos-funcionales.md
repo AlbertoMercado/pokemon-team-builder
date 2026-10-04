@@ -169,7 +169,9 @@ Hay dos excepciones:
 - **Descripción**: junto al equipo se muestra su puntuación total y lo que aporta cada regla
   blanda, para que el usuario entienda por qué se ha elegido y ajuste los pesos.
 - **Criterios de aceptación**:
-    - La suma de las aportaciones de cada regla coincide con la puntuación total.
+    - La suma de las aportaciones de cada regla coincide con la puntuación total. Ambas se
+      muestran como números enteros redondeados, repartidos para que sigan sumando el total
+      ([CA-51](cuestiones-abiertas.md#resueltas)).
     - Se indica qué datos usados en la generación ha confirmado el usuario
       ([RN-18](reglas-negocio.md#rn-18)).
 
