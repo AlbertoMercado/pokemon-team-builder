@@ -154,7 +154,7 @@ flowchart LR
 
 | Fase | Rama | Contenido | Tests |
 |------|------|-----------|-------|
-| 1 | `feat/core-dominio` | Modelos de `core/domain/`, `TypeChart` con el factor contra dos tipos, catálogo de reglas con sus valores por defecto y `RuleSettings`. Nueva página del DDT «Motor de reglas». | Modelos, tabla de tipos (Fantasma contra Psíquico en la 1.ª generación, Agua contra Roca/Tierra ×4) y catálogo. |
+| 1 ✅ | `feat/core-dominio` | Modelos de entrada de `core/domain/`, `TypeChart` con el factor contra dos tipos, catálogo de reglas con sus valores por defecto y `RuleSettings`. Nueva página del DDT [Motor de reglas](motor.md). Los modelos de salida (`GenerationResult`) se añaden en las fases que los usan. | Modelos, tabla de tipos (Fantasma contra Psíquico en la 1.ª generación, Agua contra Roca/Tierra ×4) y catálogo. |
 | 2 | `feat/core-filtros` | `breeding.py`, `journey.py` y los filtros RN-03, RN-11 y RN-16 con su motivo de descarte. | Ejemplos de RN-03, RN-11 y RN-16 del DDF, incluidas las excepciones de Dragonite y Eevee. |
 | 3 | `feat/core-puntuacion` | `evolution.py`, las reglas blandas RN-06, RN-15, RN-17 y RN-20, la puntuación ponderada con desglose y la clave de RN-19. | Ejemplos de RN-15 (Gengar, Raichu, Milotic), RN-20 (Wurmple) y RN-17 (Brock); suma del desglose. |
 | 4 | `feat/core-busqueda` | Restricciones RN-07, RN-12 y RN-14, niveles de presencia de RN-13 y RN-14, grafo de incompatibilidades, búsqueda con retroceso y `generate` para equipos completos. | Ejemplos de RN-07, RN-12, RN-13 y RN-14; propiedades con hypothesis y fuerza bruta; escenario real de Rojo Fuego. |
@@ -167,20 +167,21 @@ reales de extremo a extremo.
 
 ## Trazabilidad de las reglas
 
-Se completa en cada fase con el módulo y los tests de cada regla.
+Se completa en cada fase con el módulo y los tests de cada regla. Detalle de lo implementado en
+[Motor de reglas](motor.md).
 
 | Regla | Módulo | Fase | Estado |
 |-------|--------|------|--------|
 | RN-01 | `engine/` | 4 | Pendiente |
 | RN-02 | `engine/` | 4 | Pendiente |
 | RN-03 | `rules/candidate.py` | 2 | Pendiente |
-| RN-04 | `scoring.py` | 3 | Pendiente |
-| RN-05 | `domain/` | 1 | Pendiente |
+| RN-04 | `rules/catalog.py` (pesos), `scoring.py` | 1, 3 | Pesos hechos (`test_catalog.py`); puntuación pendiente |
+| RN-05 | `domain/` | 1 | Hecho (`test_domain.py`) |
 | RN-06 | `rules/soft.py` | 3 | Pendiente |
 | RN-07 | `rules/team.py` | 4 | Pendiente |
 | RN-08 | `engine/suggestions.py` | 5 | Pendiente |
-| RN-09 | `domain/`, `engine/` | 1, 4 | Pendiente |
-| RN-10 | `domain/` (`TypeChart`, tipos por generación) | 1 | Pendiente |
+| RN-09 | `domain/`, `engine/` | 1, 4 | Modelo hecho (`test_domain.py`); uso en el motor pendiente |
+| RN-10 | `domain/` (`TypeChart`, tipos por generación) | 1 | Hecho (`test_type_chart.py`, `test_domain.py`) |
 | RN-11 | `breeding.py`, `rules/candidate.py` | 2 | Pendiente |
 | RN-12 | `rules/team.py` | 4 | Pendiente |
 | RN-13 | `rules/team.py` | 4 | Pendiente |

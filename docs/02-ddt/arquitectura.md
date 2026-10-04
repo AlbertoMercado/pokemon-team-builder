@@ -39,7 +39,9 @@ flowchart LR
 ### `core/`: dominio puro
 
 Contiene toda la lógica de negocio del [DDF](../01-ddf/reglas-negocio.md). No accede a la red,
-a la base de datos ni al sistema de ficheros, y solo depende de la biblioteca estándar.
+a la base de datos ni al sistema de ficheros, y solo depende de la biblioteca estándar. Lo
+implementado está en [Motor de reglas](motor.md) y el plan, en
+[plan de implementación del motor](plan-motor.md).
 
 | Módulo | Responsabilidad |
 |--------|-----------------|

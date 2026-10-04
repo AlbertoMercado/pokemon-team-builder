@@ -59,6 +59,7 @@ nav:
   - Diseño técnico (DDT):
       - 02-ddt/index.md
       - Arquitectura: 02-ddt/arquitectura.md
+      - Motor de reglas: 02-ddt/motor.md
       - Estructura del código: 02-ddt/estructura-codigo.md
       - Modelo de datos: 02-ddt/modelo-datos.md
       - API: 02-ddt/api.md
