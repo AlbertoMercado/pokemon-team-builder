@@ -1,9 +1,10 @@
 """Load phase of the ingest: build reference.sqlite safely and replace the previous one.
 
 The new database is built in a temporary file next to the target. Only when every row is
-stored, the integrity checks pass and the data checks of the load (``ingest/checks.py``)
-pass does it replace the previous file, in a single atomic rename. If anything fails, the
-previous database is kept untouched (RF-11).
+stored, the integrity checks pass, the data checks of the load (``ingest/checks.py``) pass
+and the keys that user.sqlite uses still exist (``ingest/user_keys.py``) does it replace the
+previous file, in a single atomic rename. If anything fails, the previous database is kept
+untouched (RF-11, ADR-0003).
 """
 
 from collections import defaultdict
@@ -20,6 +21,7 @@ from db.sqlite import create_sqlite_engine
 from ingest.checks import Check
 from ingest.report import LoadReport
 from ingest.sources import Source
+from ingest.user_keys import check_user_keys
 
 ORIGIN_COLUMN_SUFFIX = "origin"
 MAX_DANGLING_VALUES = 5
@@ -30,11 +32,16 @@ class IntegrityCheckError(Exception):
 
 
 def build_reference(
-    sources: Sequence[Source], target: Path, checks: Sequence[Check] = ()
+    sources: Sequence[Source],
+    target: Path,
+    checks: Sequence[Check] = (),
+    user_database: Path | None = None,
 ) -> LoadReport:
     """Build reference.sqlite at ``target`` from ``sources`` and report the outcome.
 
-    ``checks`` run on the new database; any problem they report rejects the load.
+    ``checks`` run on the new database; any problem they report rejects the load. Then, if
+    ``user_database`` is given, the keys of user.sqlite are checked against the new database:
+    missing favourites or Hall of Fame data reject it, missing confirmations are warnings.
     """
     report = LoadReport(target=target)
     temporary = target.with_name(f"{target.name}.tmp")
@@ -48,7 +55,7 @@ def build_reference(
         problems = _run_checks(engine, checks)
         if problems:
             report.errors.extend(f"Comprobación fallida: {problem}" for problem in problems)
-        else:
+        elif user_database is None or not _rejected_by_user_keys(engine, user_database, report):
             report.checks_passed = len(checks)
             _record_run(engine, sources, started_at)
             report.rows_by_table = _count_rows(engine)
@@ -112,6 +119,15 @@ def _describe_dangling(
         for reference, values in sorted(missing.items())
     )
     return f"{len(dangling)} referencias a filas que no existen ({details})"
+
+
+def _rejected_by_user_keys(engine: Engine, user_database: Path, report: LoadReport) -> bool:
+    """Adds the problems with user.sqlite's keys to ``report``; true if they reject the load."""
+    with Session(engine) as session:
+        problems = check_user_keys(session, user_database)
+    report.errors.extend(f"Datos del usuario: {error}" for error in problems.errors)
+    report.warnings.extend(problems.warnings)
+    return bool(problems.errors)
 
 
 def _run_checks(engine: Engine, checks: Sequence[Check]) -> list[str]:

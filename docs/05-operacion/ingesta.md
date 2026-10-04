@@ -105,13 +105,20 @@ flowchart TD
 6. **Comprobaciones de la carga** (`ingest/checks.py`): cantidades esperadas y casos
    conocidos de la primera carga ([detalle](../02-ddt/plan-carga-datos.md#comprobaciones-de-la-carga)).
    Si alguna falla, la carga se rechaza.
-7. **Registro**: guarda una fila en `ingest_run` con el inicio y el fin de la carga, el commit
+7. **Datos del usuario** (`ingest/user_keys.py`): si existe `user.sqlite` en el directorio de
+   datos, comprueba que lo que usa sigue existiendo en la nueva base de datos
+   ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md)). Un favorito, el juego de un
+   registro del *Hall of Fame* o un miembro de su equipo que ya no existe **rechaza la carga**;
+   una confirmación de un dato que ya no existe solo es un **aviso**, porque responde a una
+   pregunta que ya no se hace y la API la ignora. Sin `user.sqlite`, o sin sus tablas, no hay
+   nada que comprobar. Solo lo lee: la carga nunca escribe en `user.sqlite`.
+8. **Registro**: guarda una fila en `ingest_run` con el inicio y el fin de la carga, el commit
    de PokeAPI, los juegos cargados y el número de filas por tabla.
-8. **Sustitución**: renombra el temporal sobre `reference.sqlite` en una sola operación
+9. **Sustitución**: renombra el temporal sobre `reference.sqlite` en una sola operación
    atómica. No hay ningún momento en que el fichero esté a medio escribir.
-9. **Informe**: lo muestra en la terminal.
+10. **Informe**: lo muestra en la terminal, con los avisos si los hay.
 
-Si algo falla en los pasos 1 a 7, se borra el temporal y `reference.sqlite` queda como estaba.
+Si algo falla en los pasos 1 a 8, se borra el temporal y `reference.sqlite` queda como estaba.
 
 ## Informe
 
@@ -398,7 +405,8 @@ Código en `ingest/` ([estructura del código](../02-ddt/estructura-codigo.md)):
 | `__main__.py` | Punto de entrada de `python -m ingest`. |
 | `cli.py` | Opciones de la línea de comandos y fuentes de una carga completa (`default_sources`). |
 | `scope.py` | Alcance de la carga: generaciones cargadas, generaciones con juego objetivo, primera generación con crianza y grupos de versiones excluidos ([CA-11](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| `load.py` | `build_reference(sources, target, checks)`: fichero temporal, filas, integridad, comprobaciones, registro y sustitución. |
+| `load.py` | `build_reference(sources, target, checks, user_database)`: fichero temporal, filas, integridad, comprobaciones, datos del usuario, registro y sustitución. |
+| `user_keys.py` | `check_user_keys`: lo que usa `user.sqlite` y no tiene la nueva carga, como errores (favoritos y *Hall of Fame*) o avisos (confirmaciones). |
 | `checks.py` | Comprobaciones de la primera carga: cantidades y casos conocidos. |
 | `report.py` | `LoadReport`: recuentos, comprobaciones superadas, errores y texto del informe. |
 | `sources/__init__.py` | `Source`, la interfaz de una fuente: `name`, `pokeapi_commit` y `rows()`, que entrega filas ya validadas. |
@@ -417,6 +425,10 @@ Tests en `tests/ingest/`:
 
 - `test_load.py`: la carga con fuentes en memoria (filas desordenadas, registro, recuento por
   origen, referencias rotas, fuentes que fallan) y el CLI.
+- `test_user_keys.py`: las claves de `user.sqlite` frente a la nueva carga: sin `user.sqlite`,
+  con todas las claves, favoritos y datos del *Hall of Fame* que desaparecen (la carga se
+  rechaza y se conserva la anterior), confirmaciones que desaparecen (solo avisos), listas
+  largas y la CLI.
 - `test_pokeapi.py`: la fuente de PokeAPI sobre un
   [extracto real del volcado](https://github.com/AlbertoMercado/pokemon-team-builder/tree/main/tests/ingest/fixtures/pokeapi)
   con unas 45 especies elegidas por sus casos especiales: caché, validación, juegos, formas,
@@ -432,9 +444,6 @@ Ningún test usa la red: `tests/conftest.py` hace fallar cualquier petición HTT
 ## Pendiente
 
 - **Rubí, Zafiro y Esmeralda** (fase 6): mecánicas, regla de llegada y combates clave.
-- **Claves de `user.sqlite`**: cuando exista, la carga comprobará que los favoritos, el *Hall
-  of Fame* y las confirmaciones siguen apuntando a datos que existen
-  ([arquitectura](../02-ddt/arquitectura.md#ingest-carga-de-datos)).
 - **Elegir juegos**: cargar solo algunos juegos objetivo, cuando haya más de una generación.
 - **Cargas bloqueadas** (fase 7): bloqueos, informe en JSON y Markdown y código de salida 2
   ([carga bloqueada](#carga-bloqueada)).

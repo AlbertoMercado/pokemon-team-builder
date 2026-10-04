@@ -199,6 +199,23 @@ El esquema de la respuesta está en la [API](api.md#generacion).
   versiones más reciente que tiene cada evolución. Convertirlos en texto («nivel 25»,
   «intercambio») es cosa de la interfaz, que ya tendrá que mostrar nombres de objetos.
 
+### Decisiones tomadas al implementar la fase 7
+
+- **Las confirmaciones huérfanas son avisos, no errores**: el plan decía que también
+  rechazaban la carga. Pero una confirmación de un dato que ya no existe responde a una
+  pregunta que ya no se hace, la API la ignora y no hay forma de borrarla desde la API, así que
+  bloquear la carga obligaría a editar `user.sqlite` a mano. Los favoritos y el *Hall of Fame*
+  sí la rechazan: son datos del usuario y generar sin ellos cambiaría los equipos sin avisar.
+- **Solo lectura**: la ingesta abre `user.sqlite` del mismo directorio de datos solo para
+  leerlo; no lo crea ni lo migra. Sin el fichero o sin sus tablas, no comprueba nada.
+- **El informe explica qué hacer**: quitar el favorito o corregir el registro y repetir la
+  carga, o, si las fuentes han renombrado un identificador, una migración de datos de
+  `user.sqlite` ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md)). Las listas se
+  recortan a 10 claves.
+- **Código de salida 1**, como cualquier otro error: no es una carga bloqueada
+  ([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)), porque el problema está en los datos del
+  usuario, no en las fuentes.
+
 ## Fases
 
 Cada fase es un PR con sus tests y su documentación.
@@ -225,7 +242,7 @@ contexto incorpora el recorrido (RN-16).
 | 4 ✅ | `feat/api-generacion` | `POST /generations`, esquemas de respuesta, enteros con mayor resto y `409` con datos pendientes. | Generación de Rojo Fuego de principio a fin con datos reales; `409`; las aportaciones suman el total; equipo incompleto con sugerencias. |
 | 5 ✅ | `feat/api-hall-of-fame` | CRUD del *Hall of Fame* (RF-12, RF-13) y el recorrido en el contexto (RN-16). | Orden del recorrido por fecha y orden de registro; tipos copiados del juego; validaciones; un equipo registrado excluye su línea al generar. |
 | 6 ✅ | `feat/api-catalogo` | `GET /api/pokemon` con filtros y `GET /api/pokemon/{pokemon}` con la línea y el método de cada evolución (RF-01, RF-02). | Búsqueda por nombre, filtro por tipo y por favorito, formas regionales, ficha. |
-| 7 | `feat/ingest-claves-usuario` | La ingesta comprueba, antes de sustituir `reference.sqlite`, que los favoritos, los miembros del *Hall of Fame* y las confirmaciones apuntan a datos que siguen existiendo; si no, la carga falla y lo explica (ADR-0003). | Carga rechazada con una clave que desaparece; carga aceptada sin `user.sqlite`. |
+| 7 ✅ | `feat/ingest-claves-usuario` | La ingesta comprueba, antes de sustituir `reference.sqlite`, que los favoritos, los miembros del *Hall of Fame* y las confirmaciones apuntan a datos que siguen existiendo; si no, la carga falla y lo explica (ADR-0003). | Carga rechazada con una clave que desaparece; carga aceptada sin `user.sqlite`. |
 
 Después de la fase 4 ya se pueden generar equipos de Rojo Fuego y Verde Hoja desde la API con
 los datos reales; con la 5, teniendo en cuenta el recorrido.
