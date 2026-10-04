@@ -4,7 +4,8 @@ Aplicación personal y sin ánimo de lucro que, a partir de una lista de Pokémo
 juego objetivo, genera un equipo de 6 según reglas configurables (duras = filtros, blandas =
 puntuación ponderada).
 
-> Proyecto en fase inicial: todavía no hay código de aplicación.
+> Proyecto en fase inicial: existe la estructura de paquetes, pero todavía no hay lógica de
+> aplicación. Qué contiene cada directorio: [estructura del código](docs/02-ddt/estructura-codigo.md).
 
 ## Puesta en marcha
 

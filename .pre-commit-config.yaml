@@ -26,6 +26,16 @@ repos:
         args: [--strict]
         additional_dependencies: [pytest, hypothesis]
 
+  # Contratos de dependencia entre paquetes (ADR-0002), definidos en pyproject.toml.
+  - repo: local
+    hooks:
+      - id: lint-imports
+        name: import-linter (contratos de dependencia)
+        entry: uv run lint-imports
+        language: system
+        pass_filenames: false
+        types: [python]
+
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0
     hooks:

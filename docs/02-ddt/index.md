@@ -7,6 +7,8 @@ arquitectura se registran como [ADR](../03-adr/index.md).
 
 - [Arquitectura](arquitectura.md): componentes, reglas de dependencia, flujos, despliegue y
   estrategia de pruebas.
+- [Estructura del código](estructura-codigo.md): qué es y qué hace cada directorio, contratos
+  de dependencia entre paquetes y cómo se documenta el código.
 - [Modelo de datos](modelo-datos.md): las dos bases de datos SQLite, los datos revisables y el
   contexto del motor.
 - [API](api.md): endpoints HTTP y formato de la generación.

@@ -225,6 +225,7 @@ test-results/
 
 # Caché local de ingesta
 .cache/
+data/cache/
 *.sqlite
 *.db
 

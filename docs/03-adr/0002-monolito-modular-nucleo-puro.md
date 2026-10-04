@@ -55,11 +55,12 @@ Detalle en la [arquitectura](../02-ddt/arquitectura.md).
 
 ### Acciones derivadas
 
-- [ ] Añadir `import-linter` a las dependencias de desarrollo y a CI con los contratos de
-  dependencia.
-- [ ] Añadir `db` a los paquetes que revisa mypy en `pyproject.toml`.
+- [x] Añadir `import-linter` a las dependencias de desarrollo y a CI con los contratos de
+  dependencia ([estructura del código](../02-ddt/estructura-codigo.md#reglas-de-dependencia)).
+- [x] Añadir `db` a los paquetes que revisa mypy en `pyproject.toml`.
 
 ## Referencias
 
 - [Arquitectura](../02-ddt/arquitectura.md)
+- [Estructura del código](../02-ddt/estructura-codigo.md)
 - [import-linter](https://import-linter.readthedocs.io/)
