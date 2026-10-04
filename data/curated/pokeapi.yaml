@@ -1,0 +1,4 @@
+# Commit fijado del volcado CSV de PokeAPI (ADR-0004). Es el revisado en el plan de la
+# primera carga (docs/02-ddt/plan-carga-datos.md), del 2026-09-30.
+# Cambiarlo es actualizar los datos: se hace por PR y se vuelve a ejecutar la ingesta.
+commit: bc92d3b6029ef1abe9e7ad424c400b338f3c11fe

@@ -32,6 +32,8 @@ de Pokémon favoritos y un juego objetivo, genera un equipo de 6 según reglas c
   rate limit**; nunca hacer peticiones masivas sin caché. Identificarse con un `User-Agent`
   descriptivo.
 - **Datos curados**: `data/curated/*.yaml`, versionados y validados con pydantic (ADR-0005).
+- **Tests sin red**: `tests/conftest.py` hace fallar cualquier petición HTTP; los tests usan
+  extractos reales guardados en `tests/<paquete>/fixtures/`.
 - **Pokémon Showdown**: aplazado; ninguna regla lo necesita por ahora (ADR-0004).
 
 ## Estructura
@@ -106,7 +108,7 @@ tests e issues.**
 | Hooks de pre-commit | `uv run pre-commit install` / `uv run pre-commit run --all-files` | ✅ |
 | Documentación en local | `uv run mkdocs serve` | ✅ |
 | Construir documentación | `uv run mkdocs build --strict` | ✅ |
-| Ejecutar ingesta | `uv run python -m ingest [--data-dir DIR]` ([detalle](docs/05-operacion/ingesta.md)) | ✅ Sin fuentes todavía |
+| Ejecutar ingesta | `uv run python -m ingest [--data-dir DIR] [--offline]` ([detalle](docs/05-operacion/ingesta.md)) | ✅ Solo PokeAPI todavía |
 | Arrancar API | `uv run uvicorn api.main:app --reload` | ⏳ Pendiente |
 | Frontend en desarrollo | `cd web && npm run dev` | ⏳ Pendiente |
 | Lint / formato web | `cd web && npm run lint` / `npm run format` | ⏳ Pendiente |

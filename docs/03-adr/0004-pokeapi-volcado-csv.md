@@ -58,7 +58,8 @@ que:
 
 ### Acciones derivadas
 
-- [ ] Elegir el commit inicial de PokeAPI.
+- [x] Elegir el commit inicial de PokeAPI: `bc92d3b` (2026-09-30). El SHA completo está en
+  `data/curated/pokeapi.yaml`, que es la referencia.
 - [ ] Revisar las condiciones de uso de los datos de PokeAPI y de WikiDex (CC BY-NC-SA) e
   incluir la atribución en la aplicación.
 

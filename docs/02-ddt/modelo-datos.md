@@ -124,8 +124,9 @@ Decisiones de implementación:
   `pending` (RN-18), `factor` solo admite 0, 50, 100 y 200, y `slot` solo 1 o 2.
 - **Orden de inserción**: los modelos declaran claves foráneas pero no relaciones
   (`Relationship`), así que SQLAlchemy no reordena las inserciones. La ingesta guarda todas
-  las filas en una sola transacción con `PRAGMA defer_foreign_keys`, que comprueba las claves
-  al confirmarla: el orden no importa, ni siquiera dentro de una tabla
+  las filas en una sola transacción con las claves foráneas desactivadas y después las
+  comprueba con `PRAGMA foreign_key_check`, que dice qué tabla, columna y valor fallan: el
+  orden no importa, ni siquiera dentro de una tabla
   ([ingesta](../05-operacion/ingesta.md#que-hace)).
 - **JSON**: `conditions`, `games` y `summary` son columnas JSON, porque su contenido es
   variable y nunca se filtra por él en SQL.

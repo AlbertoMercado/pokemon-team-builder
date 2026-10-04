@@ -14,10 +14,16 @@ que solo sustituye al anterior si todo es correcto.
 | Ruta | Qué hace |
 |------|----------|
 | `__main__.py` | Punto de entrada de `python -m ingest`. |
-| `cli.py` | Opciones (`--data-dir`) y fuentes de una carga completa. |
+| `cli.py` | Opciones (`--data-dir`, `--offline`) y fuentes de una carga completa. |
+| `scope.py` | Alcance de la carga: generaciones y juegos que se cargan (CA-11). |
+| `checks.py` | Comprobaciones de la primera carga: cantidades y casos conocidos. |
 | `load.py` | `build_reference`: fichero temporal, filas, comprobaciones, registro en `ingest_run` y sustitución atómica. |
 | `report.py` | Informe de la carga: filas por tabla, datos por origen y errores. |
-| `sources/` | Interfaz `Source` de las fuentes. Los adaptadores (PokeAPI, curados, WikiDex) llegan en las fases 3 a 5 del [plan de carga](../docs/02-ddt/plan-carga-datos.md). |
+| `sources/` | Interfaz `Source` de las fuentes. |
+| `sources/pokeapi/` | Fuente de PokeAPI: descarga con caché (`download.py`), validación de cada fila (`rows.py`) y transformación (`transform.py`). |
+
+Los datos curados y WikiDex llegan en las fases 4 y 5 del
+[plan de carga](../docs/02-ddt/plan-carga-datos.md).
 
 **Restricciones**: solo puede importar `db/` (`lint-imports`).
 

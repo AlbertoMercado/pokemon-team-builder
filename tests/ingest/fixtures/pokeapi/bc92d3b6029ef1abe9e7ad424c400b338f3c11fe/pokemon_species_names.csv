@@ -1,0 +1,93 @@
+pokemon_species_id,local_language_id,name,genus
+1,7,Bulbasaur,Pokémon Semilla
+1,9,Bulbasaur,Seed Pokémon
+2,7,Ivysaur,Pokémon Semilla
+2,9,Ivysaur,Seed Pokémon
+3,7,Venusaur,Pokémon Semilla
+3,9,Venusaur,Seed Pokémon
+25,7,Pikachu,Pokémon Ratón
+25,9,Pikachu,Mouse Pokémon
+26,7,Raichu,Pokémon Ratón
+26,9,Raichu,Mouse Pokémon
+35,7,Clefairy,Pokémon Hada
+35,9,Clefairy,Fairy Pokémon
+36,7,Clefable,Pokémon Hada
+36,9,Clefable,Fairy Pokémon
+79,7,Slowpoke,Pokémon Atontado
+79,9,Slowpoke,Dopey Pokémon
+80,7,Slowbro,Pokémon Ermitaño
+80,9,Slowbro,Hermit Crab Pokémon
+81,7,Magnemite,Pokémon Imán
+81,9,Magnemite,Magnet Pokémon
+82,7,Magneton,Pokémon Imán
+82,9,Magneton,Magnet Pokémon
+92,7,Gastly,Pokémon Gas
+92,9,Gastly,Gas Pokémon
+93,7,Haunter,Pokémon Gas
+93,9,Haunter,Gas Pokémon
+94,7,Gengar,Pokémon Sombra
+94,9,Gengar,Shadow Pokémon
+106,7,Hitmonlee,Pokémon Patada
+106,9,Hitmonlee,Kicking Pokémon
+107,7,Hitmonchan,Pokémon Puñetazo
+107,9,Hitmonchan,Punching Pokémon
+113,7,Chansey,Pokémon Huevo
+113,9,Chansey,Egg Pokémon
+132,7,Ditto,Pokémon Transformación
+132,9,Ditto,Transform Pokémon
+133,7,Eevee,Pokémon Evolución
+133,9,Eevee,Evolution Pokémon
+134,7,Vaporeon,Pokémon Burbuja
+134,9,Vaporeon,Bubble Jet Pokémon
+135,7,Jolteon,Pokémon Relámpago
+135,9,Jolteon,Lightning Pokémon
+136,7,Flareon,Pokémon Llama
+136,9,Flareon,Flame Pokémon
+150,7,Mewtwo,Pokémon Genético
+150,9,Mewtwo,Genetic Pokémon
+172,7,Pichu,Pokémon Ratoncito
+172,9,Pichu,Tiny Mouse Pokémon
+173,7,Cleffa,Pokémon Estrella
+173,9,Cleffa,Star Shape Pokémon
+183,7,Marill,Pokémon Ratón Agua
+183,9,Marill,Aqua Mouse Pokémon
+184,7,Azumarill,Pokémon Conejo Agua
+184,9,Azumarill,Aqua Rabbit Pokémon
+196,7,Espeon,Pokémon Sol
+196,9,Espeon,Sun Pokémon
+197,7,Umbreon,Pokémon Luz Lunar
+197,9,Umbreon,Moonlight Pokémon
+199,7,Slowking,Pokémon Regio
+199,9,Slowking,Royal Pokémon
+236,7,Tyrogue,Pokémon Peleón
+236,9,Tyrogue,Scuffle Pokémon
+237,7,Hitmontop,Pokémon Boca Abajo
+237,9,Hitmontop,Handstand Pokémon
+242,7,Blissey,Pokémon Felicidad
+242,9,Blissey,Happiness Pokémon
+265,7,Wurmple,Pokémon Gusano
+265,9,Wurmple,Worm Pokémon
+266,7,Silcoon,Pokémon Capullo
+266,9,Silcoon,Cocoon Pokémon
+267,7,Beautifly,Pokémon Mariposa
+267,9,Beautifly,Butterfly Pokémon
+268,7,Cascoon,Pokémon Capullo
+268,9,Cascoon,Cocoon Pokémon
+269,7,Dustox,Pokémon Polilla Ven.
+269,9,Dustox,Poison Moth Pokémon
+290,7,Nincada,Pokémon Aprendiz
+290,9,Nincada,Trainee Pokémon
+291,7,Ninjask,Pokémon Ninja
+291,9,Ninjask,Ninja Pokémon
+292,7,Shedinja,Pokémon Muda
+292,9,Shedinja,Shed Pokémon
+298,7,Azurill,Pokémon A Topos
+298,9,Azurill,Polka Dot Pokémon
+349,7,Feebas,Pokémon Pez
+349,9,Feebas,Fish Pokémon
+350,7,Milotic,Pokémon Tierno
+350,9,Milotic,Tender Pokémon
+386,7,Deoxys,Pokémon ADN
+386,9,Deoxys,DNA Pokémon
+440,7,Happiny,Pokémon Casita
+440,9,Happiny,Playhouse Pokémon

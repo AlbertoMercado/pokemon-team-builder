@@ -14,3 +14,9 @@ no ([ADR-0005](../docs/03-adr/0005-datos-curados-yaml.md)).
 | `*.sqlite` | `reference.sqlite` y `user.sqlite`. | No |
 
 Más detalle en [Estructura del código](../docs/02-ddt/estructura-codigo.md).
+
+**Ficheros curados**:
+
+| Fichero | Qué contiene |
+|---------|--------------|
+| `curated/pokeapi.yaml` | Commit fijado del volcado CSV de PokeAPI ([ADR-0004](../docs/03-adr/0004-pokeapi-volcado-csv.md)). Cambiarlo es actualizar los datos. |
