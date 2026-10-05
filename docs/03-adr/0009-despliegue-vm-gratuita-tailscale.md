@@ -16,7 +16,8 @@ local, desde cualquier dispositivo, con estas restricciones:
   disco que se borra al reiniciar o al desplegar pierde esos datos.
 - **Sin autenticación**: la aplicación es de un solo usuario y no tiene cuentas
   ([alcance](../01-ddf/index.md#alcance)). Publicada en Internet, cualquiera podría cambiar los
-  datos.
+  datos. Protegerla es una mejora prevista
+  ([RF-19](../01-ddf/requisitos-funcionales.md#rf-19)) que no se ha implementado.
 - **Un solo proceso**: `uvicorn` sirve la API y la web compilada; necesita poca memoria y CPU, y
   unos pocos MB de disco.
 
@@ -72,6 +73,8 @@ Go* sin salir de los recursos gratuitos, con un presupuesto y una alerta de gast
   hasta 50 usuarios).
 - ❌ Exige un dominio gestionado por Cloudflare, que tiene un coste anual. Se puede añadir más
   adelante sin cambiar el resto.
+- Con [RF-19](../01-ddf/requisitos-funcionales.md#rf-19) implementado, publicar la aplicación
+  dejaría de depender solo de la capa de acceso.
 
 ## Consecuencias
 
@@ -95,7 +98,8 @@ Go* sin salir de los recursos gratuitos, con un presupuesto y una alerta de gast
 
 ### Acciones derivadas
 
-- [ ] Elegir la opción y aceptar o cambiar este ADR.
+- [ ] Revisar las opciones de despliegue en producción y aprobar una: aceptar o cambiar este
+  ADR.
 - [ ] Seguir la [puesta en producción](../05-operacion/puesta-en-produccion.md) y probarla.
 - [ ] Automatizar la copia de seguridad diaria de `user.sqlite`.
 

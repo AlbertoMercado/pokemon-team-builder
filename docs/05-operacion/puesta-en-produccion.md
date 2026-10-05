@@ -4,10 +4,11 @@ Cómo tener la aplicación siempre disponible, sin arrancarla en el ordenador, c
 qué opciones hay, cuál se recomienda y cómo instalarla, mantenerla y hacer copias de seguridad.
 La decisión está en [ADR-0009](../03-adr/0009-despliegue-vm-gratuita-tailscale.md).
 
-!!! warning "Propuesta"
-    La opción está pendiente de elegir ([ADR-0009](../03-adr/0009-despliegue-vm-gratuita-tailscale.md),
-    *Propuesto*) y la guía todavía no se ha seguido de principio a fin. Los planes gratuitos se
-    revisaron el **2026-10-05** y cambian a menudo: compruébalos antes de empezar.
+!!! warning "Pendiente de aprobar"
+    Es una **propuesta**: hay que revisar las opciones de despliegue en producción y aprobar una
+    ([ADR-0009](../03-adr/0009-despliegue-vm-gratuita-tailscale.md), *Propuesto*). La guía
+    todavía no se ha seguido de principio a fin. Los planes gratuitos se revisaron el
+    **2026-10-05** y cambian a menudo: compruébalos antes de empezar.
 
 ## Qué necesita la aplicación
 
@@ -17,7 +18,7 @@ La decisión está en [ADR-0009](../03-adr/0009-despliegue-vm-gratuita-tailscale
 | Disco persistente | `reference.sqlite` (los datos de los juegos, se puede regenerar con la [ingesta](ingesta.md)) y **`user.sqlite`** (favoritos, reglas, confirmaciones y *Hall of Fame*), que **no se puede regenerar**. Pocos MB en total. |
 | Python 3.13 y uv | Para la API. `uv sync --no-dev` instala solo lo necesario para ejecutarla. |
 | Node 24 | Solo para compilar la web (`npm run build`). Se compila en el ordenador y se copia `web/dist`, así que el servidor no lo necesita. |
-| Acceso privado | La aplicación **no tiene autenticación**: es de un solo usuario. Si se publica en Internet tal cual, cualquiera puede cambiar los datos. |
+| Acceso privado | La aplicación **no tiene autenticación**: es de un solo usuario. Si se publica en Internet tal cual, cualquiera puede cambiar los datos. Protegerla es una mejora prevista ([RF-19](../01-ddf/requisitos-funcionales.md#rf-19)); hasta entonces, el acceso tiene que ser privado. |
 
 Cualquier opción debe cumplir: coste 0, disco que sobreviva a reinicios y despliegues, y acceso
 solo para el usuario.
@@ -43,7 +44,7 @@ Revisadas el 2026-10-05.
 |--------|-------|------|---------|-----------|
 | **Tailscale** (plan *Personal*) | 0 | Red privada entre tus dispositivos: la aplicación no se expone a Internet. `tailscale serve` le da HTTPS con un nombre `*.ts.net`. Sin dominio ni puertos abiertos. Hasta 6 usuarios y dispositivos ilimitados. | Hay que instalar Tailscale en cada dispositivo (ordenador, móvil). | **Recomendada** |
 | Cloudflare Tunnel con Cloudflare Access | El túnel y Access (hasta 50 usuarios) son gratis; **el dominio no** | Acceso desde cualquier navegador, con inicio de sesión. | Exige un dominio gestionado por Cloudflare, con coste anual. | Mejora opcional |
-| Publicar el puerto en Internet | 0 | — | Sin autenticación, cualquiera podría cambiar los datos. | **Descartada** |
+| Publicar el puerto en Internet | 0 | — | Sin autenticación, cualquiera podría cambiar los datos. | **Descartada** mientras no exista [RF-19](../01-ddf/requisitos-funcionales.md#rf-19) |
 
 ## Recomendación
 

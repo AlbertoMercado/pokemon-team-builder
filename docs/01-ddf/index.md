@@ -63,11 +63,14 @@ Consecuencias:
 - Registrar los equipos con los que se ha completado un juego (*Hall of Fame*).
 - Como mejora deseable, mostrar las imágenes de los Pokémon y las portadas de los juegos
   ([RF-17](requisitos-funcionales.md#rf-17), [RF-18](requisitos-funcionales.md#rf-18)).
+- Como mejora deseable, proteger el acceso a la aplicación para que solo la use su usuario
+  ([RF-19](requisitos-funcionales.md#rf-19)).
 
 **Fuera del alcance** (por ahora):
 
 - Combate competitivo: equipos para formatos de Showdown, EV/IV, objetos o estrategias.
-- Varios usuarios, cuentas o autenticación: la aplicación es personal y de un solo usuario.
+- Varios usuarios o cuentas: la aplicación es personal y de un solo usuario. Proteger el acceso
+  de ese único usuario sí entra, como mejora ([RF-19](requisitos-funcionales.md#rf-19)).
 - Juegos que no sean de la saga principal (spin-offs, Pokémon GO, TCG…).
 
 **Fuera del alcance de este documento**:

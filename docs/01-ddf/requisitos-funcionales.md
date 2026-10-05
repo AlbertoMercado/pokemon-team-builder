@@ -36,6 +36,7 @@ Hay dos excepciones:
 | [RF-16](#rf-16) | Informar de las cargas bloqueadas | Datos | Must |
 | [RF-17](#rf-17) | Mostrar imágenes de los Pokémon | Imágenes | Could |
 | [RF-18](#rf-18) | Mostrar la portada de los juegos | Imágenes | Could |
+| [RF-19](#rf-19) | Proteger el acceso a la aplicación | Seguridad | Could |
 
 ## Catálogo
 
@@ -344,3 +345,32 @@ decidido en [CA-54, CA-55 y CA-56](cuestiones-abiertas.md#resueltas).
     - Como las imágenes de los Pokémon, con el aviso de su titularidad y su procedencia.
 - **Nota**: las portadas salen de WikiDex si las tiene y se pueden usar; si no, se busca otra
   fuente antes de implementarlo ([CA-55](cuestiones-abiertas.md#resueltas)).
+
+## Seguridad
+
+La aplicación es personal y de un solo usuario, y no tiene autenticación: en su ordenador no
+hace falta. Si se usa desde fuera de él ([puesta en producción](../05-operacion/puesta-en-produccion.md)),
+cualquiera que llegue a ella podría ver y cambiar los datos. Hoy se evita con un acceso privado
+([ADR-0009](../03-adr/0009-despliegue-vm-gratuita-tailscale.md), *Propuesto*); esta mejora
+protege la propia aplicación, de forma que no dependa solo de cómo se despliega.
+
+### RF-19 · Proteger el acceso a la aplicación { #rf-19 }
+
+- **Prioridad**: Could
+- **Descripción**: solo el usuario de la aplicación puede usar la API y la web. Sigue siendo una
+  aplicación de un solo usuario: no hay registro ni varias cuentas.
+- **Criterios de aceptación**:
+    - Sin identificarse no se puede ver ni cambiar nada: la web muestra una pantalla de acceso
+      y la API rechaza las peticiones (`401`), salvo una comprobación de que está en marcha que
+      no revela datos.
+    - Las credenciales se configuran en el servidor, nunca en el código ni en git.
+    - La sesión se mantiene en el navegador durante un tiempo razonable y se puede cerrar desde
+      la web.
+    - Fuera del ordenador del usuario, la comunicación va siempre cifrada (HTTPS).
+    - Los intentos de acceso fallidos se limitan, para dificultar que se adivinen las
+      credenciales.
+    - La documentación interactiva de la API y su contrato OpenAPI solo se ven identificado.
+    - En desarrollo y en los tests se puede desactivar con la configuración, sin cambiar el
+      código.
+- **Nota**: el mecanismo y las protecciones que lo acompañan se deciden en
+  [CA-57](cuestiones-abiertas.md#abiertas) y [CA-58](cuestiones-abiertas.md#abiertas).

@@ -220,7 +220,9 @@ Uso personal, en local o en una máquina virtual gratuita con acceso privado
   (`api/web.py`, [Operación](../05-operacion/web.md#un-solo-proceso)).
 - Los dos ficheros SQLite están en un directorio de datos configurable.
 - Sin autenticación: la aplicación es de un solo usuario
-  ([alcance](../01-ddf/index.md#alcance)).
+  ([alcance](../01-ddf/index.md#alcance)). Protegerla es una mejora prevista
+  ([RF-19](../01-ddf/requisitos-funcionales.md#rf-19)); mientras tanto, fuera del ordenador del
+  usuario el acceso tiene que ser privado.
 
 ## Estrategia de pruebas
 
