@@ -81,6 +81,7 @@ nav:
       - "0006 · Búsqueda exacta": 03-adr/0006-algoritmo-busqueda-exacta.md
       - "0007 · Cliente generado desde OpenAPI": 03-adr/0007-cliente-generado-openapi.md
       - "0008 · Cargas bloqueadas": 03-adr/0008-cargas-bloqueadas.md
+      - "0009 · Despliegue en una VM gratuita": 03-adr/0009-despliegue-vm-gratuita-tailscale.md
   - Manual de usuario:
       - 04-manual-usuario/index.md
       - Cargar y actualizar los datos: 04-manual-usuario/cargar-datos.md
@@ -92,4 +93,5 @@ nav:
       - Ingesta de datos: 05-operacion/ingesta.md
       - Arrancar la API: 05-operacion/api.md
       - Web: 05-operacion/web.md
+      - Puesta en producción: 05-operacion/puesta-en-produccion.md
       - Informes de carga: 05-operacion/informes-carga/index.md

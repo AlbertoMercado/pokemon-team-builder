@@ -11,11 +11,12 @@ Instalación, despliegue, ingesta de datos y mantenimiento.
 - [Web](web.md): la aplicación en un solo proceso (la API sirve la web compilada), la web en
   desarrollo con `npm run dev`, el cliente de la API, las comprobaciones y las pruebas de
   extremo a extremo.
+- [Puesta en producción](puesta-en-produccion.md): tener la aplicación siempre disponible con
+  coste 0 (opciones evaluadas, recomendación, instalación en una VM gratuita con acceso por
+  Tailscale, copias de seguridad, actualización y supervisión).
 - [Informes de carga](informes-carga/index.md): historial de las cargas bloqueadas y de las
   que las resuelven, registrado en git a mano.
 
 !!! note "Pendiente"
-    Una guía de mantenimiento: actualizar la aplicación y los datos y hacer copias de seguridad
-    de `user.sqlite`. Mientras tanto, cada paso está en su página: [ingesta](ingesta.md),
-    [migraciones](api.md#base-de-datos-del-usuario-usersqlite) y
-    [compilar la web](web.md#un-solo-proceso).
+    Elegir la opción de despliegue ([ADR-0009](../03-adr/0009-despliegue-vm-gratuita-tailscale.md),
+    *Propuesto*) y probar la [puesta en producción](puesta-en-produccion.md).
