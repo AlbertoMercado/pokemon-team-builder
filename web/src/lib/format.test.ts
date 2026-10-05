@@ -1,4 +1,4 @@
-import { formatDate, shortCommit } from "./format";
+import { formatDate, formatDexNumber, shortCommit } from "./format";
 
 describe("formatDate", () => {
   it("writes a date of the API in Spanish without moving it to another day", () => {
@@ -9,5 +9,12 @@ describe("formatDate", () => {
 describe("shortCommit", () => {
   it("keeps the first 7 characters of a commit", () => {
     expect(shortCommit("bc92d3b" + "6029ef1abe9e")).toBe("bc92d3b");
+  });
+});
+
+describe("formatDexNumber", () => {
+  it("pads the number to three digits", () => {
+    expect(formatDexNumber(25)).toBe("#025");
+    expect(formatDexNumber(386)).toBe("#386");
   });
 });

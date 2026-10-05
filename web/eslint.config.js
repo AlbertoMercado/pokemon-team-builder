@@ -26,6 +26,11 @@ export default defineConfig([
     },
   },
   {
+    // Hot reload does not apply to tests.
+    files: ["src/test/**", "**/*.test.{ts,tsx}"],
+    rules: { "react-refresh/only-export-components": "off" },
+  },
+  {
     files: ["**/*.js"],
     extends: [js.configs.recommended],
     languageOptions: { globals: globals.node },

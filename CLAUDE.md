@@ -115,7 +115,7 @@ tests e issues.**
 | Arrancar API | `uv run uvicorn api.main:app --reload` (`PTB_DATA_DIR` para otro directorio de datos; [detalle](docs/05-operacion/api.md)) | ✅ Metadatos, catálogo, favoritos, reglas, juegos, revisión de datos, generación y Hall of Fame |
 | Migraciones de `user.sqlite` | `uv run alembic -c db/user/alembic.ini upgrade head` (la API las aplica al arrancar) | ✅ |
 | Instalar dependencias web | `cd web && npm ci` | ✅ |
-| Frontend en desarrollo | `cd web && npm run dev` (con la API arrancada; [detalle](docs/05-operacion/web.md)) | ✅ Inicio y navegación |
+| Frontend en desarrollo | `cd web && npm run dev` (con la API arrancada; [detalle](docs/05-operacion/web.md)) | ✅ Inicio, catálogo, ficha y favoritos |
 | Regenerar el cliente de la API | `cd web && npm run api:generate` (al cambiar la API, en el mismo PR) | ✅ |
 | Lint / formato web | `cd web && npm run lint` / `npm run format` | ✅ |
 | Tipos web | `cd web && npm run typecheck` | ✅ |
@@ -135,5 +135,6 @@ Actualiza esta tabla cuando un comando pendiente pase a existir.
   tipos, tests y compilación.
 - **Secretos**: gitleaks sobre todo el historial.
 
-Python, Documentación y Secretos son comprobaciones obligatorias para fusionar en `main`; Web
-lo será cuando se añada a la protección de la rama.
+Los cuatro son comprobaciones obligatorias para fusionar en `main`. Cuando exista el job E2E
+(fase 8 del [plan de la web](docs/02-ddt/plan-web.md#ci)), habrá que añadirlo también a la
+protección de la rama.

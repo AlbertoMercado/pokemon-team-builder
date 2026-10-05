@@ -5,8 +5,8 @@ la CI. Qué pantallas tiene y cómo se construye, en el [plan de la web](../02-d
 cómo se usa, en el [manual de usuario](../04-manual-usuario/web.md).
 
 !!! note "Estado"
-    Fase 1 del [plan de la web](../02-ddt/plan-web.md#fases): proyecto, cliente de la API,
-    navegación e Inicio. Hasta la fase 8, la web se sirve con el servidor de desarrollo de
+    Fases 1 y 2 del [plan de la web](../02-ddt/plan-web.md#fases): proyecto, cliente de la
+    API, navegación, Inicio, catálogo, ficha y favoritos. Hasta la fase 8, la web se sirve con el servidor de desarrollo de
     Vite, aparte de la API.
 
 ## Requisitos
@@ -69,8 +69,8 @@ una pantalla hace una petición sin respuesta simulada.
 
 El job **Web** de `.github/workflows/ci.yml` ejecuta `npm ci`, regenera el cliente y falla si
 `schema.d.ts` cambia, y después el lint, el formato, los tipos, los tests y la compilación.
-Para que sea obligatorio al fusionar en `main`, el propietario del repositorio tiene que
-añadirlo a la protección de la rama en GitHub.
+Es una comprobación obligatoria para fusionar en `main`, como Python, Documentación y Secretos
+(protección de la rama en GitHub).
 
 ## Problemas habituales
 

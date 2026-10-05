@@ -5,17 +5,21 @@
 import { Route, Routes } from "react-router";
 
 import Layout from "./components/Layout";
+import CatalogPage from "./pages/CatalogPage";
+import FavoritesPage from "./pages/FavoritesPage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PendingPage from "./pages/PendingPage";
+import PokemonPage from "./pages/PokemonPage";
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
-        <Route path="pokemon/*" element={<PendingPage title="Catálogo" />} />
-        <Route path="favoritos" element={<PendingPage title="Favoritos" />} />
+        <Route path="pokemon" element={<CatalogPage />} />
+        <Route path="pokemon/:pokemon" element={<PokemonPage />} />
+        <Route path="favoritos" element={<FavoritesPage />} />
         <Route path="reglas" element={<PendingPage title="Reglas" />} />
         <Route path="juego/*" element={<PendingPage title="Nuevo juego" />} />
         <Route path="hall-of-fame" element={<PendingPage title="Hall of Fame" />} />
