@@ -1,4 +1,4 @@
-/** Values of the API shown to the user: dates in Spanish and commits. */
+/** Values of the API shown to the user: dates in Spanish, Pokédex numbers and commits. */
 
 const DATE = new Intl.DateTimeFormat("es-ES", { dateStyle: "long", timeZone: "UTC" });
 const DATE_TIME = new Intl.DateTimeFormat("es-ES", { dateStyle: "long", timeStyle: "short" });
@@ -18,4 +18,9 @@ const SHORT_COMMIT = 7;
 /** The first characters of a commit, as Git shows it: `bc92d3b`. */
 export function shortCommit(commit: string): string {
   return commit.slice(0, SHORT_COMMIT);
+}
+
+/** A National Pokédex number with three digits at least: `#025`. */
+export function formatDexNumber(number: number): string {
+  return `#${String(number).padStart(3, "0")}`;
 }
