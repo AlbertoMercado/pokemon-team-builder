@@ -299,11 +299,11 @@ Hay dos excepciones:
 
 ## Imágenes
 
-Mejora de la interfaz que revisa [CA-52](cuestiones-abiertas.md#resueltas): la primera versión
-identifica cada Pokémon por su número, su nombre y sus tipos, y cada juego por su nombre. Las
-imágenes ayudan a reconocerlos de un vistazo, pero no cambian ninguna regla ni ningún cálculo.
-Antes de implementarlas hay que resolver [CA-54](cuestiones-abiertas.md#abiertas),
-[CA-55](cuestiones-abiertas.md#abiertas) y [CA-56](cuestiones-abiertas.md#abiertas).
+Mejora de la interfaz prevista en [CA-52](cuestiones-abiertas.md#resueltas): la primera versión
+identifica cada Pokémon por su número, su nombre y sus tipos, y cada juego por su nombre, y deja
+las imágenes para más adelante. Ayudan a reconocerlos de un vistazo, pero no cambian ninguna
+regla ni ningún cálculo. Qué imágenes, de dónde salen y en qué condiciones se usan está
+decidido en [CA-54, CA-55 y CA-56](cuestiones-abiertas.md#resueltas).
 
 ### RF-17 · Mostrar imágenes de los Pokémon { #rf-17 }
 
@@ -323,8 +323,10 @@ Antes de implementarlas hay que resolver [CA-54](cuestiones-abiertas.md#abiertas
       sin errores.
     - La aplicación funciona sin conexión una vez cargados los datos: las imágenes se obtienen
       en la carga ([RF-11](#rf-11)), no cada vez que se abre una pantalla.
-- **Nota**: qué imagen se usa (el sprite del juego o la ilustración oficial) y de qué fuente
-  sale se decide en [CA-54](cuestiones-abiertas.md#abiertas).
+    - La aplicación indica de quién son las imágenes y de dónde salen
+      ([CA-56](cuestiones-abiertas.md#resueltas)).
+- **Nota**: se empieza con los *sprites* de PokeAPI, una imagen pequeña por forma, y se valora
+  cómo queda ([CA-54](cuestiones-abiertas.md#resueltas)).
 
 ### RF-18 · Mostrar la portada de los juegos { #rf-18 }
 
@@ -339,4 +341,6 @@ Antes de implementarlas hay que resolver [CA-54](cuestiones-abiertas.md#abiertas
     - Si un juego no tiene portada, se muestra igual, solo con su nombre.
     - Como las imágenes de los Pokémon, las portadas se obtienen en la carga y la aplicación
       funciona sin conexión.
-- **Nota**: la fuente de las portadas se decide en [CA-55](cuestiones-abiertas.md#abiertas).
+    - Como las imágenes de los Pokémon, con el aviso de su titularidad y su procedencia.
+- **Nota**: las portadas salen de WikiDex si las tiene y se pueden usar; si no, se busca otra
+  fuente antes de implementarlo ([CA-55](cuestiones-abiertas.md#resueltas)).

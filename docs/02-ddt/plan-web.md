@@ -92,8 +92,8 @@ Dos decisiones de la interfaz eran funcionales, así que se registraron en el DD
 resolvieron al planificar:
 
 - **Sin imágenes de los Pokémon** ([CA-52](../01-ddf/cuestiones-abiertas.md#resueltas)): número,
-  nombre y tipos con sus colores. Los datos cargados no tienen imágenes. Revisada después como
-  mejora ([RF-17](../01-ddf/requisitos-funcionales.md#rf-17),
+  nombre y tipos con sus colores. Los datos cargados no tienen imágenes. Quedan para una
+  mejora posterior ([RF-17](../01-ddf/requisitos-funcionales.md#rf-17),
   [RF-18](../01-ddf/requisitos-funcionales.md#rf-18)).
 - **Selector del equipo** ([CA-53](../01-ddf/cuestiones-abiertas.md#resueltas),
   [RF-12](../01-ddf/requisitos-funcionales.md#rf-12)): en el resultado, el usuario elige uno de
