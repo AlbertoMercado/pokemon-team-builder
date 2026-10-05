@@ -61,6 +61,8 @@ Consecuencias:
 - Consultar el catálogo de Pokémon y la ficha básica de cada uno.
 - Cargar y actualizar los datos de los Pokémon desde fuentes externas.
 - Registrar los equipos con los que se ha completado un juego (*Hall of Fame*).
+- Como mejora deseable, mostrar las imágenes de los Pokémon y las portadas de los juegos
+  ([RF-17](requisitos-funcionales.md#rf-17), [RF-18](requisitos-funcionales.md#rf-18)).
 
 **Fuera del alcance** (por ahora):
 

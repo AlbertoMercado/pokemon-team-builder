@@ -26,7 +26,10 @@ los requisitos del [DDF](../01-ddf/requisitos-funcionales.md).
 **Fuera**: lanzar la carga de datos desde la web
 ([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)), reglas definidas por el usuario (RF-14,
 *Could*), varios usuarios o autenticación ([alcance](../01-ddf/index.md#alcance)) e imágenes
-de los Pokémon ([CA-52](../01-ddf/cuestiones-abiertas.md#resueltas)).
+de los Pokémon ([CA-52](../01-ddf/cuestiones-abiertas.md#resueltas)). Las imágenes de los
+Pokémon y las portadas de los juegos quedan como mejora posterior
+([RF-17](../01-ddf/requisitos-funcionales.md#rf-17),
+[RF-18](../01-ddf/requisitos-funcionales.md#rf-18)).
 
 ## Principios
 
@@ -89,7 +92,9 @@ Dos decisiones de la interfaz eran funcionales, así que se registraron en el DD
 resolvieron al planificar:
 
 - **Sin imágenes de los Pokémon** ([CA-52](../01-ddf/cuestiones-abiertas.md#resueltas)): número,
-  nombre y tipos con sus colores. Los datos cargados no tienen imágenes.
+  nombre y tipos con sus colores. Los datos cargados no tienen imágenes. Revisada después como
+  mejora ([RF-17](../01-ddf/requisitos-funcionales.md#rf-17),
+  [RF-18](../01-ddf/requisitos-funcionales.md#rf-18)).
 - **Selector del equipo** ([CA-53](../01-ddf/cuestiones-abiertas.md#resueltas),
   [RF-12](../01-ddf/requisitos-funcionales.md#rf-12)): en el resultado, el usuario elige uno de
   los equipos (una alternativa por posición cuando hay Pokémon intercambiables y una sugerencia
