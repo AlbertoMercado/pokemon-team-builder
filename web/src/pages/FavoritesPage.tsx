@@ -35,7 +35,7 @@ export default function FavoritesPage() {
           </p>
           <ul
             aria-label="Favoritos"
-            className="divide-y divide-slate-200 rounded-lg border bg-white"
+            className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white"
           >
             {favorites.data.favorites.map((favorite) => (
               <li key={favorite.pokemon} className="flex flex-wrap items-center gap-3 px-3 py-2">

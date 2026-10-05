@@ -130,7 +130,10 @@ function Results({ query }: { query: ReturnType<typeof useCatalog> }) {
       {total === 0 ? (
         <p>Ningún Pokémon coincide con la búsqueda.</p>
       ) : (
-        <ul aria-label="Pokémon" className="divide-y divide-slate-200 rounded-lg border bg-white">
+        <ul
+          aria-label="Pokémon"
+          className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white"
+        >
           {pokemon.map((entry) => (
             <li key={entry.pokemon} className="flex flex-wrap items-center gap-3 px-3 py-2">
               <PokemonName pokemon={entry.pokemon} name={entry.name} dexNumber={entry.dex_number} />

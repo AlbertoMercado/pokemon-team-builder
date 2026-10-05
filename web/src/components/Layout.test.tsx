@@ -29,7 +29,7 @@ describe("Navegación", () => {
 
   it("keeps the routes of the later screens, such as the result of a game", () => {
     renderApp("/juego/firered/resultado");
-    expect(screen.getByRole("heading", { level: 1, name: "Nuevo juego" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Resultado" })).toBeInTheDocument();
   });
 
   it("says when a page does not exist", () => {

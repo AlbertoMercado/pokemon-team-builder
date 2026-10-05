@@ -2,6 +2,7 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { currentLocation, renderApp } from "../test/render";
+import { FORMS } from "../test/server";
 
 async function shownNames(): Promise<(string | null)[]> {
   const list = await screen.findByRole("list", { name: "Pokémon" });
@@ -15,8 +16,8 @@ describe("Catálogo", () => {
   it("lists every form with its number, name, types and star (RF-01)", async () => {
     renderApp("/pokemon");
 
-    expect(await shownNames()).toHaveLength(10);
-    expect(screen.getByText("10 Pokémon")).toBeInTheDocument();
+    expect(await shownNames()).toHaveLength(FORMS.length);
+    expect(screen.getByText(`${String(FORMS.length)} Pokémon`)).toBeInTheDocument();
     const venusaur = screen.getByRole("link", { name: "Venusaur" }).closest("li");
     expect(venusaur).not.toBeNull();
     const row = within(venusaur as HTMLElement);
@@ -76,7 +77,7 @@ describe("Catálogo", () => {
     await userEvent.click(screen.getByRole("button", { name: "Quitar los filtros" }));
     expect(currentLocation()).toBe("/pokemon");
     await vi.waitFor(async () => {
-      expect(await shownNames()).toHaveLength(10);
+      expect(await shownNames()).toHaveLength(FORMS.length);
     });
   });
 

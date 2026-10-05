@@ -4,9 +4,10 @@ La web es la forma de usar la aplicación: desde ella eliges tus favoritos y tus
 generas el equipo para un juego y registras tu *Hall of Fame*.
 
 !!! note "Disponible por ahora"
-    **Inicio**, **Catálogo**, la **ficha** de cada Pokémon y **Favoritos**. El resto de
-    pantallas (reglas, nuevo juego y *Hall of Fame*) se añadirán en las siguientes versiones;
-    mientras tanto, muestran «Esta pantalla todavía no está disponible». Lo que todavía no hace la web
+    **Inicio**, **Catálogo**, la **ficha** de cada Pokémon, **Favoritos** y, en **Nuevo
+    juego**, elegir el juego y revisar sus datos. El resultado de la generación, las reglas y el
+    *Hall of Fame* se añadirán en las siguientes versiones; mientras tanto, muestran «Esta
+    pantalla todavía no está disponible». Lo que todavía no hace la web
     se puede hacer con la [API](api.md).
 
 ## Antes de empezar
@@ -110,6 +111,60 @@ método, un objeto o una condición, lo muestra con su nombre en inglés de Poke
 
 Tu lista, en orden de la Pokédex Nacional, con cuántos tienes. Pulsa la estrella de uno para
 quitarlo.
+
+## Empezar un juego nuevo
+
+### Elegir el juego
+
+En **Nuevo juego** aparecen los juegos que puedes elegir: los de la saga principal con datos
+cargados que permiten la crianza ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Pulsa
+uno para revisar sus datos. Cambiar de juego no cambia tus favoritos.
+
+### Revisar los datos
+
+Algunos datos no se han podido cargar con certeza
+([RN-18](../01-ddf/reglas-negocio.md#rn-18)). Antes de generar el equipo tienes que
+confirmarlos, pero solo los que intervienen con tus favoritos y tus reglas actuales. Aparecen
+en tres grupos:
+
+| Grupo | Qué se pregunta | Respuesta |
+|-------|-----------------|-----------|
+| **Mecánicas del juego** | Si el juego tiene una mecánica, como el ciclo de día y noche. | Sí o No. |
+| **Combates clave** | El equipo de un líder o rival, en orden. | La lista de sus Pokémon. |
+| **Favoritos** | Si un favorito se puede tener en el juego o si puede llegar a él y evolucionar hasta esa forma antes de completarlo. | Sí o No. |
+
+Cada dato muestra la **propuesta** de la carga, si la hay, y su estado:
+
+| Estado | Significa |
+|--------|-----------|
+| **Pendiente** | Todavía no lo has confirmado. |
+| **Confirmado** | Ya lo confirmaste; no se vuelve a pedir. Puedes cambiar la respuesta cuando quieras. |
+| **Desactualizado** | Lo confirmaste, pero una carga posterior propone otro valor: vuelve a confirmarlo. |
+
+Formas de confirmar:
+
+- **Aceptar todas las propuestas**: confirma de una vez todo lo que tiene propuesta. Lo que
+  no la tiene se queda pendiente.
+- **Sí** o **No** en cada dato: confirma la propuesta o la corrige. El botón de la respuesta
+  confirmada aparece resaltado.
+- **En un combate clave**: **Confirmar el equipo propuesto**, o **Corregir el equipo** (o
+  **Indicar el equipo**, si no hay propuesta). Al corregirlo, quita Pokémon con **Quitar** y
+  añádelos al final escribiendo parte del nombre en el buscador y pulsando **Añadir**; el equipo
+  tiene hasta 6 en el orden en que los añades. **Guardar el equipo** lo confirma. Si la API lo
+  rechaza (por ejemplo, porque un Pokémon no existe en la generación del juego), el mensaje
+  aparece debajo y puedes corregirlo.
+
+Por ejemplo, si Raichu es favorito, en Rojo Fuego se propone que **No** puede llegar antes de
+completar el juego, porque de su huevo nace Pichu y Pichu no aparece en la Pokédex de Kanto. Si
+lo confirmas, Raichu no entrará en el equipo.
+
+Cuando todo está confirmado, aparece **Generar el equipo**. Las confirmaciones se guardan por
+juego: la próxima vez solo se piden los datos nuevos, por ejemplo, los de un favorito que
+acabas de añadir.
+
+!!! warning "Aviso"
+    Los datos que confirmas se usan tal cual. Si confirmas uno erróneo, el equipo propuesto
+    puede ser inexacto ([responsabilidad sobre los datos confirmados](index.md#responsabilidad-sobre-los-datos-confirmados)).
 
 ## Avisos
 
