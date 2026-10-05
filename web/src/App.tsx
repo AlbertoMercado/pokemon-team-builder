@@ -8,6 +8,7 @@ import Layout from "./components/Layout";
 import CatalogPage from "./pages/CatalogPage";
 import FavoritesPage from "./pages/FavoritesPage";
 import GamesPage from "./pages/GamesPage";
+import HallOfFamePage from "./pages/HallOfFamePage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PendingPage from "./pages/PendingPage";
@@ -27,7 +28,7 @@ export default function App() {
         <Route path="juego" element={<GamesPage />} />
         <Route path="juego/:game/revision" element={<ReviewPage />} />
         <Route path="juego/:game/resultado" element={<ResultPage />} />
-        <Route path="hall-of-fame" element={<PendingPage title="Hall of Fame" />} />
+        <Route path="hall-of-fame" element={<HallOfFamePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

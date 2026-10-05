@@ -74,6 +74,10 @@ de los Pokémon ([CA-52](../01-ddf/cuestiones-abiertas.md#resueltas)).
   (`uv run python -m api.openapi`) y ejecuta `openapi-typescript`. CI lo vuelve a generar y
   falla si hay diferencias.
 
+- **Todos los juegos para el *Hall of Fame***: `GET /api/games` solo daba los juegos objetivo,
+  pero se puede registrar cualquier juego cargado. En la fase 7 se añadió `all=true`, con el
+  campo `target` en cada juego, en lugar de un endpoint nuevo.
+
 ### Decisiones funcionales
 
 Dos decisiones de la interfaz eran funcionales, así que se registraron en el DDF y se
@@ -137,7 +141,7 @@ flowchart LR
 | `/juego` | Nuevo juego | Los juegos objetivo para elegir uno. | RF-05 | `GET /api/games` |
 | `/juego/:game/revision` | Revisión de datos | Los datos que hay que confirmar: mecánicas y combates clave del juego y la llegada de cada favorito, con su propuesta. Se acepta todo de una vez o se confirma o corrige uno a uno (sí o no; en un combate clave, su equipo con un buscador de Pokémon). Los desactualizados se señalan. Con todo confirmado, lleva al resultado. | RF-15, RN-18 | `GET /review`, `PUT /review/{fact_key}`, `POST /review/accept-proposals` |
 | `/juego/:game/resultado` | Resultado | Genera al entrar y con **Volver a generar**. Muestra el estado y su motivo, cada grupo de equipos con sus posiciones (las alternativas, como «Cloyster o Lapras»), el desglose por regla, los huecos con sus sugerencias (las no verificadas, señaladas) y un botón para añadir cada una a favoritos, los descartes agrupados por motivo, las reglas de presencia y los datos confirmados usados. Si la API responde `409`, lleva a la revisión. El **selector** permite elegir un equipo (una alternativa por posición y una sugerencia por hueco), lo comprueba y, si no tiene problemas, lo registra en el *Hall of Fame* con la fecha y las notas que el usuario indique; o descartar todos. | RF-08, RF-09, RF-10, RF-12, CA-53 | `POST /api/games/{game}/generations`, `POST /api/games/{game}/team-checks`, `POST /api/hall-of-fame` |
-| `/hall-of-fame` | Hall of Fame | El recorrido en orden, con el último juego completado señalado y filtro por juego. Registrar a mano un equipo (por ejemplo, de un juego que no es juego objetivo), corregir y eliminar (con confirmación), con un buscador de Pokémon para el equipo. | RF-12, RF-13, RN-16 | `GET`, `POST`, `PATCH`, `DELETE /api/hall-of-fame` |
+| `/hall-of-fame` | Hall of Fame | El recorrido en orden, con el último juego completado señalado y filtro por juego. Registrar a mano un equipo (por ejemplo, de un juego que no es juego objetivo), corregir y eliminar (con confirmación), con un buscador de Pokémon para el equipo. | RF-12, RF-13, RN-16 | `GET`, `POST`, `PATCH`, `DELETE /api/hall-of-fame`, `GET /api/games?all=true` |
 
 En todas las pantallas, una barra de navegación lleva a Catálogo, Favoritos, Reglas, Nuevo
 juego y *Hall of Fame*.
@@ -210,7 +214,7 @@ flowchart LR
 | 4 ✅ | `feat/web-nuevo-juego` | Elegir juego y revisión: aceptar todo, confirmar o corregir uno a uno, equipo de un combate clave con el buscador de Pokémon y datos desactualizados. | Flujo de la revisión con el ejemplo de Raichu (RN-18); combate clave corregido; `422` de un Pokémon que no existe. |
 | 5 ✅ | `feat/web-resultado` | Resultado: grupos, desglose, huecos y sugerencias con «Añadir a favoritos», descartes por motivo, presencia, datos confirmados y `409` hacia la revisión. | Equipo completo de Rojo Fuego con el grupo «Cloyster o Lapras»; incompleto con sugerencias sin verificar; añadir una sugerencia y regenerar; `409`. |
 | 6 ✅ | `feat/selector-equipo` | `core.rules.check.check_team`, `POST /api/games/{game}/team-checks` y el selector del resultado: elegir alternativas y sugerencias, comprobar, registrar en el *Hall of Fame* o descartar (CA-53). Documentación del motor, la API y el manual. | Motor: cada regla que comprueba, con `@pytest.mark.rn`, y con hypothesis que los equipos que devuelve `generate` no tienen problemas. API: equipo válido, dos sugerencias que chocan por RN-12, regla de presencia sin cumplir, `409`. Web: elegir y registrar, equipo con problemas que no se deja registrar, descartar sin registrar nada. |
-| 7 | `feat/web-hall-of-fame` | Recorrido con el último juego señalado y filtro por juego; registrar a mano, corregir y eliminar. | Orden y último juego; validación de 1 a 6; corregir la fecha reordena; eliminar con confirmación. |
+| 7 ✅ | `feat/web-hall-of-fame` | Recorrido con el último juego señalado y filtro por juego; registrar a mano, corregir y eliminar. | Orden y último juego; validación de 1 a 6; corregir la fecha reordena; eliminar con confirmación. |
 | 8 | `feat/web-despliegue` | La API sirve `web/dist` en `/` con vuelta a `index.html`; `npm run build` en el flujo de instalación; Playwright con el flujo de nuevo juego de extremo a extremo; job **E2E** de CI. | E2E: favoritos → reglas → nuevo juego en Rojo Fuego → revisión → resultado → elegir el equipo y registrarlo → la siguiente generación excluye lo usado (RN-16). La API sirve la web y no tapa `/api`. |
 
 Después de la fase 6 ya se puede usar la aplicación de principio a fin en desarrollo; con la

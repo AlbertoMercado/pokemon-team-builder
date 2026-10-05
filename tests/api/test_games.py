@@ -6,7 +6,7 @@ from tests.api.conftest import ClientFactory
 from tests.api.factories import GameRow, reference_database
 
 
-def test_only_target_games_with_breeding_in_release_order(
+def test_target_games_or_every_loaded_game_in_release_order(
     make_client: ClientFactory, data_dir: Path
 ) -> None:
     games = [
@@ -32,13 +32,22 @@ def test_only_target_games_with_breeding_in_release_order(
             "name": "Firered",
             "generation": 3,
             "version_group": "firered-leafgreen",
+            "target": True,
         },
         {
             "game": "leafgreen",
             "name": "Leafgreen",
             "generation": 3,
             "version_group": "firered-leafgreen",
+            "target": True,
         },
+    ]
+    every = make_client().get("/api/games", params={"all": "true"}).json()
+    assert [(g["game"], g["target"]) for g in every] == [
+        ("red", False),
+        ("gold", False),
+        ("firered", True),
+        ("leafgreen", True),
     ]
 
 

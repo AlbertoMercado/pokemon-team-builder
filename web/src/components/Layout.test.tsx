@@ -28,8 +28,8 @@ describe("Navegación", () => {
   });
 
   it("keeps the routes of the later screens", () => {
-    renderApp("/hall-of-fame");
-    expect(screen.getByRole("heading", { level: 1, name: "Hall of Fame" })).toBeInTheDocument();
+    renderApp("/reglas");
+    expect(screen.getByRole("heading", { level: 1, name: "Reglas" })).toBeInTheDocument();
   });
 
   it("says when a page does not exist", () => {

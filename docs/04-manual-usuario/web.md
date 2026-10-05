@@ -5,10 +5,10 @@ generas el equipo para un juego y registras tu *Hall of Fame*.
 
 !!! note "Disponible por ahora"
     **Inicio**, **Catálogo**, la **ficha** de cada Pokémon, **Favoritos** y, en **Nuevo
-    juego**, elegir el juego, revisar sus datos, ver el resultado y elegir el equipo para
-    registrarlo en el *Hall of Fame*. Las pantallas de reglas y de *Hall of Fame* se añadirán
-    en las siguientes versiones; mientras tanto, muestran «Esta pantalla todavía no está
-    disponible». Lo que todavía no hace la web
+    juego**, elegir el juego, revisar sus datos, ver el resultado y elegir el equipo, y el
+    ***Hall of Fame***. La pantalla de reglas se añadirá en la siguiente versión; mientras
+    tanto, muestra «Esta pantalla todavía no está disponible» y las reglas se configuran con la
+    [API](api.md#reglas). Lo que todavía no hace la web
     se puede hacer con la [API](api.md).
 
 ## Antes de empezar
@@ -214,10 +214,31 @@ Pokémon con datos sin confirmar se indican, pero no impiden registrarlo.
 
 Al registrarlo, el equipo cuenta para tu recorrido desde ese momento: el resultado se vuelve a
 generar sin sus líneas evolutivas ([RN-16](../01-ddf/reglas-negocio.md#rn-16)). Si después
-quieres cambiar la fecha o el equipo, por ahora puedes hacerlo con la
-[API](api.md#hall-of-fame-tu-recorrido).
+quieres cambiar la fecha o el equipo, hazlo en el [*Hall of Fame*](#hall-of-fame).
 
 Si no te convence ninguno, **Descartar los equipos** no registra nada.
+
+## Hall of Fame
+
+Tu **recorrido**: los juegos que has completado y su equipo, ordenados por fecha y, si dos
+coinciden, por orden de registro ([RF-12](../01-ddf/requisitos-funcionales.md#rf-12),
+[RF-13](../01-ddf/requisitos-funcionales.md#rf-13)). El **último juego completado** aparece
+señalado. Cada miembro muestra los tipos que tenía en ese juego.
+
+El recorrido decide qué Pokémon se excluyen al generar
+([RN-16](../01-ddf/reglas-negocio.md#rn-16)): las líneas evolutivas del último juego completado
+y las de los juegos de la misma generación que el que vas a jugar. Por eso, registrar, corregir
+o eliminar un registro cambia los equipos que se generan a partir de ese momento.
+
+| Acción | Cómo |
+|--------|------|
+| **Filtrar por juego** | Elige el juego en **Juego**. El filtro se guarda en la dirección de la página. |
+| **Registrar un equipo** | Además de hacerlo desde el resultado, puedes registrar a mano cualquier juego cargado, también los que no pueden ser juego objetivo (como Rojo u Oro). Elige el juego, la fecha y, si quieres, notas, y añade de 1 a 6 Pokémon con el buscador, en orden. **Guardar** lo registra. |
+| **Corregir** | Cambia el juego, la fecha, las notas o el equipo. Si cambias la fecha, el recorrido se reordena. |
+| **Eliminar** | Pide confirmación: **Sí, eliminar** borra el registro y su equipo. |
+
+Si la API rechaza un registro (por ejemplo, un Pokémon que no existía en la generación de ese
+juego), el mensaje aparece en el formulario y puedes corregirlo.
 
 ## Avisos
 

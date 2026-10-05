@@ -143,7 +143,8 @@ export interface paths {
         /**
          * Juegos objetivo
          * @description Los juegos que se pueden elegir como objetivo, en orden de lanzamiento: los de la saga
-         *     principal con datos cargados que permiten la crianza (RF-05).
+         *     principal con datos cargados que permiten la crianza (RF-05). Con `all=true`, todos los
+         *     juegos cargados; `target` dice cuáles pueden ser juego objetivo.
          */
         get: operations["list_games_api_games_get"];
         put?: never;
@@ -554,6 +555,11 @@ export interface components {
              * @description Grupo de versiones, p. ej. `firered-leafgreen`.
              */
             version_group: string;
+            /**
+             * Target
+             * @description Si se puede elegir como juego objetivo (RF-05).
+             */
+            target: boolean;
         };
         /** GenerationOut */
         GenerationOut: {
@@ -1357,7 +1363,10 @@ export interface operations {
     };
     list_games_api_games_get: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Todos los juegos cargados, también los que no son juego objetivo, para el *Hall of Fame* (RF-12). */
+                all?: boolean;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1371,6 +1380,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["GameOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

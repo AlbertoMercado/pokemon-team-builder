@@ -127,6 +127,10 @@ curl http://127.0.0.1:8000/api/games
 Los juegos que puedes elegir para generar un equipo, en orden de lanzamiento. Solo aparecen los
 que tienen datos cargados y permiten la crianza.
 
+Con `?all=true` aparecen todos los juegos cargados, también los que no pueden ser juego objetivo
+(como Rojo u Oro), que sí se pueden registrar en el [Hall of Fame](#hall-of-fame-tu-recorrido).
+`target` dice si cada uno puede ser juego objetivo.
+
 ## Revisar los datos de un juego
 
 Algunos datos no se pueden cargar con certeza: la carga los deja **inferidos** (con una
