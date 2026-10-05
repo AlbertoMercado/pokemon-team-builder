@@ -34,7 +34,11 @@ export function useConfirmFact(game: string) {
           body: { value },
         }),
       ),
-    onSettled: () => client.invalidateQueries({ queryKey: queryKeys.review(game) }),
+    onSettled: () =>
+      Promise.all([
+        client.invalidateQueries({ queryKey: queryKeys.review(game) }),
+        client.invalidateQueries({ queryKey: queryKeys.generation(game) }),
+      ]),
   });
 }
 
@@ -48,8 +52,9 @@ export function useAcceptProposals(game: string) {
           params: { path: { game } },
         }),
       ),
-    onSuccess: (review) => {
+    onSuccess: async (review) => {
       client.setQueryData(queryKeys.review(game), review);
+      await client.invalidateQueries({ queryKey: queryKeys.generation(game) });
     },
   });
 }

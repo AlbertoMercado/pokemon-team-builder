@@ -27,9 +27,9 @@ describe("Navegación", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Inicio" })).toBeInTheDocument();
   });
 
-  it("keeps the routes of the later screens, such as the result of a game", () => {
-    renderApp("/juego/firered/resultado");
-    expect(screen.getByRole("heading", { level: 1, name: "Resultado" })).toBeInTheDocument();
+  it("keeps the routes of the later screens", () => {
+    renderApp("/hall-of-fame");
+    expect(screen.getByRole("heading", { level: 1, name: "Hall of Fame" })).toBeInTheDocument();
   });
 
   it("says when a page does not exist", () => {

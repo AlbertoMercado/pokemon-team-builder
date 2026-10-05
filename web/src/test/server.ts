@@ -14,11 +14,14 @@ import type {
   Evolution,
   FavoritesOut,
   Game,
+  GeneratedPokemon,
+  Generation,
   HallOfFameEntry,
   Meta,
   PokemonDetail,
   Review,
   ReviewFact,
+  Rule,
   ReviewValue,
 } from "../api/types";
 
@@ -58,6 +61,8 @@ export const FORMS: Form[] = [
   form("onix", "Onix", 95, ["rock", "ground"], 1),
   form("staryu", "Staryu", 120, ["water"], 1),
   form("starmie", "Starmie", 121, ["water", "psychic"], 2),
+  form("dratini", "Dratini", 147, ["dragon"], 1),
+  form("dragonite", "Dragonite", 149, ["dragon", "flying"], 3),
 ].sort((a, b) => a.dex_number - b.dex_number);
 
 const evolution = (
@@ -157,6 +162,7 @@ export function resetData(): void {
   favoriteSet.clear();
   INITIAL_FAVORITES.forEach((pokemon) => favoriteSet.add(pokemon));
   fireredFacts = initialFirered();
+  generationCalls.count = 0;
 }
 
 function reviewOut(): Review {
@@ -236,6 +242,216 @@ export const hallOfFame: HallOfFameEntry[] = [
   },
 ];
 
+/** Adds a favourite straight to the simulated API, as if done before the test. */
+export function addFavorite(pokemon: string): void {
+  favoriteSet.add(pokemon);
+}
+
+/** Confirms every fact of the review, as the user does before generating. */
+export function confirmAll(): void {
+  for (const candidate of fireredFacts) {
+    confirmFact(candidate.fact_key, candidate.proposal ?? ["geodude"]);
+  }
+}
+
+const generated = (
+  pokemon: string,
+  name: string,
+  dex_number: number,
+  types: string[],
+): GeneratedPokemon => ({ pokemon, name, dex_number, types });
+
+const MAGNETON = generated("magneton", "Magneton", 82, ["electric", "steel"]);
+const CLOYSTER = generated("cloyster", "Cloyster", 91, ["water", "ice"]);
+const LAPRAS = generated("lapras", "Lapras", 131, ["water", "ice"]);
+const EXEGGUTOR = generated("exeggutor", "Exeggutor", 103, ["grass", "psychic"]);
+const RHYDON = generated("rhydon", "Rhydon", 112, ["ground", "rock"]);
+const FLAREON = generated("flareon", "Flareon", 136, ["fire"]);
+const DRAGONITE = generated("dragonite", "Dragonite", 149, ["dragon", "flying"]);
+const GENGAR = generated("gengar", "Gengar", 94, ["ghost", "poison"]);
+
+const breakdown = (tedious: number, penalized: string[] = []) => [
+  {
+    rule_id: "RN-06",
+    name: "Penalizar varias formas de la misma especie",
+    weight: 1,
+    score: 100,
+    contribution: 1,
+    penalized: [],
+  },
+  {
+    rule_id: "RN-15",
+    name: "Penalizar evoluciones tediosas",
+    weight: 3,
+    score: tedious,
+    contribution: tedious === 100 ? 3 : 1,
+    penalized,
+  },
+  {
+    rule_id: "RN-17",
+    name: "Tipos eficaces frente a los combates clave",
+    weight: 10,
+    score: 96,
+    contribution: 10,
+    penalized: [],
+  },
+  {
+    rule_id: "RN-20",
+    name: "Penalizar las evoluciones aleatorias",
+    weight: 5,
+    score: 100,
+    contribution: 5,
+    penalized: [],
+  },
+];
+
+const confirmedFacts: Generation["confirmed_facts"] = [
+  { fact_key: "mechanic:firered:contests", kind: "mechanic", name: "Concursos", value: false },
+  {
+    fact_key: "battle:firered:brock",
+    kind: "key_battle",
+    name: "Brock",
+    value: ["geodude", "onix"],
+  },
+];
+
+/** Rojo Fuego with Dragonite among the favourites: complete, with «Cloyster o Lapras». */
+export const completeGeneration: Generation = {
+  game: "firered",
+  status: "complete",
+  incomplete_reason: null,
+  score: 19,
+  groups: [
+    {
+      positions: [[MAGNETON], [CLOYSTER, LAPRAS], [EXEGGUTOR], [RHYDON], [FLAREON], [DRAGONITE]],
+      teams: ["cloyster", "lapras"].map((water) => ({
+        members: ["magneton", water, "exeggutor", "rhydon", "flareon", "dragonite"],
+        score: 19,
+        dual_type_members: 5,
+        breakdown: breakdown(100),
+        open_slots: [],
+      })),
+    },
+  ],
+  discards: [
+    {
+      pokemon: "zapdos",
+      name: "Zapdos",
+      rule_id: "RN-11",
+      reason: "breeding",
+      detail: "Zapdos no se puede criar (grupos huevo de su línea: no-eggs)",
+      fact_key: null,
+    },
+  ],
+  presence: [
+    {
+      rule_id: "RN-13",
+      level: 1,
+      status: "candidates",
+      options: ["dragonite"],
+      detail: "Dragonite es un candidato válido: forma parte del equipo",
+    },
+  ],
+  confirmed_facts: confirmedFacts,
+  data_version: meta.data,
+};
+
+const suggestion = (pokemon: GeneratedPokemon, gain: number, verified = false) => ({
+  pokemon,
+  gain,
+  verified,
+});
+
+/** Rojo Fuego without Dragonite: a slot reserved by RN-13 and free slots with suggestions. */
+export const incompleteGeneration: Generation = {
+  game: "firered",
+  status: "incomplete",
+  incomplete_reason: "reserved_slot",
+  score: 13,
+  groups: [
+    {
+      positions: [[GENGAR], [LAPRAS]],
+      teams: [
+        {
+          members: ["gengar", "lapras"],
+          score: 13,
+          dual_type_members: 2,
+          breakdown: breakdown(50, ["gengar"]),
+          open_slots: [
+            {
+              count: 1,
+              rule_id: "RN-13",
+              suggestions: [
+                suggestion(DRAGONITE, 1),
+                suggestion(generated("dratini", "Dratini", 147, ["dragon"]), 1),
+              ],
+            },
+            {
+              count: 3,
+              rule_id: null,
+              suggestions: [
+                suggestion(EXEGGUTOR, 3, true),
+                suggestion(RHYDON, 3),
+                suggestion(MAGNETON, 2),
+                suggestion(FLAREON, 2),
+                suggestion(CLOYSTER, 2),
+                suggestion(generated("sandslash", "Sandslash", 28, ["ground"]), 1),
+                suggestion(generated("kingler", "Kingler", 99, ["water"]), 1),
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  discards: [
+    {
+      pokemon: "pikachu",
+      name: "Pikachu",
+      rule_id: "RN-03",
+      reason: "arrival",
+      detail: "Pikachu no puede llegar a Rojo Fuego y evolucionar antes de completarlo",
+      fact_key: "pokemon:firered:pikachu:arrival",
+    },
+    {
+      pokemon: "zapdos",
+      name: "Zapdos",
+      rule_id: "RN-11",
+      reason: "breeding",
+      detail: "Zapdos no se puede criar (grupos huevo de su línea: no-eggs)",
+      fact_key: null,
+    },
+  ],
+  presence: [
+    {
+      rule_id: "RN-13",
+      level: 3,
+      status: "reserved",
+      options: ["dratini", "dragonite"],
+      detail: "Ningún candidato válido es de tipo primario Dragón: se reserva un hueco",
+    },
+  ],
+  confirmed_facts: confirmedFacts,
+  data_version: meta.data,
+};
+
+export const rules: Rule[] = [
+  {
+    rule_id: "RN-13",
+    name: "Dragonite o un Pokémon de tipo primario Dragón",
+    description:
+      "El equipo incluye a Dragonite o, si no es posible, un Pokémon de tipo primario Dragón.",
+    kind: "presence",
+    configurable: true,
+    enabled: true,
+    weight: null,
+    default_weight: null,
+  },
+];
+
+/** Generations answered, to check that a change generates again. */
+export const generationCalls = { count: 0 };
+
 const notFound = (pokemon: string) =>
   HttpResponse.json(
     { detail: `El Pokémon ${pokemon} no existe en los datos cargados` },
@@ -301,6 +517,25 @@ export const handlers = [
         : HttpResponse.json({ detail: `El dato ${params.fact_key} no existe` }, { status: 404 });
     },
   ),
+  http.post("/api/games/firered/generations", () => {
+    generationCalls.count += 1;
+    const pending = fireredFacts.filter((candidate) => candidate.status === "pending");
+    if (pending.length > 0) {
+      return HttpResponse.json(
+        {
+          detail: {
+            message: "Antes de generar hay que confirmar los datos sin verificar que intervienen",
+            pending,
+          },
+        },
+        { status: 409 },
+      );
+    }
+    return HttpResponse.json(
+      favoriteSet.has("dragonite") ? completeGeneration : incompleteGeneration,
+    );
+  }),
+  http.get("/api/rules", () => HttpResponse.json(rules)),
   http.post("/api/games/firered/review/accept-proposals", () => {
     for (const candidate of fireredFacts) {
       if (candidate.status === "pending" && candidate.proposal !== null) {
