@@ -34,6 +34,8 @@ Hay dos excepciones:
 | [RF-14](#rf-14) | Cargar reglas definidas por el usuario | Reglas | Could |
 | [RF-15](#rf-15) | Revisar los datos del juego objetivo | Reglas | Must |
 | [RF-16](#rf-16) | Informar de las cargas bloqueadas | Datos | Must |
+| [RF-17](#rf-17) | Mostrar imágenes de los Pokémon | Imágenes | Could |
+| [RF-18](#rf-18) | Mostrar la portada de los juegos | Imágenes | Could |
 
 ## Catálogo
 
@@ -294,3 +296,51 @@ Hay dos excepciones:
   de las del catálogo predefinido.
 - **Nota**: en la primera versión, las reglas son las del catálogo predefinido del DDF. Que el
   usuario defina reglas nuevas exige diseñar cómo se expresan; se abordará más adelante.
+
+## Imágenes
+
+Mejora de la interfaz prevista en [CA-52](cuestiones-abiertas.md#resueltas): la primera versión
+identifica cada Pokémon por su número, su nombre y sus tipos, y cada juego por su nombre, y deja
+las imágenes para más adelante. Ayudan a reconocerlos de un vistazo, pero no cambian ninguna
+regla ni ningún cálculo. Qué imágenes, de dónde salen y en qué condiciones se usan está
+decidido en [CA-54, CA-55 y CA-56](cuestiones-abiertas.md#resueltas).
+
+### RF-17 · Mostrar imágenes de los Pokémon { #rf-17 }
+
+- **Prioridad**: Could
+- **Descripción**: cada Pokémon se muestra con su imagen, además de su número, su nombre y sus
+  tipos, allí donde aparece en la aplicación.
+- **Criterios de aceptación**:
+    - Se ve la imagen en el catálogo ([RF-01](#rf-01)), la ficha y su línea evolutiva
+      ([RF-02](#rf-02)), los favoritos ([RF-04](#rf-04)), las posiciones y las sugerencias del
+      resultado ([RF-08](#rf-08), [RF-10](#rf-10)) y el equipo de cada registro del *Hall of
+      Fame* ([RF-13](#rf-13)).
+    - Cada forma tiene su propia imagen: Vulpix y Vulpix de Alola se distinguen
+      ([RN-05](reglas-negocio.md#rn-05)).
+    - La imagen acompaña al nombre, nunca lo sustituye: el nombre sigue siendo el texto que
+      identifica al Pokémon, también para los lectores de pantalla.
+    - Si un Pokémon no tiene imagen, o no se ha podido obtener, se muestra igual, sin imagen y
+      sin errores.
+    - La aplicación funciona sin conexión una vez cargados los datos: las imágenes se obtienen
+      en la carga ([RF-11](#rf-11)), no cada vez que se abre una pantalla.
+    - La aplicación indica de quién son las imágenes y de dónde salen
+      ([CA-56](cuestiones-abiertas.md#resueltas)).
+- **Nota**: se empieza con los *sprites* de PokeAPI, una imagen pequeña por forma, y se valora
+  cómo queda ([CA-54](cuestiones-abiertas.md#resueltas)).
+
+### RF-18 · Mostrar la portada de los juegos { #rf-18 }
+
+- **Prioridad**: Could
+- **Descripción**: cada juego se muestra con su portada, además de su nombre.
+- **Criterios de aceptación**:
+    - Se ve la portada al elegir el juego objetivo ([RF-05](#rf-05)), en la cabecera de la
+      revisión de datos y del resultado, en el último juego completado del Inicio y en cada
+      registro del *Hall of Fame* ([RF-13](#rf-13)), también de los juegos que no pueden ser
+      juego objetivo (Rojo, Oro…).
+    - El nombre del juego sigue visible: la portada lo acompaña.
+    - Si un juego no tiene portada, se muestra igual, solo con su nombre.
+    - Como las imágenes de los Pokémon, las portadas se obtienen en la carga y la aplicación
+      funciona sin conexión.
+    - Como las imágenes de los Pokémon, con el aviso de su titularidad y su procedencia.
+- **Nota**: las portadas salen de WikiDex si las tiene y se pueden usar; si no, se busca otra
+  fuente antes de implementarlo ([CA-55](cuestiones-abiertas.md#resueltas)).
