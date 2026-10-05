@@ -7,12 +7,14 @@ import type { CatalogFilters } from "./pokemon";
 export const queryKeys = {
   meta: ["meta"] as const,
   favorites: ["favorites"] as const,
+  /** Prefix of every list of the Hall of Fame, whole or filtered by game. */
   hallOfFame: ["hall-of-fame"] as const,
+  hallOfFameList: (game: string | undefined) => ["hall-of-fame", game ?? null] as const,
   /** Prefix of every catalogue query: the lists and the details. */
   pokemon: ["pokemon"] as const,
   catalog: (filters: CatalogFilters) => ["pokemon", "list", filters] as const,
   pokemonDetail: (pokemon: string) => ["pokemon", "detail", pokemon] as const,
-  games: ["games"] as const,
+  games: (all: boolean) => ["games", all] as const,
   /** Prefix of the reviews of every game: they depend on the favourites and the rules. */
   reviews: ["review"] as const,
   review: (game: string) => ["review", game] as const,

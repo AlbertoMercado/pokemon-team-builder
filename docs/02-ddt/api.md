@@ -92,7 +92,7 @@ defecto del catálogo ([CA-41](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
-| `GET` | `/api/games` | Juegos que pueden ser juego objetivo: los marcados como objetivo y con crianza, en orden de lanzamiento. ✅ | RF-05 |
+| `GET` | `/api/games` | Juegos que pueden ser juego objetivo: los marcados como objetivo y con crianza, en orden de lanzamiento. Con `all=true`, todos los juegos cargados, para registrarlos en el *Hall of Fame*. Cada juego indica con `target` si puede ser juego objetivo. ✅ | RF-05, RF-12 |
 | `GET` | `/api/games/{game}/review` | Datos inferidos o pendientes que intervienen en la generación, con su propuesta y su estado, y cuántos faltan por confirmar. `404` si el juego no es juego objetivo. ✅ | RF-15 |
 | `PUT` | `/api/games/{game}/review/{fact_key}` | Confirma un dato con el valor propuesto o corregido (`{"value": ...}`): un booleano, o la lista de Pokémon del equipo si es un combate clave. Devuelve el dato. `404` si el dato no existe en el juego; `409` si es automático; `422` si el valor no es del tipo del dato o el equipo tiene Pokémon que no existen en la generación del juego. ✅ | RF-15 |
 | `POST` | `/api/games/{game}/review/accept-proposals` | Acepta de una vez las propuestas inferidas que intervienen y aún no están confirmadas, y devuelve la revisión. Los datos pendientes, sin propuesta, se siguen tratando uno a uno. ✅ | RF-15 |

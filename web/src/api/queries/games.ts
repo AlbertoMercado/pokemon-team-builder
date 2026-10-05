@@ -8,10 +8,12 @@ import { api, unwrap } from "../client";
 import type { ReviewValue } from "../types";
 import { queryKeys } from "./keys";
 
-export function useGames() {
+/** The target games or, with `all`, every loaded game (for the Hall of Fame, RF-12). */
+export function useGames({ all = false }: { all?: boolean } = {}) {
   return useQuery({
-    queryKey: queryKeys.games,
-    queryFn: async ({ signal }) => unwrap(await api.GET("/api/games", { signal })),
+    queryKey: queryKeys.games(all),
+    queryFn: async ({ signal }) =>
+      unwrap(await api.GET("/api/games", { params: { query: { all } }, signal })),
   });
 }
 

@@ -18,6 +18,7 @@ import type {
   Generation,
   HallOfFameEntry,
   HallOfFameEntryIn,
+  HallOfFamePatch,
   Meta,
   PokemonDetail,
   Review,
@@ -115,8 +116,14 @@ const INITIAL_FAVORITES = ["venusaur", "ninetales-alola"];
 const favoriteSet = new Set(INITIAL_FAVORITES);
 
 export const games: Game[] = [
-  { game: "emerald", name: "Esmeralda", generation: 3, version_group: "emerald" },
-  { game: "firered", name: "Rojo Fuego", generation: 3, version_group: "firered-leafgreen" },
+  { game: "emerald", name: "Esmeralda", generation: 3, version_group: "emerald", target: true },
+  {
+    game: "firered",
+    name: "Rojo Fuego",
+    generation: 3,
+    version_group: "firered-leafgreen",
+    target: true,
+  },
 ];
 
 const fact = (
@@ -165,6 +172,8 @@ export function resetData(): void {
   INITIAL_FAVORITES.forEach((pokemon) => favoriteSet.add(pokemon));
   fireredFacts = initialFirered();
   generationCalls.count = 0;
+  entries = INITIAL_ENTRIES.map((entry) => ({ ...entry }));
+  nextEntryId = 2;
   requests.checks = [];
   requests.entries = [];
 }
@@ -229,22 +238,82 @@ function detail(found: Form): PokemonDetail {
   };
 }
 
-export const hallOfFame: HallOfFameEntry[] = [
+/** Every loaded game, for the Hall of Fame: also those that are not a target. */
+export const allGames: Game[] = [
+  { game: "red", name: "Rojo", generation: 1, version_group: "red-blue", target: false },
+  ...games,
+  {
+    game: "leafgreen",
+    name: "Verde Hoja",
+    generation: 3,
+    version_group: "firered-leafgreen",
+    target: true,
+  },
+];
+
+/** An entry as the simulated API keeps it; the order and the names are worked out on reading. */
+interface StoredEntry {
+  id: number;
+  game: string;
+  completed_on: string;
+  notes: string | null;
+  members: string[];
+}
+
+const INITIAL_ENTRIES: StoredEntry[] = [
   {
     id: 1,
     game: "firered",
-    game_name: "Rojo Fuego",
-    generation: 3,
     completed_on: "2026-09-20",
     notes: null,
-    order: 1,
-    last: true,
-    members: [
-      { position: 1, pokemon: "venusaur", name: "Venusaur", types: ["grass", "poison"] },
-      { position: 2, pokemon: "lapras", name: "Lapras", types: ["water", "ice"] },
-    ],
+    members: ["venusaur", "lapras"],
   },
 ];
+let entries: StoredEntry[] = INITIAL_ENTRIES.map((entry) => ({ ...entry }));
+let nextEntryId = 2;
+
+/** Name and types of a form: from the catalogue or from the generations. */
+function member(pokemon: string): { name: string; types: string[] } | undefined {
+  const found = FORMS.find((candidate) => candidate.pokemon === pokemon) ?? NAMES.get(pokemon);
+  return found && { name: found.name, types: found.types };
+}
+
+/** The journey as the API answers it: by date and, on the same date, by order of recording. */
+function journey(game: string | null): HallOfFameEntry[] {
+  const ordered = [...entries].sort(
+    (a, b) => a.completed_on.localeCompare(b.completed_on) || a.id - b.id,
+  );
+  const lastId = ordered.at(-1)?.id;
+  return ordered
+    .map((entry, index) => ({
+      ...entry,
+      game_name: allGames.find((candidate) => candidate.game === entry.game)?.name ?? entry.game,
+      generation: allGames.find((candidate) => candidate.game === entry.game)?.generation ?? null,
+      order: index + 1,
+      last: entry.id === lastId,
+      members: entry.members.map((pokemon, position) => ({
+        position: position + 1,
+        pokemon,
+        name: member(pokemon)?.name ?? pokemon,
+        types: member(pokemon)?.types ?? [],
+      })),
+    }))
+    .filter((entry) => game === null || entry.game === game);
+}
+
+/** `422` like the API, for a game or a Pokémon it does not know; `null` if they are valid. */
+function invalidEntry(game: string | undefined, members: string[] | undefined) {
+  if (game !== undefined && !allGames.some((candidate) => candidate.game === game)) {
+    return HttpResponse.json({ detail: `El juego ${game} no existe` }, { status: 422 });
+  }
+  const unknown = (members ?? []).filter((pokemon) => member(pokemon) === undefined);
+  return unknown.length > 0
+    ? HttpResponse.json(
+        { detail: `Pokémon que no existen en los datos cargados: ${unknown.join(", ")}` },
+        { status: 422 },
+      )
+    : null;
+}
 
 /** Adds a favourite straight to the simulated API, as if done before the test. */
 export function addFavorite(pokemon: string): void {
@@ -539,34 +608,59 @@ export const handlers = [
     }
     return new HttpResponse(null, { status: 204 });
   }),
-  http.get("/api/hall-of-fame", () => HttpResponse.json(hallOfFame)),
+  http.get("/api/hall-of-fame", ({ request }) =>
+    HttpResponse.json(journey(new URL(request.url).searchParams.get("game"))),
+  ),
   http.post<never, HallOfFameEntryIn>("/api/hall-of-fame", async ({ request }) => {
-    const entry = await request.json();
-    requests.entries.push(entry);
-    const recorded: HallOfFameEntry = {
-      id: 2,
-      game: entry.game,
-      game_name: "Rojo Fuego",
-      generation: 3,
-      completed_on: entry.completed_on,
-      notes: entry.notes ?? null,
-      order: 2,
-      last: true,
-      members: entry.members.map((pokemon, index) => ({
-        position: index + 1,
-        pokemon,
-        name: NAMES.get(pokemon)?.name ?? pokemon,
-        types: NAMES.get(pokemon)?.types ?? [],
-      })),
-    };
-    return HttpResponse.json(recorded, { status: 201 });
+    const body = await request.json();
+    requests.entries.push(body);
+    const invalid = invalidEntry(body.game, body.members);
+    if (invalid) return invalid;
+    const id = nextEntryId++;
+    entries.push({
+      id,
+      game: body.game,
+      completed_on: body.completed_on,
+      notes: body.notes ?? null,
+      members: body.members,
+    });
+    return HttpResponse.json(
+      journey(null).find((entry) => entry.id === id),
+      { status: 201 },
+    );
+  }),
+  http.patch<{ id: string }, HallOfFamePatch>(
+    "/api/hall-of-fame/:id",
+    async ({ params, request }) => {
+      const change = await request.json();
+      const found = entries.find((entry) => entry.id === Number(params.id));
+      if (!found) return HttpResponse.json({ detail: "El registro no existe" }, { status: 404 });
+      const invalid = invalidEntry(change.game ?? undefined, change.members ?? undefined);
+      if (invalid) return invalid;
+      Object.assign(found, {
+        ...(change.game ? { game: change.game } : {}),
+        ...(change.completed_on ? { completed_on: change.completed_on } : {}),
+        ...("notes" in change ? { notes: change.notes ?? null } : {}),
+        ...(change.members ? { members: change.members } : {}),
+      });
+      return HttpResponse.json(journey(null).find((entry) => entry.id === found.id));
+    },
+  ),
+  http.delete<{ id: string }>("/api/hall-of-fame/:id", ({ params }) => {
+    const before = entries.length;
+    entries = entries.filter((entry) => entry.id !== Number(params.id));
+    return entries.length < before
+      ? new HttpResponse(null, { status: 204 })
+      : HttpResponse.json({ detail: "El registro no existe" }, { status: 404 });
   }),
   http.post<never, { members: string[] }>("/api/games/firered/team-checks", async ({ request }) => {
     const { members } = await request.json();
     requests.checks.push(members);
     return HttpResponse.json(checkTeam(members));
   }),
-  http.get("/api/games", () => HttpResponse.json(games)),
+  http.get("/api/games", ({ request }) =>
+    HttpResponse.json(new URL(request.url).searchParams.get("all") === "true" ? allGames : games),
+  ),
   http.get<{ game: string }>("/api/games/:game/review", ({ params }) =>
     params.game === "firered"
       ? HttpResponse.json(reviewOut())

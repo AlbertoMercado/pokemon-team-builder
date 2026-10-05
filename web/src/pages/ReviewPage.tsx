@@ -11,9 +11,7 @@ import { useAcceptProposals, useConfirmFact, useGames, useReview } from "../api/
 import { usePokemonNames } from "../api/queries/pokemon";
 import type { Review, ReviewFact } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
-import PokemonPicker from "../components/PokemonPicker";
-
-const TEAM_SIZE = 6;
+import TeamEditor from "../components/TeamEditor";
 
 const GROUPS = [
   { title: "Mecánicas del juego", kinds: ["mechanic"] },
@@ -261,7 +259,7 @@ function KeyBattleFact({ game, fact }: { game: string; fact: ReviewFact }) {
         </div>
       )}
       {editing ? (
-        <TeamEditor
+        <KeyBattleEditor
           initial={value ?? proposal ?? []}
           saving={confirm.isPending}
           onCancel={() => {
@@ -322,47 +320,18 @@ function Team({ members }: { members: readonly string[] }) {
   );
 }
 
-interface TeamEditorProps {
+interface KeyBattleEditorProps {
   initial: readonly string[];
   saving: boolean;
   onSave: (team: string[]) => void;
   onCancel: () => void;
 }
 
-function TeamEditor({ initial, saving, onSave, onCancel }: TeamEditorProps) {
+function KeyBattleEditor({ initial, saving, onSave, onCancel }: KeyBattleEditorProps) {
   const [team, setTeam] = useState<string[]>([...initial]);
-  const names = usePokemonNames();
   return (
     <div className="space-y-3 rounded border border-slate-200 p-3">
-      <p className="text-sm font-semibold">{`Equipo en orden (${String(team.length)} de ${String(TEAM_SIZE)})`}</p>
-      {team.length > 0 && (
-        <ol aria-label="Equipo corregido" className="space-y-1">
-          {team.map((pokemon, index) => {
-            const name = names.data?.get(pokemon) ?? pokemon;
-            return (
-              <li key={`${String(index)}-${pokemon}`} className="flex items-center gap-2 text-sm">
-                <span>{`${String(index + 1)}. ${name}`}</span>
-                <button
-                  type="button"
-                  className="text-red-700 underline"
-                  onClick={() => {
-                    setTeam(team.filter((_, position) => position !== index));
-                  }}
-                >
-                  {`Quitar ${name}`}
-                </button>
-              </li>
-            );
-          })}
-        </ol>
-      )}
-      <PokemonPicker
-        label="Añadir un Pokémon al equipo"
-        disabled={team.length >= TEAM_SIZE}
-        onPick={(pokemon) => {
-          setTeam([...team, pokemon.pokemon]);
-        }}
-      />
+      <TeamEditor team={team} onChange={setTeam} label="Equipo corregido" />
       <div className="flex gap-2">
         <button
           type="button"
