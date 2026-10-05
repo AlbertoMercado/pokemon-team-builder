@@ -8,7 +8,7 @@ la web) se documenta aquí en el mismo PR que la introduce o la cambia
 |----------|--------------|------|--------|
 | CLI de carga de datos | Administrador | [Cargar y actualizar los datos](cargar-datos.md) | Disponible |
 | API | Integraciones y la propia web | [Usar la API](api.md) | Disponible |
-| Web | Usuario | [Usar la web](web.md) | Disponible; por ahora, en dos procesos (API y web) |
+| Web | Usuario | [Usar la web](web.md) | Disponible |
 
 ## Responsabilidad sobre los datos confirmados
 

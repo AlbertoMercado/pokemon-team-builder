@@ -3,7 +3,8 @@
     uv run uvicorn api.main:app --reload
 
 Every route is under ``/api``; the OpenAPI contract is at ``/api/openapi.json`` and the
-interactive documentation at ``/api/docs`` (docs/02-ddt/api.md).
+interactive documentation at ``/api/docs`` (docs/02-ddt/api.md). The compiled web, if it has
+been built, is served at ``/`` (``api.web``).
 """
 
 from collections.abc import AsyncIterator
@@ -27,6 +28,7 @@ from api.routers import (
 )
 from api.services.context import GameReferences
 from api.services.meta import app_version
+from api.web import mount_web
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -63,6 +65,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         meta.router,
     ):
         app.include_router(router, prefix="/api")
+    mount_web(app, chosen.web_dir)  # after the API: it takes every other path
     return app
 
 

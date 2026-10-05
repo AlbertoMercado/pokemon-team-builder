@@ -1,4 +1,6 @@
 dist
+playwright-report
+test-results
 node_modules
 package-lock.json
 # Generated from the OpenAPI contract (npm run api:generate).

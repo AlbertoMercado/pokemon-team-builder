@@ -5,8 +5,8 @@ la CI. Qué pantallas tiene y cómo se construye, en el [plan de la web](../02-d
 cómo se usa, en el [manual de usuario](../04-manual-usuario/web.md).
 
 !!! note "Estado"
-    Fases 1 a 7 del [plan de la web](../02-ddt/plan-web.md#fases): todas las pantallas. Hasta la fase 8, la web se sirve con el servidor de desarrollo de
-    Vite, aparte de la API.
+    Las 8 fases del [plan de la web](../02-ddt/plan-web.md#fases): todas las pantallas, la
+    API sirve la web compilada en un solo proceso y hay pruebas de extremo a extremo.
 
 ## Requisitos
 
@@ -34,6 +34,24 @@ cd web && npm run dev                  # la web en http://localhost:5173
 El servidor de Vite reenvía `/api` a `http://127.0.0.1:8000` (`web/vite.config.ts`), así que
 la web y la API comparten el origen y no hace falta CORS. Al cambiar el código, la página se
 actualiza sola.
+
+## Un solo proceso
+
+Para usar la aplicación sin desarrollar, la API sirve también la web compilada:
+
+```bash
+cd web && npm ci && npm run build && cd ..   # una vez, y cada vez que cambie la web
+uv run uvicorn api.main:app                  # la aplicación en http://127.0.0.1:8000
+```
+
+- `npm run build` escribe la web en `web/dist` (fuera de git). La API la sirve en `/`
+  (`api/web.py`) después de sus rutas: los ficheros de la compilación tal cual y, para el
+  resto de rutas, `index.html`, así que una pantalla como `/juego/firered/resultado` se puede
+  recargar o enlazar. Las rutas de `/api` nunca reciben la web: una desconocida responde `404`
+  en JSON.
+- `PTB_WEB_DIR` cambia el directorio de la compilación. Si no tiene `index.html`, la API
+  arranca igual y solo sirve `/api`.
+- Al actualizar el código, vuelve a compilar la web y reinicia la API.
 
 ## Cliente de la API
 
@@ -64,11 +82,31 @@ Si un cambio de la API rompe la web, `npm run typecheck` lo señala.
 Los tests de pantallas no usan la API real: `src/test/server.ts` la simula con MSW y falla si
 una pantalla hace una petición sin respuesta simulada.
 
+### Pruebas de extremo a extremo
+
+```bash
+cd web && npx playwright install chromium   # una vez: el navegador de Playwright
+npm run test:e2e                            # compila la web y ejecuta e2e/ con Playwright
+```
+
+`e2e/new-game.spec.ts` recorre el flujo de un juego nuevo contra la **API real**: favoritos →
+reglas → nuevo juego en Rojo Fuego → revisión → resultado → elegir el equipo y registrarlo →
+la siguiente generación excluye lo usado (RN-16). Playwright arranca la API con
+`uv run python -m tests.e2e.serve` (`playwright.config.ts`), que escribe el escenario de Rojo
+Fuego de los tests en un directorio temporal y sirve la web compilada en el puerto 8765. No usa
+la red ni tus datos; los juegos aparecen como «Firered» porque el escenario no tiene sus
+nombres en español. Si falla, el informe queda en `web/playwright-report/`.
+
 ### CI
 
-El job **Web** de `.github/workflows/ci.yml` ejecuta `npm ci`, regenera el cliente y falla si
-`schema.d.ts` cambia, y después el lint, el formato, los tipos, los tests y la compilación.
-Es una comprobación obligatoria para fusionar en `main`, como Python, Documentación y Secretos
+`.github/workflows/ci.yml` tiene dos jobs para la web:
+
+- **Web**: `npm ci`, regenera el cliente y falla si `schema.d.ts` cambia, y después el lint, el
+  formato, los tipos, los tests y la compilación.
+- **E2E**: instala Python, Node y Chromium y ejecuta `npm run test:e2e`. Si falla, sube el
+  informe de Playwright como artefacto.
+
+Son comprobaciones obligatorias para fusionar en `main`, como Python, Documentación y Secretos
 (protección de la rama en GitHub).
 
 ## Problemas habituales
@@ -78,4 +116,7 @@ Es una comprobación obligatoria para fusionar en `main`, como Python, Documenta
 | Aviso «La API no responde» | La API no está arrancada o no está en el puerto 8000. |
 | Aviso «No hay datos cargados» | No existe `reference.sqlite`: [carga los datos](ingesta.md) y reinicia la API. |
 | `npm run typecheck` falla en `src/api/` tras cambiar la API | Falta regenerar el cliente con `npm run api:generate`. |
+| `http://127.0.0.1:8000/` responde `{"detail":"Not Found"}` | No hay compilación de la web: `cd web && npm run build` y reinicia la API. |
+| La web servida por la API no tiene los últimos cambios | Vuelve a ejecutar `npm run build` y recarga. |
+| `npm run test:e2e` no encuentra el navegador | Instálalo una vez con `npx playwright install chromium`. |
 | El job Web falla en «Cliente de la API al día» | `schema.d.ts` no está al día: regenéralo y súbelo. |

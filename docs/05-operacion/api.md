@@ -24,6 +24,7 @@ uv run uvicorn api.main:app --reload
 | Variable | Por defecto | Qué es |
 |----------|-------------|--------|
 | `PTB_DATA_DIR` | `data` | Directorio con `reference.sqlite`, que escribe la [ingesta](ingesta.md), y `user.sqlite`, que escribe la API. |
+| `PTB_WEB_DIR` | `web/dist` | Compilación de la web que la API sirve en `/` ([un solo proceso](web.md#un-solo-proceso)). Si no existe, solo se sirve la API. |
 
 ```bash
 PTB_DATA_DIR=/ruta/a/otros-datos uv run uvicorn api.main:app
@@ -80,7 +81,8 @@ Al cambiar un modelo de `db/user/models.py`:
 | Fichero | Qué hace |
 |---------|----------|
 | `api/main.py` | `create_app(settings)`: crea la aplicación, abre las bases de datos al arrancar y las cierra al parar. `app` es la que sirve uvicorn. |
-| `api/config.py` | `Settings`: el directorio de datos, de `PTB_DATA_DIR`. |
+| `api/config.py` | `Settings`: el directorio de datos (`PTB_DATA_DIR`) y el de la web compilada (`PTB_WEB_DIR`). |
+| `api/web.py` | Sirve la web compilada en `/`, después de las rutas de la API, con vuelta a `index.html` para las rutas de la web y sin tapar `/api`. |
 | `api/database.py` | `Databases`: migra y abre `user.sqlite` al arrancar y abre `reference.sqlite` cuando una petición lo necesita (`503` si no existe). Dependencias `reference_session` y `user_session` para los endpoints. |
 | `api/openapi.py` | Exporta el contrato OpenAPI de `create_app()` sin arrancar la API: `uv run python -m api.openapi [FICHERO]`. Lo usa la web para generar su cliente ([web](web.md#cliente-de-la-api)). |
 | `api/errors.py` | Errores de los casos de uso (`NotFoundError`, `ConflictError`) y su traducción a `404` y `409`. |

@@ -16,6 +16,8 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
+    // The end-to-end tests (e2e/) run with Playwright, not with Vitest.
+    include: ["src/**/*.test.{ts,tsx}"],
     restoreMocks: true,
   },
 });

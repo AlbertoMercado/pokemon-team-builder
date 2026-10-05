@@ -212,8 +212,10 @@ generación responde `409 Conflict` con la lista de datos pendientes ([RF-08](..
 
 Uso local y personal:
 
-- Un único proceso `uvicorn` sirve la API en `/api` y el frontend compilado como ficheros
-  estáticos.
+- Un único proceso `uvicorn` sirve la API en `/api` y el frontend compilado (`web/dist`, o el
+  directorio de `PTB_WEB_DIR`) como ficheros estáticos en `/`. Las rutas de la web que no son
+  ficheros reciben `index.html`, para poder recargarlas y enlazarlas; las de `/api` nunca
+  (`api/web.py`, [Operación](../05-operacion/web.md#un-solo-proceso)).
 - Los dos ficheros SQLite están en un directorio de datos configurable.
 - Sin autenticación: la aplicación es de un solo usuario
   ([alcance](../01-ddf/index.md#alcance)).
