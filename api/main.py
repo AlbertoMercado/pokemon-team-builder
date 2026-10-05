@@ -23,6 +23,7 @@ from api.routers import (
     meta,
     review,
     rules,
+    team_checks,
 )
 from api.services.context import GameReferences
 from api.services.meta import app_version
@@ -57,6 +58,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         games.router,
         review.router,
         generations.router,
+        team_checks.router,
         hall_of_fame.router,
         meta.router,
     ):

@@ -8,7 +8,7 @@ la web) se documenta aquí en el mismo PR que la introduce o la cambia
 |----------|--------------|------|--------|
 | CLI de carga de datos | Administrador | [Cargar y actualizar los datos](cargar-datos.md) | Disponible |
 | API | Integraciones y la propia web | [Usar la API](api.md) | Disponible |
-| Web | Usuario | [Usar la web](web.md) | Parcial: todo salvo las reglas, elegir el equipo y el *Hall of Fame* |
+| Web | Usuario | [Usar la web](web.md) | Parcial: todo salvo las pantallas de reglas y de *Hall of Fame* |
 
 ## Responsabilidad sobre los datos confirmados
 

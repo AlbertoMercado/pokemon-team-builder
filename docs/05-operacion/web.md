@@ -5,9 +5,9 @@ la CI. Qué pantallas tiene y cómo se construye, en el [plan de la web](../02-d
 cómo se usa, en el [manual de usuario](../04-manual-usuario/web.md).
 
 !!! note "Estado"
-    Fases 1, 2, 4 y 5 del [plan de la web](../02-ddt/plan-web.md#fases): proyecto, cliente
-    de la API, navegación, Inicio, catálogo, ficha, favoritos, nuevo juego, revisión de datos y
-    resultado. Hasta la fase 8, la web se sirve con el servidor de desarrollo de
+    Fases 1, 2, 4, 5 y 6 del [plan de la web](../02-ddt/plan-web.md#fases): proyecto,
+    cliente de la API, navegación, Inicio, catálogo, ficha, favoritos, nuevo juego, revisión de
+    datos, resultado y selector del equipo. Hasta la fase 8, la web se sirve con el servidor de desarrollo de
     Vite, aparte de la API.
 
 ## Requisitos

@@ -1,14 +1,16 @@
 """Generation of teams: build the context, call the engine and translate its result (RF-08).
 
-Nothing is generated while some data that takes part is unverified (RN-18): the answer is a
-``409`` with the values to confirm, the same the review shows. The result is not stored: it
-is a calculation without state. Scores are sent as rounded integers whose contributions add
-up to the total (CA-51, ``api.services.rounding``).
+Also the check of a team chosen in the result (RF-12, CA-53), with the same context.
+
+Nothing is generated nor checked while some data that takes part is unverified (RN-18): the
+answer is a ``409`` with the values to confirm, the same the review shows. The result is not
+stored: it is a calculation without state. Scores are sent as rounded integers whose
+contributions add up to the total (CA-51, ``api.services.rounding``).
 """
 
 from sqlmodel import Session
 
-from api.errors import ConflictError
+from api.errors import ConflictError, InvalidValueError
 from api.repositories import meta as meta_repo
 from api.repositories import user as user_repo
 from api.schemas.generation import (
@@ -25,23 +27,26 @@ from api.schemas.generation import (
 )
 from api.schemas.meta import DataVersion
 from api.schemas.review import ReviewStatus
+from api.schemas.team_check import TeamCheckOut, TeamProblemOut
 from api.services import hall_of_fame
 from api.services import review as review_service
 from api.services.context import GameReference, build_context, to_stored
 from api.services.rounding import largest_remainder, percentage, round_half_up
 from api.services.rules import current_settings
-from core.domain import PokemonData
+from core.domain import GameContext, PokemonData
 from core.engine import OpenSlots, RankedTeam, generate
 from core.review import Origin
 from core.rules.candidate import Discard
 from core.rules.catalog import CATALOG
+from core.rules.check import UnknownMemberError, check_team
 from core.rules.team import PresenceRequirement
 
 PENDING_MESSAGE = "Antes de generar hay que confirmar los datos sin verificar que intervienen"
 
 
-def generate_teams(user: Session, reference: Session, game: GameReference) -> GenerationOut:
-    """``ConflictError`` (409) with the pending data if some value is still unverified."""
+def _ready_context(user: Session, reference: Session, game: GameReference) -> GameContext:
+    """The engine's context; ``ConflictError`` (409) with the pending data if some value that
+    takes part is still unverified."""
     review = review_service.review(user, reference, game)
     if review.pending:
         pending = [f for f in review.facts if f.status is ReviewStatus.PENDING]
@@ -51,7 +56,42 @@ def generate_teams(user: Session, reference: Session, game: GameReference) -> Ge
     confirmations = user_repo.confirmations(user, game.slug)
     favorites = [favorite.pokemon for favorite in user_repo.favorites(user)]
     journey = hall_of_fame.journey(user, reference, game)
-    ctx = build_context(game, favorites, current_settings(user), confirmations, journey)
+    return build_context(game, favorites, current_settings(user), confirmations, journey)
+
+
+def check_chosen_team(
+    user: Session, reference: Session, game: GameReference, members: list[str]
+) -> TeamCheckOut:
+    """The problems of a team chosen in the result with the active rules.
+
+    ``InvalidValueError`` (422) if a member is repeated or is not a Pokémon of the game's
+    generation; ``ConflictError`` (409) as when generating.
+    """
+    repeated = sorted({slug for slug in members if members.count(slug) > 1})
+    if repeated:
+        raise InvalidValueError(f"Pokémon repetidos en el equipo: {', '.join(repeated)}")
+    ctx = _ready_context(user, reference, game)
+    try:
+        check = check_team(ctx, members)
+    except UnknownMemberError as error:
+        raise InvalidValueError(
+            f"Pokémon que no existen en la {game.generation}.ª generación: "
+            f"{', '.join(error.members)}"
+        ) from error
+    return TeamCheckOut(
+        valid=check.valid,
+        problems=[
+            TeamProblemOut(rule_id=p.rule_id, members=list(p.members), detail=p.detail)
+            for p in check.problems
+        ],
+        unverified=list(check.unverified),
+    )
+
+
+def generate_teams(user: Session, reference: Session, game: GameReference) -> GenerationOut:
+    """``ConflictError`` (409) with the pending data if some value is still unverified."""
+    ctx = _ready_context(user, reference, game)
+    confirmations = user_repo.confirmations(user, game.slug)
     result = generate(ctx)
 
     confirmed = []

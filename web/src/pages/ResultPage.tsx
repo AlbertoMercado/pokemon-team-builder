@@ -2,9 +2,10 @@
  * Resultado (RF-08, RF-09, RF-10): generates the teams when it opens and with «Volver a
  * generar». It shows the state and its reason, each group of tied teams with its positions, the
  * breakdown by rule, the open slots with their suggestions, the discards by reason, the presence
- * rules and the confirmed data used. A `409` (data to confirm) leads to the review.
+ * rules and the confirmed data used. A `409` (data to confirm) leads to the review. The
+ * selector (`TeamSelector`) chooses one of the teams and records it in the Hall of Fame.
  */
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, Navigate, useParams } from "react-router";
 
 import { ApiError } from "../api/client";
@@ -14,6 +15,7 @@ import { useGeneration } from "../api/queries/generation";
 import { usePokemonNames } from "../api/queries/pokemon";
 import { useRuleNames } from "../api/queries/rules";
 import type {
+  HallOfFameEntry,
   ConfirmedFact,
   Discard,
   Generation,
@@ -25,8 +27,9 @@ import type {
 } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
 import FavoriteButton from "../components/FavoriteButton";
+import TeamSelector from "../components/TeamSelector";
 import { TypeBadges } from "../components/TypeBadge";
-import { formatDateTime, formatDexNumber } from "../lib/format";
+import { formatDate, formatDateTime, formatDexNumber } from "../lib/format";
 import {
   alternatives,
   DISCARD_REASONS,
@@ -46,6 +49,9 @@ export default function ResultPage() {
   const generation = useGeneration(game);
   const games = useGames();
   const gameName = games.data?.find((candidate) => candidate.game === game)?.name ?? game;
+  // What the user did with the selector; it stays while the result is generated again.
+  const [registered, setRegistered] = useState<HallOfFameEntry | null>(null);
+  const [discarded, setDiscarded] = useState(false);
 
   if (generation.error instanceof ApiError && generation.error.status === 409) {
     return <Navigate to={`/juego/${game}/revision`} replace />;
@@ -71,18 +77,64 @@ export default function ResultPage() {
           </button>
         </div>
       </div>
+      {registered !== null && <Registered entry={registered} />}
+      {discarded && (
+        <p role="status" className="rounded border border-slate-200 bg-white px-3 py-2">
+          Has descartado los equipos: no se ha registrado nada.{" "}
+          <Link to="/" className="text-red-700 underline">
+            Volver al inicio
+          </Link>
+        </p>
+      )}
       {generation.error !== null ? (
         <ErrorMessage error={generation.error} />
       ) : generation.data === undefined ? (
         <p className="text-slate-500">Generando los equipos…</p>
       ) : (
-        <Result game={game} generation={generation.data} />
+        <Result
+          game={game}
+          generation={generation.data}
+          selector={
+            registered === null && !discarded && generation.data.groups.length > 0 ? (
+              <TeamSelector
+                game={game}
+                groups={generation.data.groups}
+                onRegistered={setRegistered}
+                onDiscard={() => {
+                  setDiscarded(true);
+                }}
+              />
+            ) : null
+          }
+        />
       )}
     </div>
   );
 }
 
-function Result({ game, generation }: { game: string; generation: Generation }) {
+function Registered({ entry }: { entry: HallOfFameEntry }) {
+  return (
+    <div role="status" className="rounded border border-green-300 bg-green-50 px-3 py-2">
+      <p className="font-semibold text-green-900">
+        {`Equipo registrado en el Hall of Fame: ${entry.game_name}, ${formatDate(entry.completed_on)}.`}
+      </p>
+      <p className="text-sm text-green-900">
+        {`${entry.members.map((member) => member.name).join(", ")}. Desde ahora, sus líneas quedan excluidas de las próximas generaciones (RN-16), así que el resultado de abajo ya es otro.`}{" "}
+        <Link to="/hall-of-fame" className="underline">
+          Ver el Hall of Fame
+        </Link>
+      </p>
+    </div>
+  );
+}
+
+interface ResultProps {
+  game: string;
+  generation: Generation;
+  selector: ReactNode;
+}
+
+function Result({ game, generation, selector }: ResultProps) {
   return (
     <>
       <Status generation={generation} />
@@ -95,6 +147,7 @@ function Result({ game, generation }: { game: string; generation: Generation }) 
           }
         />
       ))}
+      {selector}
       {generation.discards.length > 0 && <Discards game={game} discards={generation.discards} />}
       {generation.presence.length > 0 && <PresenceRules presence={generation.presence} />}
       {generation.confirmed_facts.length > 0 && (

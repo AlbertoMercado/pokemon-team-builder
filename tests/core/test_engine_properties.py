@@ -25,6 +25,7 @@ from core.engine import (
 )
 from core.rules.candidate import valid_candidates
 from core.rules.catalog import RuleSettings
+from core.rules.check import check_team
 from core.rules.team import (
     EeveePresence,
     PairConstraint,
@@ -191,6 +192,28 @@ def test_every_team_meets_the_active_hard_rules(ctx: GameContext) -> None:
         assert set(team.slugs) <= set(result.valid_candidates)
         assert _valid(team.members, constraints)
         assert all(set(team.slugs) & options for options in required)
+
+
+@pytest.mark.rn("RN-03")
+@pytest.mark.rn("RN-07")
+@pytest.mark.rn("RN-11")
+@pytest.mark.rn("RN-12")
+@pytest.mark.rn("RN-13")
+@pytest.mark.rn("RN-14")
+@pytest.mark.rn("RN-16")
+@settings(max_examples=200, deadline=None)
+@given(ctx=contexts())
+def test_check_finds_no_problem_in_the_teams_of_the_engine(ctx: GameContext) -> None:
+    """``check_team`` uses the engine's rules: its teams only miss their reserved slots."""
+    result = generate(ctx)
+    reserved = {p.rule_id for p in result.presence if p.status is PresenceStatus.RESERVED}
+    for team in result.teams:
+        check = check_team(ctx, team.slugs)
+        assert {problem.rule_id for problem in check.problems} <= reserved
+        assert all(problem.members == () for problem in check.problems)
+        assert check.unverified == ()
+        if not reserved:
+            assert check.valid
 
 
 def _suggestion_order(gain: object, pokemon: PokemonData) -> tuple[object, ...]:
