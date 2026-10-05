@@ -256,7 +256,8 @@ def test_a_registered_team_excludes_its_lines(client: TestClient) -> None:
     body = _ready(client, *FAVORITES)
     journey = {d["pokemon"]: d["detail"] for d in body["discards"] if d["reason"] == "journey"}
     assert sorted(journey) == ["charizard", "gengar", "vaporeon"]
-    assert "leafgreen" in journey["gengar"]
+    # The names, not the identifiers (#42); the scenario names Leaf Green «Leafgreen».
+    assert journey["gengar"] == "Gengar queda excluido porque se usó Gengar en Leafgreen"
     members = {slug for team in _teams(body) for slug in team}
     assert {"dragonite", "flareon"} <= members
     assert not members & set(journey)

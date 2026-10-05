@@ -60,9 +60,9 @@ classDiagram
 | `Availability` | `pokemon.py` | Si la forma existe en el juego y puede llegar a tiempo ([RN-03](../01-ddf/reglas-negocio.md#rn-03)), ya confirmado. |
 | `Candidate` | `pokemon.py` | Un favorito con su disponibilidad ([RN-02](../01-ddf/reglas-negocio.md#rn-02)). |
 | `PoolEntry` | `pokemon.py` | Un Pokémon del juego que no es favorito, para las sugerencias, y si sus datos están verificados ([RN-08](../01-ddf/reglas-negocio.md#rn-08), [CA-31](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| `GameInfo` | `game.py` | Juego objetivo, su generación y las mecánicas que tiene (`day_night_cycle`, `contests`). |
+| `GameInfo` | `game.py` | Juego objetivo, su generación, las mecánicas que tiene (`day_night_cycle`, `contests`) y su nombre en español para las explicaciones (`label`, el identificador si no lo tiene). |
 | `KeyBattle`, `Rival` | `game.py` | Combate clave y los tipos de cada Pokémon rival ([RN-17](../01-ddf/reglas-negocio.md#rn-17)). |
-| `HallOfFameEntry`, `JourneyMember` | `journey.py` | Un juego completado, su orden en el recorrido y su equipo, con la cadena evolutiva y la región de cada miembro ([RN-16](../01-ddf/reglas-negocio.md#rn-16), [RF-12](../01-ddf/requisitos-funcionales.md#rf-12)). |
+| `HallOfFameEntry`, `JourneyMember` | `journey.py` | Un juego completado, su orden en el recorrido y su equipo, con la cadena evolutiva y la región de cada miembro ([RN-16](../01-ddf/reglas-negocio.md#rn-16), [RF-12](../01-ddf/requisitos-funcionales.md#rf-12)), y los nombres del juego y de cada miembro para las explicaciones. |
 | `GameContext` | `context.py` | La única entrada del motor: todo lo anterior más la configuración del usuario y su recorrido. |
 
 `core/domain/lines.py` identifica las líneas que algunas reglas tratan aparte: la de Dragonite
@@ -164,10 +164,14 @@ ejemplo:
 
 | Pokémon | Regla | `reason` | `detail` | `fact_key` |
 |---------|-------|----------|----------|------------|
-| Treecko en Oro | RN-03 | `generation` | Treecko aparece en la 3.ª generación y gold es de la 2.ª | — |
-| Raichu en Rojo Fuego | RN-03 | `arrival` | Raichu no puede llegar a firered y evolucionar antes de completarlo | `pokemon:firered:raichu:arrival` |
+| Treecko en Oro | RN-03 | `generation` | Treecko aparece en la 3.ª generación y Oro es de la 2.ª | — |
+| Raichu en Rojo Fuego | RN-03 | `arrival` | Raichu no puede llegar a Rojo Fuego y evolucionar antes de completarlo | `pokemon:firered:raichu:arrival` |
 | Zapdos | RN-11 | `breeding` | Zapdos no se puede criar (grupos huevo de su línea: no-eggs) | — |
-| Haunter tras usar Gengar en Verde Hoja | RN-16 | `journey` | Haunter queda excluido porque se usó gengar en leafgreen | — |
+| Haunter tras usar Gengar en Verde Hoja | RN-16 | `journey` | Haunter queda excluido porque se usó Gengar en Verde Hoja | — |
+
+Los textos usan los nombres en español del juego (`GameInfo.name`), del juego del recorrido
+(`HallOfFameEntry.game_name`) y del miembro usado (`JourneyMember.name`), que rellena la API. Si
+faltan, como en muchos tests, usan los identificadores.
 
 `valid_candidates(ctx)` devuelve los candidatos válidos y los descartes, los dos en **orden
 canónico**: número de la Pokédex Nacional y, a igualdad, identificador de la forma

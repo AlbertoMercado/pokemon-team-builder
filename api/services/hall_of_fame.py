@@ -103,12 +103,18 @@ def journey(user: Session, reference: Session, game: GameReference) -> tuple[Hal
             continue
         team = tuple(
             JourneyMember(
-                m.pokemon, game.forms[m.pokemon].evolution_chain, game.forms[m.pokemon].region
+                m.pokemon,
+                game.forms[m.pokemon].evolution_chain,
+                game.forms[m.pokemon].region,
+                game.forms[m.pokemon].name,
             )
             for m in members
             if m.pokemon in game.forms
         )
-        result.append(HallOfFameEntry(entry.game, games[entry.game].generation, order, team))
+        found = games[entry.game]
+        result.append(
+            HallOfFameEntry(entry.game, found.generation, order, team, game_name=found.name_es)
+        )
     return tuple(result)
 
 

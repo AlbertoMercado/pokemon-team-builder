@@ -64,14 +64,14 @@ class AvailabilityFilter:
                 self.rule_id,
                 DiscardReason.GENERATION,
                 f"{pokemon.name} aparece en la {pokemon.generation}.ª generación y "
-                f"{game.slug} es de la {game.generation}.ª",
+                f"{game.label} es de la {game.generation}.ª",
             )
         if not availability.exists_in_game:
             return Discard(
                 pokemon.slug,
                 self.rule_id,
                 DiscardReason.GAME,
-                f"{pokemon.name} no se puede tener en {game.slug}",
+                f"{pokemon.name} no se puede tener en {game.label}",
                 f"pokemon:{game.slug}:{pokemon.slug}:exists",
             )
         if not availability.can_arrive:
@@ -79,7 +79,7 @@ class AvailabilityFilter:
                 pokemon.slug,
                 self.rule_id,
                 DiscardReason.ARRIVAL,
-                f"{pokemon.name} no puede llegar a {game.slug} y evolucionar antes de completarlo",
+                f"{pokemon.name} no puede llegar a {game.label} y evolucionar antes de completarlo",
                 f"pokemon:{game.slug}:{pokemon.slug}:arrival",
             )
         return None
@@ -120,7 +120,7 @@ class JourneyFilter:
             pokemon.slug,
             self.rule_id,
             DiscardReason.JOURNEY,
-            f"{pokemon.name} queda excluido porque se usó {member.pokemon} en {entry.game}",
+            f"{pokemon.name} queda excluido porque se usó {member.label} en {entry.game_label}",
         )
 
 
