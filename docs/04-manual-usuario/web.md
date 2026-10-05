@@ -3,30 +3,34 @@
 La web es la forma de usar la aplicación: desde ella eliges tus favoritos y tus reglas,
 generas el equipo para un juego y registras tu *Hall of Fame*.
 
-!!! note "Por ahora, dos procesos"
-    La web tiene todas sus pantallas. Hasta la próxima versión se arranca aparte de la API
-    ([abrir la web](#abrir-la-web)); después, la API la servirá en un solo proceso.
 
 ## Antes de empezar
 
 - Haber cargado los datos al menos una vez ([cargar los datos](cargar-datos.md)).
-- Tener instaladas las dependencias de la web (`cd web && npm ci`;
-  [detalle](../05-operacion/web.md#instalar)).
+- Tener Node 24 y las dependencias de Python (`uv sync`)
+  ([entorno de desarrollo](../05-operacion/entorno-desarrollo-macos.md)).
 
 ## Abrir la web
 
-Por ahora, la web y la API se arrancan por separado, cada una en su terminal, desde la raíz
-del proyecto:
+La primera vez, y cada vez que actualices la aplicación, compila la web desde la raíz del
+proyecto:
 
 ```bash
-uv run uvicorn api.main:app --reload
+cd web && npm ci && npm run build && cd ..
 ```
+
+Después, arranca la aplicación:
 
 ```bash
-cd web && npm run dev
+uv run uvicorn api.main:app
 ```
 
-Abre `http://localhost:5173` en el navegador. Para pararlas, `Ctrl+C` en cada terminal.
+Abre `http://127.0.0.1:8000` en el navegador. Para pararla, `Ctrl+C`.
+
+!!! tip "Mientras desarrollas"
+    Para ver los cambios del código al momento, arranca la API con `--reload` y la web con
+    `cd web && npm run dev` en otra terminal, y abre `http://localhost:5173`
+    ([detalle](../05-operacion/web.md#arrancar-en-desarrollo)).
 
 ## Navegar
 
@@ -261,7 +265,7 @@ juego), el mensaje aparece en el formulario y puedes corregirlo.
 | Aviso | Qué significa | Qué hacer |
 |-------|---------------|-----------|
 | **No hay datos cargados** | La API funciona, pero todavía no se han cargado los datos de los juegos. | Ejecuta la carga con `uv run python -m ingest` ([cargar los datos](cargar-datos.md)) y reinicia la API. |
-| **La API no responde** | La web no puede comunicarse con la API. | Arráncala con `uv run uvicorn api.main:app --reload` y recarga la página. |
+| **La API no responde** | La web no puede comunicarse con la API (solo pasa mientras desarrollas, con la web aparte). | Arráncala con `uv run uvicorn api.main:app --reload` y recarga la página. |
 
 Cuando una parte de una pantalla no se puede mostrar por otro motivo, el mensaje de error
 aparece en su lugar y el resto de la pantalla sigue funcionando.

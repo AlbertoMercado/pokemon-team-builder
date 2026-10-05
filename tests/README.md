@@ -26,6 +26,9 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
 - `ingest/test_curated.py`: datos curados (los ficheros reales, los esquemas y la fuente).
 - `ingest/test_wikidex.py`: fuente de WikiDex sobre páginas reales recortadas
   (`ingest/fixtures/wikidex/`, con su README, su atribución y el script que las genera).
+- `e2e/serve.py`: no es un test. Arranca la API con la web compilada sobre el escenario de
+  Rojo Fuego en un directorio temporal, para las pruebas de extremo a extremo de Playwright
+  (`web/e2e/`); `uv run python -m tests.e2e.serve [--port N]`.
 - `conftest.py`: hace fallar cualquier petición HTTP. **Los tests nunca usan la red.**
 - Los tests de cada paquete van en `tests/<paquete>/` (`core/`, `db/`, `ingest/`, `api/`).
 

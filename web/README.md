@@ -2,8 +2,8 @@
 
 **Qué es**: la interfaz de la aplicación: una aplicación de una sola página con React, Vite,
 TypeScript (strict) y Tailwind ([ADR-0001](../docs/03-adr/0001-stack-tecnologico.md)).
-Implementadas las fases 1 a 7 del [plan](../docs/02-ddt/plan-web.md#fases): proyecto, cliente
-de la API, rutas, navegación, avisos de API no disponible y todas las pantallas: **Inicio**,
+Completa: las 8 fases del [plan](../docs/02-ddt/plan-web.md#fases). La API sirve su compilación
+(`npm run build` → `dist/`) en un solo proceso. Pantallas: **Inicio**,
 **Catálogo**, **Ficha**, **Favoritos**, **Reglas**, **Nuevo juego**, **Revisión de datos**,
 **Resultado** con el **selector del equipo**, y ***Hall of Fame***.
 
@@ -29,7 +29,9 @@ con TanStack Query.
 | `src/lib/` | Funciones puras: `format.ts` (fechas, números de la Pokédex y *commits*), `generation.ts` (textos del resultado: motivos, descartes y reglas de presencia), `docs.ts` (enlaces a la documentación en GitHub), `types.ts` (nombres y colores de los 18 tipos), `evolution.ts` (métodos de evolución en texto) y `commands.ts` (comandos que la web indica). |
 | `src/test/` | Configuración de Vitest, `renderApp` y la API simulada con MSW, que guarda los favoritos, las reglas (`rules.ts`, el catálogo real), las confirmaciones de la revisión y el *Hall of Fame* como estado y genera un resultado completo o incompleto según los favoritos. |
 
-Los tests están junto a lo que prueban (`*.test.ts(x)`).
+Los tests están junto a lo que prueban (`*.test.ts(x)`). Las pruebas de extremo a extremo están
+en `e2e/` (Playwright, `playwright.config.ts`) y van contra la API real, que arranca
+`tests/e2e/serve.py`.
 
 Cómo se arranca y se comprueba: [Operación](../docs/05-operacion/web.md). Cómo se usa:
 [manual de usuario](../docs/04-manual-usuario/web.md).
