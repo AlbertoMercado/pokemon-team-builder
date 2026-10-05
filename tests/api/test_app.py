@@ -1,11 +1,13 @@
 """Start-up of the API, data directory, /api/meta and the OpenAPI contract."""
 
+import json
 import tomllib
 from pathlib import Path
 
 import pytest
 from sqlalchemy import inspect
 
+from api import openapi
 from api.config import DATA_DIR_VARIABLE, Settings
 from api.database import NO_REFERENCE_DATA
 from db.sqlite import create_sqlite_engine
@@ -89,3 +91,15 @@ def test_data_dir_comes_from_the_environment(monkeypatch: pytest.MonkeyPatch) ->
     assert Settings.from_environment().data_dir == Path("/tmp/otros-datos")
     monkeypatch.delenv(DATA_DIR_VARIABLE)
     assert Settings.from_environment().data_dir == Path("data")
+
+
+def test_openapi_export_matches_the_published_contract(
+    make_client: ClientFactory, tmp_path: Path
+) -> None:
+    """``python -m api.openapi`` writes the same contract the API serves, for the web client."""
+    target = tmp_path / "out" / "openapi.json"
+    openapi.main([str(target)])
+    assert json.loads(target.read_text(encoding="utf-8")) == (
+        make_client().get("/api/openapi.json").json()
+    )
+    assert openapi.contract() == target.read_text(encoding="utf-8")

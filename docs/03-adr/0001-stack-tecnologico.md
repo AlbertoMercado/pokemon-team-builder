@@ -95,7 +95,8 @@ flowchart LR
 
 ### Acciones derivadas
 
-- [ ] Inicializar el proyecto `web/` con Vite y sus herramientas de calidad.
+- [x] Inicializar el proyecto `web/` con Vite y sus herramientas de calidad
+  ([plan de la web](../02-ddt/plan-web.md#fases), fase 1).
 - [x] Configurar CI en `.github/workflows/`.
 - [x] Definir el modelo de datos en el DDT ([modelo de datos](../02-ddt/modelo-datos.md)).
 

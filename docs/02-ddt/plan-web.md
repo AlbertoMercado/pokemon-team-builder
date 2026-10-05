@@ -164,19 +164,23 @@ web/
     api/
       schema.d.ts           generado (openapi-typescript); no se edita
       client.ts             cliente de openapi-fetch y manejo de errores
+      queryClient.ts        QueryClient: solo reintenta los fallos de conexión
+      types.ts              nombres cortos de los esquemas del contrato
       queries/              una consulta o mutación por recurso, con sus invalidaciones
     pages/                  una por pantalla
-    components/             Layout, TypeBadge, PokemonName, PokemonPicker, ErrorMessage…
+    components/             Layout, ApiStatusBanner, TypeBadge, PokemonName, PokemonPicker, ErrorMessage…
     lib/
+      format.ts             fechas en español
+      commands.ts           comandos que la web indica (carga, arranque de la API)
       types.ts              nombres y colores de los tipos
       evolution.ts          métodos de evolución en texto
-    test/                   configuración de Vitest y manejadores de MSW
+    test/                   configuración de Vitest, API simulada con MSW y renderApp
   e2e/                      pruebas de Playwright
   README.md
 ```
 
 `api/openapi.py` (en Python) exporta el OpenAPI de `create_app()` sin arrancar la API, para
-generar el cliente.
+generar el cliente. Los tests de Vitest están junto a lo que prueban (`*.test.ts(x)`).
 
 ## Fases
 
@@ -198,7 +202,7 @@ flowchart LR
 
 | Fase | Rama | Contenido | Tests |
 |------|------|-----------|-------|
-| 1 | `feat/web-base` | Proyecto con Vite, React, TypeScript (strict) y Tailwind; ESLint, Prettier y Vitest; `api/openapi.py` y `npm run api:generate`; cliente, `QueryClient`, rutas y `Layout` con la navegación; avisos de `503` y de error de red; **Inicio**. Job **Web** de CI (cliente al día, lint, formato, tipos, tests y compilación). | El cliente generado coincide con el OpenAPI; Inicio con datos, sin datos (`503`) y sin API; navegación. |
+| 1 ✅ | `feat/web-base` | Proyecto con Vite, React, TypeScript (strict) y Tailwind; ESLint, Prettier y Vitest; `api/openapi.py` y `npm run api:generate`; cliente, `QueryClient`, rutas y `Layout` con la navegación; avisos de `503` y de error de red; **Inicio**. Job **Web** de CI (cliente al día, lint, formato, tipos, tests y compilación). | El cliente generado coincide con el OpenAPI; Inicio con datos, sin datos (`503`) y sin API; navegación. |
 | 2 | `feat/web-catalogo-favoritos` | Catálogo con búsqueda y filtros en la URL, ficha con la línea y los métodos en texto (`lib/evolution.ts`), favoritos y la estrella en las tres pantallas. | Búsqueda y filtros; formas regionales; estrella que actualiza las tres pantallas; texto de cada disparador y condición conocidos y de uno desconocido. |
 | 3 | `feat/web-reglas` | Reglas por clase con interruptores, pesos y errores de la API. | Regla no configurable sin interruptor; cambiar peso y activar; mensaje de un `409`. |
 | 4 | `feat/web-nuevo-juego` | Elegir juego y revisión: aceptar todo, confirmar o corregir uno a uno, equipo de un combate clave con el buscador de Pokémon y datos desactualizados. | Flujo de la revisión con el ejemplo de Raichu (RN-18); combate clave corregido; `422` de un Pokémon que no existe. |

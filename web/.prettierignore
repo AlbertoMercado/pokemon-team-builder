@@ -1,0 +1,7 @@
+dist
+node_modules
+package-lock.json
+# Generated from the OpenAPI contract (npm run api:generate).
+src/api/schema.d.ts
+# Markdown follows the style of the repository's docs (compact tables).
+*.md

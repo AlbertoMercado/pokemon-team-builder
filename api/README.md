@@ -17,6 +17,7 @@ partir de las dos bases de datos y llaman a `core/`, y los repositorios acceden 
 | `main.py` | `create_app(settings)` y `app`, la que sirve uvicorn. |
 | `config.py` | `Settings`: el directorio de datos (`PTB_DATA_DIR`). |
 | `database.py` | Motores y sesiones de las dos bases de datos; `503` si falta `reference.sqlite`. |
+| `openapi.py` | `python -m api.openapi [FICHERO]`: exporta el OpenAPI sin arrancar la API, para generar el cliente de la web. |
 | `errors.py` | Errores de los casos de uso y su código HTTP (`404`, `409`, `422`). |
 | `dependencies.py` | Dependencias de los routers: sesiones de las bases de datos y datos de referencia del juego de la ruta (`404` si no es juego objetivo). |
 | `routers/` | Un router por grupo de endpoints de la [API](../docs/02-ddt/api.md). |
