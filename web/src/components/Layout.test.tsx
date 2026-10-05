@@ -27,7 +27,7 @@ describe("Navegación", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Inicio" })).toBeInTheDocument();
   });
 
-  it("keeps the routes of the later screens", () => {
+  it("opens a screen from its address", () => {
     renderApp("/reglas");
     expect(screen.getByRole("heading", { level: 1, name: "Reglas" })).toBeInTheDocument();
   });
