@@ -1,4 +1,4 @@
-import { formatDate, formatDexNumber, shortCommit } from "./format";
+import { formatDate, formatDexNumber, shortCommit, todayIso } from "./format";
 
 describe("formatDate", () => {
   it("writes a date of the API in Spanish without moving it to another day", () => {
@@ -16,5 +16,11 @@ describe("formatDexNumber", () => {
   it("pads the number to three digits", () => {
     expect(formatDexNumber(25)).toBe("#025");
     expect(formatDexNumber(386)).toBe("#386");
+  });
+});
+
+describe("todayIso", () => {
+  it("writes the local date as the API does", () => {
+    expect(todayIso(new Date(2026, 9, 5, 23, 30))).toBe("2026-10-05");
   });
 });

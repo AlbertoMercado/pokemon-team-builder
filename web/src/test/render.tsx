@@ -21,7 +21,7 @@ export function renderApp(path = "/") {
 /** Shows the current path and query string, for tests that check the URL. */
 function LocationProbe() {
   const { pathname, search } = useLocation();
-  return <output data-testid="location">{pathname + search}</output>;
+  return <span data-testid="location">{pathname + search}</span>;
 }
 
 /** The current path and query string of the application under test. */

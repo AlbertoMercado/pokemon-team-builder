@@ -25,3 +25,5 @@ export type Presence = Schemas["PresenceOut"];
 export type ConfirmedFact = Schemas["ConfirmedFactOut"];
 export type GeneratedPokemon = Schemas["PokemonOut"];
 export type Rule = Schemas["RuleOut"];
+export type HallOfFameEntryIn = Schemas["HallOfFameEntryIn"];
+export type TeamCheck = Schemas["TeamCheckOut"];

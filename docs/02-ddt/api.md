@@ -161,7 +161,7 @@ confirmado.
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
 | `POST` | `/api/games/{game}/generations` | Genera los equipos con los favoritos, las reglas y las confirmaciones actuales. `409` con la lista de datos pendientes si queda alguno sin confirmar; `404` si el juego no es juego objetivo. ✅ | RF-08, RF-09, RF-10 |
-| `POST` | `/api/games/{game}/team-checks` | Comprueba un equipo elegido en el selector del resultado (`{"members": [...]}`, de 1 a 6 formas) contra las reglas activas: `{"valid": ..., "problems": [...]}`. `409` si quedan datos sin confirmar. ⏳ Fase 6 del [plan de la web](plan-web.md#comprobacion-del-equipo). | RF-12, CA-53 |
+| `POST` | `/api/games/{game}/team-checks` | Comprueba un equipo elegido en el selector del resultado (`{"members": [...]}`, de 1 a 6 formas) contra las reglas activas: `{"valid": ..., "problems": [...], "unverified": [...]}`. No se guarda. `409` si quedan datos sin confirmar; `422` si un miembro se repite o no existe en la generación del juego. ✅ | RF-12, CA-53 |
 
 La generación no se guarda: es un cálculo sin estado, y con los mismos datos da siempre la misma
 respuesta. Ejemplo con los favoritos del escenario de Rojo Fuego, abreviado:
@@ -224,6 +224,27 @@ respuesta. Ejemplo con los favoritos del escenario de Rojo Fuego, abreviado:
 | `presence` | El nivel de cada regla de presencia activa ([RN-13](../01-ddf/reglas-negocio.md#rn-13), [RN-14](../01-ddf/reglas-negocio.md#rn-14)): `candidates`, `reserved` o `unmet`, con los Pokémon que la cumplen. |
 | `confirmed_facts` | Los datos que confirmó el usuario y que intervienen en la generación, con su valor ([RF-09](../01-ddf/requisitos-funcionales.md#rf-09)). |
 | `data_version` | La carga de datos usada, como en `/api/meta`. |
+
+**Comprobación de un equipo elegido** (`team-checks`): la usa el selector del resultado antes
+de registrar el equipo en el *Hall of Fame* ([motor](motor.md#comprobacion-de-un-equipo-elegido-corerulescheckpy)).
+Los miembros pueden ser favoritos o sugerencias. Ejemplo con dos sugerencias que comparten
+tipo:
+
+```json
+{
+  "valid": false,
+  "problems": [
+    {"rule_id": "RN-12", "members": ["lapras", "vaporeon"], "detail": "Lapras y Vaporeon comparten tipo"}
+  ],
+  "unverified": ["lapras", "vaporeon"]
+}
+```
+
+`problems` lleva primero los filtros por miembro (un miembro), después los pares
+incompatibles (dos) y por último las reglas de presencia que no se cumplen (ninguno).
+`unverified` son los miembros con datos sin confirmar
+([CA-31](../01-ddf/cuestiones-abiertas.md#resueltas)): no es un problema. El registro en el
+*Hall of Fame* no exige que el equipo cumpla las reglas; la comprobación es del selector.
 
 **Puntuaciones enteras** ([CA-51](../01-ddf/cuestiones-abiertas.md#resueltas)): el motor
 calcula con fracciones exactas ([ADR-0006](../03-adr/0006-algoritmo-busqueda-exacta.md)) y

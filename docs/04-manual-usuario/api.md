@@ -201,6 +201,27 @@ Las puntuaciones son números enteros redondeados. Dos equipos con la misma cifr
 qué estar empatados: el orden se decide con los valores exactos. El resultado no se guarda;
 generar otra vez con lo mismo da el mismo resultado.
 
+## Comprobar un equipo elegido
+
+Antes de registrar un equipo formado con los del resultado (una alternativa de cada posición y
+una sugerencia para cada hueco), puedes comprobar que cumple tus reglas. Es lo que hace el
+selector de la web:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/games/firered/team-checks \
+  -H 'Content-Type: application/json' \
+  -d '{"members": ["gengar", "dragonite", "lapras", "vaporeon"]}'
+```
+
+- **`valid`**: si cumple las reglas activas.
+- **`problems`**: cada regla que no cumple, con los miembros afectados y la explicación. Por
+  ejemplo, dos sugerencias para huecos libres que comparten tipo (RN-12), o un equipo sin la
+  evolución de Eevee que pide RN-14.
+- **`unverified`**: los miembros con datos que no has confirmado. No es un problema.
+
+No se guarda nada. Como al generar, responde `409` si queda algún dato por confirmar, y `422`
+si repites un Pokémon o uno no existe en la generación del juego.
+
 ## Hall of Fame: tu recorrido
 
 Cuando completes un juego, registra el equipo con el que lo hiciste. Los registros forman tu

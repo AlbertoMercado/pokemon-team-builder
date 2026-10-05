@@ -321,6 +321,28 @@ Con el estado `candidates`, el equipo tiene que incluir **al menos uno** de `opt
 incluya solo uno lo garantizan RN-12 (dos de tipo primario Dragón comparten tipo) y la
 restricción de RN-14.
 
+## Comprobación de un equipo elegido (`core/rules/check.py`)
+
+`check_team(ctx, miembros)` comprueba un equipo que elige el usuario en el selector del
+resultado ([RF-12](../01-ddf/requisitos-funcionales.md#rf-12),
+[CA-53](../01-ddf/cuestiones-abiertas.md#resueltas)): una alternativa por posición y una
+sugerencia por hueco. Dos sugerencias de huecos libres encajan cada una con el equipo, pero no
+necesariamente entre sí, así que el equipo se comprueba antes de registrarlo. Usa las mismas
+funciones que el motor, así que no duplica ninguna regla:
+
+| Comprobación | Reglas | Cómo |
+|--------------|--------|------|
+| Cada miembro pasa los filtros por candidato | [RN-03](../01-ddf/reglas-negocio.md#rn-03), [RN-11](../01-ddf/reglas-negocio.md#rn-11), [RN-16](../01-ddf/reglas-negocio.md#rn-16) | `first_exclusion`, con el texto del descarte. |
+| No hay dos miembros incompatibles | [RN-07](../01-ddf/reglas-negocio.md#rn-07), [RN-12](../01-ddf/reglas-negocio.md#rn-12), [RN-14](../01-ddf/reglas-negocio.md#rn-14) | `conflict` con las restricciones activas, para cada par. |
+| Se cumplen las reglas de presencia en el nivel que se aplica | [RN-13](../01-ddf/reglas-negocio.md#rn-13), RN-14 | El equipo incluye uno de los `options` de cada regla `candidates` o `reserved` de `generate(ctx).presence`, que ya tiene en cuenta el desplazamiento de [CA-48](../01-ddf/cuestiones-abiertas.md#resueltas). |
+
+Devuelve un `TeamCheck` con los problemas (`TeamProblem`: regla, miembros afectados y
+explicación en español), en ese orden, y los miembros del pool sin verificar
+([CA-31](../01-ddf/cuestiones-abiertas.md#resueltas)), que no son un problema. Los miembros
+pueden ser favoritos o Pokémon del pool (las sugerencias); si alguno no es ninguna de las dos
+cosas, lanza `UnknownMemberError` con sus identificadores. El tamaño del equipo no se
+comprueba: uno incompleto puede tener huecos sin sugerencias.
+
 ## Motor (`core/engine/`)
 
 `generate(ctx)` devuelve un `GenerationResult`

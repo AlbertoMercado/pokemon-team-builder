@@ -112,10 +112,10 @@ tests e issues.**
 | Construir documentación | `uv run mkdocs build --strict` | ✅ |
 | Ejecutar ingesta | `uv run python -m ingest [--data-dir DIR] [--offline]` ([detalle](docs/05-operacion/ingesta.md)) | ✅ Rojo Fuego y Verde Hoja completos |
 | Ver la base de datos | `uvx datasette data/reference.sqlite` ([otras opciones](docs/05-operacion/ingesta.md#consultar-los-datos)) | ✅ |
-| Arrancar API | `uv run uvicorn api.main:app --reload` (`PTB_DATA_DIR` para otro directorio de datos; [detalle](docs/05-operacion/api.md)) | ✅ Metadatos, catálogo, favoritos, reglas, juegos, revisión de datos, generación y Hall of Fame |
+| Arrancar API | `uv run uvicorn api.main:app --reload` (`PTB_DATA_DIR` para otro directorio de datos; [detalle](docs/05-operacion/api.md)) | ✅ Metadatos, catálogo, favoritos, reglas, juegos, revisión de datos, generación, comprobación del equipo y Hall of Fame |
 | Migraciones de `user.sqlite` | `uv run alembic -c db/user/alembic.ini upgrade head` (la API las aplica al arrancar) | ✅ |
 | Instalar dependencias web | `cd web && npm ci` | ✅ |
-| Frontend en desarrollo | `cd web && npm run dev` (con la API arrancada; [detalle](docs/05-operacion/web.md)) | ✅ Inicio, catálogo, ficha, favoritos, nuevo juego, revisión de datos y resultado |
+| Frontend en desarrollo | `cd web && npm run dev` (con la API arrancada; [detalle](docs/05-operacion/web.md)) | ✅ Inicio, catálogo, ficha, favoritos, nuevo juego, revisión de datos, resultado y selector del equipo |
 | Regenerar el cliente de la API | `cd web && npm run api:generate` (al cambiar la API, en el mismo PR) | ✅ |
 | Lint / formato web | `cd web && npm run lint` / `npm run format` | ✅ |
 | Tipos web | `cd web && npm run typecheck` | ✅ |

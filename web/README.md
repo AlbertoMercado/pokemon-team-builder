@@ -2,9 +2,10 @@
 
 **Qué es**: la interfaz de la aplicación: una aplicación de una sola página con React, Vite,
 TypeScript (strict) y Tailwind ([ADR-0001](../docs/03-adr/0001-stack-tecnologico.md)).
-Implementadas las fases 1, 2, 4 y 5 del [plan](../docs/02-ddt/plan-web.md#fases): proyecto,
+Implementadas las fases 1, 2, 4, 5 y 6 del [plan](../docs/02-ddt/plan-web.md#fases): proyecto,
 cliente de la API, rutas, navegación, avisos de API no disponible, **Inicio**, **Catálogo**,
-**Ficha**, **Favoritos**, **Nuevo juego**, **Revisión de datos** y **Resultado**.
+**Ficha**, **Favoritos**, **Nuevo juego**, **Revisión de datos**, **Resultado** y el **selector
+del equipo**.
 
 **Por qué existe**: es la forma de usar la aplicación para el usuario; muestra lo que calcula
 la [API](../docs/02-ddt/api.md) y no implementa reglas de negocio.
@@ -23,7 +24,7 @@ con TanStack Query.
 | `src/api/queryClient.ts` | `QueryClient`: solo reintenta los fallos de conexión. |
 | `src/api/queries/` | Una consulta o mutación por recurso, con sus claves en `keys.ts`. La generación es una consulta (un cálculo sin estado): se repite al cambiar los favoritos o las confirmaciones. |
 | `src/api/types.ts` | Nombres cortos de los esquemas del contrato. |
-| `src/components/` | `Layout` (navegación), `ApiStatusBanner` (aviso de `503` o sin API), `ErrorMessage`, `TypeBadge`, `PokemonName`, `FavoriteButton` (la estrella, que invalida el catálogo, los favoritos y las revisiones), `FavoriteHint` (qué es un favorito, RN-09) y `PokemonPicker` (buscador para elegir un Pokémon). |
+| `src/components/` | `Layout` (navegación), `ApiStatusBanner` (aviso de `503` o sin API), `ErrorMessage`, `TypeBadge`, `PokemonName`, `FavoriteButton` (la estrella, que invalida el catálogo, los favoritos y las revisiones), `FavoriteHint` (qué es un favorito, RN-09) `PokemonPicker` (buscador para elegir un Pokémon) y `TeamSelector` (elegir un equipo del resultado, comprobarlo y registrarlo en el *Hall of Fame*). |
 | `src/pages/` | Una por pantalla. |
 | `src/lib/` | Funciones puras: `format.ts` (fechas, números de la Pokédex y *commits*), `generation.ts` (textos del resultado: motivos, descartes y reglas de presencia), `types.ts` (nombres y colores de los 18 tipos), `evolution.ts` (métodos de evolución en texto) y `commands.ts` (comandos que la web indica). |
 | `src/test/` | Configuración de Vitest, `renderApp` y la API simulada con MSW, que guarda los favoritos y las confirmaciones de la revisión como estado y genera un resultado completo o incompleto según los favoritos. |

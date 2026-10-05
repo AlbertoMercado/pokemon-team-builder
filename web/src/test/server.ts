@@ -17,12 +17,14 @@ import type {
   GeneratedPokemon,
   Generation,
   HallOfFameEntry,
+  HallOfFameEntryIn,
   Meta,
   PokemonDetail,
   Review,
   ReviewFact,
-  Rule,
   ReviewValue,
+  Rule,
+  TeamCheck,
 } from "../api/types";
 
 export const meta: Meta = {
@@ -163,6 +165,8 @@ export function resetData(): void {
   INITIAL_FAVORITES.forEach((pokemon) => favoriteSet.add(pokemon));
   fireredFacts = initialFirered();
   generationCalls.count = 0;
+  requests.checks = [];
+  requests.entries = [];
 }
 
 function reviewOut(): Review {
@@ -452,6 +456,48 @@ export const rules: Rule[] = [
 /** Generations answered, to check that a change generates again. */
 export const generationCalls = { count: 0 };
 
+/** Bodies of the teams checked and of the Hall of Fame entries recorded, in order. */
+export const requests: { checks: string[][]; entries: HallOfFameEntryIn[] } = {
+  checks: [],
+  entries: [],
+};
+
+const NAMES = new Map(
+  [completeGeneration, incompleteGeneration].flatMap((generation) =>
+    generation.groups.flatMap((group) => [
+      ...group.positions.flat().map((p): [string, GeneratedPokemon] => [p.pokemon, p]),
+      ...group.teams.flatMap((team) =>
+        team.open_slots.flatMap((slot) =>
+          slot.suggestions.map((s): [string, GeneratedPokemon] => [s.pokemon.pokemon, s.pokemon]),
+        ),
+      ),
+    ]),
+  ),
+);
+
+/** The check of the API, simplified: Rhydon and Sandslash share the Ground type (RN-12). */
+function checkTeam(members: string[]): TeamCheck {
+  const clash = members.includes("rhydon") && members.includes("sandslash");
+  const unverified = incompleteGeneration.groups
+    .flatMap((group) => group.teams.flatMap((team) => team.open_slots))
+    .flatMap((slot) => slot.suggestions)
+    .filter((s) => !s.verified && members.includes(s.pokemon.pokemon))
+    .map((s) => s.pokemon.pokemon);
+  return {
+    valid: !clash,
+    problems: clash
+      ? [
+          {
+            rule_id: "RN-12",
+            members: ["rhydon", "sandslash"],
+            detail: "Rhydon y Sandslash comparten tipo",
+          },
+        ]
+      : [],
+    unverified: [...new Set(unverified)],
+  };
+}
+
 const notFound = (pokemon: string) =>
   HttpResponse.json(
     { detail: `El Pokémon ${pokemon} no existe en los datos cargados` },
@@ -494,6 +540,32 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 });
   }),
   http.get("/api/hall-of-fame", () => HttpResponse.json(hallOfFame)),
+  http.post<never, HallOfFameEntryIn>("/api/hall-of-fame", async ({ request }) => {
+    const entry = await request.json();
+    requests.entries.push(entry);
+    const recorded: HallOfFameEntry = {
+      id: 2,
+      game: entry.game,
+      game_name: "Rojo Fuego",
+      generation: 3,
+      completed_on: entry.completed_on,
+      notes: entry.notes ?? null,
+      order: 2,
+      last: true,
+      members: entry.members.map((pokemon, index) => ({
+        position: index + 1,
+        pokemon,
+        name: NAMES.get(pokemon)?.name ?? pokemon,
+        types: NAMES.get(pokemon)?.types ?? [],
+      })),
+    };
+    return HttpResponse.json(recorded, { status: 201 });
+  }),
+  http.post<never, { members: string[] }>("/api/games/firered/team-checks", async ({ request }) => {
+    const { members } = await request.json();
+    requests.checks.push(members);
+    return HttpResponse.json(checkTeam(members));
+  }),
   http.get("/api/games", () => HttpResponse.json(games)),
   http.get<{ game: string }>("/api/games/:game/review", ({ params }) =>
     params.game === "firered"

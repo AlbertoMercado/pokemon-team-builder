@@ -243,6 +243,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/games/{game}/team-checks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Comprobar un equipo elegido
+         * @description Comprueba el equipo elegido en el resultado (favoritos y sugerencias) con las reglas
+         *     activas: que cada miembro pase los filtros (RN-03, RN-11, RN-16), que no haya dos
+         *     incompatibles (RN-07, RN-12, RN-14) y que se cumplan las reglas de presencia (RN-13,
+         *     RN-14). No se guarda. `409` si quedan datos sin confirmar, como al generar; `422` si un
+         *     miembro se repite o no existe en la generación del juego; `404` si el juego no es juego
+         *     objetivo.
+         */
+        post: operations["check_team_api_games__game__team_checks_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/hall-of-fame": {
         parameters: {
             query?: never;
@@ -1034,6 +1059,32 @@ export interface components {
              */
             verified: boolean;
         };
+        /** TeamCheckIn */
+        TeamCheckIn: {
+            /**
+             * Members
+             * @description Las formas del equipo elegido, de 1 a 6, sin repetir: favoritos o sugerencias del resultado.
+             */
+            members: string[];
+        };
+        /** TeamCheckOut */
+        TeamCheckOut: {
+            /**
+             * Valid
+             * @description Si el equipo cumple las reglas activas.
+             */
+            valid: boolean;
+            /**
+             * Problems
+             * @description Por cada regla que no se cumple: primero los filtros por miembro, después los pares incompatibles y por último las reglas de presencia.
+             */
+            problems: components["schemas"]["TeamProblemOut"][];
+            /**
+             * Unverified
+             * @description Miembros con datos sin confirmar (CA-31). No es un problema.
+             */
+            unverified: string[];
+        };
         /** TeamOut */
         TeamOut: {
             /**
@@ -1061,6 +1112,24 @@ export interface components {
              * @description Huecos con sus sugerencias, si el equipo tiene menos de 6 (RN-08).
              */
             open_slots: components["schemas"]["OpenSlotsOut"][];
+        };
+        /** TeamProblemOut */
+        TeamProblemOut: {
+            /**
+             * Rule Id
+             * @description La regla que no se cumple.
+             */
+            rule_id: string;
+            /**
+             * Members
+             * @description Los miembros afectados: uno (un filtro), dos (incompatibles) o ninguno (una regla de presencia que el equipo no cumple).
+             */
+            members: string[];
+            /**
+             * Detail
+             * @description Explicación en español.
+             */
+            detail: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -1422,6 +1491,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["GenerationOut"];
+                };
+            };
+            /** @description Quedan datos sin verificar que intervienen (RN-18). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingDataOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_team_api_games__game__team_checks_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                game: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TeamCheckIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamCheckOut"];
                 };
             };
             /** @description Quedan datos sin verificar que intervienen (RN-18). */

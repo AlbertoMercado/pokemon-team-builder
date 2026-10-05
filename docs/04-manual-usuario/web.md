@@ -5,9 +5,9 @@ generas el equipo para un juego y registras tu *Hall of Fame*.
 
 !!! note "Disponible por ahora"
     **Inicio**, **Catálogo**, la **ficha** de cada Pokémon, **Favoritos** y, en **Nuevo
-    juego**, elegir el juego, revisar sus datos y ver el resultado. Elegir el equipo y
-    registrarlo, las reglas y el *Hall of Fame* se añadirán en las siguientes versiones;
-    mientras tanto, las reglas y el *Hall of Fame* muestran «Esta pantalla todavía no está
+    juego**, elegir el juego, revisar sus datos, ver el resultado y elegir el equipo para
+    registrarlo en el *Hall of Fame*. Las pantallas de reglas y de *Hall of Fame* se añadirán
+    en las siguientes versiones; mientras tanto, muestran «Esta pantalla todavía no está
     disponible». Lo que todavía no hace la web
     se puede hacer con la [API](api.md).
 
@@ -193,6 +193,31 @@ el equipo, pero no necesariamente con las demás.
 !!! note "Puntuaciones redondeadas"
     Las puntuaciones se muestran como enteros. Dos equipos con el mismo número no tienen por
     qué estar empatados: el orden se decide con los valores exactos.
+
+### Elegir el equipo y registrarlo
+
+Debajo de los equipos, **Elegir el equipo** te deja quedarte con uno y registrarlo en tu
+*Hall of Fame* como el equipo con el que vas a completar el juego
+([RF-12](../01-ddf/requisitos-funcionales.md#rf-12)):
+
+1. Si hay varias **opciones**, elige una.
+2. En cada **posición** con alternativas (por ejemplo, «Cloyster o Lapras»), elige un Pokémon.
+3. Si el equipo es incompleto, elige una **sugerencia para cada hueco**. No puedes elegir dos
+   veces el mismo Pokémon. **Equipo elegido** muestra cómo queda.
+4. Revisa la **fecha** (hoy, por defecto) y añade **notas** si quieres.
+5. Pulsa **Comprobar y registrar**.
+
+La aplicación comprueba el equipo con tus reglas. Es necesario porque dos sugerencias pueden
+encajar cada una con el equipo, pero no entre sí (por ejemplo, si comparten tipo). Si tiene
+algún problema, lo explica y **no se registra**: cambia la elección y vuelve a probar. Los
+Pokémon con datos sin confirmar se indican, pero no impiden registrarlo.
+
+Al registrarlo, el equipo cuenta para tu recorrido desde ese momento: el resultado se vuelve a
+generar sin sus líneas evolutivas ([RN-16](../01-ddf/reglas-negocio.md#rn-16)). Si después
+quieres cambiar la fecha o el equipo, por ahora puedes hacerlo con la
+[API](api.md#hall-of-fame-tu-recorrido).
+
+Si no te convence ninguno, **Descartar los equipos** no registra nada.
 
 ## Avisos
 

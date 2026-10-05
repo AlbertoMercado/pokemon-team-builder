@@ -4,7 +4,7 @@
  * It is a calculation without state, so it is a query: it runs when the result screen opens,
  * with «Volver a generar», and again when the favourites or the confirmations change.
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { api, unwrap } from "../client";
 import { queryKeys } from "./keys";
@@ -18,5 +18,21 @@ export function useGeneration(game: string) {
       ),
     // Only when asked or when its data change, not when the window gets the focus.
     refetchOnWindowFocus: false,
+  });
+}
+
+/**
+ * Checks a team chosen in the result against the active rules (RF-12, CA-53):
+ * POST /api/games/{game}/team-checks. Nothing is stored.
+ */
+export function useCheckTeam(game: string) {
+  return useMutation({
+    mutationFn: async (members: string[]) =>
+      unwrap(
+        await api.POST("/api/games/{game}/team-checks", {
+          params: { path: { game } },
+          body: { members },
+        }),
+      ),
   });
 }

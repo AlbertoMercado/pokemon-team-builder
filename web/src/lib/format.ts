@@ -24,3 +24,10 @@ export function shortCommit(commit: string): string {
 export function formatDexNumber(number: number): string {
   return `#${String(number).padStart(3, "0")}`;
 }
+
+/** Today in the user's time zone as the API writes dates: `2026-10-05`. */
+export function todayIso(now: Date = new Date()): string {
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${String(now.getFullYear())}-${month}-${day}`;
+}
