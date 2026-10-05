@@ -27,8 +27,9 @@ export function useSetFavorite() {
       Promise.all([
         client.invalidateQueries({ queryKey: queryKeys.pokemon }),
         client.invalidateQueries({ queryKey: queryKeys.favorites }),
-        // A favourite brings or takes data to review (RN-18).
+        // A favourite brings or takes data to review (RN-18) and changes the teams.
         client.invalidateQueries({ queryKey: queryKeys.reviews }),
+        client.invalidateQueries({ queryKey: queryKeys.generations }),
       ]),
   });
 }

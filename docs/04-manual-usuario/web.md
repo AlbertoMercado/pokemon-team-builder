@@ -5,9 +5,10 @@ generas el equipo para un juego y registras tu *Hall of Fame*.
 
 !!! note "Disponible por ahora"
     **Inicio**, **Catálogo**, la **ficha** de cada Pokémon, **Favoritos** y, en **Nuevo
-    juego**, elegir el juego y revisar sus datos. El resultado de la generación, las reglas y el
-    *Hall of Fame* se añadirán en las siguientes versiones; mientras tanto, muestran «Esta
-    pantalla todavía no está disponible». Lo que todavía no hace la web
+    juego**, elegir el juego, revisar sus datos y ver el resultado. Elegir el equipo y
+    registrarlo, las reglas y el *Hall of Fame* se añadirán en las siguientes versiones;
+    mientras tanto, las reglas y el *Hall of Fame* muestran «Esta pantalla todavía no está
+    disponible». Lo que todavía no hace la web
     se puede hacer con la [API](api.md).
 
 ## Antes de empezar
@@ -165,6 +166,33 @@ acabas de añadir.
 !!! warning "Aviso"
     Los datos que confirmas se usan tal cual. Si confirmas uno erróneo, el equipo propuesto
     puede ser inexacto ([responsabilidad sobre los datos confirmados](index.md#responsabilidad-sobre-los-datos-confirmados)).
+
+### Ver el resultado
+
+Al abrir el resultado se generan los equipos con tus favoritos, tus reglas y los datos que
+confirmaste. No se guarda nada: es un cálculo, y con los mismos datos da siempre el mismo
+resultado. **Volver a generar** lo repite. Si falta algún dato por confirmar (por ejemplo,
+porque acabas de añadir un favorito), te lleva a la revisión.
+
+| Apartado | Qué muestra |
+|----------|-------------|
+| **Estado** | Si el equipo está **completo** (6 favoritos) o **incompleto** y por qué, y su **puntuación**. Si varios equipos empatan en cabeza, cuántos son. |
+| **Equipo recomendado** u **Opción N** | Sus posiciones, con el número, el nombre y los tipos en el juego. Una posición como «Cloyster o Lapras» significa que cualquiera de los dos da la misma puntuación: es un grupo de equipos y eliges uno de cada posición. |
+| **Puntuación por regla** | Cada regla blanda activa con su peso, cuánto la cumple el equipo (en %), lo que aporta al total y qué miembros cuentan en contra. Las aportaciones suman el total ([RF-09](../01-ddf/requisitos-funcionales.md#rf-09)). |
+| **Huecos** | Si el equipo es incompleto: los huecos reservados por una regla de presencia y los libres, cada uno con sus **sugerencias**, de mejor a peor, con lo que aportarían (`+3`). Se ven las 5 primeras; **Ver N sugerencias más** muestra el resto. |
+| **Favoritos descartados** | Cuántos favoritos se han descartado y por qué, agrupados por motivo. Si lo decidió un dato que confirmaste, enlaza a la revisión. |
+| **Reglas de presencia** | Cómo se aplica cada una (RN-13, RN-14): si se cumple con tus favoritos, si se le reserva un hueco o si no se puede cumplir en el juego, y qué Pokémon la cumplen. |
+| **Datos que confirmaste** | Los datos confirmados que se han usado, con un enlace para cambiarlos. |
+
+Las sugerencias no son favoritos. Las marcadas **Sin verificar** dependen de datos que no has
+confirmado ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). Con la **estrella** de una sugerencia
+la añades a favoritos y el resultado se vuelve a generar con ella (si trae datos nuevos que
+confirmar, primero pasas por la revisión). Con varios huecos libres, cada sugerencia encaja con
+el equipo, pero no necesariamente con las demás.
+
+!!! note "Puntuaciones redondeadas"
+    Las puntuaciones se muestran como enteros. Dos equipos con el mismo número no tienen por
+    qué estar empatados: el orden se decide con los valores exactos.
 
 ## Avisos
 

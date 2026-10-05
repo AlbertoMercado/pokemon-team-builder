@@ -12,6 +12,7 @@ import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PendingPage from "./pages/PendingPage";
 import PokemonPage from "./pages/PokemonPage";
+import ResultPage from "./pages/ResultPage";
 import ReviewPage from "./pages/ReviewPage";
 
 export default function App() {
@@ -25,7 +26,7 @@ export default function App() {
         <Route path="reglas" element={<PendingPage title="Reglas" />} />
         <Route path="juego" element={<GamesPage />} />
         <Route path="juego/:game/revision" element={<ReviewPage />} />
-        <Route path="juego/:game/resultado" element={<PendingPage title="Resultado" />} />
+        <Route path="juego/:game/resultado" element={<ResultPage />} />
         <Route path="hall-of-fame" element={<PendingPage title="Hall of Fame" />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

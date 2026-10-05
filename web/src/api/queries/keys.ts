@@ -16,4 +16,8 @@ export const queryKeys = {
   /** Prefix of the reviews of every game: they depend on the favourites and the rules. */
   reviews: ["review"] as const,
   review: (game: string) => ["review", game] as const,
+  rules: ["rules"] as const,
+  /** Prefix of the generations of every game: they depend on favourites, rules and data. */
+  generations: ["generation"] as const,
+  generation: (game: string) => ["generation", game] as const,
 };
