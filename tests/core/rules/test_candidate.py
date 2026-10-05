@@ -1,5 +1,7 @@
 """Filters per candidate (RN-03, RN-11, RN-16) and the reason of each discard (RF-10)."""
 
+import dataclasses
+
 import pytest
 
 from core.domain import Candidate, GameInfo
@@ -139,3 +141,59 @@ def test_results_are_in_canonical_order() -> None:
 
     assert _slugs(valid) == ["bulbasaur", "vulpix", "vulpix-alola", "gengar"]
     assert [d.pokemon for d in discards] == ["abra", "mew"]
+
+
+# --- Explanations with names (#42) ---------------------------------------------------------
+
+FIRERED_NAMED = GameInfo("firered", 3, name="Rojo Fuego")
+
+
+@pytest.mark.rn("RN-03")
+def test_rn03_generation_explains_with_the_name_of_the_game() -> None:
+    gold = GameInfo("gold", 2, name="Oro")
+    treecko = candidate(pokemon("treecko", ("grass",), generation=3, dex_number=252))
+    _, [discard] = valid_candidates(context([treecko], chart=GEN2_CHART, game=gold))
+    assert discard.detail == "Treecko aparece en la 3.ª generación y Oro es de la 2.ª"
+
+
+@pytest.mark.rn("RN-03")
+def test_rn03_game_explains_with_the_name_of_the_game() -> None:
+    ponyta = candidate(pokemon("ponyta", ("fire",)), exists=False)
+    _, [discard] = valid_candidates(context([ponyta], game=FIRERED_NAMED))
+    assert discard.detail == "Ponyta no se puede tener en Rojo Fuego"
+
+
+@pytest.mark.rn("RN-03")
+def test_rn03_arrival_explains_with_the_name_of_the_game() -> None:
+    raichu = candidate(pokemon("raichu", ("electric",)), can_arrive=False)
+    _, [discard] = valid_candidates(context([raichu], game=FIRERED_NAMED))
+    assert discard.detail == (
+        "Raichu no puede llegar a Rojo Fuego y evolucionar antes de completarlo"
+    )
+
+
+@pytest.mark.rn("RN-16")
+def test_rn16_explains_with_the_names_of_the_member_and_the_game() -> None:
+    gengar = pokemon("gengar", ("ghost", "poison"), line=("gastly", "haunter"))
+    haunter = pokemon(
+        "haunter", ("ghost", "poison"), line=("gastly",), chain=gengar.evolution_chain
+    )
+    entry = completed("leafgreen", 3, 1, gengar)
+    named = dataclasses.replace(
+        entry,
+        game_name="Verde Hoja",
+        members=tuple(dataclasses.replace(m, name="Gengar") for m in entry.members),
+    )
+    _, [discard] = valid_candidates(context([candidate(haunter)], journey=[named]))
+    assert discard.detail == "Haunter queda excluido porque se usó Gengar en Verde Hoja"
+
+
+@pytest.mark.rn("RN-03")
+@pytest.mark.rn("RN-16")
+def test_without_names_the_explanations_use_the_identifiers() -> None:
+    gengar = pokemon("gengar", ("ghost", "poison"), line=("gastly", "haunter"))
+    journey = [completed("leafgreen", 3, 1, gengar)]
+    _, [used] = valid_candidates(context([candidate(gengar)], journey=journey))
+    assert used.detail == "Gengar queda excluido porque se usó gengar en leafgreen"
+    _, [late] = valid_candidates(context([candidate(gengar, can_arrive=False)]))
+    assert late.detail.startswith("Gengar no puede llegar a firered")

@@ -1,7 +1,7 @@
-# Web: desarrollo y comprobaciones
+# Web: un solo proceso, desarrollo y comprobaciones
 
-Cómo se arranca la web en desarrollo, cómo se regenera su cliente de la API y qué comprueba
-la CI. Qué pantallas tiene y cómo se construye, en el [plan de la web](../02-ddt/plan-web.md);
+Cómo se sirve la web con la API en un solo proceso, cómo se arranca en desarrollo, cómo se
+regenera su cliente de la API y qué comprueba la CI. Qué pantallas tiene y cómo se construye, en el [plan de la web](../02-ddt/plan-web.md);
 cómo se usa, en el [manual de usuario](../04-manual-usuario/web.md).
 
 !!! note "Estado"

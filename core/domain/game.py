@@ -9,14 +9,24 @@ CONTESTS = "contests"
 
 @dataclass(frozen=True)
 class GameInfo:
-    """Target game: identifier, generation and the mechanics it has (already confirmed)."""
+    """Target game: identifier, generation and the mechanics it has (already confirmed).
+
+    ``name`` is its Spanish name, for the explanations of the rules; without it, they use the
+    identifier.
+    """
 
     slug: str
     generation: int
     mechanics: frozenset[str] = frozenset()
+    name: str | None = None
 
     def has(self, mechanic: str) -> bool:
         return mechanic in self.mechanics
+
+    @property
+    def label(self) -> str:
+        """How the explanations call the game: «Rojo Fuego»."""
+        return self.name or self.slug
 
 
 @dataclass(frozen=True)

@@ -5,9 +5,9 @@ endpoint está en la [API](../02-ddt/api.md); cómo se usa, en el
 [manual de usuario](../04-manual-usuario/api.md).
 
 !!! note "Estado"
-    Fases 1 y 2 del [plan de la API](../02-ddt/plan-api.md#fases): arranque, `user.sqlite` con
-    sus migraciones, metadatos, favoritos, reglas y juegos. El resto de endpoints llega en las
-    fases siguientes.
+    Completa: todas las fases del [plan de la API](../02-ddt/plan-api.md#fases) y, desde la
+    fase 8 del [plan de la web](../02-ddt/plan-web.md#fases), sirve también la web compilada
+    en un solo proceso ([detalle](web.md#un-solo-proceso)).
 
 ## Arrancar
 

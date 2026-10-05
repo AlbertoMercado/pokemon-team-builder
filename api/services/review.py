@@ -38,7 +38,7 @@ def involved_values(user: Session, reference: Session, game: GameReference) -> l
     confirmations = user_repo.confirmations(user, game.slug)
     favorites = [favorite.pokemon for favorite in user_repo.favorites(user)]
     facts = involved_facts(
-        GameInfo(game.slug, game.generation),
+        GameInfo(game.slug, game.generation, name=game.name),
         game.game_facts(confirmations),
         game.favorite_facts(favorites, confirmations),
         current_settings(user),

@@ -1,5 +1,6 @@
 """The engine's GameContext built from reference.sqlite and the user's data (RN-10, RN-18)."""
 
+import dataclasses
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
@@ -71,7 +72,8 @@ def test_firered_context_matches_the_engine_scenario(firered: GameReference) -> 
     included, and the engine gives the same teams."""
     built = _context(firered)
     expected = firered_context()
-    assert built.game == expected.game
+    # The API adds the name of the game, for the explanations; the scenario has none.
+    assert built.game == dataclasses.replace(expected.game, name="Firered")
     assert built.type_chart.types == tuple(sorted(expected.type_chart.types))
     assert dict(built.type_chart.factors) == dict(expected.type_chart.factors)
     assert sorted(built.favorites, key=str) == sorted(expected.favorites, key=str)

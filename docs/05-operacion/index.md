@@ -8,10 +8,14 @@ Instalación, despliegue, ingesta de datos y mantenimiento.
   cargados.
 - [Arrancar la API](api.md): `uv run uvicorn api.main:app`, el directorio de datos, la base de
   datos del usuario y sus migraciones.
-- [Web en desarrollo](web.md): arrancar la web con `npm run dev`, regenerar el cliente de la
-  API y las comprobaciones del frontend.
+- [Web](web.md): la aplicación en un solo proceso (la API sirve la web compilada), la web en
+  desarrollo con `npm run dev`, el cliente de la API, las comprobaciones y las pruebas de
+  extremo a extremo.
 - [Informes de carga](informes-carga/index.md): historial de las cargas bloqueadas y de las
   que las resuelven, registrado en git a mano.
 
 !!! note "Pendiente"
-    Despliegue y mantenimiento están en construcción.
+    Una guía de mantenimiento: actualizar la aplicación y los datos y hacer copias de seguridad
+    de `user.sqlite`. Mientras tanto, cada paso está en su página: [ingesta](ingesta.md),
+    [migraciones](api.md#base-de-datos-del-usuario-usersqlite) y
+    [compilar la web](web.md#un-solo-proceso).

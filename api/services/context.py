@@ -229,7 +229,7 @@ def build_context(
         value.subject for value in game.mechanics if value.fact(confirmations).value is True
     )
     return GameContext(
-        game=GameInfo(game.slug, game.generation, mechanics),
+        game=GameInfo(game.slug, game.generation, mechanics, game.name),
         type_chart=game.type_chart,
         favorites=tuple(candidates),
         pool=tuple(pool),
