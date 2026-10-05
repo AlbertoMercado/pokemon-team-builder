@@ -176,7 +176,7 @@ A partir de aquí, cada `git commit` ejecuta automáticamente ruff, mypy, import
 ([contratos de dependencia](../02-ddt/estructura-codigo.md#reglas-de-dependencia)), gitleaks y las
 comprobaciones básicas.
 
-### Frontend (cuando exista la carpeta `web/` con su `package.json`)
+### Frontend
 
 ```bash
 cd web
@@ -239,7 +239,7 @@ gh repo clone AlbertoMercado/pokemon-team-builder
 cd pokemon-team-builder
 uv sync
 uv run pre-commit install
-(cd web && npm ci)      # solo cuando exista web/package.json
+(cd web && npm ci)
 code .
 claude
 ```

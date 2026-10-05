@@ -1,0 +1,8 @@
+/** Short names for the schemas of the contract that the screens use. */
+import type { components } from "./schema";
+
+type Schemas = components["schemas"];
+
+export type Meta = Schemas["Meta"];
+export type FavoritesOut = Schemas["FavoritesOut"];
+export type HallOfFameEntry = Schemas["HallOfFameEntryOut"];

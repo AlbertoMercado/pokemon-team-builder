@@ -61,6 +61,51 @@ jobs:
       - name: Construir documentación
         run: uv run mkdocs build --strict
 
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # uv exporta el OpenAPI de la API para comprobar que el cliente generado está al día.
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: true
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: web/.nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      # ADR-0007: el cliente generado debe coincidir con el OpenAPI de la API.
+      - name: Cliente de la API al día
+        run: |
+          uv sync --locked --directory ..
+          npm run api:generate
+          git diff --exit-code -- src/api/schema.d.ts
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Formato
+        run: npm run format:check
+
+      - name: Tipos
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm run test
+
+      - name: Compilar
+        run: npm run build
+
   secrets:
     name: Secretos
     runs-on: ubuntu-latest

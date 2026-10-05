@@ -114,21 +114,26 @@ tests e issues.**
 | Ver la base de datos | `uvx datasette data/reference.sqlite` ([otras opciones](docs/05-operacion/ingesta.md#consultar-los-datos)) | ✅ |
 | Arrancar API | `uv run uvicorn api.main:app --reload` (`PTB_DATA_DIR` para otro directorio de datos; [detalle](docs/05-operacion/api.md)) | ✅ Metadatos, catálogo, favoritos, reglas, juegos, revisión de datos, generación y Hall of Fame |
 | Migraciones de `user.sqlite` | `uv run alembic -c db/user/alembic.ini upgrade head` (la API las aplica al arrancar) | ✅ |
-| Frontend en desarrollo | `cd web && npm run dev` | ⏳ Pendiente |
-| Lint / formato web | `cd web && npm run lint` / `npm run format` | ⏳ Pendiente |
-| Tests unitarios web | `cd web && npm run test` | ⏳ Pendiente |
+| Instalar dependencias web | `cd web && npm ci` | ✅ |
+| Frontend en desarrollo | `cd web && npm run dev` (con la API arrancada; [detalle](docs/05-operacion/web.md)) | ✅ Inicio y navegación |
+| Regenerar el cliente de la API | `cd web && npm run api:generate` (al cambiar la API, en el mismo PR) | ✅ |
+| Lint / formato web | `cd web && npm run lint` / `npm run format` | ✅ |
+| Tipos web | `cd web && npm run typecheck` | ✅ |
+| Tests unitarios web | `cd web && npm run test` | ✅ |
 | Tests E2E | `cd web && npm run test:e2e` | ⏳ Pendiente |
 
 Actualiza esta tabla cuando un comando pendiente pase a existir.
 
 ### CI
 
-`.github/workflows/ci.yml` se ejecuta en cada PR y en cada push a `main` con tres jobs:
+`.github/workflows/ci.yml` se ejecuta en cada PR y en cada push a `main` con cuatro jobs:
 
 - **Python**: pre-commit (sin gitleaks, mypy ni lint-imports), `mypy` con el entorno del
   proyecto, contratos de dependencia (`lint-imports`) y `pytest`.
 - **Documentación**: `mkdocs build --strict`.
+- **Web**: cliente de la API al día (`npm run api:generate` sin diferencias), lint, formato,
+  tipos, tests y compilación.
 - **Secretos**: gitleaks sobre todo el historial.
 
-Los tres son comprobaciones obligatorias para fusionar en `main`. Cuando exista `web/`, se añadirá
-un job para el frontend.
+Python, Documentación y Secretos son comprobaciones obligatorias para fusionar en `main`; Web
+lo será cuando se añada a la protección de la rama.

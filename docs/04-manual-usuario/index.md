@@ -7,8 +7,8 @@ la web) se documenta aquí en el mismo PR que la introduce o la cambia
 | Interfaz | Quién la usa | Guía | Estado |
 |----------|--------------|------|--------|
 | CLI de carga de datos | Administrador | [Cargar y actualizar los datos](cargar-datos.md) | Disponible |
-| API | Integraciones y la propia web | [Usar la API](api.md) | Parcial: arranque, favoritos, reglas y juegos |
-| Web | Usuario | — | Pendiente: se documentará al desarrollarla |
+| API | Integraciones y la propia web | [Usar la API](api.md) | Disponible |
+| Web | Usuario | [Usar la web](web.md) | Parcial: Inicio y navegación |
 
 ## Responsabilidad sobre los datos confirmados
 
@@ -25,4 +25,5 @@ Las sugerencias para completar un equipo incompleto pueden depender de datos que
 confirmado. En ese caso aparecen marcadas como «sin verificar».
 
 !!! note "Pendiente"
-    Las guías de la API y de la web se añadirán cuando existan.
+    La guía de la web se completa a medida que se añaden sus pantallas
+    ([plan de la web](../02-ddt/plan-web.md#fases)).

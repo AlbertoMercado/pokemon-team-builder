@@ -41,7 +41,8 @@ comprueba que el cliente generado está al día.
 
 ### Acciones derivadas
 
-- [ ] Añadir la generación del cliente y su comprobación al job de CI del frontend.
+- [x] Añadir la generación del cliente y su comprobación al job de CI del frontend
+  (job **Web**; [web en desarrollo](../05-operacion/web.md#ci)).
 
 ## Referencias
 
