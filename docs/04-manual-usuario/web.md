@@ -3,13 +3,9 @@
 La web es la forma de usar la aplicación: desde ella eliges tus favoritos y tus reglas,
 generas el equipo para un juego y registras tu *Hall of Fame*.
 
-!!! note "Disponible por ahora"
-    **Inicio**, **Catálogo**, la **ficha** de cada Pokémon, **Favoritos** y, en **Nuevo
-    juego**, elegir el juego, revisar sus datos, ver el resultado y elegir el equipo, y el
-    ***Hall of Fame***. La pantalla de reglas se añadirá en la siguiente versión; mientras
-    tanto, muestra «Esta pantalla todavía no está disponible» y las reglas se configuran con la
-    [API](api.md#reglas). Lo que todavía no hace la web
-    se puede hacer con la [API](api.md).
+!!! note "Por ahora, dos procesos"
+    La web tiene todas sus pantallas. Hasta la próxima versión se arranca aparte de la API
+    ([abrir la web](#abrir-la-web)); después, la API la servirá en un solo proceso.
 
 ## Antes de empezar
 
@@ -112,6 +108,26 @@ método, un objeto o una condición, lo muestra con su nombre en inglés de Poke
 
 Tu lista, en orden de la Pokédex Nacional, con cuántos tienes. Pulsa la estrella de uno para
 quitarlo.
+
+## Configurar las reglas
+
+En **Reglas** decides qué reglas se aplican al generar y cuánto pesa cada una
+([RF-06](../01-ddf/requisitos-funcionales.md#rf-06),
+[RF-07](../01-ddf/requisitos-funcionales.md#rf-07)). Están agrupadas por clase, cada una con su
+identificador (`RN-XX`) y lo que hace. El enlace **reglas de negocio** lleva al documento que
+las explica en detalle.
+
+| Clase | Qué hacen | Qué puedes cambiar |
+|-------|-----------|--------------------|
+| **Reglas duras** | Filtros: un Pokémon o un equipo que no las cumple se descarta. | Las configurables tienen un interruptor **Activa**; las estructurales (como RN-01, «El equipo tiene 6 Pokémon») están siempre activas. |
+| **Reglas de presencia** | Obligan a incluir un tipo de miembro: Dragonite o un Dragón (RN-13) y una evolución de Eevee (RN-14). | El interruptor **Activa**. |
+| **Reglas blandas** | Puntúan el equipo; la puntuación de cada una se multiplica por su **peso**. | El interruptor y el **Peso**, de 0 a 10. Junto al peso se ve su valor por defecto. |
+| **Mecanismos** | Cómo funciona el generador. | Nada: son informativos. |
+
+Los cambios se guardan al momento, valen para todos los juegos y se conservan entre sesiones.
+El próximo resultado ya se genera con ellos, y la revisión de datos puede pedir datos nuevos: por
+ejemplo, al activar RN-17, los combates clave del juego. Si la API rechaza un cambio, el
+mensaje aparece junto a la regla.
 
 ## Empezar un juego nuevo
 

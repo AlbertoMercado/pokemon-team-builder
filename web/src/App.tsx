@@ -1,7 +1,4 @@
-/**
- * Routes of the application (docs/02-ddt/plan-web.md, "Pantallas"). The screens of the later
- * phases answer with `PendingPage` until they exist.
- */
+/** Routes of the application (docs/02-ddt/plan-web.md, "Pantallas"). */
 import { Route, Routes } from "react-router";
 
 import Layout from "./components/Layout";
@@ -11,9 +8,9 @@ import GamesPage from "./pages/GamesPage";
 import HallOfFamePage from "./pages/HallOfFamePage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
-import PendingPage from "./pages/PendingPage";
 import PokemonPage from "./pages/PokemonPage";
 import ResultPage from "./pages/ResultPage";
+import RulesPage from "./pages/RulesPage";
 import ReviewPage from "./pages/ReviewPage";
 
 export default function App() {
@@ -24,7 +21,7 @@ export default function App() {
         <Route path="pokemon" element={<CatalogPage />} />
         <Route path="pokemon/:pokemon" element={<PokemonPage />} />
         <Route path="favoritos" element={<FavoritesPage />} />
-        <Route path="reglas" element={<PendingPage title="Reglas" />} />
+        <Route path="reglas" element={<RulesPage />} />
         <Route path="juego" element={<GamesPage />} />
         <Route path="juego/:game/revision" element={<ReviewPage />} />
         <Route path="juego/:game/resultado" element={<ResultPage />} />

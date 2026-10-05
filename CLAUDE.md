@@ -115,7 +115,7 @@ tests e issues.**
 | Arrancar API | `uv run uvicorn api.main:app --reload` (`PTB_DATA_DIR` para otro directorio de datos; [detalle](docs/05-operacion/api.md)) | ✅ Metadatos, catálogo, favoritos, reglas, juegos, revisión de datos, generación, comprobación del equipo y Hall of Fame |
 | Migraciones de `user.sqlite` | `uv run alembic -c db/user/alembic.ini upgrade head` (la API las aplica al arrancar) | ✅ |
 | Instalar dependencias web | `cd web && npm ci` | ✅ |
-| Frontend en desarrollo | `cd web && npm run dev` (con la API arrancada; [detalle](docs/05-operacion/web.md)) | ✅ Todas las pantallas salvo Reglas |
+| Frontend en desarrollo | `cd web && npm run dev` (con la API arrancada; [detalle](docs/05-operacion/web.md)) | ✅ Todas las pantallas |
 | Regenerar el cliente de la API | `cd web && npm run api:generate` (al cambiar la API, en el mismo PR) | ✅ |
 | Lint / formato web | `cd web && npm run lint` / `npm run format` | ✅ |
 | Tipos web | `cd web && npm run typecheck` | ✅ |

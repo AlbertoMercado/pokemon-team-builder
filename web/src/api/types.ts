@@ -28,3 +28,4 @@ export type Rule = Schemas["RuleOut"];
 export type HallOfFameEntryIn = Schemas["HallOfFameEntryIn"];
 export type TeamCheck = Schemas["TeamCheckOut"];
 export type HallOfFamePatch = Schemas["HallOfFamePatch"];
+export type RulePatch = Schemas["RulePatch"];

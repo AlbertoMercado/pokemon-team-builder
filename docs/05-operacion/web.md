@@ -5,8 +5,7 @@ la CI. Qué pantallas tiene y cómo se construye, en el [plan de la web](../02-d
 cómo se usa, en el [manual de usuario](../04-manual-usuario/web.md).
 
 !!! note "Estado"
-    Fases 1, 2 y 4 a 7 del [plan de la web](../02-ddt/plan-web.md#fases): todas las
-    pantallas salvo Reglas. Hasta la fase 8, la web se sirve con el servidor de desarrollo de
+    Fases 1 a 7 del [plan de la web](../02-ddt/plan-web.md#fases): todas las pantallas. Hasta la fase 8, la web se sirve con el servidor de desarrollo de
     Vite, aparte de la API.
 
 ## Requisitos

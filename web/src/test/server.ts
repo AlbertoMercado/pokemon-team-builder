@@ -25,8 +25,10 @@ import type {
   ReviewFact,
   ReviewValue,
   Rule,
+  RulePatch,
   TeamCheck,
 } from "../api/types";
+import { CATALOG } from "./rules";
 
 export const meta: Meta = {
   app_version: "0.9.0",
@@ -172,6 +174,7 @@ export function resetData(): void {
   INITIAL_FAVORITES.forEach((pokemon) => favoriteSet.add(pokemon));
   fireredFacts = initialFirered();
   generationCalls.count = 0;
+  rules = CATALOG.map((rule) => ({ ...rule }));
   entries = INITIAL_ENTRIES.map((entry) => ({ ...entry }));
   nextEntryId = 2;
   requests.checks = [];
@@ -508,19 +511,42 @@ export const incompleteGeneration: Generation = {
   data_version: meta.data,
 };
 
-export const rules: Rule[] = [
-  {
-    rule_id: "RN-13",
-    name: "Dragonite o un Pokémon de tipo primario Dragón",
-    description:
-      "El equipo incluye a Dragonite o, si no es posible, un Pokémon de tipo primario Dragón.",
-    kind: "presence",
-    configurable: true,
-    enabled: true,
-    weight: null,
-    default_weight: null,
-  },
-];
+/** The user's rules: the catalogue with their changes. */
+let rules: Rule[] = CATALOG.map((rule) => ({ ...rule }));
+
+/** PATCH /api/rules/{rule_id}, with the errors of the API (`404`, `409`, `422`). */
+function updateRule(ruleId: string, change: RulePatch) {
+  const rule = rules.find((candidate) => candidate.rule_id === ruleId);
+  if (!rule) {
+    return HttpResponse.json(
+      { detail: `La regla ${ruleId} no existe en el catálogo` },
+      { status: 404 },
+    );
+  }
+  if (change.enabled == null && change.weight == null) {
+    return HttpResponse.json(
+      { detail: [{ loc: ["body"], msg: "Value error, indica enabled, weight o los dos" }] },
+      { status: 422 },
+    );
+  }
+  if (change.enabled != null && !rule.configurable) {
+    return HttpResponse.json(
+      { detail: `la regla ${ruleId} no se puede desactivar` },
+      { status: 409 },
+    );
+  }
+  if (change.weight != null && rule.kind !== "soft") {
+    return HttpResponse.json(
+      { detail: `la regla ${ruleId} no es blanda: no tiene peso` },
+      { status: 409 },
+    );
+  }
+  Object.assign(rule, {
+    ...(change.enabled != null ? { enabled: change.enabled } : {}),
+    ...(change.weight != null ? { weight: change.weight } : {}),
+  });
+  return HttpResponse.json(rule);
+}
 
 /** Generations answered, to check that a change generates again. */
 export const generationCalls = { count: 0 };
@@ -702,6 +728,9 @@ export const handlers = [
     );
   }),
   http.get("/api/rules", () => HttpResponse.json(rules)),
+  http.patch<{ ruleId: string }, RulePatch>("/api/rules/:ruleId", async ({ params, request }) =>
+    updateRule(params.ruleId, await request.json()),
+  ),
   http.post("/api/games/firered/review/accept-proposals", () => {
     for (const candidate of fireredFacts) {
       if (candidate.status === "pending" && candidate.proposal !== null) {
