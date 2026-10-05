@@ -244,8 +244,8 @@ la fase 8, la web compilada servida por ella.
 | **Web** | Fase 1 | `npm ci`; `npm run api:generate` y `git diff --exit-code`; `npm run lint`; `npm run format:check`; `npm run typecheck`; `npm run test`; `npm run build`. |
 | **E2E** | Fase 8 | Instala Python y Node, crea los datos de prueba, `npx playwright install chromium` y `npm run test:e2e`. |
 
-Para que sean obligatorios al fusionar en `main` hay que añadirlos a la protección de la rama
-en GitHub; lo hace el propietario del repositorio cuando existan.
+Los dos son comprobaciones obligatorias de la protección de `main`, junto con Python,
+Documentación y Secretos.
 
 ## Riesgos
 

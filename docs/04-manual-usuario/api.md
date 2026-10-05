@@ -5,11 +5,11 @@ ejemplo para probarla o automatizar algo. Qué hace cada endpoint, en detalle, e
 [API](../02-ddt/api.md); cómo se arranca y se configura, en
 [Operación](../05-operacion/api.md).
 
-!!! note "Disponible por ahora"
+!!! note "Disponible"
     Arrancar la API, consultar su versión y la de los datos, gestionar los favoritos y las
-    reglas, consultar el catálogo de Pokémon, ver los juegos objetivo, revisar sus datos,
-    generar equipos y registrar tu *Hall of Fame*: todos los endpoints previstos en el
-    [plan de la API](../02-ddt/plan-api.md#fases).
+    reglas, consultar el catálogo de Pokémon, ver los juegos, revisar sus datos, generar
+    equipos, comprobar un equipo elegido y registrar tu *Hall of Fame*. Lo mismo se puede hacer
+    desde la [web](web.md).
 
 ## Antes de empezar
 

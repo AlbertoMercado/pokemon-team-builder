@@ -7,8 +7,8 @@ arquitectura se registran como [ADR](../03-adr/index.md).
 
 - [Arquitectura](arquitectura.md): componentes, reglas de dependencia, flujos, despliegue y
   estrategia de pruebas.
-- [Motor de reglas](motor.md): lo implementado en `core/`: modelos del dominio, tabla de
-  tipos, catálogo de reglas y configuración.
+- [Motor de reglas](motor.md): lo implementado en `core/`: modelos del dominio, reglas,
+  puntuación, generación de equipos, revisión de datos y comprobación de un equipo elegido.
 - [Estructura del código](estructura-codigo.md): qué es y qué hace cada directorio, contratos
   de dependencia entre paquetes y cómo se documenta el código.
 - [Modelo de datos](modelo-datos.md): las dos bases de datos SQLite, los datos revisables y el

@@ -259,6 +259,9 @@ claude
 
 ---
 
-## Herramientas pendientes para fases posteriores
+## Despliegue
 
-- **Docker Desktop** (gratuito para uso personal): se añadirá a esta guía en la fase de despliegue.
+No hace falta ninguna herramienta más: la aplicación es local y se ejecuta como un solo proceso,
+la API sirviendo la web compilada ([un solo proceso](web.md#un-solo-proceso)). Para las pruebas
+de extremo a extremo, instala una vez el navegador de Playwright con
+`cd web && npx playwright install chromium`.
