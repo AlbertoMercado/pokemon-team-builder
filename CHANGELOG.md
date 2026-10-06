@@ -6,32 +6,50 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+## [1.1.0] - 2026-10-06
+
+Imágenes de los Pokémon (RF-17): cada Pokémon se ve con su imagen en toda la aplicación, sin
+depender de servidores externos una vez cargados los datos.
+
+**Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`): la tabla
+`pokemon` tiene columnas nuevas y, hasta repetirla, la API responde `503` pidiéndolo. En el
+servidor, copia también las imágenes
+([puesta en producción](docs/05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos)).
+
 ### Añadido
 
-- **Ingesta**: descarga las imágenes de cada Pokémon (su *sprite*, que recorta a la figura, y su
-  ilustración oficial, que reduce a 256 px, del commit fijado en `data/curated/pokeapi.yaml`) a
-  la caché local, sin versionarlas en git. Nueva dependencia: Pillow. Una imagen que
-  falta no rompe la carga: el informe la avisa (RF-17, ADR-0010, #49).
+- **Ingesta**: descarga las imágenes de cada Pokémon del repositorio PokeAPI/sprites, fijado a
+  un commit en `data/curated/pokeapi.yaml`, a la caché local y sin versionarlas en git: su
+  *sprite*, que recorta a la figura, y su ilustración oficial, que reduce a 256 px. Una imagen
+  que falta no rompe la carga: el informe la avisa. Nueva dependencia: Pillow (RF-17,
+  ADR-0010, #58, #63).
+- **API**: `GET /api/pokemon/{pokemon}/image` y `/artwork` sirven la imagen y la ilustración de
+  cada forma desde la caché local. Las respuestas con Pokémon (catálogo, ficha, favoritos,
+  generación y *Hall of Fame*) incluyen `image_url`, y la ficha, `artwork_url`. `/api/meta` da
+  el commit de las imágenes (`sprites_commit`) (RF-17, #61, #63).
+- **API**: si `reference.sqlite` es de una versión anterior y le faltan datos, responde `503`
+  pidiendo repetir la carga, en lugar de fallar (#58).
 - **Web**: cada Pokémon se muestra con su imagen junto al nombre en el catálogo, la ficha y su
   línea evolutiva, los favoritos, el resultado, el selector del equipo y el *Hall of Fame*: su
-  *sprite* recortado a la figura en las listas y su ilustración oficial en la ficha. Sin
-  imagen se muestra igual. Al pie, el aviso de la titularidad de las imágenes y la procedencia
-  de los datos (RF-17, CA-56).
-- **API**: `GET /api/pokemon/{pokemon}/image` y `/artwork` sirven la imagen y la ilustración de
-  cada forma desde la caché local; las respuestas con Pokémon (catálogo, ficha, favoritos,
-  generación y *Hall of Fame*) incluyen `image_url`, y la ficha, `artwork_url`. `/api/meta` da el commit de las imágenes (`sprites_commit`) (RF-17).
-- **API**: si `reference.sqlite` es de una versión anterior y le faltan datos, responde `503`
-  pidiendo repetir la carga, en lugar de fallar.
+  *sprite* recortado en las listas y su ilustración oficial en la ficha. Sin imagen se muestra
+  igual. Al pie, el aviso de la titularidad de las imágenes y la procedencia de los datos
+  (RF-17, CA-56, #62, #63).
 
 ### Cambiado
 
-- **Hay que repetir la carga de datos** (`uv run python -m ingest`) al actualizar: la tabla
-  `pokemon` guarda ahora el identificador de PokeAPI y la imagen de cada forma. En el
-  servidor, copia también las imágenes ([puesta en producción](docs/05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos)).
-- El aviso de la web cuando no hay datos se titula «Hay que cargar los datos».
-- **Comprobar el equipo elegido** (`POST /api/games/{game}/team-checks`) ya no genera los equipos
-  otra vez: solo resuelve las reglas de presencia. Pasa de unos 40 ms a menos de 1 ms en Rojo
-  Fuego (#59).
+- **Comprobar el equipo elegido** (`POST /api/games/{game}/team-checks`) ya no genera los
+  equipos otra vez: solo resuelve las reglas de presencia. Pasa de unos 40 ms a menos de 1 ms
+  en Rojo Fuego, y la suite de tests de unos 90 s a 22 s (RN-13, RN-14, #59, #60).
+- El aviso de la web cuando no hay datos se titula «Hay que cargar los datos», porque también
+  sale cuando los datos son de una versión anterior (#58).
+
+### Pendiente
+
+- Portadas de los juegos (RF-18, #49): falta comprobar si WikiDex las tiene y se pueden usar
+  (CA-55).
+- Mostrar la página y la revisión de WikiDex de cada combate clave (ADR-0004).
+- Aprobar la puesta en producción (ADR-0009, #51), proteger el acceso (RF-19, #52) y las
+  restricciones de llegada del resto de juegos (CA-28, #8).
 
 ## [1.0.0] - 2026-10-06
 
@@ -73,5 +91,6 @@ Hoja**.
   acceso (RF-19, #52).
 - Restricciones de llegada del resto de juegos (CA-28, #8).
 
-[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.0.0...HEAD
+[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/AlbertoMercado/pokemon-team-builder/releases/tag/v1.0.0
