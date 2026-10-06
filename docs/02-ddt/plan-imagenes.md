@@ -22,7 +22,7 @@ API y mostrarla en la web, con el aviso de su titularidad. La decisión de arqui
 - Las portadas de los juegos ([RF-18](../01-ddf/requisitos-funcionales.md#rf-18)). Antes hay
   que comprobar si WikiDex las tiene y en qué condiciones
   ([CA-55](../01-ddf/cuestiones-abiertas.md#resueltas)). Se harán después, reutilizando el
-  endpoint y el aviso de este plan.
+  endpoint y el aviso de este plan: [plan de las portadas](plan-portadas.md).
 - Los *sprites* de la generación de cada juego (los de Rojo Fuego y Verde Hoja, por ejemplo):
   no existen para las formas regionales y obligarían a guardar una imagen por forma y juego.
 

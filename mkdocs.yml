@@ -71,6 +71,7 @@ nav:
       - Plan de la API: 02-ddt/plan-api.md
       - Plan de la web: 02-ddt/plan-web.md
       - Plan de las imágenes: 02-ddt/plan-imagenes.md
+      - Plan de las portadas: 02-ddt/plan-portadas.md
   - Decisiones (ADR):
       - 03-adr/index.md
       - Plantilla: 03-adr/0000-plantilla.md
@@ -84,6 +85,7 @@ nav:
       - "0008 · Cargas bloqueadas": 03-adr/0008-cargas-bloqueadas.md
       - "0009 · Despliegue en una VM gratuita": 03-adr/0009-despliegue-vm-gratuita-tailscale.md
       - "0010 · Imágenes de los Pokémon": 03-adr/0010-imagenes-pokemon-cache-local.md
+      - "0011 · Portadas de WikiDex de uso privado": 03-adr/0011-portadas-wikidex-uso-privado.md
   - Manual de usuario:
       - 04-manual-usuario/index.md
       - Cargar y actualizar los datos: 04-manual-usuario/cargar-datos.md

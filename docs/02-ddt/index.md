@@ -25,6 +25,8 @@ arquitectura se registran como [ADR](../03-adr/index.md).
 - [Plan de las imágenes de los Pokémon](plan-imagenes.md): obtenerlas en la ingesta,
   servirlas desde la API y mostrarlas en la web (RF-17), con sus comprobaciones previas, fases y
   riesgos.
+- [Plan de las portadas de los juegos](plan-portadas.md): obtenerlas de WikiDex en la ingesta,
+  servirlas desde la API y mostrarlas en la web (RF-18), con la fuente de cada combate clave.
 - [Plan de implementación de la API](plan-api.md): alcance, `user.sqlite`, construcción del
   contexto, datos revisables, fases y estrategia de pruebas.
 - [Plan de implementación del motor](plan-motor.md): alcance, interfaz, módulos, cómo se
