@@ -72,7 +72,9 @@ Cada directorio de código tiene un `README.md` y cada paquete un *docstring* en
   rama `feat/`, `fix/`, `docs/`, `chore/` o `test/`.
 - **Commits**: [Conventional Commits](https://www.conventionalcommits.org/es/) en español,
   p. ej. `feat(core): añadir filtro por juego objetivo (RN-03)`.
-- **Versionado**: SemVer. Mientras sea `0.x`, los cambios incompatibles suben la versión menor.
+- **Versionado**: SemVer desde la 1.0.0: los cambios incompatibles (API, `user.sqlite` sin
+  migración que conserve los datos, CLI) suben la versión mayor. Cada versión se anota en
+  `CHANGELOG.md` y se publica con una etiqueta `vX.Y.Z` ([versiones](docs/05-operacion/versiones.md)).
 - **Decisiones de arquitectura**: toda decisión relevante se registra como ADR en
   `docs/03-adr/` a partir de `0000-plantilla.md`, con numeración correlativa.
 - **Tipado**: mypy en modo `strict`; no usar `Any` ni `# type: ignore` sin justificar.

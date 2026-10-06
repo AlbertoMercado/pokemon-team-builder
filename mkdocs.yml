@@ -94,4 +94,5 @@ nav:
       - Arrancar la API: 05-operacion/api.md
       - Web: 05-operacion/web.md
       - Puesta en producción: 05-operacion/puesta-en-produccion.md
+      - Versiones: 05-operacion/versiones.md
       - Informes de carga: 05-operacion/informes-carga/index.md
