@@ -30,7 +30,12 @@ class VersionGroup(ReferenceModel, table=True):
 
 
 class Game(ReferenceModel, table=True):
-    """A main-series game. Only games with ``is_target`` can be chosen as target (RF-05)."""
+    """A main-series game. Only games with ``is_target`` can be chosen as target (RF-05).
+
+    ``cover`` is the path of its cover relative to the data directory and ``cover_source`` the
+    title of its file in WikiDex, for the attribution; both null if it has no cover (RF-18,
+    ADR-0011).
+    """
 
     __tablename__ = "game"
 
@@ -41,6 +46,8 @@ class Game(ReferenceModel, table=True):
     release_order: int
     has_breeding: bool
     is_target: bool
+    cover: str | None = None
+    cover_source: str | None = None
 
 
 class GameMechanic(ReferenceModel, table=True):

@@ -24,7 +24,7 @@ que solo sustituye al anterior si todo es correcto, también que las claves que 
 | `sources/` | Interfaz `Source` de las fuentes. |
 | `sources/curated/` | Datos curados: esquemas de los YAML (`schemas.py`), lectura (`read_curated`) y la fuente de mecánicas y combates clave. |
 | `sources/pokeapi/` | Fuente de PokeAPI: descarga con caché (`download.py`), imágenes de las formas con caché, recortadas o reducidas con Pillow (`sprites.py`, ADR-0010), validación de cada fila (`rows.py`), transformación (`transform.py`) e índice de Pokémon por nombre (`index.py`). |
-| `sources/wikidex/` | Fuente de WikiDex: descarga con caché y límite de peticiones (`fetch.py`), procesado de las plantillas `{{Equipo}}` (`parse.py`) y filas de los combates clave. |
+| `sources/wikidex/` | Fuente de WikiDex: descarga con caché y límite de peticiones (`fetch.py`), portadas de los juegos con caché y reducidas con Pillow (`covers.py`, ADR-0011), procesado de las plantillas `{{Equipo}}` (`parse.py`) y filas de los combates clave. |
 
 Fases del [plan de carga](../docs/02-ddt/plan-carga-datos.md).
 

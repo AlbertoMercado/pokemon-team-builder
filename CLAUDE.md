@@ -118,7 +118,7 @@ tests e issues.**
 | Hooks de pre-commit | `uv run pre-commit install` / `uv run pre-commit run --all-files` | ✅ |
 | Documentación en local | `uv run mkdocs serve` | ✅ |
 | Construir documentación | `uv run mkdocs build --strict` | ✅ |
-| Ejecutar ingesta | `uv run python -m ingest [--data-dir DIR] [--offline]` ([detalle](docs/05-operacion/ingesta.md)) | ✅ Rojo Fuego y Verde Hoja completos |
+| Ejecutar ingesta | `uv run python -m ingest [--data-dir DIR] [--offline] [--no-covers]` ([detalle](docs/05-operacion/ingesta.md)) | ✅ Rojo Fuego y Verde Hoja completos |
 | Ver la base de datos | `uvx datasette data/reference.sqlite` ([otras opciones](docs/05-operacion/ingesta.md#consultar-los-datos)) | ✅ |
 | Arrancar la aplicación | `uv run uvicorn api.main:app --reload` (sirve también `web/dist` si se ha compilado; `PTB_DATA_DIR`, `PTB_WEB_DIR`; [detalle](docs/05-operacion/api.md)) | ✅ Metadatos, catálogo, favoritos, reglas, juegos, revisión de datos, generación, comprobación del equipo y Hall of Fame |
 | Migraciones de `user.sqlite` | `uv run alembic -c db/user/alembic.ini upgrade head` (la API las aplica al arrancar) | ✅ |

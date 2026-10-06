@@ -141,17 +141,27 @@ que repetir la ingesta en la VM y evita una carga bloqueada
 # En tu ordenador, desde la raíz del proyecto
 scp data/reference.sqlite ubuntu@<nombre-de-la-vm>:/tmp/
 rsync -a data/cache/pokeapi-sprites/ ubuntu@<nombre-de-la-vm>:/tmp/pokeapi-sprites/
+rsync -a data/cache/wikidex/covers/ ubuntu@<nombre-de-la-vm>:/tmp/covers/
 # En la VM
 sudo install -o ptb -g ptb -m 640 /tmp/reference.sqlite /var/lib/pokemon-team-builder/
 sudo install -d -o ptb -g ptb /var/lib/pokemon-team-builder/cache
 sudo rsync -a --chown=ptb:ptb /tmp/pokeapi-sprites/ /var/lib/pokemon-team-builder/cache/pokeapi-sprites/
+sudo install -d -o ptb -g ptb /var/lib/pokemon-team-builder/cache/wikidex
+sudo rsync -a --chown=ptb:ptb /tmp/covers/ /var/lib/pokemon-team-builder/cache/wikidex/covers/
 ```
 
-Las imágenes de los Pokémon (unos 23 MB) se copian con `reference.sqlite`, que guarda sus rutas
-dentro del directorio de datos ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)).
-Es una copia tuya en tu servidor, no una redistribución, y no van a git
-([CA-56](../01-ddf/cuestiones-abiertas.md#resueltas)). Si no las copias, la aplicación funciona
-igual, sin imágenes.
+Las imágenes de los Pokémon (unos 23 MB) y las portadas de los juegos (unos 5,6 MB) se copian con
+`reference.sqlite`, que guarda sus rutas dentro del directorio de datos
+([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md),
+[ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)). Es una copia tuya en tu servidor, no
+una redistribución, y no van a git ([CA-56](../01-ddf/cuestiones-abiertas.md#resueltas)). Si no
+las copias, la aplicación funciona igual, sin imágenes.
+
+!!! warning "Portadas: solo con acceso privado"
+    WikiDex declara sus carátulas de uso legítimo solo en sus artículos, así que la aplicación
+    las usa solo en privado ([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)). Con el
+    acceso privado de esta guía (Tailscale) se cumple. Si alguna vez la publicaras abierta,
+    carga los datos con `--no-covers` y no copies las portadas.
 
 Para llevarte tus favoritos y tu *Hall of Fame*, copia también `data/user.sqlite` de la misma
 forma. Si no, la API crea uno nuevo al arrancar.

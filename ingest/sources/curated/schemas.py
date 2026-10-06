@@ -5,6 +5,7 @@ pending value that has a value) fail the load. The files and their meaning are d
 in docs/02-ddt/datos-curados.md.
 """
 
+import re
 from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -13,6 +14,7 @@ from db.reference import BattleCategory
 
 SLUG_PATTERN = r"^[a-z0-9]+(-[a-z0-9]+)*$"
 COMMIT_PATTERN = r"^[0-9a-f]{40}$"
+COVER_TITLE = re.compile(r"Archivo:[^|#\[\]{}]+\.(png|jpe?g)", re.IGNORECASE)
 
 type Slug = str
 type ReviewableOrigin = Literal["automatic", "inferred", "pending"]
@@ -111,6 +113,26 @@ class KeyBattlesFile(CuratedModel):
         duplicated = sorted({battle_id for battle_id in ids if ids.count(battle_id) > 1})
         if duplicated:
             raise ValueError(f"ids de combate repetidos: {duplicated}")
+        return self
+
+
+class CoversFile(CuratedModel):
+    """``covers.yaml``: the title of the cover of each game in WikiDex (RF-18, ADR-0011).
+
+    Titles have no common pattern, so each one is curated. A game without entry has no cover.
+    """
+
+    covers: dict[Slug, str]
+
+    @model_validator(mode="after")
+    def _file_titles(self) -> Self:
+        wrong = sorted(
+            game for game, title in self.covers.items() if not COVER_TITLE.fullmatch(title)
+        )
+        if wrong:
+            raise ValueError(
+                f"títulos que no son un fichero de imagen de WikiDex ('Archivo:….png'): {wrong}"
+            )
         return self
 
 
