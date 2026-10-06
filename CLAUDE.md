@@ -129,6 +129,7 @@ tests e issues.**
 | Tipos web | `cd web && npm run typecheck` | ✅ |
 | Tests unitarios web | `cd web && npm run test` | ✅ |
 | Compilar la web | `cd web && npm run build` (la sirve la API en `/`) | ✅ |
+| Revisar dependencias desactualizadas | `uv tree --outdated --depth 1` / `cd web && npm outdated` ([detalle](docs/05-operacion/dependencias.md)) | ✅ |
 | Publicar una versión | Pedírselo a Claude (skill `publicar-version`; [detalle](docs/05-operacion/versiones.md#publicar-una-version)) | ✅ |
 | Tests E2E | `cd web && npm run test:e2e` (una vez: `npx playwright install chromium`) | ✅ Flujo de nuevo juego |
 

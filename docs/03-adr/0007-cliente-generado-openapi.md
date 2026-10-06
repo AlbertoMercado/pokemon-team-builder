@@ -38,6 +38,10 @@ comprueba que el cliente generado está al día.
 ### Negativas / riesgos
 
 - Un paso más en el flujo de desarrollo y en CI.
+- La versión de TypeScript queda atada a las que admite `openapi-typescript`, que usa la API de
+  JavaScript del compilador para generar el cliente. Con TypeScript 6 hace falta un
+  `overrides`, y TypeScript 7.0 no es posible
+  ([detalle](../05-operacion/web.md#cliente-de-la-api), [dependencias](../05-operacion/dependencias.md#casos-especiales)).
 
 ### Acciones derivadas
 

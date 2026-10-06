@@ -16,6 +16,8 @@ Instalación, despliegue, ingesta de datos y mantenimiento.
   Tailscale, copias de seguridad, actualización y supervisión).
 - [Versiones](versiones.md): cómo se numeran (SemVer desde la 1.0.0), cómo se publica una
   versión y cómo actualizar sin perder `user.sqlite`.
+- [Dependencias](dependencias.md): revisar qué dependencias están desactualizadas,
+  actualizarlas (Python, web, hooks de pre-commit y acciones de la CI) y los casos especiales.
 - [Informes de carga](informes-carga/index.md): historial de las cargas bloqueadas y de las
   que las resuelven, registrado en git a mano.
 
