@@ -17,8 +17,8 @@ cualquier biblioteca de terceros, para poder probarlas a fondo con hypothesis
 | `rules/catalog.py` | Catálogo de las 20 reglas (`CATALOG`) y configuración del usuario (`RuleSettings`). |
 | `rules/candidate.py` | Filtros por candidato (RN-03, RN-11, RN-16) con el motivo de cada descarte. |
 | `rules/team.py` | Restricciones entre miembros (RN-07, RN-12, RN-14) y reglas de presencia (RN-13, RN-14). |
-| `rules/check.py` | `check_team(ctx, miembros)`: comprueba un equipo elegido en el resultado con las mismas reglas que el motor (RF-12, CA-53). |
-| `engine/` | `generate(ctx)`: filtros, presencia, búsqueda con retroceso (`search.py`), sugerencias para los huecos (`suggestions.py`), agrupación de empates (`grouping.py`) y resultado (`result.py`). |
+| `rules/check.py` | `check_team(ctx, miembros)`: comprueba un equipo elegido en el resultado con las mismas reglas que el motor (RF-12, CA-53), con la presencia de `resolved_presence`. |
+| `engine/` | `generate(ctx)`: filtros, presencia (también sin generar, `resolved_presence`), búsqueda con retroceso (`search.py`), sugerencias para los huecos (`suggestions.py`), agrupación de empates (`grouping.py`) y resultado (`result.py`). |
 | `rules/soft.py` | Reglas blandas (RN-06, RN-15, RN-17, RN-20), cada una con una puntuación entre 0 y 1. |
 | `evolution.py` | Si un paso de evolución es tedioso, aleatorio o imposible en el juego. |
 | `scoring.py` | Puntuación ponderada, desglose por regla y clave de desempate (RN-04, RN-19); `Scorer` guarda el perfil de cada miembro para puntuar muchos equipos. |

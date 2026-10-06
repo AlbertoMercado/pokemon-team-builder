@@ -139,6 +139,21 @@ def test_rn14_a_team_without_an_evolution_of_eevee_is_a_problem() -> None:
     assert "Vaporeon o Jolteon" in problem.detail
 
 
+@pytest.mark.rn("RN-13")
+@pytest.mark.rn("RN-14")
+def test_rn14_gives_way_to_rn13_as_in_the_generation() -> None:
+    """Zekrom, the only primary Dragon, and Jolteon share Electric (RN-12): RN-14 gives way
+    and reserves a slot for the other evolutions of Eevee (CA-48). The check uses that level:
+    Jolteon is not an option, and Vaporeon meets it."""
+    zekrom = pokemon("zekrom", ("dragon", "electric"), dex_number=644, generation=3)
+    ctx = _context(zekrom, JOLTEON, pool=(VAPOREON, FLAREON))
+
+    [problem] = check_team(ctx, ["zekrom"]).problems
+    assert problem.rule_id == "RN-14"
+    assert "Vaporeon o Flareon" in problem.detail
+    assert check_team(ctx, ["zekrom", "vaporeon"]).valid
+
+
 @pytest.mark.rn("RN-12")
 def test_a_disabled_rule_is_not_checked() -> None:
     ctx = _context(GENGAR, DRAGONITE, pool=(LAPRAS, VAPOREON), disabled=("RN-12", "RN-14"))

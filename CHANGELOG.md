@@ -20,6 +20,9 @@ versión: [versiones](docs/05-operacion/versiones.md).
   `pokemon` guarda ahora el identificador de PokeAPI y la imagen de cada forma. En el
   servidor, copia también las imágenes ([puesta en producción](docs/05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos)).
 - El aviso de la web cuando no hay datos se titula «Hay que cargar los datos».
+- **Comprobar el equipo elegido** (`POST /api/games/{game}/team-checks`) ya no genera los equipos
+  otra vez: solo resuelve las reglas de presencia. Pasa de unos 40 ms a menos de 1 ms en Rojo
+  Fuego (#59).
 
 ## [1.0.0] - 2026-10-06
 
