@@ -21,6 +21,7 @@ from core.engine import (
     GenerationStatus,
     generate,
     presence_requirements,
+    resolved_presence,
     suggestible_entries,
 )
 from core.rules.candidate import valid_candidates
@@ -214,6 +215,16 @@ def test_check_finds_no_problem_in_the_teams_of_the_engine(ctx: GameContext) -> 
         assert check.unverified == ()
         if not reserved:
             assert check.valid
+
+
+@pytest.mark.rn("RN-13")
+@pytest.mark.rn("RN-14")
+@settings(max_examples=200, deadline=None)
+@given(ctx=contexts())
+def test_resolved_presence_is_the_one_of_the_generation(ctx: GameContext) -> None:
+    """``resolved_presence`` (used by ``check_team``) resolves RN-13 and RN-14 to the same
+    level as ``generate``, also when one of them gives way (CA-48)."""
+    assert resolved_presence(ctx) == generate(ctx).presence
 
 
 def _suggestion_order(gain: object, pokemon: PokemonData) -> tuple[object, ...]:

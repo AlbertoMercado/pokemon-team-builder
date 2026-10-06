@@ -338,7 +338,7 @@ funciones que el motor, así que no duplica ninguna regla:
 |--------------|--------|------|
 | Cada miembro pasa los filtros por candidato | [RN-03](../01-ddf/reglas-negocio.md#rn-03), [RN-11](../01-ddf/reglas-negocio.md#rn-11), [RN-16](../01-ddf/reglas-negocio.md#rn-16) | `first_exclusion`, con el texto del descarte. |
 | No hay dos miembros incompatibles | [RN-07](../01-ddf/reglas-negocio.md#rn-07), [RN-12](../01-ddf/reglas-negocio.md#rn-12), [RN-14](../01-ddf/reglas-negocio.md#rn-14) | `conflict` con las restricciones activas, para cada par. |
-| Se cumplen las reglas de presencia en el nivel que se aplica | [RN-13](../01-ddf/reglas-negocio.md#rn-13), RN-14 | El equipo incluye uno de los `options` de cada regla `candidates` o `reserved` de `generate(ctx).presence`, que ya tiene en cuenta el desplazamiento de [CA-48](../01-ddf/cuestiones-abiertas.md#resueltas). |
+| Se cumplen las reglas de presencia en el nivel que se aplica | [RN-13](../01-ddf/reglas-negocio.md#rn-13), RN-14 | El equipo incluye uno de los `options` de cada regla `candidates` o `reserved` de `resolved_presence(ctx)`: el mismo nivel que `generate(ctx).presence`, con el desplazamiento de [CA-48](../01-ddf/cuestiones-abiertas.md#resueltas), pero sin buscar los mejores equipos. |
 
 Devuelve un `TeamCheck` con los problemas (`TeamProblem`: regla, miembros afectados y
 explicación en español), en ese orden, y los miembros del pool sin verificar
@@ -373,6 +373,13 @@ Si ningún tamaño permite cumplir a la vez RN-13 y RN-14, RN-14 cede (`displace
 nivel siguiente, como si ninguna evolución de Eevee favorita la cumpliera, y se repite la
 búsqueda ([CA-48](../01-ddf/cuestiones-abiertas.md#resueltas)). Su `detail` explica qué
 candidatos no cabían.
+
+`resolved_presence(ctx)` resuelve la presencia igual, con el mismo bucle de desplazamiento
+(`_meet_presence`), pero solo comprueba si **existe** algún equipo de cada tamaño: pide el
+primero a la búsqueda, que es perezosa, y no puntúa ninguno. La usa `check_team`, que solo
+necesita el nivel de cada regla. Llamar a `generate` para eso costaba una generación completa
+por comprobación (37 ms en el escenario de Rojo Fuego frente a menos de 1 ms, #59). Un test
+de propiedades comprueba que coincide siempre con `generate(ctx).presence`.
 
 ### Búsqueda (`core/engine/search.py`)
 

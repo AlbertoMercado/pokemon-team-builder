@@ -16,7 +16,7 @@ level, which reserves a slot for the evolutions of Eevee that are not favourites
 """
 
 import dataclasses
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from functools import partial
 
 from core.domain import GameContext, PokemonData, PoolEntry
@@ -56,6 +56,7 @@ __all__ = [
     "TeamGroup",
     "generate",
     "presence_requirements",
+    "resolved_presence",
     "suggestible_entries",
 ]
 
@@ -122,21 +123,75 @@ def _largest_best_teams(
     return []
 
 
+def _first_team(
+    valid: Sequence[PokemonData],
+    presence: Sequence[PresenceRequirement],
+    constraints: tuple[PairConstraint, ...],
+) -> list[tuple[PokemonData, ...]]:
+    """A team of the sizes ``_largest_best_teams`` tries, or none: whether one exists.
+
+    The search is lazy, so it stops at the first team, without scoring any.
+    """
+    reserved = sum(1 for p in presence if p.status is PresenceStatus.RESERVED)
+    required = [frozenset(p.options) for p in presence if p.status is PresenceStatus.CANDIDATES]
+    for size in range(TEAM_SIZE - reserved, len(required) - 1, -1):
+        if size == 0:
+            return [()]
+        found = search.teams(valid, size, partial(_conflicts, constraints), required)
+        team = next(found, None)
+        if team is not None:
+            return [team]
+    return []
+
+
+def _meet_presence(
+    ctx: GameContext,
+    presence: Sequence[PresenceRequirement],
+    find: Callable[[Sequence[PresenceRequirement]], list[tuple[PokemonData, ...]]],
+) -> tuple[list[PresenceRequirement], list[tuple[PokemonData, ...]]]:
+    """The presence rules at the level some team meets, and the teams ``find`` gives for it.
+
+    While ``find`` finds no team, the presence rules cannot be met together: the last one
+    gives way (CA-48).
+    """
+    resolved = list(presence)
+    teams = find(resolved)
+    while not teams:
+        required = [i for i, p in enumerate(resolved) if p.status is PresenceStatus.CANDIDATES]
+        last = required[-1]
+        resolved[last] = displace(resolved[last], resolved[required[0]], ctx)
+        teams = find(resolved)
+    return resolved, teams
+
+
+def resolved_presence(ctx: GameContext) -> tuple[PresenceRequirement, ...]:
+    """The presence rules at the level ``generate`` resolves them, without generating.
+
+    Only searches whether a team meets them, not the best teams, so it is much cheaper than
+    ``generate(ctx).presence``. Used to check a team chosen by the user (``check_team``).
+    """
+    candidates, _ = valid_candidates(ctx)
+    valid = [c.pokemon for c in candidates]
+    constraints = active_pair_constraints(ctx.settings)
+    presence, _ = _meet_presence(
+        ctx,
+        presence_requirements(ctx, valid),
+        lambda presence: _first_team(valid, presence, constraints),
+    )
+    return tuple(presence)
+
+
 def generate(ctx: GameContext) -> GenerationResult:
     """Generate the best teams of favourites for the context's game."""
     candidates, discards = valid_candidates(ctx)
     valid = [c.pokemon for c in candidates]  # already in canonical order
-    presence = list(presence_requirements(ctx, valid))
     constraints = active_pair_constraints(ctx.settings)
     scorer = Scorer(ctx)
-
-    winners = _largest_best_teams(valid, presence, constraints, scorer)
-    while not winners:
-        # The presence rules cannot be met together: the last one gives way (CA-48).
-        required = [i for i, p in enumerate(presence) if p.status is PresenceStatus.CANDIDATES]
-        last = required[-1]
-        presence[last] = displace(presence[last], presence[required[0]], ctx)
-        winners = _largest_best_teams(valid, presence, constraints, scorer)
+    presence, winners = _meet_presence(
+        ctx,
+        presence_requirements(ctx, valid),
+        lambda presence: _largest_best_teams(valid, presence, constraints, scorer),
+    )
 
     reserved = [p for p in presence if p.status is PresenceStatus.RESERVED]
     suggester = Suggester(suggestible_entries(ctx), constraints, scorer)

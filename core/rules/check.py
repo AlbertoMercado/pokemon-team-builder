@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from itertools import combinations
 
 from core.domain import Availability, GameContext, PokemonData
-from core.engine import generate
+from core.engine import resolved_presence
 from core.rules.candidate import first_exclusion
 from core.rules.team import PresenceStatus, active_pair_constraints, conflict
 
@@ -94,7 +94,7 @@ def check_team(ctx: GameContext, members: Sequence[str]) -> TeamCheck:
             detail = _PAIR_DETAILS[rule_id].format(a=a.name, b=b.name)
             problems.append(TeamProblem(rule_id, (a.slug, b.slug), detail))
 
-    for requirement in generate(ctx).presence:
+    for requirement in resolved_presence(ctx):
         if requirement.status is PresenceStatus.UNMET or set(members) & set(requirement.options):
             continue
         names = [known[slug][0].name if slug in known else slug for slug in requirement.options]
