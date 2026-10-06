@@ -72,11 +72,27 @@ con el commit `8491ffde1b247e4de574d4bb8e24b7bd9fa876fa` (2026-10-06), el últim
     - Con `--offline`, solo usa la caché.
 - `pokemon.image` guarda la ruta relativa al directorio de datos
   (`cache/pokeapi-sprites/<commit>/37.png`), o queda nula si no se pudo obtener.
-- **Avisos**: hoy las fuentes solo devuelven filas. Hace falta que una fuente pueda devolver
-  avisos para el informe (por ejemplo, un método `warnings()` en el protocolo `Source`). El
-  informe dice cuántas formas tienen imagen y cuáles no. Que falten imágenes **no** rechaza la
-  carga.
+- **Avisos**: el informe dice cuántas formas tienen imagen y cuáles no, agrupadas por motivo.
+  Que falten imágenes **no** rechaza la carga.
 - `ingest_run` guarda `sprites_commit`, igual que `pokeapi_commit`.
+
+#### Decisiones tomadas al implementar la fase 1
+
+- **Las imágenes son un paso de la carga, no de una fuente**: `build_reference` recibe el
+  `SpriteCache` y, con todas las filas ya guardadas, asigna la imagen de cada forma de la tabla
+  `pokemon` y añade los avisos al informe. Así no cambia el protocolo `Source` (las fuentes
+  siguen entregando solo filas) y cualquier forma tiene imagen, venga de la fuente que venga,
+  también las regionales de cargas futuras.
+- **Un servidor que no responde detiene las descargas de esa carga**: tras un fallo que no es
+  un `404` (sin conexión, tiempo agotado, error del servidor), el resto de formas solo usan la
+  caché. Si no, un servidor caído costaría un tiempo de espera de 60 s por cada forma.
+- **Peticiones espaciadas 0,2 s**: el CDN de GitHub no publica un límite de peticiones. La
+  primera carga de las 386 imágenes tarda unos 2 minutos; las siguientes, sin descargas, un par
+  de segundos. En disco ocupan 1,5 MB.
+- **Sin imágenes reales en los tests**: guardarlas como *fixtures* sería versionarlas en git,
+  que [CA-56](../01-ddf/cuestiones-abiertas.md#resueltas) no permite. Los tests usan un PNG
+  mínimo creado en el propio test, y la carga real se ha comprobado a mano: 386 de 386 formas
+  con imagen.
 
 ### Modelo de datos
 
@@ -140,7 +156,7 @@ flowchart LR
 | Fase | Rama | Contenido | Tests |
 |------|------|-----------|-------|
 | 0 ✅ | `docs/imagenes-pokemon` | ADR-0010, este plan y las comprobaciones previas. | — |
-| 1 | `feat/ingesta-imagenes` | `sprites_commit`, `pokemon.pokeapi_id` e `image`, `SpriteCache`, avisos de las fuentes en el informe, `ingest_run.sprites_commit`. Operación de la ingesta, modelo de datos y puesta en producción (copiar las imágenes con `reference.sqlite`). | Sin red, con *sprites* reales en `tests/ingest/fixtures/`: imagen en caché, descarga simulada, `404`, error de red, fichero que no es PNG, `--offline` con la caché vacía, forma regional con su `pokeapi_id`, carga correcta aunque falten imágenes. |
+| 1 ✅ | `feat/ingesta-imagenes` | `sprites_commit`, `pokemon.pokeapi_id` e `image`, `SpriteCache`, imágenes y avisos en el informe, `ingest_run.sprites_commit`. Operación de la ingesta, modelo de datos y puesta en producción (copiar las imágenes con `reference.sqlite`). | Sin red, con un PNG mínimo creado en el test (CA-56): imagen en caché, descarga del commit fijado, `404`, servidor que no responde, fichero que no es PNG, `--offline` con la caché vacía, peticiones espaciadas, `pokeapi_id` de las formas, carga correcta aunque falten imágenes y caché fuera de git. |
 | 2 | `feat/api-imagenes` | Endpoint de la imagen, `image_url` en las respuestas, `sprites_commit` en `/api/meta`, cliente regenerado. API, Operación y manual de la API. | `200` con `image/png` y `Cache-Control`; `404` sin forma, sin imagen o sin fichero; una ruta fuera del directorio de datos no se sirve; `image_url` presente o nula en cada respuesta. |
 | 3 | `feat/web-imagenes` | `PokemonSprite`, imágenes en todas las pantallas de RF-17 y aviso de titularidad. Manual de la web, plan de la web y CHANGELOG. | Vitest: con imagen, sin `image_url`, error de carga y `alt` vacío. E2E: el flujo de nuevo juego sigue funcionando sin imágenes. |
 | 4 | `feat/web-imagen-ficha` (si hace falta) | Valorar los *sprites* en la web (CA-54) y, si hace falta, usar una imagen más grande en la ficha, ampliando ADR-0010. Publicar la versión 1.1.0. | Los de la fase 3 para la imagen nueva. |
@@ -149,7 +165,7 @@ flowchart LR
 
 | Tipo | Qué cubre | Dónde |
 |------|-----------|-------|
-| **Ingesta** | `SpriteCache` con un descargador falso (como `CsvCache` y `PageCache`) y *sprites* reales guardados como *fixtures*; la carga completa con imágenes y con imágenes que faltan. | `tests/ingest/` |
+| **Ingesta** | `SpriteCache` con un descargador falso (como `CsvCache` y `PageCache`) y un PNG mínimo creado en el test, porque las imágenes reales no se versionan (CA-56); la carga completa con imágenes y con imágenes que faltan. | `tests/ingest/test_sprites.py` |
 | **API** | El endpoint y `image_url` sobre un directorio de datos temporal con un *sprite* de prueba. | `tests/api/` |
 | **Web** | `PokemonSprite` y `PokemonName` con y sin imagen; cada pantalla con `image_url` nula. | `web/src/**/*.test.tsx` |
 | **E2E** | El servidor de pruebas no tiene imágenes: el flujo funciona igual. | `web/e2e/` |
@@ -164,7 +180,7 @@ Los tests siguen sin red: `tests/conftest.py` hace fallar cualquier petición HT
 | `raw.githubusercontent.com` limita las peticiones o falla durante la carga. | Caché permanente por commit, pausa entre peticiones y una imagen que falta solo genera un aviso: la siguiente carga descarga solo las que faltan. |
 | El repositorio cambia las rutas o reorganiza los ficheros. | Commit fijado. Cambiarlo es un PR que vuelve a hacer las comprobaciones previas. |
 | Se suben imágenes a git. | `data/cache/` está en `.gitignore`, con un test que lo comprueba. |
-| En producción las formas se ven sin imagen: la [puesta en producción](../05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos) copia `reference.sqlite` desde el ordenador, pero no la caché a la que apunta `pokemon.image`. | La fase 1 añade a la guía copiar también `cache/pokeapi-sprites/<commit>/` (unos 400 KB) al directorio de datos de la VM. Es la copia del propio usuario en su servidor, no una redistribución (CA-56). Si no se copia, la aplicación funciona igual, sin imágenes. |
+| En producción las formas se ven sin imagen: la [puesta en producción](../05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos) copia `reference.sqlite` desde el ordenador, pero no la caché a la que apunta `pokemon.image`. | La [puesta en producción](../05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos) copia también `cache/pokeapi-sprites/` (1,5 MB) al directorio de datos de la VM. Es la copia del propio usuario en su servidor, no una redistribución (CA-56). Si no se copia, la aplicación funciona igual, sin imágenes. |
 | Una forma regional usa el número de la Pokédex y muestra la imagen de la forma base. | La regla es usar siempre `pokeapi_id`, y los tests incluyen Vulpix de Alola. |
 | El endpoint sirve un fichero fuera del directorio de datos. | La ruta sale de la base de datos y se comprueba tras resolverla, con un test. |
 | Los *sprites* de 96 px, con mucho margen transparente, quedan pequeños en la ficha. | Fase 4: se valora en la web y, si hace falta, se usa la ilustración oficial en la ficha. |

@@ -31,7 +31,7 @@ from ingest.sources.curated import (
     CuratedDataError,
     CuratedSource,
     read_curated,
-    read_pinned_commit,
+    read_pinned_commits,
 )
 from ingest.sources.curated.schemas import ArrivalFile, ArrivalRule
 from ingest.sources.pokeapi import PokeapiCsvSource
@@ -40,6 +40,7 @@ from ingest.sources.pokeapi.rows import CsvSchemaError
 from ingest.sources.pokeapi.transform import TransformError
 
 COMMIT = "bc92d3b6029ef1abe9e7ad424c400b338f3c11fe"
+SPRITES_COMMIT = "8491ffde1b247e4de574d4bb8e24b7bd9fa876fa"
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "pokeapi"
 REPOSITORY = Path(__file__).resolve().parents[2]
 CURATED = read_curated(REPOSITORY / "data" / "curated")
@@ -90,15 +91,24 @@ def _steps(session: Session, group: str, evolved: str) -> list[EvolutionStep]:
 # --- Pinned commit and cache ---------------------------------------------------------------
 
 
-def test_repository_pins_a_full_commit() -> None:
-    assert read_pinned_commit(REPOSITORY / "data" / "curated" / "pokeapi.yaml") == COMMIT
+def test_repository_pins_full_commits() -> None:
+    commits = read_pinned_commits(REPOSITORY / "data" / "curated" / "pokeapi.yaml")
+    assert commits.commit == COMMIT
+    assert commits.sprites_commit == SPRITES_COMMIT
 
 
 def test_invalid_pinned_commit_is_rejected(tmp_path: Path) -> None:
     path = tmp_path / "pokeapi.yaml"
-    path.write_text("commit: bc92d3b\n", encoding="utf-8")  # abbreviated SHA
-    with pytest.raises(CuratedDataError):
-        read_pinned_commit(path)
+    path.write_text(f"commit: bc92d3b\nsprites_commit: {SPRITES_COMMIT}\n", encoding="utf-8")
+    with pytest.raises(CuratedDataError):  # abbreviated SHA
+        read_pinned_commits(path)
+
+
+def test_missing_sprites_commit_is_rejected(tmp_path: Path) -> None:
+    path = tmp_path / "pokeapi.yaml"
+    path.write_text(f"commit: {COMMIT}\n", encoding="utf-8")
+    with pytest.raises(CuratedDataError, match="sprites_commit"):
+        read_pinned_commits(path)
 
 
 def test_cache_downloads_once_and_reuses_the_file(tmp_path: Path) -> None:
@@ -184,6 +194,14 @@ def test_only_default_forms_of_loaded_species(loaded: Session) -> None:
     assert "deoxys-normal" in pokemon
     assert not {"deoxys-attack", "raichu-alola", "slowbro-galar", "happiny"} & pokemon
     assert loaded.exec(select(Pokemon).where(Pokemon.slug == "pikachu")).one().name_es == "Pikachu"
+
+
+def test_each_form_keeps_its_pokeapi_id(loaded: Session) -> None:
+    """The id of the form names its sprite (ADR-0010); it is not always the Pokédex number."""
+    ids = dict(loaded.exec(select(Pokemon.slug, Pokemon.pokeapi_id)).all())
+
+    assert ids["pikachu"] == 25
+    assert ids["deoxys-normal"] == 386
 
 
 def test_pre_evolution_of_a_later_generation_is_left_out(loaded: Session) -> None:
@@ -330,6 +348,7 @@ def _with_arrival(game: str, pokedex: str) -> CuratedData:
     rule = ArrivalRule(regional_pokedex=pokedex, origin="inferred")
     return CuratedData(
         pokeapi_commit=CURATED.pokeapi_commit,
+        sprites_commit=CURATED.sprites_commit,
         games=CURATED.games,
         breeding=CURATED.breeding,
         arrival=ArrivalFile(games={game: rule}),

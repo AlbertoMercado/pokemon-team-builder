@@ -15,5 +15,5 @@ router = APIRouter(tags=["Metadatos"])
 @router.get("/meta", summary="Versión de la aplicación y de los datos")
 def get_meta(reference: Annotated[Session, Depends(reference_session)]) -> Meta:
     """Versión de la aplicación y de la carga de datos con la que trabaja (commit de PokeAPI,
-    fecha y juegos). `503` si todavía no se han cargado los datos."""
+    fecha y juegos). `503` si todavía no se han cargado los datos o hay que repetir la carga."""
     return service.meta(reference)

@@ -9,8 +9,9 @@ es una tarea del administrador que se ejecuta de forma puntual, no al arrancar l
     el comando, el informe, la sustitución segura y las tres fuentes: **PokeAPI** (especies,
     formas, tipos, eficacias, grupos huevo, evoluciones y juegos), los
     **[datos curados](../02-ddt/datos-curados.md)** de Rojo Fuego y Verde Hoja y los equipos
-    de sus combates clave desde **WikiDex**. Rubí, Zafiro y Esmeralda se completan en la
-    fase 6.
+    de sus combates clave desde **WikiDex**, y las imágenes de los Pokémon
+    ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)). Rubí, Zafiro y Esmeralda se
+    completan en la fase 6.
 
 ## Uso
 
@@ -23,7 +24,7 @@ uv run python -m ingest --data-dir otra/   # escribe otra/reference.sqlite y usa
 | Opción | Por defecto | Qué hace |
 |--------|-------------|----------|
 | `--data-dir DIR` | `data` | Directorio donde se escriben `reference.sqlite` y la caché de descargas. Se crea si no existe. |
-| `--offline` | No | No descarga nada, ni de PokeAPI ni de WikiDex. Si falta algún fichero en la caché, la carga falla. |
+| `--offline` | No | No descarga nada, ni de PokeAPI ni de WikiDex ni las imágenes. Si falta algún fichero de datos en la caché, la carga falla; si falta una imagen, solo es un aviso. |
 | `-h`, `--help` | | Muestra la ayuda. |
 
 | Código de salida | Significado |
@@ -67,6 +68,29 @@ ingesta la trata con cuidado:
 **Actualizar un equipo** (si WikiDex lo corrige): borrar su página de la caché y volver a
 ejecutar la ingesta. La revisión usada queda en `key_battle.source_revision`.
 
+### Imágenes de los Pokémon
+
+La imagen de cada forma es su *sprite* del repositorio
+[PokeAPI/sprites](https://github.com/PokeAPI/sprites), del commit fijado en
+`sprites_commit` de `data/curated/pokeapi.yaml`
+([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)):
+
+- **Caché permanente**: cada imagen se descarga una sola vez, fichero a fichero (el repositorio
+  ocupa unos 10 GB), y se guarda en `<data-dir>/cache/pokeapi-sprites/<commit>/<id>.png`, con
+  el identificador de la forma en PokeAPI (Vulpix de Alola es `10103.png`). La primera carga
+  descarga las 386 imágenes en unos 2 minutos; ocupan 1,5 MB en disco.
+- **Peticiones espaciadas**: como mucho cinco por segundo, con el mismo `User-Agent`.
+- **Una imagen que falta no rompe la carga**: la forma se carga sin imagen y el informe lo
+  avisa con el motivo ([informe](#informe)). Si el servidor no responde (sin conexión, tiempo
+  agotado o error del servidor), la ingesta deja de descargar imágenes en esa carga y usa solo
+  las que ya tiene en la caché; la siguiente carga descarga las que falten.
+- **No se versionan**: las imágenes son de sus titulares
+  ([CA-56](../01-ddf/cuestiones-abiertas.md#resueltas)). `data/cache/` está fuera de git.
+
+`reference.sqlite` guarda la ruta de cada imagen relativa al directorio de datos
+(`pokemon.image`). Si se borra la caché, las formas se ven sin imagen hasta la siguiente carga.
+**Actualizar las imágenes** es cambiar `sprites_commit` en un PR y volver a ejecutar la ingesta.
+
 **Licencia**: el contenido de WikiDex es [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/deed.es).
 La aplicación es sin ánimo de lucro y guarda la página y la revisión de cada equipo para
 mostrar la atribución ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)).
@@ -102,6 +126,8 @@ flowchart TD
    una fila que no existe se informa con su tabla, su columna y su valor, p. ej.
    `species.evolves_from → species: happiny`. Todas las fuentes tienen que venir del mismo
    commit de PokeAPI.
+   Después, cada forma recibe la ruta de su [imagen](#imagenes-de-los-pokemon), de la caché o
+   descargándola. Las que no tienen imagen son avisos, no errores.
 6. **Comprobaciones de la carga** (`ingest/checks.py`): cantidades esperadas y casos
    conocidos de la primera carga ([detalle](../02-ddt/plan-carga-datos.md#comprobaciones-de-la-carga)).
    Si alguna falla, la carga se rechaza.
@@ -112,8 +138,8 @@ flowchart TD
    una confirmación de un dato que ya no existe solo es un **aviso**, porque responde a una
    pregunta que ya no se hace y la API la ignora. Sin `user.sqlite`, o sin sus tablas, no hay
    nada que comprobar. Solo lo lee: la carga nunca escribe en `user.sqlite`.
-8. **Registro**: guarda una fila en `ingest_run` con el inicio y el fin de la carga, el commit
-   de PokeAPI, los juegos cargados y el número de filas por tabla.
+8. **Registro**: guarda una fila en `ingest_run` con el inicio y el fin de la carga, los
+   commits de PokeAPI y de las imágenes, los juegos cargados y el número de filas por tabla.
 9. **Sustitución**: renombra el temporal sobre `reference.sqlite` en una sola operación
    atómica. No hay ningún momento en que el fichero esté a medio escribir.
 10. **Informe**: lo muestra en la terminal, con los avisos si los hay.
@@ -146,6 +172,7 @@ Datos revisables por origen:
   game_mechanic        inferred 4
   game_pokemon         automatic 1930, inferred 772, pending 1158
   key_battle           automatic 26
+Imágenes: 386 de 386 formas
 Comprobaciones superadas: 9
 Carga completada.
 ```
@@ -157,6 +184,9 @@ Carga completada.
   `game_pokemon` hay dos valores por fila: la existencia (automática) y la llegada (inferida
   en Rojo Fuego y Verde Hoja, pendiente en Rubí, Zafiro y Esmeralda). Los combates clave
   son automáticos.
+- **Imágenes**: cuántas formas tienen imagen. Las que no la tienen aparecen en **Avisos**,
+  agrupadas por motivo, por ejemplo:
+  `1 forma sin imagen, no está en la caché y no se ha podido descargar: pikachu`.
 - **Comprobaciones superadas**: número de comprobaciones de la carga que se han cumplido.
 
 Ejemplos de cargas fallidas:
@@ -403,12 +433,12 @@ Código en `ingest/` ([estructura del código](../02-ddt/estructura-codigo.md)):
 | Fichero | Qué hace |
 |---------|----------|
 | `__main__.py` | Punto de entrada de `python -m ingest`. |
-| `cli.py` | Opciones de la línea de comandos y fuentes de una carga completa (`default_sources`). |
+| `cli.py` | Opciones de la línea de comandos, fuentes de una carga completa (`default_sources`) e imágenes del commit fijado (`default_sprites`). |
 | `scope.py` | Alcance de la carga: generaciones cargadas, generaciones con juego objetivo, primera generación con crianza y grupos de versiones excluidos ([CA-11](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| `load.py` | `build_reference(sources, target, checks, user_database)`: fichero temporal, filas, integridad, comprobaciones, datos del usuario, registro y sustitución. |
+| `load.py` | `build_reference(sources, target, checks, user_database, sprites)`: fichero temporal, filas, integridad, imágenes, comprobaciones, datos del usuario, registro y sustitución. |
 | `user_keys.py` | `check_user_keys`: lo que usa `user.sqlite` y no tiene la nueva carga, como errores (favoritos y *Hall of Fame*) o avisos (confirmaciones). |
 | `checks.py` | Comprobaciones de la primera carga: cantidades y casos conocidos. |
-| `report.py` | `LoadReport`: recuentos, comprobaciones superadas, errores y texto del informe. |
+| `report.py` | `LoadReport`: recuentos, imágenes, comprobaciones superadas, errores y texto del informe. |
 | `sources/__init__.py` | `Source`, la interfaz de una fuente: `name`, `pokeapi_commit` y `rows()`, que entrega filas ya validadas. |
 | `sources/curated/__init__.py` | `read_curated`, que lee y valida los ficheros de `data/curated/`, y `CuratedSource`, la fuente de las mecánicas y los combates clave. |
 | `sources/curated/schemas.py` | Un modelo pydantic por fichero curado ([datos curados](../02-ddt/datos-curados.md)). |
@@ -418,6 +448,7 @@ Código en `ingest/` ([estructura del código](../02-ddt/estructura-codigo.md)):
 | `sources/pokeapi/index.py` | Índice de los Pokémon cargados por su nombre en español, para traducir los nombres de WikiDex. |
 | `sources/pokeapi/__init__.py` | `PokeapiCsvSource`, la fuente de PokeAPI. Recibe los datos curados para los bebés de incienso y las propuestas de llegada. |
 | `sources/pokeapi/download.py` | `CsvCache`: descarga con caché de los CSV de un commit. |
+| `sources/pokeapi/sprites.py` | `SpriteCache`: descarga con caché y peticiones espaciadas de las imágenes de un commit de PokeAPI/sprites, y los motivos por los que una forma no tiene imagen. |
 | `sources/pokeapi/rows.py` | Un modelo pydantic por fichero CSV y `read_rows`, que valida cada fila. |
 | `sources/pokeapi/transform.py` | Funciones puras que convierten las filas de PokeAPI en filas de `reference.sqlite`. |
 
@@ -435,6 +466,10 @@ Tests en `tests/ingest/`:
   crianza, tipos y eficacias por generación, evoluciones y existencia.
 - `test_curated.py`: los ficheros curados reales del repositorio, sus esquemas, la fuente
   de datos curados y el error del CLI con un fichero inválido.
+- `test_sprites.py`: las imágenes: caché, descarga del commit fijado, imagen que no existe,
+  descarga que no es un PNG, servidor que no responde (deja de descargar), `--offline`,
+  peticiones espaciadas, la carga con imágenes y sin ellas, y que la caché no se versiona. Usa
+  un PNG mínimo creado en el test: las imágenes reales no se guardan en git (CA-56).
 - `test_wikidex.py`: la fuente de WikiDex sobre páginas reales recortadas: caché y límite
   de peticiones, respuesta de la API, rótulos, variantes y Pokémon comunes, desambiguación y
   filas de los combates.

@@ -68,7 +68,9 @@ def _firered_rows() -> list[ReferenceModel]:
             can_arrive=None,
             arrival_origin=Origin.PENDING,
         ),
-        Pokemon(slug="ivysaur", species="ivysaur", name_es="Ivysaur", is_default=True),
+        Pokemon(
+            slug="ivysaur", species="ivysaur", name_es="Ivysaur", is_default=True, pokeapi_id=2
+        ),
         _species("ivysaur", 2, evolves_from="bulbasaur"),
         _species("bulbasaur", 1),
         Game(
@@ -138,7 +140,9 @@ def _build_previous(target: Path) -> bytes:
 def test_dangling_reference_keeps_the_previous_database(tmp_path: Path) -> None:
     target = tmp_path / "reference.sqlite"
     previous = _build_previous(target)
-    orphan = Pokemon(slug="missingno", species="missingno", name_es="?", is_default=True)
+    orphan = Pokemon(
+        slug="missingno", species="missingno", name_es="?", is_default=True, pokeapi_id=0
+    )
 
     report = build_reference([FakeSource([*_firered_rows(), orphan])], target)
 
@@ -197,7 +201,11 @@ def test_cli_builds_reference_in_the_data_dir(
 
     assert exit_code == 0
     assert (data_dir / "reference.sqlite").exists()
-    assert "Carga completada." in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "Carga completada." in output
+    # Offline with an empty sprite cache: the forms are loaded without image (ADR-0010).
+    assert "Imágenes: 0 de " in output
+    assert "formas sin imagen, no está en la caché" in output
 
 
 def test_cli_fails_when_the_checks_fail(

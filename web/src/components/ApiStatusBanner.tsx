@@ -1,6 +1,6 @@
 /**
- * Notice for the whole application when it cannot work: no reference data loaded (`503`) or
- * the API does not answer. It follows `GET /api/meta`, which every screen shares.
+ * Notice for the whole application when it cannot work: no reference data loaded, or loaded by
+ * an older version of the application (`503`), or the API does not answer. It follows `GET /api/meta`, which every screen shares.
  */
 import type { ReactNode } from "react";
 
@@ -20,7 +20,7 @@ export default function ApiStatusBanner() {
   }
   if (error instanceof ApiError && error.status === 503) {
     return (
-      <Banner title="No hay datos cargados">
+      <Banner title="Hay que cargar los datos">
         Ejecuta la carga de datos con <Command>{LOAD_COMMAND}</Command> y reinicia la API.
       </Banner>
     );

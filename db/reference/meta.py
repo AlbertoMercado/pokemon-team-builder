@@ -11,7 +11,8 @@ from db.reference.base import ReferenceModel
 class IngestRun(ReferenceModel, table=True):
     """The ingest run that generated the file. There is a single row; the API exposes it.
 
-    ``pokeapi_commit`` is null only when the load includes no PokeAPI data (e.g. in tests).
+    ``pokeapi_commit`` is null only when the load includes no PokeAPI data (e.g. in tests), and
+    ``sprites_commit`` when it includes no images (ADR-0010).
     """
 
     __tablename__ = "ingest_run"
@@ -20,5 +21,6 @@ class IngestRun(ReferenceModel, table=True):
     started_at: datetime
     finished_at: datetime
     pokeapi_commit: str | None = None
+    sprites_commit: str | None = None
     games: list[str] = Field(default_factory=list, sa_type=JSON)
     summary: dict[str, int] = Field(default_factory=dict, sa_type=JSON)

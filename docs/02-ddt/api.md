@@ -18,7 +18,9 @@ del [plan de la API](plan-api.md#fases). Cómo se arranca: [Operación](../05-op
     - `409`: la operación no se puede hacer en el estado actual (p. ej., generar con datos sin
       confirmar).
     - `422`: datos de entrada no válidos.
-    - `503`: todavía no se han cargado los datos de referencia (`reference.sqlite`).
+    - `503`: todavía no se han cargado los datos de referencia (`reference.sqlite`), o los cargó
+      una versión anterior de la aplicación y les faltan tablas o columnas: hay que repetir la
+      carga.
 - Sin autenticación: la aplicación es de un solo usuario.
 
 ## Endpoints

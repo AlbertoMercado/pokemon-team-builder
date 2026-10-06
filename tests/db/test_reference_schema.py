@@ -30,6 +30,7 @@ from db.reference import (
     TypeEfficacy,
     VersionGroup,
     create_reference_schema,
+    missing_columns,
 )
 from db.sqlite import create_sqlite_engine
 
@@ -115,8 +116,16 @@ def _firered_base() -> list[ReferenceModel]:
             is_legendary=False,
             is_mythical=False,
         ),
-        Pokemon(slug="bulbasaur", species="bulbasaur", name_es="Bulbasaur", is_default=True),
-        Pokemon(slug="ivysaur", species="ivysaur", name_es="Ivysaur", is_default=True),
+        Pokemon(
+            slug="bulbasaur",
+            species="bulbasaur",
+            name_es="Bulbasaur",
+            is_default=True,
+            pokeapi_id=1,
+        ),
+        Pokemon(
+            slug="ivysaur", species="ivysaur", name_es="Ivysaur", is_default=True, pokeapi_id=2
+        ),
     ]
 
 
@@ -124,6 +133,23 @@ def test_schema_has_the_documented_tables(engine: Engine) -> None:
     with engine.connect() as connection:
         rows = connection.execute(text("SELECT name FROM sqlite_master WHERE type = 'table'"))
         assert {row[0] for row in rows} == DOCUMENTED_TABLES
+
+
+def test_a_current_schema_misses_no_column(engine: Engine) -> None:
+    assert missing_columns(engine) == []
+
+
+def test_missing_tables_and_columns_of_an_older_file_are_listed(engine: Engine) -> None:
+    with engine.begin() as connection:
+        connection.execute(text("ALTER TABLE pokemon DROP COLUMN image"))
+        connection.execute(text("ALTER TABLE ingest_run DROP COLUMN sprites_commit"))
+        connection.execute(text("DROP TABLE key_battle_pokemon"))
+
+    assert sorted(missing_columns(engine)) == [
+        "ingest_run.sprites_commit",
+        "key_battle_pokemon",
+        "pokemon.image",
+    ]
 
 
 def test_reference_tables_are_not_in_the_default_metadata() -> None:
@@ -196,7 +222,9 @@ def test_round_trip_of_a_minimal_firered_dataset(session: Session) -> None:
 
 
 def test_foreign_keys_are_enforced(session: Session) -> None:
-    session.add(Pokemon(slug="missingno", species="missingno", name_es="?", is_default=True))
+    session.add(
+        Pokemon(slug="missingno", species="missingno", name_es="?", is_default=True, pokeapi_id=0)
+    )
     with pytest.raises(IntegrityError):
         session.flush()
 

@@ -22,12 +22,13 @@ Detalle técnico (qué hace cada paso, la caché, las fuentes y las comprobacion
 uv run python -m ingest
 ```
 
-La primera vez descarga los datos de PokeAPI y las páginas de WikiDex (unos segundos; WikiDex
-va a una petición por segundo). Las siguientes usan la caché y tardan menos de un segundo.
+La primera vez descarga los datos de PokeAPI, las páginas de WikiDex (WikiDex va a una petición
+por segundo) y las imágenes de los Pokémon (unos 2 minutos). Las siguientes usan la caché y
+tardan un par de segundos.
 
 | Opción | Para qué |
 |--------|----------|
-| `--offline` | Cargar sin red, solo con lo que ya está en la caché. |
+| `--offline` | Cargar sin red, solo con lo que ya está en la caché. Las imágenes que falten solo dan un aviso. |
 | `--data-dir DIR` | Usar otro directorio de datos (por ejemplo, para probar sin tocar `data/`). |
 
 Al terminar, la carga muestra un informe y sale con un código que dice cómo ha ido:
@@ -85,6 +86,7 @@ una nueva versión de la aplicación ([RF-16](../01-ddf/requisitos-funcionales.m
 | `Comprobación fallida: …` | Los datos cargados no son los esperados (por ejemplo, faltan especies). | No es algo que se arregle en local: avisa al arquitecto con el mensaje. |
 | `Datos del usuario: Favoritos que no existen en la nueva carga: …` | Tienes en favoritos una forma que la nueva carga ya no tiene. | Quítala de favoritos (`DELETE /api/favorites/{pokemon}`) y repite la carga. Si es un Pokémon que debería seguir existiendo, avisa al arquitecto. |
 | `Datos del usuario: Registros del Hall of Fame con …` | Un registro de tu *Hall of Fame* usa un juego o un Pokémon que la nueva carga ya no tiene. El número es el `id` del registro. | Corrige o elimina ese registro (`PATCH` o `DELETE /api/hall-of-fame/{id}`) y repite la carga. |
+| Aviso `N formas sin imagen, …` | No se ha podido obtener la imagen de esas formas: sin conexión, el servidor de imágenes no responde o no la tiene. | Nada: la carga se completa y esas formas se muestran sin imagen. Repite la carga con conexión para descargar las que falten. |
 | Aviso `Confirmaciones de datos que ya no existen…` | Confirmaste datos que la nueva carga ya no tiene. | Nada: la carga se completa y esas confirmaciones se ignoran. |
 
 ## Consultar los datos cargados

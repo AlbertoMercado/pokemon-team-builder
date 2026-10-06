@@ -66,7 +66,10 @@ class Pokemon(ReferenceModel, table=True):
     """A form with its own data: the default form or a regional one (RN-05).
 
     Mega evolutions, Gigamax and battle-only forms are not loaded. ``region`` is set only for
-    regional forms (``alola``, ``galar``…).
+    regional forms (``alola``, ``galar``…). ``pokeapi_id`` is the id of the form in PokeAPI,
+    which names its sprite (``10103`` for Alolan Vulpix, not the Pokédex number). ``image`` is
+    the path of the sprite relative to the data directory, or null if it could not be obtained
+    (ADR-0010).
     """
 
     __tablename__ = "pokemon"
@@ -76,6 +79,8 @@ class Pokemon(ReferenceModel, table=True):
     name_es: str
     is_default: bool
     region: str | None = None
+    pokeapi_id: int = Field(unique=True)
+    image: str | None = None
 
 
 class PokemonType(ReferenceModel, table=True):

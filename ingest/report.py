@@ -13,7 +13,8 @@ class LoadReport:
 
     ``rows_by_table`` counts the stored rows per table. ``origins_by_table`` counts the
     reviewable values per table and origin (``automatic``, ``inferred``, ``pending``), so
-    the administrator knows how much the user will have to confirm (RN-18).
+    the administrator knows how much the user will have to confirm (RN-18). ``images`` is the
+    number of forms with a sprite and the number of forms, if the load includes images.
     """
 
     target: Path
@@ -22,6 +23,7 @@ class LoadReport:
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     checks_passed: int = 0
+    images: tuple[int, int] | None = None
 
     @property
     def succeeded(self) -> bool:
@@ -43,6 +45,9 @@ class LoadReport:
             for table, origins in self.origins_by_table.items():
                 detail = ", ".join(f"{origin} {count}" for origin, count in origins.items())
                 lines.append(f"  {table:<20} {detail}")
+        if self.images is not None:
+            with_image, forms = self.images
+            lines.append(f"Imágenes: {with_image} de {forms} formas")
         if self.checks_passed:
             lines.append(f"Comprobaciones superadas: {self.checks_passed}")
         lines.extend(self._warnings())

@@ -192,6 +192,7 @@ def _curated_with(*battles: BattleEntry) -> CuratedData:
     )
     return CuratedData(
         pokeapi_commit=CURATED.pokeapi_commit,
+        sprites_commit=CURATED.sprites_commit,
         games=CURATED.games,
         breeding=CURATED.breeding,
         arrival=CURATED.arrival,

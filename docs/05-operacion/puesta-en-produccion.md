@@ -140,9 +140,18 @@ que repetir la ingesta en la VM y evita una carga bloqueada
 ```bash
 # En tu ordenador, desde la raíz del proyecto
 scp data/reference.sqlite ubuntu@<nombre-de-la-vm>:/tmp/
+rsync -a data/cache/pokeapi-sprites/ ubuntu@<nombre-de-la-vm>:/tmp/pokeapi-sprites/
 # En la VM
 sudo install -o ptb -g ptb -m 640 /tmp/reference.sqlite /var/lib/pokemon-team-builder/
+sudo install -d -o ptb -g ptb /var/lib/pokemon-team-builder/cache
+sudo rsync -a --chown=ptb:ptb /tmp/pokeapi-sprites/ /var/lib/pokemon-team-builder/cache/pokeapi-sprites/
 ```
+
+Las imágenes de los Pokémon (1,5 MB) se copian con `reference.sqlite`, que guarda sus rutas
+dentro del directorio de datos ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)).
+Es una copia tuya en tu servidor, no una redistribución, y no van a git
+([CA-56](../01-ddf/cuestiones-abiertas.md#resueltas)). Si no las copias, la aplicación funciona
+igual, sin imágenes.
 
 Para llevarte tus favoritos y tu *Hall of Fame*, copia también `data/user.sqlite` de la misma
 forma. Si no, la API crea uno nuevo al arrancar.
@@ -249,7 +258,8 @@ Compila la web en tu ordenador con la misma versión y cópiala como en la
 sudo systemctl restart pokemon-team-builder
 ```
 
-Si cambian los datos de los juegos, vuelve a copiar `reference.sqlite` desde tu ordenador
+Si cambian los datos de los juegos o las imágenes, vuelve a copiar `reference.sqlite` y las
+imágenes desde tu ordenador
 después de la [ingesta](ingesta.md) y reinicia el servicio: la API sigue con la carga anterior
 hasta reiniciarla ([Arrancar la API](api.md#directorio-de-datos)). Antes de sustituirla, la
 ingesta comprueba que tus datos de usuario siguen apuntando a datos que existen.
@@ -266,7 +276,7 @@ ingesta comprueba que tus datos de usuario siguen apuntando a datos que existen.
 | Síntoma | Causa y solución |
 |---------|------------------|
 | La dirección `*.ts.net` no carga | El dispositivo no está conectado a Tailscale, o falta `tailscale serve --bg 8000`. |
-| Aviso «No hay datos cargados» | Falta `reference.sqlite` en `/var/lib/pokemon-team-builder`. |
+| Aviso «Hay que cargar los datos» | Falta `reference.sqlite` en `/var/lib/pokemon-team-builder`, o es de una versión anterior: cópialo de nuevo tras repetir la [ingesta](ingesta.md) en tu ordenador. |
 | `/` responde `{"detail":"Not Found"}` | Falta `web/dist` en la VM: compílala en tu ordenador, cópiala y reinicia el servicio. |
 | Oracle avisa de que va a reclamar la instancia | La cuenta no está en *Pay As You Go*: cámbiala o vuelve a crearla. |
 

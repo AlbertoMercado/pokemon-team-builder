@@ -33,6 +33,9 @@ PTB_DATA_DIR=/ruta/a/otros-datos uv run uvicorn api.main:app
 - **Sin `reference.sqlite`** la API arranca, pero los endpoints que necesitan los datos de
   referencia responden `503` con un mensaje que pide ejecutar la carga. Si la carga se hace con
   la API en marcha, la siguiente petición ya encuentra el fichero.
+- **Con un `reference.sqlite` de una versión anterior**, al que le faltan tablas o columnas que
+  necesita el código, esos endpoints responden también `503`, pidiendo repetir la carga y
+  reiniciar la API.
 - **Después de volver a cargar los datos**, hay que reiniciar la API: las conexiones abiertas
   siguen leyendo el fichero anterior ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md))
   y los datos de referencia de cada juego se guardan en memoria la primera vez que se usan
@@ -83,7 +86,7 @@ Al cambiar un modelo de `db/user/models.py`:
 | `api/main.py` | `create_app(settings)`: crea la aplicación, abre las bases de datos al arrancar y las cierra al parar. `app` es la que sirve uvicorn. |
 | `api/config.py` | `Settings`: el directorio de datos (`PTB_DATA_DIR`) y el de la web compilada (`PTB_WEB_DIR`). |
 | `api/web.py` | Sirve la web compilada en `/`, después de las rutas de la API, con vuelta a `index.html` para las rutas de la web y sin tapar `/api`. |
-| `api/database.py` | `Databases`: migra y abre `user.sqlite` al arrancar y abre `reference.sqlite` cuando una petición lo necesita (`503` si no existe). Dependencias `reference_session` y `user_session` para los endpoints. |
+| `api/database.py` | `Databases`: migra y abre `user.sqlite` al arrancar y abre `reference.sqlite` cuando una petición lo necesita (`503` si no existe o si le faltan tablas o columnas porque lo cargó una versión anterior, con `db.reference.missing_columns`). Dependencias `reference_session` y `user_session` para los endpoints. |
 | `api/openapi.py` | Exporta el contrato OpenAPI de `create_app()` sin arrancar la API: `uv run python -m api.openapi [FICHERO]`. Lo usa la web para generar su cliente ([web](web.md#cliente-de-la-api)). |
 | `api/errors.py` | Errores de los casos de uso (`NotFoundError`, `ConflictError`) y su traducción a `404` y `409`. |
 | `db/user/` | Modelos de `user.sqlite`, `upgrade(path)` y las migraciones. |

@@ -31,7 +31,7 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 
 | Fichero | Qué contiene | Se carga en | Juegos con datos |
 |---------|--------------|-------------|------------------|
-| [`pokeapi.yaml`](#pokeapiyaml) | Commit fijado del volcado de PokeAPI. | `ingest_run.pokeapi_commit` | — |
+| [`pokeapi.yaml`](#pokeapiyaml) | Commits fijados del volcado de PokeAPI y del repositorio de imágenes. | `ingest_run.pokeapi_commit`, `ingest_run.sprites_commit` | — |
 | [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Rojo Fuego, Verde Hoja |
 | [`breeding.yaml`](#breedingyaml) | Bebés que solo nacen con incienso. | `species.requires_incense` | — |
 | [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Rojo Fuego, Verde Hoja |
@@ -44,14 +44,17 @@ Rubí, Zafiro y Esmeralda se completan en la fase 6 del
 ### `pokeapi.yaml`
 
 **Por qué existe**: la carga de PokeAPI es reproducible porque usa siempre el mismo commit
-del volcado CSV ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)).
+del volcado CSV ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)) y del repositorio de
+imágenes PokeAPI/sprites ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)).
 
 ```yaml
-commit: bc92d3b6029ef1abe9e7ad424c400b338f3c11fe   # SHA completo, 40 caracteres
+commit: bc92d3b6029ef1abe9e7ad424c400b338f3c11fe           # volcado CSV
+sprites_commit: 8491ffde1b247e4de574d4bb8e24b7bd9fa876fa   # imágenes de los Pokémon
 ```
 
-Cambiar el commit es actualizar los datos de PokeAPI: se hace en un PR y se vuelve a
-ejecutar la [ingesta](../05-operacion/ingesta.md).
+Los dos son obligatorios y con el SHA completo, de 40 caracteres. Cambiar un commit es
+actualizar los datos o las imágenes: se hace en un PR y se vuelve a ejecutar la
+[ingesta](../05-operacion/ingesta.md).
 
 ### `games.yaml`
 
