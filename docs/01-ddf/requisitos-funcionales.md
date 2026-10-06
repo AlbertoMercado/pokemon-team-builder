@@ -343,8 +343,10 @@ decidido en [CA-54, CA-55 y CA-56](cuestiones-abiertas.md#resueltas).
     - Como las imágenes de los Pokémon, las portadas se obtienen en la carga y la aplicación
       funciona sin conexión.
     - Como las imágenes de los Pokémon, con el aviso de su titularidad y su procedencia.
-- **Nota**: las portadas salen de WikiDex si las tiene y se pueden usar; si no, se busca otra
-  fuente antes de implementarlo ([CA-55](cuestiones-abiertas.md#resueltas)).
+- **Nota**: las portadas salen de WikiDex ([CA-55](cuestiones-abiertas.md#resueltas)), que las
+  declara de uso legítimo solo en sus artículos: la aplicación las usa en privado y se pueden
+  quitar cargando los datos sin portadas
+  ([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)).
 
 ## Seguridad
 
