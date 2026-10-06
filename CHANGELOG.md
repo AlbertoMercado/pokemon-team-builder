@@ -6,6 +6,18 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+### Añadido
+
+- **Ingesta**: descarga la portada de cada juego cargado de WikiDex a la caché local, con
+  límite de peticiones y sin versionarlas en git. Cada portada se indica en
+  `data/curated/covers.yaml`. WikiDex las declara de uso legítimo solo en sus artículos, así
+  que la aplicación las usa en privado; `--no-covers` carga sin ellas (RF-18, ADR-0011, #49).
+
+### Cambiado
+
+- **Hay que repetir la carga de datos** al actualizar: la tabla `game` guarda ahora la portada
+  de cada juego.
+
 ## [1.1.1] - 2026-10-06
 
 Corrección de las imágenes de la 1.1.0. Basta con actualizar y compilar la web: no hace falta

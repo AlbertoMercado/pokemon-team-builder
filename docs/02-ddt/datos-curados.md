@@ -35,6 +35,7 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Rojo Fuego, Verde Hoja |
 | [`breeding.yaml`](#breedingyaml) | Bebés que solo nacen con incienso. | `species.requires_incense` | — |
 | [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Rojo Fuego, Verde Hoja |
+| [`covers.yaml`](#coversyaml) | Título del fichero de la portada de cada juego en WikiDex (RF-18). | `game.cover`, `game.cover_source` | Los 11 juegos cargados |
 | [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Rojo Fuego, Verde Hoja |
 | [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). **Pendiente de implementar.** | `evolution_method` | — |
 
@@ -126,6 +127,26 @@ las evoluciones de la 2.ª generación, como Crobat o Espeon
 Las propuestas son **inferidas**: el usuario las confirma. Un juego objetivo sin regla queda
 con la llegada **pendiente**. Una regla para un juego que no es juego objetivo hace fallar la
 carga.
+
+### `covers.yaml`
+
+**Por qué existe**: la portada de cada juego es la carátula que muestra la ficha de su artículo
+en WikiDex, y los nombres de esos ficheros no siguen ningún patrón (`Carátula de Rojo Fuego.png`,
+`Caratula Esmeralda.jpg`, `Pokemon Edición Oro.jpg`), así que se indican a mano
+([RF-18](../01-ddf/requisitos-funcionales.md#rf-18),
+[ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)).
+
+```yaml
+covers:
+  firered: "Archivo:Carátula de Rojo Fuego.png"
+  emerald: "Archivo:Caratula Esmeralda.jpg"
+```
+
+Cada valor es el título completo del fichero en WikiDex, con `Archivo:` y extensión `.png`, `.jpg`
+o `.jpeg`; si no, la carga no empieza. Un juego sin entrada se carga sin portada. No va en
+`games.yaml`, que solo tiene las mecánicas de los juegos objetivo, porque las portadas son de
+todos los juegos cargados. Cambiar un título se hace por PR, y la siguiente carga descarga la
+portada nueva. Las imágenes no se guardan en git: solo los títulos.
 
 ### `key_battles/*.yaml`
 

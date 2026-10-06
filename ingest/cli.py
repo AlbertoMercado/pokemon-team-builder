@@ -8,11 +8,12 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from ingest.checks import FIRST_LOAD_CHECKS
-from ingest.load import build_reference
+from ingest.load import Images, build_reference
 from ingest.sources import Source
 from ingest.sources.curated import (
     CuratedDataError,
     CuratedSource,
+    read_covers,
     read_curated,
     read_pinned_commits,
 )
@@ -20,6 +21,7 @@ from ingest.sources.pokeapi import PokeapiCsvSource
 from ingest.sources.pokeapi.download import CsvCache, download
 from ingest.sources.pokeapi.sprites import SpriteCache
 from ingest.sources.wikidex import WikidexSource
+from ingest.sources.wikidex.covers import CoverCache, CoverFetchers, fetch_cover_info
 from ingest.sources.wikidex.fetch import PageCache, fetch_page
 
 DEFAULT_DATA_DIR = Path("data")
@@ -46,6 +48,15 @@ def default_sprites(data_dir: Path, *, offline: bool) -> SpriteCache:
     return SpriteCache(data_dir, commit, None if offline else download)
 
 
+def default_covers(data_dir: Path, *, offline: bool) -> CoverCache:
+    """Covers of the games from WikiDex, cached in ``<data_dir>/cache/wikidex/covers``
+    (ADR-0011)."""
+    titles = read_covers(CURATED_DIR / "covers.yaml").covers
+    return CoverCache(
+        data_dir, titles, None if offline else CoverFetchers(fetch_cover_info, download)
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the ingest and return the process exit code (0 on success, 1 on failure)."""
     parser = argparse.ArgumentParser(
@@ -66,6 +77,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             "(una imagen que falta solo da un aviso)"
         ),
     )
+    parser.add_argument(
+        "--no-covers",
+        action="store_true",
+        help=(
+            "cargar sin las portadas de los juegos, que WikiDex declara de uso legítimo solo en "
+            "sus artículos: obligatorio si la aplicación se publica de forma abierta (ADR-0011)"
+        ),
+    )
     args = parser.parse_args(argv)
 
     data_dir: Path = args.data_dir
@@ -73,6 +92,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         sources = default_sources(data_dir, offline=args.offline)
         sprites = default_sprites(data_dir, offline=args.offline)
+        covers = None if args.no_covers else default_covers(data_dir, offline=args.offline)
     except CuratedDataError as error:
         print(f"ERROR en los datos curados; no se ha cargado nada.\n  - {error}")
         return 1
@@ -81,7 +101,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         data_dir / REFERENCE_FILE_NAME,
         FIRST_LOAD_CHECKS,
         data_dir / USER_FILE_NAME,
-        sprites,
+        Images(sprites, covers),
     )
     print(report.render())
     return 0 if report.succeeded else 1

@@ -19,12 +19,14 @@ es una tarea del administrador que se ejecuta de forma puntual, no al arrancar l
 uv run python -m ingest                    # escribe data/reference.sqlite
 uv run python -m ingest --offline          # sin descargas: solo con la caché
 uv run python -m ingest --data-dir otra/   # escribe otra/reference.sqlite y usa otra/cache/
+uv run python -m ingest --no-covers        # sin las portadas de los juegos (ADR-0011)
 ```
 
 | Opción | Por defecto | Qué hace |
 |--------|-------------|----------|
 | `--data-dir DIR` | `data` | Directorio donde se escriben `reference.sqlite` y la caché de descargas. Se crea si no existe. |
 | `--offline` | No | No descarga nada, ni de PokeAPI ni de WikiDex ni las imágenes. Si falta algún fichero de datos en la caché, la carga falla; si falta una imagen, solo es un aviso. |
+| `--no-covers` | No | Carga sin las portadas de los juegos: ni las descarga ni las asigna, y la web muestra solo los nombres. Obligatorio si la aplicación se publica de forma abierta ([portadas](#portadas-de-los-juegos)). |
 | `-h`, `--help` | | Muestra la ayuda. |
 
 | Código de salida | Significado |
@@ -97,6 +99,31 @@ en PokeAPI (Vulpix de Alola es `10103`). Se guardan en `<data-dir>/cache/pokeapi
 `reference.sqlite` guarda la ruta de cada imagen relativa al directorio de datos
 (`pokemon.image` y `pokemon.artwork`). Si se borra la caché, las formas se ven sin imagen hasta la siguiente carga.
 **Actualizar las imágenes** es cambiar `sprites_commit` en un PR y volver a ejecutar la ingesta.
+
+### Portadas de los juegos
+
+La portada de cada juego es la carátula que muestra la ficha de su artículo en WikiDex. El título
+de su fichero está en [`data/curated/covers.yaml`](../02-ddt/datos-curados.md#coversyaml)
+([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)):
+
+- **Solo uso privado**: WikiDex las declara de uso legítimo solo en sus artículos. La aplicación
+  las usa en privado, sin versionarlas ni redistribuirlas. Si la aplicación se publicara de forma
+  abierta, hay que cargar con `--no-covers`.
+- **Descarga**: una petición a la API MediaWiki con todos los títulos (`prop=imageinfo`, que da la
+  URL y el `sha1` de cada fichero) y una descarga por portada, como las páginas de los combates
+  clave: al menos 1 s entre peticiones y el mismo `User-Agent`. La primera carga tarda unos 12
+  segundos más; las siguientes no hacen ninguna petición.
+- **Caché permanente** en `<data-dir>/cache/wikidex/covers/`: `<juego>.json` (título, URL y `sha1`),
+  `<juego>-original` (el fichero de WikiDex) y `<juego>-256.png`, la portada reducida a 256 px
+  con Pillow, que es la que se muestra. Ocupan unos 5,6 MB. Se comprueba que la descarga tiene el
+  `sha1` que da WikiDex.
+- **Una portada que falta no rompe la carga**: el juego se carga sin ella y el informe lo avisa.
+  Si WikiDex no responde, deja de descargar en esa carga.
+
+`reference.sqlite` guarda la ruta de la portada (`game.cover`) y el título de su fichero en
+WikiDex (`game.cover_source`), para el enlace de la atribución. **Actualizar una portada** (si
+WikiDex la cambia): borrar sus ficheros de la caché y volver a ejecutar la ingesta. Si cambia el
+título en `covers.yaml`, la siguiente carga la descarga sola.
 
 **Licencia**: el contenido de WikiDex es [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/deed.es).
 La aplicación es sin ánimo de lucro y guarda la página y la revisión de cada equipo para
@@ -181,6 +208,7 @@ Datos revisables por origen:
   key_battle           automatic 26
 Imágenes: 386 de 386 formas
 Ilustraciones: 386 de 386 formas
+Portadas: 11 de 11 juegos
 Comprobaciones superadas: 9
 Carga completada.
 ```
@@ -195,6 +223,9 @@ Carga completada.
 - **Imágenes** e **Ilustraciones**: cuántas formas tienen su *sprite* y su ilustración. Las que
   no los tienen aparecen en **Avisos**, agrupadas por motivo, por ejemplo:
   `1 forma sin imagen, no está en la caché y no se ha podido descargar: pikachu`.
+- **Portadas**: cuántos juegos tienen portada. Con `--no-covers` no aparece. Los que no la
+  tienen también van en **Avisos**, por ejemplo:
+  `1 juego sin portada, su fichero no está en WikiDex: emerald`.
 - **Comprobaciones superadas**: número de comprobaciones de la carga que se han cumplido.
 
 Ejemplos de cargas fallidas:
@@ -441,9 +472,9 @@ Código en `ingest/` ([estructura del código](../02-ddt/estructura-codigo.md)):
 | Fichero | Qué hace |
 |---------|----------|
 | `__main__.py` | Punto de entrada de `python -m ingest`. |
-| `cli.py` | Opciones de la línea de comandos, fuentes de una carga completa (`default_sources`) e imágenes del commit fijado (`default_sprites`). |
+| `cli.py` | Opciones de la línea de comandos, fuentes de una carga completa (`default_sources`), imágenes del commit fijado (`default_sprites`) y portadas de los juegos (`default_covers`). |
 | `scope.py` | Alcance de la carga: generaciones cargadas, generaciones con juego objetivo, primera generación con crianza y grupos de versiones excluidos ([CA-11](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| `load.py` | `build_reference(sources, target, checks, user_database, sprites)`: fichero temporal, filas, integridad, imágenes, comprobaciones, datos del usuario, registro y sustitución. |
+| `load.py` | `build_reference(sources, target, checks, user_database, images)`: fichero temporal, filas, integridad, imágenes de las formas y portadas de los juegos (`Images`), comprobaciones, datos del usuario, registro y sustitución. |
 | `user_keys.py` | `check_user_keys`: lo que usa `user.sqlite` y no tiene la nueva carga, como errores (favoritos y *Hall of Fame*) o avisos (confirmaciones). |
 | `checks.py` | Comprobaciones de la primera carga: cantidades y casos conocidos. |
 | `report.py` | `LoadReport`: recuentos, imágenes, comprobaciones superadas, errores y texto del informe. |
@@ -452,6 +483,7 @@ Código en `ingest/` ([estructura del código](../02-ddt/estructura-codigo.md)):
 | `sources/curated/schemas.py` | Un modelo pydantic por fichero curado ([datos curados](../02-ddt/datos-curados.md)). |
 | `sources/wikidex/__init__.py` | `WikidexSource`: lee el equipo de cada combate de la lista curada, traduce los nombres, quita el inicial del rival y, si hay variantes, se queda con los Pokémon comunes. |
 | `sources/wikidex/fetch.py` | `PageCache`: descarga con caché y límite de peticiones de las páginas de WikiDex. |
+| `sources/wikidex/covers.py` | `CoverCache`: información (`fetch_cover_info`), descarga con caché y límite de peticiones, comprobación del `sha1` y reducción de las portadas de los juegos; los motivos por los que un juego no tiene portada (ADR-0011). |
 | `sources/wikidex/parse.py` | Busca la sección, el rótulo y las plantillas `{{Equipo}}` en el wikitexto. |
 | `sources/pokeapi/index.py` | Índice de los Pokémon cargados por su nombre en español, para traducir los nombres de WikiDex. |
 | `sources/pokeapi/__init__.py` | `PokeapiCsvSource`, la fuente de PokeAPI. Recibe los datos curados para los bebés de incienso y las propuestas de llegada. |
@@ -478,6 +510,10 @@ Tests en `tests/ingest/`:
   descarga que no es un PNG, servidor que no responde (deja de descargar), `--offline`,
   peticiones espaciadas, la carga con imágenes y sin ellas, y que la caché no se versiona. Usa
   un PNG mínimo creado en el test: las imágenes reales no se guardan en git (CA-56).
+- `test_covers.py`: las portadas: títulos curados, información de la API con una respuesta real
+  de WikiDex (solo metadatos), descarga y reducción, caché, cambio de título, fichero que no
+  existe, descarga que no coincide con su `sha1`, WikiDex sin responder, `--offline`, 1 s entre
+  peticiones, la carga con y sin portadas y `--no-covers`. Las imágenes se crean en el test.
 - `test_wikidex.py`: la fuente de WikiDex sobre páginas reales recortadas: caché y límite
   de peticiones, respuesta de la API, rótulos, variantes y Pokémon comunes, desambiguación y
   filas de los combates.

@@ -15,7 +15,8 @@ class LoadReport:
     reviewable values per table and origin (``automatic``, ``inferred``, ``pending``), so
     the administrator knows how much the user will have to confirm (RN-18). ``images`` and
     ``artworks`` are the number of forms with a sprite or an official artwork, and the number of
-    forms, if the load includes images.
+    forms, if the load includes images; ``covers``, the number of games with a cover and the
+    number of games, if it includes covers.
     """
 
     target: Path
@@ -26,6 +27,7 @@ class LoadReport:
     checks_passed: int = 0
     images: tuple[int, int] | None = None
     artworks: tuple[int, int] | None = None
+    covers: tuple[int, int] | None = None
 
     @property
     def succeeded(self) -> bool:
@@ -53,6 +55,9 @@ class LoadReport:
         if self.artworks is not None:
             with_artwork, forms = self.artworks
             lines.append(f"Ilustraciones: {with_artwork} de {forms} formas")
+        if self.covers is not None:
+            with_cover, games = self.covers
+            lines.append(f"Portadas: {with_cover} de {games} juegos")
         if self.checks_passed:
             lines.append(f"Comprobaciones superadas: {self.checks_passed}")
         lines.extend(self._warnings())

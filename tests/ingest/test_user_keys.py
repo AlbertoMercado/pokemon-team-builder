@@ -237,6 +237,7 @@ def test_the_cli_checks_the_user_database_of_the_data_dir(
         cli, "default_sources", lambda data_dir, offline: [_Source(_reference_rows("gengar"))]
     )
     monkeypatch.setattr(cli, "default_sprites", lambda data_dir, offline: None)
+    monkeypatch.setattr(cli, "default_covers", lambda data_dir, offline: None)
     assert cli.main(["--data-dir", str(data_dir)]) == 1
     assert "Favoritos que no existen en la nueva carga: vulpix-alola" in capsys.readouterr().out
     assert not (data_dir / "reference.sqlite").exists()

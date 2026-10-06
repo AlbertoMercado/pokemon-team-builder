@@ -1,0 +1,59 @@
+{
+    "batchcomplete": true,
+    "query": {
+        "normalized": [
+            {
+                "fromencoded": false,
+                "from": "File:Carátula de Verde Hoja.png",
+                "to": "Archivo:Carátula de Verde Hoja.png"
+            }
+        ],
+        "pages": [
+            {
+                "ns": 6,
+                "title": "Archivo:Carátula que no existe.png",
+                "missing": true,
+                "imagerepository": ""
+            },
+            {
+                "pageid": 8190,
+                "ns": 6,
+                "title": "Archivo:Caratula Esmeralda.jpg",
+                "imagerepository": "local",
+                "imageinfo": [
+                    {
+                        "url": "https://images.wikidexcdn.net/mwuploads/wikidex/0/02/latest/20211108123052/Caratula_Esmeralda.jpg",
+                        "descriptionurl": "https://www.wikidex.net/wiki/Archivo:Caratula_Esmeralda.jpg",
+                        "sha1": "4808309ec07c1aa85ecd44e645ec5a9b40a741c5"
+                    }
+                ]
+            },
+            {
+                "pageid": 334887,
+                "ns": 6,
+                "title": "Archivo:Carátula de Verde Hoja.png",
+                "imagerepository": "local",
+                "imageinfo": [
+                    {
+                        "url": "https://images.wikidexcdn.net/mwuploads/wikidex/3/31/latest/20211108122911/Car%C3%A1tula_de_Verde_Hoja.png",
+                        "descriptionurl": "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Verde_Hoja.png",
+                        "sha1": "7c315075afc13c47b7affebe7f77ff029ba6763c"
+                    }
+                ]
+            },
+            {
+                "pageid": 334888,
+                "ns": 6,
+                "title": "Archivo:Carátula de Rojo Fuego.png",
+                "imagerepository": "local",
+                "imageinfo": [
+                    {
+                        "url": "https://images.wikidexcdn.net/mwuploads/wikidex/a/ac/latest/20211108122617/Car%C3%A1tula_de_Rojo_Fuego.png",
+                        "descriptionurl": "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Rojo_Fuego.png",
+                        "sha1": "e728220a144b64a98554725082c25ceaf035dfe6"
+                    }
+                ]
+            }
+        ]
+    }
+}

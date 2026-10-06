@@ -7,11 +7,13 @@ previous file, in a single atomic rename. If anything fails, the previous databa
 untouched (RF-11, ADR-0003).
 
 Once the rows are stored, each form gets its images, the trimmed sprite and the official
-artwork (ADR-0010). A missing image is only a warning: the form is loaded without it.
+artwork (ADR-0010), and each game its cover (ADR-0011). A missing image is only a warning: the
+form or the game is loaded without it.
 """
 
 from collections import defaultdict
 from collections.abc import Sequence
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -25,11 +27,21 @@ from ingest.checks import Check
 from ingest.report import LoadReport
 from ingest.sources import Source
 from ingest.sources.pokeapi.sprites import MissingReason, MissingSpriteError, SpriteCache
+from ingest.sources.wikidex.covers import CoverCache, CoverMissing, MissingCoverError
 from ingest.user_keys import check_user_keys
 
 ORIGIN_COLUMN_SUFFIX = "origin"
 MAX_DANGLING_VALUES = 5
 MAX_FORMS_WITHOUT_IMAGE = 10
+
+
+@dataclass(frozen=True)
+class Images:
+    """Where the images of a load come from: the forms' (ADR-0010) and the games' covers
+    (ADR-0011). ``None`` leaves them out."""
+
+    sprites: SpriteCache | None = None
+    covers: CoverCache | None = None
 
 
 class IntegrityCheckError(Exception):
@@ -41,12 +53,12 @@ def build_reference(
     target: Path,
     checks: Sequence[Check] = (),
     user_database: Path | None = None,
-    sprites: SpriteCache | None = None,
+    images: Images | None = None,
 ) -> LoadReport:
     """Build reference.sqlite at ``target`` from ``sources`` and report the outcome.
 
-    If ``sprites`` is given, every form gets the paths of its images; forms without them are
-    reported as warnings.
+    With ``images``, every form gets the paths of its images and every game its cover; those
+    without them are reported as warnings.
 
     ``checks`` run on the new database; any problem they report rejects the load. Then, if
     ``user_database`` is given, the keys of user.sqlite are checked against the new database:
@@ -61,14 +73,16 @@ def build_reference(
         create_reference_schema(engine)
         _store_rows(engine, sources)
         _check_integrity(engine)
-        if sprites is not None:
-            _attach_images(engine, sprites, report)
+        if images is not None and images.sprites is not None:
+            _attach_images(engine, images.sprites, report)
+        if images is not None and images.covers is not None:
+            _attach_covers(engine, images.covers, report)
         problems = _run_checks(engine, checks)
         if problems:
             report.errors.extend(f"Comprobación fallida: {problem}" for problem in problems)
         elif user_database is None or not _rejected_by_user_keys(engine, user_database, report):
             report.checks_passed = len(checks)
-            _record_run(engine, sources, started_at, sprites)
+            _record_run(engine, sources, started_at, images.sprites if images else None)
             report.rows_by_table = _count_rows(engine)
             report.origins_by_table = _count_origins(engine)
     except Exception as error:  # any failure must keep the previous database
@@ -152,6 +166,24 @@ def _attach_images(engine: Engine, sprites: SpriteCache, report: LoadReport) -> 
     report.artworks = _found(len(forms), without_artwork)
     report.warnings.extend(_missing_warnings("imagen", without_image))
     report.warnings.extend(_missing_warnings("ilustración", without_artwork))
+
+
+def _attach_covers(engine: Engine, covers: CoverCache, report: LoadReport) -> None:
+    """Store the cover of every game and report the games without one."""
+    without_cover: dict[CoverMissing, list[str]] = defaultdict(list)
+    with Session(engine) as session:
+        games = session.exec(select_model(Game).order_by(col(Game.release_order))).all()
+        for game in games:
+            try:
+                game.cover, game.cover_source = covers.cover(game.slug)
+            except MissingCoverError as error:
+                without_cover[error.reason].append(game.slug)
+        session.commit()
+    missing = sum(len(slugs) for slugs in without_cover.values())
+    report.covers = (len(games) - missing, len(games))
+    for reason, slugs in without_cover.items():
+        games_text = "1 juego" if len(slugs) == 1 else f"{len(slugs)} juegos"
+        report.warnings.append(f"{games_text} sin portada, {reason}: {', '.join(slugs)}")
 
 
 def _found(forms: int, missing: dict[MissingReason, list[str]]) -> tuple[int, int]:

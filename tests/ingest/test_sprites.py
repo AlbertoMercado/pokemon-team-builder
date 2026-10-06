@@ -18,7 +18,7 @@ from sqlmodel import Session, select
 
 from db.reference import IngestRun, Pokemon, ReferenceModel
 from db.sqlite import create_sqlite_engine
-from ingest.load import build_reference
+from ingest.load import Images, build_reference
 from ingest.sources.pokeapi.sprites import (
     ARTWORK_SIZE,
     MissingReason,
@@ -255,7 +255,7 @@ def test_the_load_stores_the_images_of_each_form(tmp_path: Path) -> None:
     target = tmp_path / "reference.sqlite"
     sprites = SpriteCache(tmp_path, COMMIT, FakeDownloader(_both(1, 2)), sleep=lambda _: None)
 
-    report = build_reference([_Forms()], target, sprites=sprites)
+    report = build_reference([_Forms()], target, images=Images(sprites=sprites))
 
     assert report.succeeded, report.errors
     assert (report.images, report.artworks) == ((2, 2), (2, 2))
@@ -279,7 +279,7 @@ def test_forms_without_images_are_loaded_with_a_warning(tmp_path: Path) -> None:
     target = tmp_path / "reference.sqlite"
 
     report = build_reference(
-        [_Forms()], target, sprites=SpriteCache(tmp_path, COMMIT, downloader=None)
+        [_Forms()], target, images=Images(sprites=SpriteCache(tmp_path, COMMIT, downloader=None))
     )
 
     assert report.succeeded, report.errors

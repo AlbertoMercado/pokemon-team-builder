@@ -18,6 +18,7 @@ from ingest.sources.curated.schemas import (
     ArrivalFile,
     ArrivalRule,
     BreedingFile,
+    CoversFile,
     GamesFile,
     KeyBattlesFile,
     PinnedCommitFile,
@@ -54,6 +55,11 @@ def _read[M: BaseModel](path: Path, model: type[M]) -> M:
 def read_pinned_commits(path: Path) -> PinnedCommitFile:
     """Read and validate the pinned commits of ``pokeapi.yaml``."""
     return _read(path, PinnedCommitFile)
+
+
+def read_covers(path: Path) -> CoversFile:
+    """Read and validate ``covers.yaml``, the cover of each game in WikiDex (ADR-0011)."""
+    return _read(path, CoversFile)
 
 
 def read_curated(directory: Path) -> CuratedData:

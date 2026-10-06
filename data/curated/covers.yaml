@@ -1,0 +1,19 @@
+# Portada de cada juego: el título de su fichero en WikiDex (RF-18, ADR-0011).
+# Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# Es la carátula que muestra la ficha del artículo de cada juego en WikiDex, revisada el
+# 2026-10-06 (docs/02-ddt/plan-portadas.md). WikiDex las declara de uso legítimo solo en sus
+# artículos: la aplicación las usa en privado y se pueden quitar con --no-covers.
+# Un juego sin entrada se carga sin portada.
+covers:
+  red: "Archivo:Carátula de Pokémon Rojo.jpg"
+  blue: "Archivo:Carátula de Pokémon Azul.jpg"
+  yellow: "Archivo:Pokémon Amarillo.png"
+  gold: "Archivo:Pokemon Edición Oro.jpg"
+  silver: "Archivo:Pokemon Edición Plata.jpg"
+  crystal: "Archivo:Pokemon Edición Cristal.jpg"
+  ruby: "Archivo:Carátula de Rubí.png"
+  sapphire: "Archivo:Carátula de Zafiro.png"
+  emerald: "Archivo:Caratula Esmeralda.jpg"
+  firered: "Archivo:Carátula de Rojo Fuego.png"
+  leafgreen: "Archivo:Carátula de Verde Hoja.png"

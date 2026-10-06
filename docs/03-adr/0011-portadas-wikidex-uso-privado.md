@@ -41,7 +41,7 @@ de sus titulares, pero el repositorio de PokeAPI no añade restricciones de uso.
 - **Condición**: la aplicación no se publica de forma abierta. Se usa en el propio ordenador o
   con acceso privado ([ADR-0009](0009-despliegue-vm-gratuita-tailscale.md),
   [RF-19](../01-ddf/requisitos-funcionales.md#rf-19)). Si algún día se publicara, se cargan los
-  datos sin portadas (`--sin-portadas`): la web muestra solo los nombres.
+  datos sin portadas (`--no-covers`): la web muestra solo los nombres.
 - **Qué fichero es la portada de cada juego**: se indica en un fichero curado nuevo,
   `data/curated/covers.yaml` (juego → título del fichero en WikiDex), porque los nombres no siguen
   un patrón y `games.yaml` solo tiene las mecánicas de los juegos objetivo.
@@ -94,7 +94,7 @@ El nombre del juego sobre el color de su edición (Rojo, Azul, Oro…).
 
 - **Riesgo de derechos aceptado**: el uso queda fuera del uso legítimo que declara WikiDex. Se
   limita a uso privado, sin redistribuir, con aviso y enlace a la fuente, y se puede quitar con
-  `--sin-portadas`.
+  `--no-covers`.
 - La condición ata la aplicación a un uso privado: publicarla abierta exige cargar sin portadas.
 - Si WikiDex renombra o borra un fichero, ese juego se queda sin portada hasta corregir
   `covers.yaml` por PR.
@@ -104,7 +104,7 @@ El nombre del juego sobre el color de su edición (Rojo, Azul, Oro…).
 - [ ] Implementar las fases del [plan de las portadas](../02-ddt/plan-portadas.md) (#49).
 - [ ] Mostrar la fuente en WikiDex de cada combate clave, pendiente en
   [ADR-0004](0004-pokeapi-volcado-csv.md#acciones-derivadas), en la misma tanda.
-- [ ] Recordar la condición en la [puesta en producción](../05-operacion/puesta-en-produccion.md).
+- [x] Recordar la condición en la [puesta en producción](../05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos).
 
 ## Referencias
 

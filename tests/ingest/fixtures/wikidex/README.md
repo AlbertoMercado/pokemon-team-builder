@@ -15,6 +15,12 @@ incluidos los casos difíciles.
 | Azul (personaje) | 3557514 | Varios combates con rótulo; el de Campeón con tres variantes según el inicial dentro de `<tabber>`. |
 | Bruno | 2451940 | Página de desambiguación, completa. |
 
+`covers-imageinfo.json` es la respuesta real de la API a la petición de la información de las
+portadas (`action=query&prop=imageinfo&iiprop=url|sha1`, 2026-10-06), con dos ficheros que
+existen, uno que no (`missing`) y un título que la API normaliza (`File:` → `Archivo:`). Solo
+tiene metadatos: las imágenes no se guardan en git ([ADR-0011](../../../../docs/03-adr/0011-portadas-wikidex-uso-privado.md)).
+Se regenera repitiendo esa petición con los mismos títulos.
+
 **Licencia y atribución**: el contenido procede de [WikiDex](https://www.wikidex.net), con
 licencia [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/deed.es). Los
 autores son los editores de cada página, que figuran en su historial
