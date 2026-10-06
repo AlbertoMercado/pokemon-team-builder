@@ -204,6 +204,14 @@ con CSS cortaría a los grandes. Se compararon en una página las tres opciones 
 unos 20 MB las ilustraciones (de unos 50 KB cada una, más de los 15 MB estimados). Ninguna
 imagen rota en los favoritos, la ficha, el resultado y el *Hall of Fame*.
 
+**Corrección tras publicar la 1.1.0 (#65)**: con los *sprites* recortados, las filas no medían
+todas lo mismo. El estilo base de Tailwind (*preflight*) da a las imágenes `height: auto`, que
+anula el atributo `height`: solo el ancho quedaba fijo y la altura salía de las proporciones de
+cada recorte (Kakuna se pintaba a 40 × 74 px; en el catálogo, de 28 a 74 px de alto).
+`PokemonSprite` fija ahora la caja con CSS (`size-10`, `size-16`, `size-32` y `size-40` para la
+ilustración) y `object-contain` ajusta cada figura dentro, centrada y sin deformar. Comprobado
+con los datos reales: las 386 imágenes del catálogo miden 40 × 40 y todas sus filas, lo mismo.
+
 ## Fases
 
 Cada fase es un PR con sus tests y su documentación.

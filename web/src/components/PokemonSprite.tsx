@@ -6,20 +6,30 @@
  *   does not load, nothing is shown and the name stands alone.
  * - `PokemonArtwork`: its official artwork, larger, for the detail. Without it, or if it does
  *   not load, its sprite is shown instead.
+ *
+ * Each image sits in a square box of a fixed size and is scaled to fit in it, centred and
+ * without distortion, so every row has the same height whatever the shape of the Pokémon. The
+ * box is set in CSS because Tailwind's base styles give images `height: auto`, which overrides
+ * the `height` attribute (#65).
  */
 import { useState, type ReactNode } from "react";
 
-const SIZES = { small: 40, medium: 64, large: 128 } as const;
-const ARTWORK_SIZE = 160;
+// Pixels for the width and height attributes, and the Tailwind class of the same box.
+const SIZES = {
+  small: { pixels: 40, box: "size-10" },
+  medium: { pixels: 64, box: "size-16" },
+  large: { pixels: 128, box: "size-32" },
+} as const;
+const ARTWORK = { pixels: 160, box: "size-40" } as const;
 
 interface PictureProps {
   url: string | null | undefined;
-  pixels: number;
+  size: { pixels: number; box: string };
   className: string;
   fallback?: ReactNode;
 }
 
-function Picture({ url, pixels, className, fallback = null }: PictureProps) {
+function Picture({ url, size, className, fallback = null }: PictureProps) {
   const [failed, setFailed] = useState<string | null>(null);
   if (!url || failed === url) {
     return fallback;
@@ -28,11 +38,11 @@ function Picture({ url, pixels, className, fallback = null }: PictureProps) {
     <img
       src={url}
       alt=""
-      width={pixels}
-      height={pixels}
+      width={size.pixels}
+      height={size.pixels}
       loading="lazy"
       decoding="async"
-      className={`shrink-0 object-contain ${className}`}
+      className={`${size.box} max-w-none shrink-0 object-contain ${className}`}
       onError={() => {
         setFailed(url);
       }}
@@ -47,7 +57,7 @@ interface SpriteProps {
 
 export default function PokemonSprite({ url, size = "small" }: SpriteProps) {
   // Sprites are pixel art: scaled without smoothing they stay sharp.
-  return <Picture url={url} pixels={SIZES[size]} className="[image-rendering:pixelated]" />;
+  return <Picture url={url} size={SIZES[size]} className="[image-rendering:pixelated]" />;
 }
 
 interface ArtworkProps {
@@ -59,7 +69,7 @@ export function PokemonArtwork({ url, spriteUrl }: ArtworkProps) {
   return (
     <Picture
       url={url}
-      pixels={ARTWORK_SIZE}
+      size={ARTWORK}
       className=""
       fallback={<PokemonSprite url={spriteUrl} size="large" />}
     />

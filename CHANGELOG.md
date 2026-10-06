@@ -6,6 +6,12 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+### Corregido
+
+- **Web**: las imágenes de los Pokémon respetan su tamaño, así que todas las filas de las listas
+  miden lo mismo. El estilo base de Tailwind (`height: auto`) hacía que los Pokémon altos y
+  estrechos, como Kakuna, salieran casi el doble de altos (RF-17, #65).
+
 ## [1.1.0] - 2026-10-06
 
 Imágenes de los Pokémon (RF-17): cada Pokémon se ve con su imagen en toda la aplicación, sin
