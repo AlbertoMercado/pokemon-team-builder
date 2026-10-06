@@ -31,6 +31,7 @@ del [plan de la API](plan-api.md#fases). Cómo se arranca: [Operación](../05-op
 |--------|------|-------------|------------|
 | `GET` | `/api/pokemon` | Lista de Pokémon con su número total (`total`). Filtros: `q` (nombre), `type`, `favorite`. ✅ | RF-01 |
 | `GET` | `/api/pokemon/{pokemon}` | Ficha: número, nombre, tipos actuales, línea evolutiva y método de cada evolución. `404` si la forma no existe. ✅ | RF-01, RF-02 |
+| `GET` | `/api/pokemon/{pokemon}/image` | Imagen de la forma, en PNG. `404` si la forma no existe o no tiene imagen. ✅ | RF-17 |
 
 - **Lista**: todas las formas cargadas, en orden de la Pokédex Nacional, cada una con su
   número, su nombre, sus tipos actuales, su región si es una forma regional y si está en
@@ -47,10 +48,11 @@ del [plan de la API](plan-api.md#fases). Cómo se arranca: [Operación](../05-op
 ```json
 {
   "pokemon": "haunter", "name": "Haunter", "dex_number": 93, "types": ["ghost", "poison"],
-  "region": null, "favorite": false, "generation": 1, "species": "haunter",
+  "region": null, "favorite": false, "image_url": "/api/pokemon/haunter/image",
+  "generation": 1, "species": "haunter",
   "is_legendary": false, "is_mythical": false,
   "line": [
-    {"pokemon": "gastly", "name": "Gastly", "dex_number": 92, "types": ["ghost", "poison"], "region": null, "favorite": false, "stage": 1},
+    {"pokemon": "gastly", "name": "Gastly", "dex_number": 92, "types": ["ghost", "poison"], "region": null, "favorite": false, "image_url": "/api/pokemon/gastly/image", "stage": 1},
     {"pokemon": "haunter", "…": "…", "stage": 2},
     {"pokemon": "gengar", "…": "…", "stage": 3}
   ],
@@ -68,6 +70,22 @@ los guarda la ingesta ([modelo de datos](modelo-datos.md#evoluciones)); varias e
 `methods` son métodos alternativos. Como el método puede cambiar entre juegos, se muestra el
 del grupo de versiones más reciente cargado que tiene esa evolución (`version_group`). La
 interfaz traduce el disparador y las condiciones a texto.
+
+#### Imágenes
+
+Cada forma tiene su imagen, el *sprite* de PokeAPI que la carga de datos descarga a la caché
+local ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)). La API la sirve en
+`/api/pokemon/{pokemon}/image`, así que la web no pide nada a servidores externos:
+
+- **`image_url`**: las respuestas con Pokémon dan la URL de su imagen, o `null` si la forma no
+  tiene. Está en el catálogo, la ficha y su línea, los favoritos, las posiciones y las
+  sugerencias de la generación y los miembros del *Hall of Fame*. La web no construye URLs: solo
+  muestra la imagen si viene `image_url` ([RF-17](../01-ddf/requisitos-funcionales.md#rf-17)).
+- **Respuesta**: el PNG con `Cache-Control: public, max-age=86400`, así que el navegador no la
+  vuelve a pedir durante un día. Pesa en torno a 1 KB.
+- **`404`**: si la forma no existe, si la carga no obtuvo su imagen o si el fichero ya no está
+  en el directorio de datos (por ejemplo, porque se borró la caché). La ruta del fichero sale de
+  `reference.sqlite`, nunca de la URL, y se comprueba que queda dentro del directorio de datos.
 
 ### Favoritos
 
@@ -325,4 +343,4 @@ Cada registro de la respuesta:
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| `GET` | `/api/meta` | Versión de la aplicación y de los datos: commit de PokeAPI, fecha de la carga y juegos cargados. `data` es nulo si la carga no dejó registro. ✅ |
+| `GET` | `/api/meta` | Versión de la aplicación y de los datos: commits de PokeAPI y de sus imágenes (`sprites_commit`, nulo si la carga no incluye imágenes), fecha de la carga y juegos cargados. `data` es nulo si la carga no dejó registro. ✅ |

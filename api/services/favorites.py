@@ -6,6 +6,7 @@ from api.errors import NotFoundError
 from api.repositories import reference as reference_repo
 from api.repositories import user as user_repo
 from api.schemas.favorites import FavoriteOut, FavoritesOut
+from api.services.images import image_url
 
 
 def list_favorites(user: Session, reference: Session) -> FavoritesOut:
@@ -17,6 +18,7 @@ def list_favorites(user: Session, reference: Session) -> FavoritesOut:
             name=row.name,
             dex_number=row.dex_number,
             types=list(row.types),
+            image_url=image_url(row.slug, row.has_image),
             added_at=added[row.slug],
         )
         for row in rows
@@ -35,6 +37,7 @@ def add_favorite(user: Session, reference: Session, pokemon: str) -> FavoriteOut
         name=row.name,
         dex_number=row.dex_number,
         types=list(row.types),
+        image_url=image_url(row.slug, row.has_image),
         added_at=favorite.added_at,
     )
 

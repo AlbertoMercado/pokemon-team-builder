@@ -9,6 +9,10 @@ class DataVersion(BaseModel):
     """The load that built reference.sqlite."""
 
     pokeapi_commit: str | None = Field(description="Commit del volcado de PokeAPI usado.")
+    sprites_commit: str | None = Field(
+        description="Commit del repositorio de imágenes de PokeAPI usado; nulo si la carga no "
+        "incluye imágenes."
+    )
     ingested_at: datetime = Field(description="Cuándo terminó la carga.")
     games: list[str] = Field(description="Juegos cargados.")
 

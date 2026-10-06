@@ -46,6 +46,7 @@ curl http://127.0.0.1:8000/api/meta
   "app_version": "1.0.0",
   "data": {
     "pokeapi_commit": "bc92d3b…",
+    "sprites_commit": "8491ffd…",
     "ingested_at": "2026-10-04T09:25:10Z",
     "games": ["red", "blue", "yellow", "gold", "silver", "crystal", "ruby", "sapphire", "emerald", "firered", "leafgreen"]
   }
@@ -53,8 +54,8 @@ curl http://127.0.0.1:8000/api/meta
 ```
 
 - `app_version`: la versión de la aplicación.
-- `data`: la carga de datos con la que trabaja: el commit de PokeAPI (aquí abreviado; la API
-  devuelve los 40 caracteres), cuándo terminó y qué juegos tiene.
+- `data`: la carga de datos con la que trabaja: los commits de PokeAPI y de sus imágenes (aquí
+  abreviados; la API devuelve los 40 caracteres), cuándo terminó y qué juegos tiene.
 
 Si has vuelto a cargar los datos y `ingested_at` sigue siendo la fecha anterior, reinicia la
 API.
@@ -79,6 +80,15 @@ curl http://127.0.0.1:8000/api/pokemon/haunter                # ficha
   métodos, cualquiera sirve.
 - Los tipos son los **actuales**. Para generar equipos se usan los que tenía en el juego
   objetivo.
+- Cada Pokémon trae en `image_url` la dirección de su imagen, o `null` si no la tiene. Las
+  formas regionales tienen la suya. Puedes abrirla en el navegador o descargarla:
+
+```bash
+curl -o vulpix.png http://127.0.0.1:8000/api/pokemon/vulpix-alola/image
+```
+
+  Las imágenes son de Nintendo, Creatures, GAME FREAK y The Pokémon Company; la carga de datos
+  las descarga del repositorio de PokeAPI a tu ordenador y la API las sirve desde ahí.
 
 ## Favoritos
 
@@ -265,6 +275,7 @@ curl -X DELETE http://127.0.0.1:8000/api/hall-of-fame/1
 
 | Respuesta | Causa | Solución |
 |-----------|-------|----------|
+| `404` al pedir una imagen | Esa forma no tiene imagen: la carga no pudo descargarla, o se ha borrado la caché. | Repite la [carga](cargar-datos.md) con conexión; el informe dice qué formas no tienen imagen. |
 | `503` «No hay datos de referencia…» | No se han cargado los datos. | Ejecuta la [carga](cargar-datos.md); la siguiente petición ya los encuentra. |
 | `503` «Los datos de referencia son de una versión anterior…» | Has actualizado la aplicación y la nueva versión necesita datos que la carga anterior no tiene. | Repite la [carga](cargar-datos.md) y reinicia la API. |
 | `404` al consultar una ficha | La forma no existe en los datos cargados. | Búscala en la lista (`?q=`) para ver su identificador. |

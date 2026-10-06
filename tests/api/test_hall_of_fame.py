@@ -58,12 +58,19 @@ def test_register_a_team(client: TestClient) -> None:
         "order": 1,
         "last": True,
         "members": [
-            {"position": 1, "pokemon": "gengar", "name": "Gengar", "types": ["ghost", "poison"]},
+            {
+                "position": 1,
+                "pokemon": "gengar",
+                "name": "Gengar",
+                "types": ["ghost", "poison"],
+                "image_url": None,
+            },
             {
                 "position": 2,
                 "pokemon": "magneton",
                 "name": "Magneton",
                 "types": ["electric", "steel"],
+                "image_url": None,
             },
         ],
     }

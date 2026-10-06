@@ -46,6 +46,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/pokemon/{pokemon}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Imagen de un Pokémon
+         * @description La imagen de la forma (su *sprite* de PokeAPI), que la carga de datos guarda en la caché
+         *     local. Es la URL que dan las respuestas en `image_url`. `404` si la forma no existe o no
+         *     tiene imagen.
+         */
+        get: operations["pokemon_image_api_pokemon__pokemon__image_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/favorites": {
         parameters: {
             query?: never;
@@ -391,6 +413,11 @@ export interface components {
              * @description Si está en favoritos.
              */
             favorite: boolean;
+            /**
+             * Image Url
+             * @description URL de su imagen en esta API (`/api/pokemon/{pokemon}/image`); nula si la forma no tiene imagen.
+             */
+            image_url: string | null;
         };
         ConditionValue: string | number | boolean;
         /** ConfirmationIn */
@@ -420,6 +447,11 @@ export interface components {
              * @description Commit del volcado de PokeAPI usado.
              */
             pokeapi_commit: string | null;
+            /**
+             * Sprites Commit
+             * @description Commit del repositorio de imágenes de PokeAPI usado; nulo si la carga no incluye imágenes.
+             */
+            sprites_commit: string | null;
             /**
              * Ingested At
              * Format: date-time
@@ -517,6 +549,11 @@ export interface components {
              * @description Tipos actuales (de la última generación cargada).
              */
             types: string[];
+            /**
+             * Image Url
+             * @description URL de su imagen en esta API (`/api/pokemon/{pokemon}/image`); nula si la forma no tiene imagen.
+             */
+            image_url: string | null;
             /**
              * Added At
              * Format: date-time
@@ -702,6 +739,11 @@ export interface components {
              * @description Tipos que tenía en ese juego, copiados al registrarlo.
              */
             types: string[];
+            /**
+             * Image Url
+             * @description URL de su imagen en esta API (`/api/pokemon/{pokemon}/image`); nula si la forma no tiene imagen.
+             */
+            image_url: string | null;
         };
         /**
          * HallOfFamePatch
@@ -758,6 +800,11 @@ export interface components {
              * @description Si está en favoritos.
              */
             favorite: boolean;
+            /**
+             * Image Url
+             * @description URL de su imagen en esta API (`/api/pokemon/{pokemon}/image`); nula si la forma no tiene imagen.
+             */
+            image_url: string | null;
             /**
              * Stage
              * @description Etapa en la línea: 1 para la primera.
@@ -848,6 +895,11 @@ export interface components {
              */
             favorite: boolean;
             /**
+             * Image Url
+             * @description URL de su imagen en esta API (`/api/pokemon/{pokemon}/image`); nula si la forma no tiene imagen.
+             */
+            image_url: string | null;
+            /**
              * Generation
              * @description Generación en que apareció la especie.
              */
@@ -891,6 +943,11 @@ export interface components {
              * @description Tipos en el juego objetivo, el primario primero.
              */
             types: string[];
+            /**
+             * Image Url
+             * @description URL de su imagen en esta API (`/api/pokemon/{pokemon}/image`); nula si la forma no tiene imagen.
+             */
+            image_url: string | null;
         };
         /** PresenceOut */
         PresenceOut: {
@@ -1213,6 +1270,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PokemonDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pokemon_image_api_pokemon__pokemon__image_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pokemon: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description La imagen, en PNG. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
                 };
             };
             /** @description Validation Error */

@@ -34,7 +34,8 @@ TYPES = (
 
 @dataclass(frozen=True)
 class Form:
-    """A form to load; ``types`` maps each generation to the types it has in it."""
+    """A form to load; ``types`` maps each generation to the types it has in it, and ``image``
+    is the path of its sprite relative to the data directory."""
 
     slug: str
     dex: int
@@ -42,6 +43,7 @@ class Form:
     name: str = ""
     species: str = ""
     region: str | None = None
+    image: str | None = None
 
 
 def form(
@@ -52,6 +54,7 @@ def form(
     species: str = "",
     region: str | None = None,
     past: dict[int, tuple[str, ...]] | None = None,
+    image: str | None = None,
 ) -> Form:
     """A form with ``types`` in the 3rd generation and, optionally, other types before."""
     return Form(
@@ -61,6 +64,7 @@ def form(
         slug.replace("-", " ").title(),
         species or slug,
         region,
+        image,
     )
 
 
@@ -86,6 +90,7 @@ def reference_database(
     pokemon: Sequence[Form] = (),
     games: Sequence[GameRow] = DEFAULT_GAMES,
     pokeapi_commit: str | None = "bc92d3b",
+    sprites_commit: str | None = None,
 ) -> Path:
     """A reference.sqlite with the 3 first generations, the given forms and games, and the
     record of its load."""
@@ -137,6 +142,7 @@ def reference_database(
                     is_default=f.region is None,
                     region=f.region,
                     pokeapi_id=pokeapi_id,
+                    image=f.image,
                 )
             )
             session.flush()
@@ -150,6 +156,7 @@ def reference_database(
                 started_at=LOADED_AT,
                 finished_at=LOADED_AT,
                 pokeapi_commit=pokeapi_commit,
+                sprites_commit=sprites_commit,
                 games=[g.slug for g in games],
             )
         )

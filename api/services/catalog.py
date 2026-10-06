@@ -22,6 +22,7 @@ from api.schemas.catalog import (
     LineMemberOut,
     PokemonDetailOut,
 )
+from api.services.images import image_url
 from db.reference import Species
 
 
@@ -107,4 +108,5 @@ def _out(row: PokemonRow, favorites: set[str]) -> CatalogPokemonOut:
         types=list(row.types),
         region=row.region,
         favorite=row.slug in favorites,
+        image_url=image_url(row.slug, row.has_image),
     )

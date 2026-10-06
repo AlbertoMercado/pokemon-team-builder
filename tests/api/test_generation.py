@@ -82,6 +82,7 @@ def test_firered_gives_the_engine_teams(client: TestClient) -> None:
         "name": "Lapras",
         "dex_number": 131,
         "types": ["water", "ice"],
+        "image_url": None,
     }
 
 

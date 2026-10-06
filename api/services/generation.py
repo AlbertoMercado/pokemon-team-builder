@@ -12,6 +12,7 @@ from sqlmodel import Session
 
 from api.errors import ConflictError, InvalidValueError
 from api.repositories import meta as meta_repo
+from api.repositories import reference as reference_repo
 from api.repositories import user as user_repo
 from api.schemas.generation import (
     ConfirmedFactOut,
@@ -25,12 +26,13 @@ from api.schemas.generation import (
     SuggestionOut,
     TeamOut,
 )
-from api.schemas.meta import DataVersion
 from api.schemas.review import ReviewStatus
 from api.schemas.team_check import TeamCheckOut, TeamProblemOut
 from api.services import hall_of_fame
 from api.services import review as review_service
 from api.services.context import GameReference, build_context, to_stored
+from api.services.images import image_url
+from api.services.meta import data_version
 from api.services.rounding import largest_remainder, percentage, round_half_up
 from api.services.rules import current_settings
 from core.domain import GameContext, PokemonData
@@ -105,7 +107,7 @@ def generate_teams(user: Session, reference: Session, game: GameReference) -> Ge
             )
     confirmed_keys = {fact.fact_key for fact in confirmed}
 
-    run = meta_repo.ingest_run(reference)
+    with_image = reference_repo.forms_with_image(reference)
     return GenerationOut(
         game=game.slug,
         status=result.status,
@@ -113,32 +115,32 @@ def generate_teams(user: Session, reference: Session, game: GameReference) -> Ge
         score=round_half_up(result.teams[0].score.total),
         groups=[
             GroupOut(
-                positions=[[_pokemon(p) for p in alternatives] for alternatives in group.positions],
-                teams=[_team(team) for team in group.teams],
+                positions=[
+                    [_pokemon(p, with_image) for p in alternatives]
+                    for alternatives in group.positions
+                ],
+                teams=[_team(team, with_image) for team in group.teams],
             )
             for group in result.groups
         ],
         discards=[_discard(game, d, confirmed_keys) for d in result.discards],
         presence=[_presence(p) for p in result.presence],
         confirmed_facts=confirmed,
-        data_version=None
-        if run is None
-        else DataVersion(
-            pokeapi_commit=run.pokeapi_commit, ingested_at=run.finished_at, games=run.games
-        ),
+        data_version=data_version(meta_repo.ingest_run(reference)),
     )
 
 
-def _pokemon(pokemon: PokemonData) -> PokemonOut:
+def _pokemon(pokemon: PokemonData, with_image: set[str]) -> PokemonOut:
     return PokemonOut(
         pokemon=pokemon.slug,
         name=pokemon.name,
         dex_number=pokemon.dex_number,
         types=list(pokemon.types),
+        image_url=image_url(pokemon.slug, pokemon.slug in with_image),
     )
 
 
-def _team(team: RankedTeam) -> TeamOut:
+def _team(team: RankedTeam, with_image: set[str]) -> TeamOut:
     breakdown = team.score.breakdown
     contributions = largest_remainder([rule.contribution for rule in breakdown])
     return TeamOut(
@@ -156,17 +158,19 @@ def _team(team: RankedTeam) -> TeamOut:
             )
             for rule, contribution in zip(breakdown, contributions, strict=True)
         ],
-        open_slots=[_slots(slots) for slots in team.open_slots],
+        open_slots=[_slots(slots, with_image) for slots in team.open_slots],
     )
 
 
-def _slots(slots: OpenSlots) -> OpenSlotsOut:
+def _slots(slots: OpenSlots, with_image: set[str]) -> OpenSlotsOut:
     return OpenSlotsOut(
         count=slots.count,
         rule_id=slots.rule_id,
         suggestions=[
             SuggestionOut(
-                pokemon=_pokemon(s.pokemon), gain=round_half_up(s.gain), verified=s.verified
+                pokemon=_pokemon(s.pokemon, with_image),
+                gain=round_half_up(s.gain),
+                verified=s.verified,
             )
             for s in slots.suggestions
         ],

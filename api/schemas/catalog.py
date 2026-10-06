@@ -12,6 +12,10 @@ class CatalogPokemonOut(BaseModel):
     types: list[str] = Field(description="Tipos actuales (de la última generación cargada).")
     region: str | None = Field(description="Región de una forma regional (`alola`, `galar`…).")
     favorite: bool = Field(description="Si está en favoritos.")
+    image_url: str | None = Field(
+        description="URL de su imagen en esta API (`/api/pokemon/{pokemon}/image`); nula si la "
+        "forma no tiene imagen."
+    )
 
 
 class CatalogOut(BaseModel):

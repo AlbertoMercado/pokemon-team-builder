@@ -106,8 +106,8 @@ Cambios en `reference.sqlite`, que se reconstruye en cada carga, así que no hay
 
 ### API
 
-- `GET /api/pokemon/{pokemon}/image` devuelve el PNG con `Cache-Control: max-age` largo, porque
-  la imagen de un commit no cambia. Devuelve `404` si la forma no existe, no tiene imagen o el
+- `GET /api/pokemon/{pokemon}/image` devuelve el PNG con `Cache-Control: max-age` de un día:
+  la imagen solo cambia con una carga nueva. Devuelve `404` si la forma no existe, no tiene imagen o el
   fichero ya no está en el disco.
     - La ruta sale de `pokemon.image`, nunca de la URL. Antes de abrirla se comprueba que, una
       vez resuelta, queda dentro del directorio de datos.
@@ -120,6 +120,21 @@ Cambios en `reference.sqlite`, que se reconstruye en cada carga, así que no hay
 - `GET /api/meta` incluye `sprites_commit` en la versión de los datos.
 - Son campos y un endpoint nuevos, compatibles con los clientes actuales: la versión será
   **MENOR** ([versiones](../05-operacion/versiones.md#numeracion)).
+
+#### Decisiones tomadas al implementar la fase 2
+
+- **Un día de caché, sin `304`**: el `FileResponse` de Starlette envía `ETag`, pero no responde
+  `304` a las peticiones condicionales. Con imágenes de 1 KB no compensa programarlo: el
+  navegador guarda cada una un día (`max-age=86400`) y después la vuelve a descargar.
+- **Qué formas tienen imagen**: el catálogo, la ficha, los favoritos y el *Hall of Fame* lo
+  leen de la propia fila de cada forma (`PokemonRow.has_image`). La generación trabaja con los
+  modelos de `core/`, que no saben nada de imágenes, así que lee una vez el conjunto de formas
+  con imagen (`forms_with_image`).
+- **Datos de prueba de la web**: los campos nuevos son obligatorios en el contrato, así que los
+  datos simulados de los tests de la web (`web/src/test/server.ts`) los incluyen ya, con
+  `image_url: null`, hasta la fase 3.
+- **Comprobado con los datos reales**: con la carga de la fase 1, el catálogo tarda 9 ms con
+  `image_url`, y la imagen de Bulbasaur se sirve en PNG (543 B).
 
 ### Web
 
@@ -157,7 +172,7 @@ flowchart LR
 |------|------|-----------|-------|
 | 0 ✅ | `docs/imagenes-pokemon` | ADR-0010, este plan y las comprobaciones previas. | — |
 | 1 ✅ | `feat/ingesta-imagenes` | `sprites_commit`, `pokemon.pokeapi_id` e `image`, `SpriteCache`, imágenes y avisos en el informe, `ingest_run.sprites_commit`. Operación de la ingesta, modelo de datos y puesta en producción (copiar las imágenes con `reference.sqlite`). | Sin red, con un PNG mínimo creado en el test (CA-56): imagen en caché, descarga del commit fijado, `404`, servidor que no responde, fichero que no es PNG, `--offline` con la caché vacía, peticiones espaciadas, `pokeapi_id` de las formas, carga correcta aunque falten imágenes y caché fuera de git. |
-| 2 | `feat/api-imagenes` | Endpoint de la imagen, `image_url` en las respuestas, `sprites_commit` en `/api/meta`, cliente regenerado. API, Operación y manual de la API. | `200` con `image/png` y `Cache-Control`; `404` sin forma, sin imagen o sin fichero; una ruta fuera del directorio de datos no se sirve; `image_url` presente o nula en cada respuesta. |
+| 2 ✅ | `feat/api-imagenes` | Endpoint de la imagen, `image_url` en las respuestas, `sprites_commit` en `/api/meta`, cliente regenerado. API, Operación y manual de la API. | `200` con `image/png` y `Cache-Control`; `404` sin forma, sin imagen o sin fichero; una ruta fuera del directorio de datos no se sirve; `image_url` presente o nula en cada respuesta. |
 | 3 | `feat/web-imagenes` | `PokemonSprite`, imágenes en todas las pantallas de RF-17 y aviso de titularidad. Manual de la web, plan de la web y CHANGELOG. | Vitest: con imagen, sin `image_url`, error de carga y `alt` vacío. E2E: el flujo de nuevo juego sigue funcionando sin imágenes. |
 | 4 | `feat/web-imagen-ficha` (si hace falta) | Valorar los *sprites* en la web (CA-54) y, si hace falta, usar una imagen más grande en la ficha, ampliando ADR-0010. Publicar la versión 1.1.0. | Los de la fase 3 para la imagen nueva. |
 
@@ -184,4 +199,4 @@ Los tests siguen sin red: `tests/conftest.py` hace fallar cualquier petición HT
 | Una forma regional usa el número de la Pokédex y muestra la imagen de la forma base. | La regla es usar siempre `pokeapi_id`, y los tests incluyen Vulpix de Alola. |
 | El endpoint sirve un fichero fuera del directorio de datos. | La ruta sale de la base de datos y se comprueba tras resolverla, con un test. |
 | Los *sprites* de 96 px, con mucho margen transparente, quedan pequeños en la ficha. | Fase 4: se valora en la web y, si hace falta, se usa la ilustración oficial en la ficha. |
-| El catálogo pide 386 imágenes. | `loading="lazy"`, ficheros de 1 KB y `Cache-Control` largo: el navegador las pide una vez. |
+| El catálogo pide 386 imágenes. | `loading="lazy"`, ficheros de 1 KB y `Cache-Control` de un día: el navegador las pide una vez al día. |

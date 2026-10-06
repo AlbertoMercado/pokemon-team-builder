@@ -23,6 +23,7 @@ from api.schemas.hall_of_fame import (
     HallOfFamePatch,
 )
 from api.services.context import GameReference
+from api.services.images import image_url
 from core.domain import HallOfFameEntry, JourneyMember
 from db import user as user_db
 from db.reference import Game
@@ -41,9 +42,11 @@ def list_entries(
     ordered = _in_journey_order(user_repo.hall_of_fame(user))
     games = reference_repo.all_games(reference)
     slugs = {member.pokemon for _, members in ordered for member in members}
-    names = {row.slug: row.name for row in reference_repo.pokemon_rows(reference, slugs)}
+    rows = reference_repo.pokemon_rows(reference, slugs)
+    names = {row.slug: row.name for row in rows}
+    with_image = {row.slug for row in rows if row.has_image}
     return [
-        _out(entry, members, order, order == len(ordered), _Names(games, names))
+        _out(entry, members, order, order == len(ordered), _Names(games, names, with_image))
         for order, (entry, members) in enumerate(ordered, start=1)
         if game is None or entry.game == game
     ]
@@ -146,10 +149,12 @@ def _members(reference: Session, game: Game, slugs: Sequence[str]) -> list[Membe
 
 @dataclass(frozen=True)
 class _Names:
-    """The loaded games and the Spanish names of the forms, to show the entries."""
+    """The loaded games, and the Spanish names of the forms and those with image, to show the
+    entries."""
 
     games: dict[str, Game]
     pokemon: dict[str, str]
+    with_image: set[str]
 
 
 def _out(
@@ -176,6 +181,7 @@ def _out(
                 pokemon=m.pokemon,
                 name=names.pokemon.get(m.pokemon, m.pokemon),
                 types=list(m.types),
+                image_url=image_url(m.pokemon, m.pokemon in names.with_image),
             )
             for m in members
         ],

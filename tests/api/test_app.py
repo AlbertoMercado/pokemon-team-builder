@@ -72,6 +72,7 @@ def test_meta_gives_the_versions_of_the_app_and_the_data(
         "app_version": _version(),
         "data": {
             "pokeapi_commit": "bc92d3b",
+            "sprites_commit": None,
             "ingested_at": "2026-10-04T10:00:00Z",
             "games": ["firered", "leafgreen"],
         },

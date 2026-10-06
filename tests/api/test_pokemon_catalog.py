@@ -44,6 +44,7 @@ def test_every_form_in_pokedex_order(client: TestClient) -> None:
         "types": ["grass", "poison"],
         "region": None,
         "favorite": False,
+        "image_url": None,
     }
     numbers = [p["dex_number"] for p in body["pokemon"]]
     assert numbers == sorted(numbers)

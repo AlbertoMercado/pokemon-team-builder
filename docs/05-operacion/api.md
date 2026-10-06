@@ -88,5 +88,6 @@ Al cambiar un modelo de `db/user/models.py`:
 | `api/web.py` | Sirve la web compilada en `/`, después de las rutas de la API, con vuelta a `index.html` para las rutas de la web y sin tapar `/api`. |
 | `api/database.py` | `Databases`: migra y abre `user.sqlite` al arrancar y abre `reference.sqlite` cuando una petición lo necesita (`503` si no existe o si le faltan tablas o columnas porque lo cargó una versión anterior, con `db.reference.missing_columns`). Dependencias `reference_session` y `user_session` para los endpoints. |
 | `api/openapi.py` | Exporta el contrato OpenAPI de `create_app()` sin arrancar la API: `uv run python -m api.openapi [FICHERO]`. Lo usa la web para generar su cliente ([web](web.md#cliente-de-la-api)). |
+| `api/services/images.py` | `image_url` de cada forma en las respuestas y `image_file`, que da el fichero de su imagen dentro del directorio de datos (`404` si no tiene o está fuera de él). Lo usa `GET /api/pokemon/{pokemon}/image` ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)). |
 | `api/errors.py` | Errores de los casos de uso (`NotFoundError`, `ConflictError`) y su traducción a `404` y `409`. |
 | `db/user/` | Modelos de `user.sqlite`, `upgrade(path)` y las migraciones. |

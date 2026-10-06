@@ -34,6 +34,7 @@ export const meta: Meta = {
   app_version: "0.9.0",
   data: {
     pokeapi_commit: "bc92d3b",
+    sprites_commit: null,
     ingested_at: "2026-10-04T10:00:00Z",
     games: ["firered", "leafgreen"],
   },
@@ -48,7 +49,16 @@ const form = (
   types: string[],
   stage: number,
   region: string | null = null,
-): Form => ({ pokemon, name, dex_number, types, region, stage, generation: region ? 7 : 1 });
+): Form => ({
+  pokemon,
+  name,
+  dex_number,
+  types,
+  region,
+  image_url: null,
+  stage,
+  generation: region ? 7 : 1,
+});
 
 /** The forms of the catalogue, in order of the National Pokédex. */
 export const FORMS: Form[] = [
@@ -205,8 +215,16 @@ function confirmFact(key: string, value: ReviewValue): ReviewFact | undefined {
 }
 
 function catalogEntry(entry: Form): CatalogPokemon {
-  const { pokemon, name, dex_number, types, region } = entry;
-  return { pokemon, name, dex_number, types, region, favorite: favoriteSet.has(pokemon) };
+  const { pokemon, name, dex_number, types, region, image_url } = entry;
+  return {
+    pokemon,
+    name,
+    dex_number,
+    types,
+    region,
+    image_url,
+    favorite: favoriteSet.has(pokemon),
+  };
 }
 
 function findForm(pokemon: string): Form | undefined {
@@ -219,6 +237,7 @@ function favoritesOut(): FavoritesOut {
     name: entry.name,
     dex_number: entry.dex_number,
     types: entry.types,
+    image_url: entry.image_url,
     added_at: "2026-10-01T09:00:00Z",
   }));
   return { total: favorites.length, favorites };
@@ -299,6 +318,7 @@ function journey(game: string | null): HallOfFameEntry[] {
         pokemon,
         name: member(pokemon)?.name ?? pokemon,
         types: member(pokemon)?.types ?? [],
+        image_url: null,
       })),
     }))
     .filter((entry) => game === null || entry.game === game);
@@ -335,7 +355,7 @@ const generated = (
   name: string,
   dex_number: number,
   types: string[],
-): GeneratedPokemon => ({ pokemon, name, dex_number, types });
+): GeneratedPokemon => ({ pokemon, name, dex_number, types, image_url: null });
 
 const MAGNETON = generated("magneton", "Magneton", 82, ["electric", "steel"]);
 const CLOYSTER = generated("cloyster", "Cloyster", 91, ["water", "ice"]);
