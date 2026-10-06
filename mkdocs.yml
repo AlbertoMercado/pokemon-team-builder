@@ -70,6 +70,7 @@ nav:
       - Plan del motor: 02-ddt/plan-motor.md
       - Plan de la API: 02-ddt/plan-api.md
       - Plan de la web: 02-ddt/plan-web.md
+      - Plan de las imágenes: 02-ddt/plan-imagenes.md
   - Decisiones (ADR):
       - 03-adr/index.md
       - Plantilla: 03-adr/0000-plantilla.md
@@ -82,6 +83,7 @@ nav:
       - "0007 · Cliente generado desde OpenAPI": 03-adr/0007-cliente-generado-openapi.md
       - "0008 · Cargas bloqueadas": 03-adr/0008-cargas-bloqueadas.md
       - "0009 · Despliegue en una VM gratuita": 03-adr/0009-despliegue-vm-gratuita-tailscale.md
+      - "0010 · Imágenes de los Pokémon": 03-adr/0010-imagenes-pokemon-cache-local.md
   - Manual de usuario:
       - 04-manual-usuario/index.md
       - Cargar y actualizar los datos: 04-manual-usuario/cargar-datos.md

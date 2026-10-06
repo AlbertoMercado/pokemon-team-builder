@@ -29,7 +29,8 @@ los requisitos del [DDF](../01-ddf/requisitos-funcionales.md).
 de los Pokémon ([CA-52](../01-ddf/cuestiones-abiertas.md#resueltas)). Las imágenes de los
 Pokémon y las portadas de los juegos quedan como mejora posterior
 ([RF-17](../01-ddf/requisitos-funcionales.md#rf-17),
-[RF-18](../01-ddf/requisitos-funcionales.md#rf-18)).
+[RF-18](../01-ddf/requisitos-funcionales.md#rf-18)); las de los Pokémon tienen su
+[plan](plan-imagenes.md).
 
 ## Principios
 
