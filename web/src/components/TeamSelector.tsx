@@ -15,6 +15,7 @@ import type { HallOfFameEntry, TeamCheck, TeamGroup } from "../api/types";
 import { todayIso } from "../lib/format";
 import { alternatives } from "../lib/generation";
 import ErrorMessage from "./ErrorMessage";
+import PokemonSprite from "./PokemonSprite";
 
 const FIELD = "rounded border border-slate-300 bg-white px-2 py-1";
 const BUTTON = "rounded px-4 py-2 font-semibold disabled:cursor-not-allowed disabled:opacity-50";
@@ -141,6 +142,7 @@ export default function TeamSelector({ game, groups, onRegistered, onDiscard }: 
                       changed();
                     }}
                   />
+                  <PokemonSprite url={pokemon.image_url} />
                   {pokemon.name}
                 </label>
               ))}

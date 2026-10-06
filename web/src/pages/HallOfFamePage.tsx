@@ -16,6 +16,7 @@ import {
 } from "../api/queries/hallOfFame";
 import type { Game, HallOfFameEntry, HallOfFameEntryIn } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
+import PokemonSprite from "../components/PokemonSprite";
 import TeamEditor, { TEAM_SIZE } from "../components/TeamEditor";
 import { TypeBadges } from "../components/TypeBadge";
 import { formatDate, todayIso } from "../lib/format";
@@ -180,6 +181,7 @@ function Entry({ entry, games }: { entry: HallOfFameEntry; games: Game[] }) {
             key={member.position}
             className="flex flex-wrap items-center gap-2 rounded border border-slate-200 px-2 py-1"
           >
+            <PokemonSprite url={member.image_url} />
             <span className="font-medium">{member.name}</span>
             <TypeBadges types={member.types} />
           </li>

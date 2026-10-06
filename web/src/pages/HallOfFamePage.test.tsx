@@ -39,6 +39,19 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
     expect(within(team).getByText("Hielo")).toBeVisible();
   });
 
+  it("shows the image of each member of the team (RF-17)", async () => {
+    renderApp("/hall-of-fame");
+    await journey();
+
+    const team = within(screen.getByRole("listitem", { name: /Rojo Fuego/ })).getByRole("list", {
+      name: "Equipo",
+    });
+    const images = Array.from(team.querySelectorAll("img")).map((image) =>
+      image.getAttribute("src"),
+    );
+    expect(images).toEqual(["/api/pokemon/venusaur/image", "/api/pokemon/lapras/image"]);
+  });
+
   it("records by hand a game that is not a target game, in the order of the journey", async () => {
     renderApp("/hall-of-fame");
     await journey();

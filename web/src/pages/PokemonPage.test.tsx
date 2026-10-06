@@ -20,6 +20,19 @@ describe("Ficha", () => {
     expect(screen.getByRole("link", { name: "Haunter", current: "page" })).toBeInTheDocument();
   });
 
+  it("shows the image of the form, larger in the heading, and of its line (RF-17)", async () => {
+    renderApp("/pokemon/venusaur");
+    expect(await screen.findByRole("heading", { level: 1, name: "Venusaur" })).toBeInTheDocument();
+
+    const images = Array.from(document.querySelectorAll("main img"));
+    expect(images.map((image) => [image.getAttribute("src"), image.getAttribute("width")])).toEqual(
+      [
+        ["/api/pokemon/venusaur/image", "128"],
+        ["/api/pokemon/venusaur/image", "40"],
+      ],
+    );
+  });
+
   it("navigates to the other forms of the line", async () => {
     renderApp("/pokemon/haunter");
     await userEvent.click(await screen.findByRole("link", { name: "Gengar" }));

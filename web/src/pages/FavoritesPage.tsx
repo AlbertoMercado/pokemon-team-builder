@@ -43,6 +43,7 @@ export default function FavoritesPage() {
                   pokemon={favorite.pokemon}
                   name={favorite.name}
                   dexNumber={favorite.dex_number}
+                  imageUrl={favorite.image_url}
                 />
                 <TypeBadges types={favorite.types} />
                 <span className="ml-auto">
