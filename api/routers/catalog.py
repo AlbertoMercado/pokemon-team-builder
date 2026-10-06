@@ -3,10 +3,12 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Query
+from fastapi.responses import FileResponse
 
-from api.dependencies import ReferenceDb, UserDb
+from api.dependencies import DataDir, ReferenceDb, UserDb
 from api.schemas.catalog import CatalogOut, PokemonDetailOut
 from api.services import catalog as service
+from api.services import images
 
 router = APIRouter(prefix="/pokemon", tags=["Catálogo"])
 
@@ -42,3 +44,19 @@ def pokemon_detail(pokemon: str, user: UserDb, reference: ReferenceDb) -> Pokemo
     """Número, nombre, tipos actuales, línea evolutiva completa y el mecanismo de cada
     evolución. `404` si la forma no existe."""
     return service.pokemon_detail(user, reference, pokemon)
+
+
+@router.get(
+    "/{pokemon}/image",
+    summary="Imagen de un Pokémon",
+    response_class=FileResponse,
+    responses={200: {"content": {"image/png": {}}, "description": "La imagen, en PNG."}},
+)
+def pokemon_image(pokemon: str, reference: ReferenceDb, data_dir: DataDir) -> FileResponse:
+    """La imagen de la forma (su *sprite* de PokeAPI), que la carga de datos guarda en la caché
+    local. Es la URL que dan las respuestas en `image_url`. `404` si la forma no existe o no
+    tiene imagen."""
+    path = images.image_file(reference, data_dir, pokemon)
+    return FileResponse(
+        path, media_type="image/png", headers={"Cache-Control": images.CACHE_CONTROL}
+    )

@@ -8,6 +8,7 @@ from sqlmodel import Session
 
 from api.repositories import meta as repository
 from api.schemas.meta import DataVersion, Meta
+from db.reference import IngestRun
 
 PYPROJECT = Path(__file__).resolve().parents[2] / "pyproject.toml"
 
@@ -20,11 +21,17 @@ def app_version() -> str:
     return version
 
 
+def data_version(run: IngestRun | None) -> DataVersion | None:
+    """The load that built reference.sqlite, as the API shows it."""
+    if run is None:
+        return None
+    return DataVersion(
+        pokeapi_commit=run.pokeapi_commit,
+        sprites_commit=run.sprites_commit,
+        ingested_at=run.finished_at,
+        games=run.games,
+    )
+
+
 def meta(reference: Session) -> Meta:
-    run = repository.ingest_run(reference)
-    data = None
-    if run is not None:
-        data = DataVersion(
-            pokeapi_commit=run.pokeapi_commit, ingested_at=run.finished_at, games=run.games
-        )
-    return Meta(app_version=app_version(), data=data)
+    return Meta(app_version=app_version(), data=data_version(repository.ingest_run(reference)))

@@ -1,15 +1,25 @@
-"""Dependencies shared by the routers: the database sessions and the cache of game data."""
+"""Dependencies shared by the routers: the database sessions, the data directory and the
+cache of game data."""
 
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, Request
 from sqlmodel import Session
 
-from api.database import reference_session, user_session
+from api.database import databases, reference_session, user_session
 from api.services.context import GameReference, GameReferences
 
 UserDb = Annotated[Session, Depends(user_session)]
 ReferenceDb = Annotated[Session, Depends(reference_session)]
+
+
+def data_dir(request: Request) -> Path:
+    """The data directory: reference.sqlite, user.sqlite and the cache of the images."""
+    return databases(request).settings.data_dir
+
+
+DataDir = Annotated[Path, Depends(data_dir)]
 
 
 def game_references(request: Request) -> GameReferences:

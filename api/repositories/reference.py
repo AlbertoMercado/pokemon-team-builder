@@ -25,7 +25,10 @@ from db.reference import (
 
 @dataclass(frozen=True)
 class PokemonRow:
-    """A form with its species' data and its types in the latest loaded generation."""
+    """A form with its species' data and its types in the latest loaded generation.
+
+    ``has_image`` tells whether the load obtained its sprite (ADR-0010).
+    """
 
     slug: str
     name: str
@@ -35,10 +38,23 @@ class PokemonRow:
     generation: int
     evolution_chain: int
     region: str | None
+    has_image: bool
 
 
 def pokemon_exists(reference: Session, slug: str) -> bool:
     return reference.get(Pokemon, slug) is not None
+
+
+def pokemon_image(reference: Session, slug: str) -> str | None:
+    """Path of the form's sprite relative to the data directory; ``None`` if it has none or
+    the form does not exist."""
+    form = reference.get(Pokemon, slug)
+    return None if form is None else form.image
+
+
+def forms_with_image(reference: Session) -> set[str]:
+    """The forms whose sprite the load obtained."""
+    return set(reference.exec(select(Pokemon.slug).where(col(Pokemon.image).is_not(None))).all())
 
 
 def pokemon_rows(reference: Session, slugs: Iterable[str] | None = None) -> list[PokemonRow]:
@@ -76,6 +92,7 @@ def pokemon_rows(reference: Session, slugs: Iterable[str] | None = None) -> list
             s.generation,
             s.evolution_chain,
             p.region,
+            p.image is not None,
         )
         for p, s in reference.exec(forms_query)
     ]

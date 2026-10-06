@@ -17,6 +17,10 @@ class HallOfFameMemberOut(BaseModel):
     pokemon: str = Field(description="Identificador de la forma.")
     name: str = Field(description="Nombre en español.")
     types: list[str] = Field(description="Tipos que tenía en ese juego, copiados al registrarlo.")
+    image_url: str | None = Field(
+        description="URL de su imagen en esta API (`/api/pokemon/{pokemon}/image`); nula si la "
+        "forma no tiene imagen."
+    )
 
 
 class HallOfFameEntryOut(BaseModel):
