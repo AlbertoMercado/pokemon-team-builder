@@ -10,7 +10,7 @@ import type { Evolution, LineMember, PokemonDetail } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
 import FavoriteButton from "../components/FavoriteButton";
 import FavoriteHint from "../components/FavoriteHint";
-import PokemonSprite from "../components/PokemonSprite";
+import PokemonSprite, { PokemonArtwork } from "../components/PokemonSprite";
 import { TypeBadges } from "../components/TypeBadge";
 import { describeMethods } from "../lib/evolution";
 import { formatDexNumber } from "../lib/format";
@@ -46,7 +46,7 @@ function Detail({ detail }: { detail: PokemonDetail }) {
       <BackToCatalog />
       <section className="space-y-2">
         <div className="flex flex-wrap items-center gap-3">
-          <PokemonSprite url={detail.image_url} size="large" />
+          <PokemonArtwork url={detail.artwork_url} spriteUrl={detail.image_url} />
           <span className="font-mono text-slate-500">{formatDexNumber(detail.dex_number)}</span>
           <h1 className="text-2xl font-bold">{detail.name}</h1>
           <FavoriteButton pokemon={detail.pokemon} name={detail.name} favorite={detail.favorite} />

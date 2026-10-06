@@ -55,11 +55,33 @@ export interface paths {
         };
         /**
          * Imagen de un Pokémon
-         * @description La imagen de la forma (su *sprite* de PokeAPI), que la carga de datos guarda en la caché
-         *     local. Es la URL que dan las respuestas en `image_url`. `404` si la forma no existe o no
-         *     tiene imagen.
+         * @description La imagen de la forma (su *sprite* de PokeAPI, recortado a la figura), que la carga de
+         *     datos guarda en la caché local. Es la URL que dan las respuestas en `image_url`. `404` si
+         *     la forma no existe o no tiene imagen.
          */
         get: operations["pokemon_image_api_pokemon__pokemon__image_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pokemon/{pokemon}/artwork": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ilustración de un Pokémon
+         * @description La ilustración oficial de la forma, de hasta 256 px, para la ficha. La carga de datos la
+         *     guarda en la caché local. Es la URL que da la ficha en `artwork_url`. `404` si la forma no
+         *     existe o no tiene ilustración.
+         */
+        get: operations["pokemon_artwork_api_pokemon__pokemon__artwork_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -900,6 +922,11 @@ export interface components {
              */
             image_url: string | null;
             /**
+             * Artwork Url
+             * @description URL de su ilustración oficial, más grande, para la ficha (`/api/pokemon/{pokemon}/artwork`); nula si la forma no tiene.
+             */
+            artwork_url: string | null;
+            /**
              * Generation
              * @description Generación en que apareció la especie.
              */
@@ -1295,6 +1322,37 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description La imagen, en PNG. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pokemon_artwork_api_pokemon__pokemon__artwork_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pokemon: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description La ilustración, en PNG. */
             200: {
                 headers: {
                     [name: string]: unknown;

@@ -31,7 +31,8 @@ del [plan de la API](plan-api.md#fases). Cómo se arranca: [Operación](../05-op
 |--------|------|-------------|------------|
 | `GET` | `/api/pokemon` | Lista de Pokémon con su número total (`total`). Filtros: `q` (nombre), `type`, `favorite`. ✅ | RF-01 |
 | `GET` | `/api/pokemon/{pokemon}` | Ficha: número, nombre, tipos actuales, línea evolutiva y método de cada evolución. `404` si la forma no existe. ✅ | RF-01, RF-02 |
-| `GET` | `/api/pokemon/{pokemon}/image` | Imagen de la forma, en PNG. `404` si la forma no existe o no tiene imagen. ✅ | RF-17 |
+| `GET` | `/api/pokemon/{pokemon}/image` | Imagen de la forma (su *sprite* recortado a la figura), en PNG. `404` si la forma no existe o no tiene imagen. ✅ | RF-17 |
+| `GET` | `/api/pokemon/{pokemon}/artwork` | Ilustración oficial de la forma, de hasta 256 px, en PNG. `404` si la forma no existe o no tiene ilustración. ✅ | RF-17 |
 
 - **Lista**: todas las formas cargadas, en orden de la Pokédex Nacional, cada una con su
   número, su nombre, sus tipos actuales, su región si es una forma regional y si está en
@@ -81,6 +82,8 @@ local ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)). La API la si
   tiene. Está en el catálogo, la ficha y su línea, los favoritos, las posiciones y las
   sugerencias de la generación y los miembros del *Hall of Fame*. La web no construye URLs: solo
   muestra la imagen si viene `image_url` ([RF-17](../01-ddf/requisitos-funcionales.md#rf-17)).
+- **`artwork_url`**: solo en la ficha, la URL de su ilustración oficial, más grande, o `null`.
+  Las listas usan el *sprite* recortado; la ficha, la ilustración.
 - **Respuesta**: el PNG con `Cache-Control: public, max-age=86400`, así que el navegador no la
   vuelve a pedir durante un día. Pesa en torno a 1 KB.
 - **`404`**: si la forma no existe, si la carga no obtuvo su imagen o si el fichero ya no está

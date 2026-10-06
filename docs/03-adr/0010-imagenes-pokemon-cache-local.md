@@ -55,6 +55,25 @@ Lo comprobado en el repositorio [PokeAPI/sprites](https://github.com/PokeAPI/spr
   sigue identificando al Pokémon, también para los lectores de pantalla. Muestra el aviso de
   titularidad y procedencia de las imágenes.
 
+### Ampliación tras la valoración (CA-54, 2026-10-06)
+
+Con las imágenes ya en la web, se midió el margen de los 385 *sprites*: la figura ocupa de
+mediana 56 de sus 96 px (entre 27 y 96), así que a 40 px un Pokémon típico se veía de unos 23 px.
+Tras comparar las opciones en la propia web, el usuario eligió:
+
+- **Listas: el *sprite* recortado a su figura**. La ingesta conserva el original y genera
+  `trimmed/<pokeapi_id>.png` sin el margen transparente; `pokemon.image` apunta a este. Todos se
+  leen bien al mismo tamaño de fila, a cambio de perder la escala relativa (Caterpie se ve tan
+  grande como Gyarados).
+- **Ficha: la ilustración oficial**, `sprites/pokemon/other/official-artwork/{pokeapi_id}.png`
+  del mismo commit. Se reduce a 256 px al descargarla (`official-artwork-256/`), suficiente para
+  mostrarla a 160 px en pantallas de alta densidad: unos 50 KB cada una en lugar de 120 KB. La
+  tabla `pokemon` guarda su ruta en `artwork`, la API la sirve en
+  `GET /api/pokemon/{slug}/artwork` y la ficha da `artwork_url`. Sin ilustración, la ficha
+  muestra el *sprite*.
+- **Pillow** pasa a ser dependencia de la aplicación, solo para procesar las imágenes en la
+  ingesta. La API sirve los ficheros ya procesados.
+
 ## Alternativas consideradas
 
 ### Que la web pida las imágenes directamente a GitHub
@@ -82,6 +101,17 @@ Lo comprobado en el repositorio [PokeAPI/sprites](https://github.com/PokeAPI/spr
   evita descargarlas otra vez.
 - ❌ Mezcla datos binarios grandes con los datos de las reglas.
 
+### Recortar el margen con CSS en lugar de en la ingesta
+
+- ✅ Sin dependencias nuevas.
+- ❌ Cada *sprite* tiene un margen distinto (la figura va de 27 a 96 px): un recorte fijo corta a
+  los Pokémon grandes (el 10 % llega a 75 px o más) y no basta para los pequeños.
+
+### Agrandar los *sprites* en las listas sin recortarlos
+
+- ✅ Solo CSS.
+- ❌ Filas más altas y los Pokémon pequeños siguen viéndose pequeños.
+
 ### Clonar o descargar el repositorio de sprites entero
 
 - ✅ Una sola operación por commit.
@@ -100,8 +130,10 @@ Lo comprobado en el repositorio [PokeAPI/sprites](https://github.com/PokeAPI/spr
 
 ### Negativas / riesgos
 
-- Una primera carga con conexión hace unas 400 peticiones más (una por forma). Se mitiga con el
-  límite de peticiones y la caché.
+- Una primera carga con conexión hace unas 800 peticiones más (el *sprite* y la ilustración de
+  cada forma) y tarda unos 2 minutos y medio. Se mitiga con el límite de peticiones y la caché.
+- La caché de imágenes ocupa unos 23 MB, casi todo las ilustraciones (unos 20 MB).
+- Pillow es una dependencia más, compilada, que hay que mantener al día.
 - `reference.sqlite` deja de ser autosuficiente: las rutas de `image` apuntan a la caché del
   mismo directorio de datos. Si se borra la caché, las formas se ven sin imagen hasta la
   siguiente carga, sin errores. Por eso, al desplegar, hay que copiar la carpeta de las imágenes
@@ -113,7 +145,8 @@ Lo comprobado en el repositorio [PokeAPI/sprites](https://github.com/PokeAPI/spr
 
 - [ ] Implementar las fases del [plan de imágenes de los Pokémon](../02-ddt/plan-imagenes.md)
   (#49).
-- [ ] Valorar cómo quedan los *sprites* y si la ficha usa una imagen más grande (CA-54).
+- [x] Valorar cómo quedan los *sprites* y si la ficha usa una imagen más grande (CA-54): ver
+  la ampliación.
 - [ ] Mostrar en la web el aviso de titularidad de las imágenes junto a la atribución pendiente
   de PokeAPI y WikiDex ([ADR-0004](0004-pokeapi-volcado-csv.md#acciones-derivadas)).
 

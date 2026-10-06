@@ -6,8 +6,8 @@ and the keys that user.sqlite uses still exist (``ingest/user_keys.py``) does it
 previous file, in a single atomic rename. If anything fails, the previous database is kept
 untouched (RF-11, ADR-0003).
 
-Once the rows are stored, each form gets its sprite (ADR-0010). A missing sprite is only a
-warning: the form is loaded without image.
+Once the rows are stored, each form gets its images, the trimmed sprite and the official
+artwork (ADR-0010). A missing image is only a warning: the form is loaded without it.
 """
 
 from collections import defaultdict
@@ -45,7 +45,7 @@ def build_reference(
 ) -> LoadReport:
     """Build reference.sqlite at ``target`` from ``sources`` and report the outcome.
 
-    If ``sprites`` is given, every form gets the path of its sprite; forms without one are
+    If ``sprites`` is given, every form gets the paths of its images; forms without them are
     reported as warnings.
 
     ``checks`` run on the new database; any problem they report rejects the load. Then, if
@@ -133,8 +133,9 @@ def _describe_dangling(
 
 
 def _attach_images(engine: Engine, sprites: SpriteCache, report: LoadReport) -> None:
-    """Store the sprite of every form and report the forms without one."""
+    """Store the images of every form (trimmed sprite and artwork) and report those without."""
     without_image: dict[MissingReason, list[str]] = defaultdict(list)
+    without_artwork: dict[MissingReason, list[str]] = defaultdict(list)
     with Session(engine) as session:
         forms = session.exec(select_model(Pokemon).order_by(col(Pokemon.pokeapi_id))).all()
         for form in forms:
@@ -142,10 +143,25 @@ def _attach_images(engine: Engine, sprites: SpriteCache, report: LoadReport) -> 
                 form.image = sprites.image(form.pokeapi_id)
             except MissingSpriteError as error:
                 without_image[error.reason].append(form.slug)
+            try:
+                form.artwork = sprites.artwork(form.pokeapi_id)
+            except MissingSpriteError as error:
+                without_artwork[error.reason].append(form.slug)
         session.commit()
-    missing = sum(len(slugs) for slugs in without_image.values())
-    report.images = (len(forms) - missing, len(forms))
-    for reason, slugs in without_image.items():
+    report.images = _found(len(forms), without_image)
+    report.artworks = _found(len(forms), without_artwork)
+    report.warnings.extend(_missing_warnings("imagen", without_image))
+    report.warnings.extend(_missing_warnings("ilustración", without_artwork))
+
+
+def _found(forms: int, missing: dict[MissingReason, list[str]]) -> tuple[int, int]:
+    return forms - sum(len(slugs) for slugs in missing.values()), forms
+
+
+def _missing_warnings(what: str, missing: dict[MissingReason, list[str]]) -> list[str]:
+    """One warning per reason: «2 formas sin imagen, <reason>: bulbasaur, ivysaur»."""
+    warnings = []
+    for reason, slugs in missing.items():
         shown = ", ".join(slugs[:MAX_FORMS_WITHOUT_IMAGE])
         more = (
             f" y {len(slugs) - MAX_FORMS_WITHOUT_IMAGE} más"
@@ -153,7 +169,8 @@ def _attach_images(engine: Engine, sprites: SpriteCache, report: LoadReport) -> 
             else ""
         )
         forms_text = "1 forma" if len(slugs) == 1 else f"{len(slugs)} formas"
-        report.warnings.append(f"{forms_text} sin imagen, {reason}: {shown}{more}")
+        warnings.append(f"{forms_text} sin {what}, {reason}: {shown}{more}")
+    return warnings
 
 
 def _rejected_by_user_keys(engine: Engine, user_database: Path, report: LoadReport) -> bool:

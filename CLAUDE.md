@@ -15,7 +15,7 @@ de Pokémon favoritos y un juego objetivo, genera un equipo de 6 según reglas c
 
 | Capa | Tecnología |
 |------|------------|
-| Ingesta de datos | Python 3.13, httpx, mwparserfromhell, pydantic |
+| Ingesta de datos | Python 3.13, httpx, mwparserfromhell, pydantic, Pillow (imágenes, ADR-0010) |
 | Motor y API | FastAPI, SQLModel |
 | Base de datos | SQLite |
 | Frontend | React + Vite + TypeScript + Tailwind |

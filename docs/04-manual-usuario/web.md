@@ -46,6 +46,8 @@ el navegador o guardar un enlace.
 Cada Pokémon se muestra con su imagen junto al nombre: en el catálogo, la ficha y su línea
 evolutiva, los favoritos, el resultado (las posiciones y las sugerencias), el selector del
 equipo y el *Hall of Fame*. Cada forma tiene la suya: Vulpix y Vulpix de Alola se distinguen.
+En las listas es su *sprite*, recortado para que se vea bien a tamaño pequeño; en la cabecera de
+la ficha, su ilustración oficial, más grande.
 
 - La imagen **acompaña** al nombre, no lo sustituye: el nombre sigue siendo lo que identifica al
   Pokémon, también para los lectores de pantalla.

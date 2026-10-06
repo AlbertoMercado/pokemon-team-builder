@@ -22,7 +22,7 @@ from api.schemas.catalog import (
     LineMemberOut,
     PokemonDetailOut,
 )
-from api.services.images import image_url
+from api.services.images import artwork_url, image_url
 from db.reference import Species
 
 
@@ -78,8 +78,10 @@ def pokemon_detail(user: Session, reference: Session, pokemon: str) -> PokemonDe
             methods.items(), key=lambda item: (canonical[item[0][1]], canonical[item[0][0]])
         )
     ]
+    artwork = reference_repo.pokemon_image(reference, row.slug, artwork=True)
     return PokemonDetailOut(
         **_out(row, favorites).model_dump(),
+        artwork_url=artwork_url(row.slug, artwork is not None),
         generation=own.generation,
         species=own.slug,
         is_legendary=own.is_legendary,

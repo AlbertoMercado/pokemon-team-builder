@@ -44,6 +44,7 @@ class Form:
     species: str = ""
     region: str | None = None
     image: str | None = None
+    artwork: str | None = None
 
 
 def form(
@@ -55,6 +56,7 @@ def form(
     region: str | None = None,
     past: dict[int, tuple[str, ...]] | None = None,
     image: str | None = None,
+    artwork: str | None = None,
 ) -> Form:
     """A form with ``types`` in the 3rd generation and, optionally, other types before."""
     return Form(
@@ -65,6 +67,7 @@ def form(
         species or slug,
         region,
         image,
+        artwork,
     )
 
 
@@ -143,6 +146,7 @@ def reference_database(
                     region=f.region,
                     pokeapi_id=pokeapi_id,
                     image=f.image,
+                    artwork=f.artwork,
                 )
             )
             session.flush()

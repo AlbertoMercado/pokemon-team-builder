@@ -147,7 +147,7 @@ sudo install -d -o ptb -g ptb /var/lib/pokemon-team-builder/cache
 sudo rsync -a --chown=ptb:ptb /tmp/pokeapi-sprites/ /var/lib/pokemon-team-builder/cache/pokeapi-sprites/
 ```
 
-Las imágenes de los Pokémon (1,5 MB) se copian con `reference.sqlite`, que guarda sus rutas
+Las imágenes de los Pokémon (unos 23 MB) se copian con `reference.sqlite`, que guarda sus rutas
 dentro del directorio de datos ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)).
 Es una copia tuya en tu servidor, no una redistribución, y no van a git
 ([CA-56](../01-ddf/cuestiones-abiertas.md#resueltas)). Si no las copias, la aplicación funciona

@@ -1,4 +1,5 @@
-"""Images of the forms: GET /api/pokemon/{pokemon}/image and ``image_url`` (RF-17, ADR-0010).
+"""Images of the forms: GET /api/pokemon/{pokemon}/image and /artwork, ``image_url`` and
+``artwork_url`` (RF-17, ADR-0010).
 
 The images belong to their owners and are never versioned (CA-56): these tests use a minimal
 PNG built in ``tests/ingest/test_sprites.py``.
@@ -32,18 +33,24 @@ def _sprite(data_dir: Path, name: str) -> str:
 
 @pytest.fixture
 def client(make_client: ClientFactory, data_dir: Path) -> TestClient:
-    """Vulpix with its sprite, Alolan Vulpix with its own and Gengar without one."""
+    """Vulpix with its sprite and artwork, Alolan Vulpix with its sprite and Gengar without."""
     reference_database(
         data_dir,
         pokemon=[
-            form("vulpix", ("fire",), dex=37, image=_sprite(data_dir, "37.png")),
+            form(
+                "vulpix",
+                ("fire",),
+                dex=37,
+                image=_sprite(data_dir, "trimmed/37.png"),
+                artwork=_sprite(data_dir, "official-artwork-256/37.png"),
+            ),
             form(
                 "vulpix-alola",
                 ("ice",),
                 dex=37,
                 species="vulpix",
                 region="alola",
-                image=_sprite(data_dir, "10103.png"),
+                image=_sprite(data_dir, "trimmed/10103.png"),
             ),
             form("gengar", ("ghost", "poison"), dex=94),
         ],
@@ -69,9 +76,22 @@ def test_no_image_is_a_404(client: TestClient, pokemon: str) -> None:
     assert client.get(f"/api/pokemon/{pokemon}/image").status_code == 404
 
 
+def test_the_artwork_is_served_from_the_data_directory(client: TestClient) -> None:
+    response = client.get("/api/pokemon/vulpix/artwork")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/png"
+    assert response.headers["cache-control"] == "public, max-age=86400"
+
+
+@pytest.mark.parametrize("pokemon", ["vulpix-alola", "missingno"], ids=["without", "unknown"])
+def test_no_artwork_is_a_404(client: TestClient, pokemon: str) -> None:
+    assert client.get(f"/api/pokemon/{pokemon}/artwork").status_code == 404
+
+
 def test_an_image_missing_on_disk_is_a_404(client: TestClient, data_dir: Path) -> None:
     """The cache was deleted after the load: the form is shown without image, no error."""
-    (data_dir / SPRITES / "37.png").unlink()
+    (data_dir / SPRITES / "trimmed" / "37.png").unlink()
     assert client.get("/api/pokemon/vulpix/image").status_code == 404
 
 
@@ -107,6 +127,13 @@ def test_the_detail_and_its_line_give_their_images(client: TestClient) -> None:
     assert {m["pokemon"]: m["image_url"] for m in detail["line"]}["vulpix-alola"] == (
         "/api/pokemon/vulpix-alola/image"
     )
+
+
+def test_only_the_detail_gives_the_artwork(client: TestClient) -> None:
+    """The lists use the trimmed sprite; the detail, the larger official artwork."""
+    assert client.get("/api/pokemon/vulpix").json()["artwork_url"] == "/api/pokemon/vulpix/artwork"
+    assert client.get("/api/pokemon/vulpix-alola").json()["artwork_url"] is None
+    assert "artwork_url" not in client.get("/api/pokemon").json()["pokemon"][0]
 
 
 def test_favourites_give_their_images(client: TestClient) -> None:

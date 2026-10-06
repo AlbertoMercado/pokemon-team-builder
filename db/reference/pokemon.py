@@ -67,9 +67,10 @@ class Pokemon(ReferenceModel, table=True):
 
     Mega evolutions, Gigamax and battle-only forms are not loaded. ``region`` is set only for
     regional forms (``alola``, ``galar``…). ``pokeapi_id`` is the id of the form in PokeAPI,
-    which names its sprite (``10103`` for Alolan Vulpix, not the Pokédex number). ``image`` is
-    the path of the sprite relative to the data directory, or null if it could not be obtained
-    (ADR-0010).
+    which names its images (``10103`` for Alolan Vulpix, not the Pokédex number). ``image`` is
+    the path of its sprite trimmed to the figure, for the lists, and ``artwork`` the one of its
+    official artwork, for the detail; both relative to the data directory, or null if they
+    could not be obtained (ADR-0010).
     """
 
     __tablename__ = "pokemon"
@@ -81,6 +82,7 @@ class Pokemon(ReferenceModel, table=True):
     region: str | None = None
     pokeapi_id: int = Field(unique=True)
     image: str | None = None
+    artwork: str | None = None
 
 
 class PokemonType(ReferenceModel, table=True):
