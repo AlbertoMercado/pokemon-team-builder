@@ -22,6 +22,9 @@ arquitectura se registran como [ADR](../03-adr/index.md).
   cargan.
 - [Plan de implementación de la web](plan-web.md): alcance, principios, pantallas y rutas,
   estructura de `web/`, fases, pruebas y CI.
+- [Plan de las imágenes de los Pokémon](plan-imagenes.md): obtenerlas en la ingesta,
+  servirlas desde la API y mostrarlas en la web (RF-17), con sus comprobaciones previas, fases y
+  riesgos.
 - [Plan de implementación de la API](plan-api.md): alcance, `user.sqlite`, construcción del
   contexto, datos revisables, fases y estrategia de pruebas.
 - [Plan de implementación del motor](plan-motor.md): alcance, interfaz, módulos, cómo se

@@ -14,3 +14,4 @@ Cada decisión de arquitectura relevante se registra como un ADR numerado a part
 | [0007](0007-cliente-generado-openapi.md) | Cliente del frontend generado desde OpenAPI | Aceptado |
 | [0008](0008-cargas-bloqueadas.md) | Cargas bloqueadas: informe para el arquitecto y resolución por nueva versión | Aceptado |
 | [0009](0009-despliegue-vm-gratuita-tailscale.md) | Despliegue en una máquina virtual gratuita con acceso privado por Tailscale | Propuesto |
+| [0010](0010-imagenes-pokemon-cache-local.md) | Imágenes de los Pokémon: sprites de PokeAPI en la caché local, servidos por la API | Aceptado |
