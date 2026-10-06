@@ -69,6 +69,14 @@ cd web && npm run api:generate
 
 Si un cambio de la API rompe la web, `npm run typecheck` lo señala.
 
+!!! note "`openapi-typescript` y TypeScript 6"
+    `openapi-typescript` 7.13 declara que necesita TypeScript `^5.x`, pero el proyecto usa
+    TypeScript 6. El bloque `overrides` de `web/package.json` le hace usar la misma versión que
+    el proyecto, y la CI comprueba que el cliente generado no cambia. Se quita cuando
+    `openapi-typescript` admita TypeScript 6. TypeScript 7 todavía no es posible: ni
+    `openapi-typescript` ni `typescript-eslint` funcionan sin la API de JavaScript del
+    compilador, que TypeScript 7.0 no ofrece.
+
 ## Comprobaciones
 
 | Tarea | Comando (en `web/`) |
