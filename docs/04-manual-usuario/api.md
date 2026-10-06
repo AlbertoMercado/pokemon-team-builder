@@ -43,7 +43,7 @@ curl http://127.0.0.1:8000/api/meta
 
 ```json
 {
-  "app_version": "1.0.0",
+  "app_version": "1.1.0",
   "data": {
     "pokeapi_commit": "bc92d3b…",
     "sprites_commit": "8491ffd…",
