@@ -175,7 +175,7 @@ Cambios en `reference.sqlite`, que se reconstruye en cada carga, así que no hay
   ninguna imagen rota en el catálogo, los favoritos (36), la ficha de Eevee, el resultado de
   Rojo Fuego y el *Hall of Fame*; sin desplazamiento horizontal a 390 px de ancho.
 
-#### Para la valoración (fase 4)
+#### Valoración (fase 4)
 
 Lo observado en las capturas de la fase 3:
 
@@ -185,6 +185,24 @@ Lo observado en las capturas de la fase 3:
 - Opciones: recortar el margen con CSS (`object-fit` con un tamaño mayor y recorte), subir el
   tamaño de las listas a 48-56 px, o usar la ilustración oficial (unos 120 KB cada una) solo en
   la ficha.
+
+Medida del margen en los 385 *sprites* (con Pillow): la figura ocupa de mediana 56 de los
+96 px, con un mínimo de 27 y un máximo de 96; el 10 % pasa de 75 px, así que un recorte fijo
+con CSS cortaría a los grandes. Se compararon en una página las tres opciones para las listas
+(actual, 56 px y recortado a la figura) y, para la ficha, el *sprite* frente a la ilustración.
+
+**Decisión del usuario** ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md#ampliacion-tras-la-valoracion-ca-54-2026-10-06)):
+
+- **Listas**: el *sprite* recortado a su figura, generado en la ingesta con Pillow
+  (`trimmed/<id>.png`). Se mantienen los tamaños de la fase 3.
+- **Ficha**: la ilustración oficial, reducida a 256 px en la ingesta
+  (`official-artwork-256/<id>.png`) y mostrada a 160 px, sin `pixelated`. Sin ilustración, el
+  *sprite* a 128 px.
+
+**Comprobado con los datos reales**: 386 de 386 formas con imagen y con ilustración, en 2 min
+20 s la primera carga. La caché ocupa unos 23 MB: 1,5 MB los *sprites*, 1,5 MB los recortados y
+unos 20 MB las ilustraciones (de unos 50 KB cada una, más de los 15 MB estimados). Ninguna
+imagen rota en los favoritos, la ficha, el resultado y el *Hall of Fame*.
 
 ## Fases
 
@@ -204,7 +222,7 @@ flowchart LR
 | 1 ✅ | `feat/ingesta-imagenes` | `sprites_commit`, `pokemon.pokeapi_id` e `image`, `SpriteCache`, imágenes y avisos en el informe, `ingest_run.sprites_commit`. Operación de la ingesta, modelo de datos y puesta en producción (copiar las imágenes con `reference.sqlite`). | Sin red, con un PNG mínimo creado en el test (CA-56): imagen en caché, descarga del commit fijado, `404`, servidor que no responde, fichero que no es PNG, `--offline` con la caché vacía, peticiones espaciadas, `pokeapi_id` de las formas, carga correcta aunque falten imágenes y caché fuera de git. |
 | 2 ✅ | `feat/api-imagenes` | Endpoint de la imagen, `image_url` en las respuestas, `sprites_commit` en `/api/meta`, cliente regenerado. API, Operación y manual de la API. | `200` con `image/png` y `Cache-Control`; `404` sin forma, sin imagen o sin fichero; una ruta fuera del directorio de datos no se sirve; `image_url` presente o nula en cada respuesta. |
 | 3 ✅ | `feat/web-imagenes` | `PokemonSprite`, imágenes en todas las pantallas de RF-17 y aviso de titularidad. Manual de la web, plan de la web y CHANGELOG. | Vitest: con imagen, sin `image_url`, error de carga y `alt` vacío. E2E: el flujo de nuevo juego sigue funcionando sin imágenes. |
-| 4 | `feat/web-imagen-ficha` (si hace falta) | Valorar los *sprites* en la web (CA-54) y, si hace falta, usar una imagen más grande en la ficha, ampliando ADR-0010. Publicar la versión 1.1.0. | Los de la fase 3 para la imagen nueva. |
+| 4 ✅ | `feat/imagenes-recorte-ilustracion` | Valoración (CA-54): *sprites* recortados a su figura en las listas e ilustración oficial en la ficha, con Pillow en la ingesta, `pokemon.artwork`, `GET /api/pokemon/{pokemon}/artwork` y `artwork_url`. Amplía ADR-0010. Después, publicar la versión 1.1.0. | Recorte y reducción con PNG sintéticos, la ilustración en la caché y en la carga, el endpoint, `artwork_url` solo en la ficha, y la ficha con ilustración y sin ella. |
 
 ## Estrategia de pruebas
 
@@ -225,8 +243,8 @@ Los tests siguen sin red: `tests/conftest.py` hace fallar cualquier petición HT
 | `raw.githubusercontent.com` limita las peticiones o falla durante la carga. | Caché permanente por commit, pausa entre peticiones y una imagen que falta solo genera un aviso: la siguiente carga descarga solo las que faltan. |
 | El repositorio cambia las rutas o reorganiza los ficheros. | Commit fijado. Cambiarlo es un PR que vuelve a hacer las comprobaciones previas. |
 | Se suben imágenes a git. | `data/cache/` está en `.gitignore`, con un test que lo comprueba. |
-| En producción las formas se ven sin imagen: la [puesta en producción](../05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos) copia `reference.sqlite` desde el ordenador, pero no la caché a la que apunta `pokemon.image`. | La [puesta en producción](../05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos) copia también `cache/pokeapi-sprites/` (1,5 MB) al directorio de datos de la VM. Es la copia del propio usuario en su servidor, no una redistribución (CA-56). Si no se copia, la aplicación funciona igual, sin imágenes. |
+| En producción las formas se ven sin imagen: la [puesta en producción](../05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos) copia `reference.sqlite` desde el ordenador, pero no la caché a la que apunta `pokemon.image`. | La [puesta en producción](../05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos) copia también `cache/pokeapi-sprites/` (unos 23 MB) al directorio de datos de la VM. Es la copia del propio usuario en su servidor, no una redistribución (CA-56). Si no se copia, la aplicación funciona igual, sin imágenes. |
 | Una forma regional usa el número de la Pokédex y muestra la imagen de la forma base. | La regla es usar siempre `pokeapi_id`, y los tests incluyen Vulpix de Alola. |
 | El endpoint sirve un fichero fuera del directorio de datos. | La ruta sale de la base de datos y se comprueba tras resolverla, con un test. |
-| Los *sprites* de 96 px, con mucho margen transparente, quedan pequeños en la ficha. | Fase 4: se valora en la web y, si hace falta, se usa la ilustración oficial en la ficha. |
+| Los *sprites* de 96 px, con mucho margen transparente, quedan pequeños. | Fase 4: recortados a su figura en las listas e ilustración oficial en la ficha. |
 | El catálogo pide 386 imágenes. | `loading="lazy"`, ficheros de 1 KB y `Cache-Control` de un día: el navegador las pide una vez al día. |

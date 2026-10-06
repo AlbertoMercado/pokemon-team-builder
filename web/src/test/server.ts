@@ -257,6 +257,8 @@ function detail(found: Form): PokemonDetail {
   });
   return {
     ...catalogEntry(found),
+    // Only Venusaur has an official artwork in these data; the others show their sprite.
+    artwork_url: found.pokemon === "venusaur" ? "/api/pokemon/venusaur/artwork" : null,
     generation: found.generation,
     species: found.pokemon.split("-")[0] ?? found.pokemon,
     is_legendary: false,

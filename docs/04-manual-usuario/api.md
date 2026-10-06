@@ -80,8 +80,9 @@ curl http://127.0.0.1:8000/api/pokemon/haunter                # ficha
   métodos, cualquiera sirve.
 - Los tipos son los **actuales**. Para generar equipos se usan los que tenía en el juego
   objetivo.
-- Cada Pokémon trae en `image_url` la dirección de su imagen, o `null` si no la tiene. Las
-  formas regionales tienen la suya. Puedes abrirla en el navegador o descargarla:
+- Cada Pokémon trae en `image_url` la dirección de su imagen, o `null` si no la tiene, y la
+  ficha además `artwork_url`, la de su ilustración oficial. Las formas regionales tienen las
+  suyas. Puedes abrirla en el navegador o descargarla:
 
 ```bash
 curl -o vulpix.png http://127.0.0.1:8000/api/pokemon/vulpix-alola/image

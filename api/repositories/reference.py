@@ -45,11 +45,13 @@ def pokemon_exists(reference: Session, slug: str) -> bool:
     return reference.get(Pokemon, slug) is not None
 
 
-def pokemon_image(reference: Session, slug: str) -> str | None:
-    """Path of the form's sprite relative to the data directory; ``None`` if it has none or
-    the form does not exist."""
+def pokemon_image(reference: Session, slug: str, *, artwork: bool = False) -> str | None:
+    """Path of the form's trimmed sprite (or of its official artwork) relative to the data
+    directory; ``None`` if it has none or the form does not exist."""
     form = reference.get(Pokemon, slug)
-    return None if form is None else form.image
+    if form is None:
+        return None
+    return form.artwork if artwork else form.image
 
 
 def forms_with_image(reference: Session) -> set[str]:

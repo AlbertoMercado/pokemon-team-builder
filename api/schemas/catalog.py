@@ -49,6 +49,10 @@ class EvolutionOut(BaseModel):
 
 
 class PokemonDetailOut(CatalogPokemonOut):
+    artwork_url: str | None = Field(
+        description="URL de su ilustración oficial, más grande, para la ficha "
+        "(`/api/pokemon/{pokemon}/artwork`); nula si la forma no tiene."
+    )
     generation: int = Field(description="Generación en que apareció la especie.")
     species: str
     is_legendary: bool

@@ -53,10 +53,26 @@ def pokemon_detail(pokemon: str, user: UserDb, reference: ReferenceDb) -> Pokemo
     responses={200: {"content": {"image/png": {}}, "description": "La imagen, en PNG."}},
 )
 def pokemon_image(pokemon: str, reference: ReferenceDb, data_dir: DataDir) -> FileResponse:
-    """La imagen de la forma (su *sprite* de PokeAPI), que la carga de datos guarda en la caché
-    local. Es la URL que dan las respuestas en `image_url`. `404` si la forma no existe o no
-    tiene imagen."""
+    """La imagen de la forma (su *sprite* de PokeAPI, recortado a la figura), que la carga de
+    datos guarda en la caché local. Es la URL que dan las respuestas en `image_url`. `404` si
+    la forma no existe o no tiene imagen."""
     path = images.image_file(reference, data_dir, pokemon)
+    return FileResponse(
+        path, media_type="image/png", headers={"Cache-Control": images.CACHE_CONTROL}
+    )
+
+
+@router.get(
+    "/{pokemon}/artwork",
+    summary="Ilustración de un Pokémon",
+    response_class=FileResponse,
+    responses={200: {"content": {"image/png": {}}, "description": "La ilustración, en PNG."}},
+)
+def pokemon_artwork(pokemon: str, reference: ReferenceDb, data_dir: DataDir) -> FileResponse:
+    """La ilustración oficial de la forma, de hasta 256 px, para la ficha. La carga de datos la
+    guarda en la caché local. Es la URL que da la ficha en `artwork_url`. `404` si la forma no
+    existe o no tiene ilustración."""
+    path = images.image_file(reference, data_dir, pokemon, artwork=True)
     return FileResponse(
         path, media_type="image/png", headers={"Cache-Control": images.CACHE_CONTROL}
     )

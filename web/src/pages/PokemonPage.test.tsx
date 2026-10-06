@@ -20,17 +20,28 @@ describe("Ficha", () => {
     expect(screen.getByRole("link", { name: "Haunter", current: "page" })).toBeInTheDocument();
   });
 
-  it("shows the image of the form, larger in the heading, and of its line (RF-17)", async () => {
+  it("shows the official artwork in the heading and the sprites in the line (RF-17)", async () => {
     renderApp("/pokemon/venusaur");
     expect(await screen.findByRole("heading", { level: 1, name: "Venusaur" })).toBeInTheDocument();
 
     const images = Array.from(document.querySelectorAll("main img"));
     expect(images.map((image) => [image.getAttribute("src"), image.getAttribute("width")])).toEqual(
       [
-        ["/api/pokemon/venusaur/image", "128"],
+        ["/api/pokemon/venusaur/artwork", "160"],
         ["/api/pokemon/venusaur/image", "40"],
       ],
     );
+  });
+
+  it("shows the sprite in the heading of a form without artwork", async () => {
+    renderApp("/pokemon/vulpix-alola");
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Vulpix de Alola" }),
+    ).toBeInTheDocument();
+
+    const heading = document.querySelector("main img");
+    expect(heading).toHaveAttribute("src", "/api/pokemon/vulpix-alola/image");
+    expect(heading).toHaveAttribute("width", "128");
   });
 
   it("navigates to the other forms of the line", async () => {

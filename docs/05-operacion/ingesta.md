@@ -70,15 +70,22 @@ ejecutar la ingesta. La revisión usada queda en `key_battle.source_revision`.
 
 ### Imágenes de los Pokémon
 
-La imagen de cada forma es su *sprite* del repositorio
+Cada forma tiene dos imágenes del repositorio
 [PokeAPI/sprites](https://github.com/PokeAPI/sprites), del commit fijado en
 `sprites_commit` de `data/curated/pokeapi.yaml`
-([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)):
+([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)), con el identificador de la forma
+en PokeAPI (Vulpix de Alola es `10103`). Se guardan en `<data-dir>/cache/pokeapi-sprites/<commit>/`:
+
+| Fichero | Qué es | Dónde se ve |
+|---------|--------|-------------|
+| `<id>.png` | El *sprite* tal como se descarga, de 96 × 96 px. | — |
+| `trimmed/<id>.png` | El *sprite* recortado a su figura, sin el margen transparente (Pillow). | Las listas (`pokemon.image`). |
+| `official-artwork-256/<id>.png` | La ilustración oficial, reducida a 256 px al descargarla. | La ficha (`pokemon.artwork`). |
 
 - **Caché permanente**: cada imagen se descarga una sola vez, fichero a fichero (el repositorio
-  ocupa unos 10 GB), y se guarda en `<data-dir>/cache/pokeapi-sprites/<commit>/<id>.png`, con
-  el identificador de la forma en PokeAPI (Vulpix de Alola es `10103.png`). La primera carga
-  descarga las 386 imágenes en unos 2 minutos; ocupan 1,5 MB en disco.
+  ocupa unos 10 GB). La primera carga descarga las 386 formas en unos 2 minutos y medio; la
+  caché ocupa unos 23 MB, casi todo las ilustraciones. El recorte se rehace solo si falta su
+  fichero.
 - **Peticiones espaciadas**: como mucho cinco por segundo, con el mismo `User-Agent`.
 - **Una imagen que falta no rompe la carga**: la forma se carga sin imagen y el informe lo
   avisa con el motivo ([informe](#informe)). Si el servidor no responde (sin conexión, tiempo
@@ -88,7 +95,7 @@ La imagen de cada forma es su *sprite* del repositorio
   ([CA-56](../01-ddf/cuestiones-abiertas.md#resueltas)). `data/cache/` está fuera de git.
 
 `reference.sqlite` guarda la ruta de cada imagen relativa al directorio de datos
-(`pokemon.image`). Si se borra la caché, las formas se ven sin imagen hasta la siguiente carga.
+(`pokemon.image` y `pokemon.artwork`). Si se borra la caché, las formas se ven sin imagen hasta la siguiente carga.
 **Actualizar las imágenes** es cambiar `sprites_commit` en un PR y volver a ejecutar la ingesta.
 
 **Licencia**: el contenido de WikiDex es [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/deed.es).
@@ -173,6 +180,7 @@ Datos revisables por origen:
   game_pokemon         automatic 1930, inferred 772, pending 1158
   key_battle           automatic 26
 Imágenes: 386 de 386 formas
+Ilustraciones: 386 de 386 formas
 Comprobaciones superadas: 9
 Carga completada.
 ```
@@ -184,8 +192,8 @@ Carga completada.
   `game_pokemon` hay dos valores por fila: la existencia (automática) y la llegada (inferida
   en Rojo Fuego y Verde Hoja, pendiente en Rubí, Zafiro y Esmeralda). Los combates clave
   son automáticos.
-- **Imágenes**: cuántas formas tienen imagen. Las que no la tienen aparecen en **Avisos**,
-  agrupadas por motivo, por ejemplo:
+- **Imágenes** e **Ilustraciones**: cuántas formas tienen su *sprite* y su ilustración. Las que
+  no los tienen aparecen en **Avisos**, agrupadas por motivo, por ejemplo:
   `1 forma sin imagen, no está en la caché y no se ha podido descargar: pikachu`.
 - **Comprobaciones superadas**: número de comprobaciones de la carga que se han cumplido.
 
@@ -448,7 +456,7 @@ Código en `ingest/` ([estructura del código](../02-ddt/estructura-codigo.md)):
 | `sources/pokeapi/index.py` | Índice de los Pokémon cargados por su nombre en español, para traducir los nombres de WikiDex. |
 | `sources/pokeapi/__init__.py` | `PokeapiCsvSource`, la fuente de PokeAPI. Recibe los datos curados para los bebés de incienso y las propuestas de llegada. |
 | `sources/pokeapi/download.py` | `CsvCache`: descarga con caché de los CSV de un commit. |
-| `sources/pokeapi/sprites.py` | `SpriteCache`: descarga con caché y peticiones espaciadas de las imágenes de un commit de PokeAPI/sprites, y los motivos por los que una forma no tiene imagen. |
+| `sources/pokeapi/sprites.py` | `SpriteCache`: descarga con caché y peticiones espaciadas de las imágenes de un commit de PokeAPI/sprites; `trimmed` recorta un *sprite* a su figura y `reduced` reduce la ilustración (Pillow); los motivos por los que una forma no tiene imagen. |
 | `sources/pokeapi/rows.py` | Un modelo pydantic por fichero CSV y `read_rows`, que valida cada fila. |
 | `sources/pokeapi/transform.py` | Funciones puras que convierten las filas de PokeAPI en filas de `reference.sqlite`. |
 

@@ -23,7 +23,7 @@ uv run python -m ingest
 ```
 
 La primera vez descarga los datos de PokeAPI, las páginas de WikiDex (WikiDex va a una petición
-por segundo) y las imágenes de los Pokémon (unos 2 minutos). Las siguientes usan la caché y
+por segundo) y las imágenes de los Pokémon (unos 2 minutos y medio). Las siguientes usan la caché y
 tardan un par de segundos.
 
 | Opción | Para qué |

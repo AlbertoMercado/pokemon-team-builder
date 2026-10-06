@@ -101,7 +101,7 @@ flowchart LR
 
 | Fuente | Adaptador | Detalle |
 |--------|-----------|---------|
-| PokeAPI | `sources/pokeapi/` | Volcado CSV del repositorio de PokeAPI, fijado a un commit ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)). |
+| PokeAPI | `sources/pokeapi/` | Volcado CSV del repositorio de PokeAPI, fijado a un commit ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)), y las imágenes de las formas del repositorio PokeAPI/sprites, recortadas o reducidas con Pillow ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)). |
 | WikiDex | `sources/wikidex/` | API MediaWiki (`action=parse&prop=wikitext`), plantillas `{{Equipo}}` con mwparserfromhell. Caché en disco, una petición por segundo como máximo y `User-Agent` descriptivo. |
 | Datos curados | `sources/curated/` | `data/curated/*.yaml`, validados con pydantic ([ADR-0005](../03-adr/0005-datos-curados-yaml.md), [datos curados](datos-curados.md)). |
 
