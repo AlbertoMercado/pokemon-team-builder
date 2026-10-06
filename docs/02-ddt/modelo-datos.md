@@ -65,7 +65,7 @@ Módulo `db/reference/pokemon.py`.
 | `type_efficacy` | `generation` FK, `attacking` FK → `type` y `defending` FK → `type` PK, `factor` | Ya resuelta con `type_efficacy_past`. `factor` en centésimas: solo 0, 50, 100 o 200. |
 | `species` | `slug` PK, `dex_number` único, `name_es`, `generation` FK, `evolves_from`? FK → `species`, `evolution_chain`, `is_baby`, `requires_incense`, `is_legendary`, `is_mythical` | Del CSV `pokemon_species`. `requires_incense` marca los bebés que solo nacen con incienso (Azurill, Wynaut), que se cargan de `data/curated/breeding.yaml` ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `species_egg_group` | `species` FK y `egg_group` PK | Para [RN-11](../01-ddf/reglas-negocio.md#rn-11). |
-| `pokemon` | `slug` PK, `species` FK, `name_es`, `is_default`, `region`? | Solo la forma base y las regionales ([RN-05](../01-ddf/reglas-negocio.md#rn-05)); se descartan las megaevoluciones y las formas de combate. `region` solo en las regionales. |
+| `pokemon` | `slug` PK, `species` FK, `name_es`, `is_default`, `region`?, `pokeapi_id` único, `image`? | Solo la forma base y las regionales ([RN-05](../01-ddf/reglas-negocio.md#rn-05)); se descartan las megaevoluciones y las formas de combate. `region` solo en las regionales. `pokeapi_id` es el `id` de la forma en PokeAPI, que da nombre a su imagen (Vulpix de Alola es `10103`, no el número de la Pokédex). `image` es la ruta de la imagen relativa al directorio de datos; nula si no se pudo obtener ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)). |
 | `pokemon_type` | `pokemon` FK, `generation` FK y `slot` PK, `type` FK | Una fila por generación y tipo, ya resuelta con `pokemon_types_past`. `slot` 1 es el tipo primario ([RN-13](../01-ddf/reglas-negocio.md#rn-13)); solo 1 o 2. |
 
 ### Evoluciones
@@ -104,7 +104,7 @@ Módulo `db/reference/meta.py`.
 
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
-| `ingest_run` | `id` PK, `started_at`, `finished_at`, `pokeapi_commit`?, `games` (JSON), `summary` (JSON) | Una fila: la carga que generó el fichero. `games` es la lista de juegos cargados y `summary`, el número de filas por tabla. `pokeapi_commit` solo es nulo si la carga no incluye datos de PokeAPI. La API la expone para saber con qué datos se trabaja. |
+| `ingest_run` | `id` PK, `started_at`, `finished_at`, `pokeapi_commit`?, `sprites_commit`?, `games` (JSON), `summary` (JSON) | Una fila: la carga que generó el fichero. `games` es la lista de juegos cargados y `summary`, el número de filas por tabla. `pokeapi_commit` solo es nulo si la carga no incluye datos de PokeAPI, y `sprites_commit` si no incluye imágenes. La API la expone para saber con qué datos se trabaja. |
 
 ### Implementación de `reference.sqlite`
 
@@ -123,7 +123,9 @@ Decisiones de implementación:
   y no del `MetaData` global de SQLModel. Así, crear el esquema de una base de datos nunca crea
   las tablas de la otra ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md)).
 - **Sin migraciones**: el fichero se reconstruye entero en cada carga, así que el esquema se
-  crea con `create_reference_schema` y no con Alembic.
+  crea con `create_reference_schema` y no con Alembic. Si una versión nueva añade tablas o
+  columnas, un fichero anterior no las tiene: `missing_columns` lo detecta y la API pide
+  repetir la carga (`503`) en lugar de fallar. Esas versiones lo indican en el `CHANGELOG.md`.
 - **Enums como texto**: `origin` y `category` se guardan con su valor (`inferred`,
   `gym_leader`), no con el nombre del miembro de Python, porque es el que usan las claves de
   los datos revisables y la API.
@@ -140,8 +142,9 @@ Decisiones de implementación:
   variable y nunca se filtra por él en SQL.
 
 Los tests están en `tests/db/test_reference_schema.py`: comprueban que existen las tablas
-documentadas, guardan y leen un conjunto mínimo de Rojo Fuego y verifican que se rechazan los
-datos incoherentes.
+documentadas, guardan y leen un conjunto mínimo de Rojo Fuego, verifican que se rechazan los
+datos incoherentes y que `missing_columns` detecta las tablas y columnas que le faltan a un
+fichero anterior.
 
 ## Base de datos del usuario (`user.sqlite`)
 

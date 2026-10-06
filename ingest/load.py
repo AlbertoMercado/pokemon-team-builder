@@ -5,6 +5,9 @@ stored, the integrity checks pass, the data checks of the load (``ingest/checks.
 and the keys that user.sqlite uses still exist (``ingest/user_keys.py``) does it replace the
 previous file, in a single atomic rename. If anything fails, the previous database is kept
 untouched (RF-11, ADR-0003).
+
+Once the rows are stored, each form gets its sprite (ADR-0010). A missing sprite is only a
+warning: the form is loaded without image.
 """
 
 from collections import defaultdict
@@ -16,15 +19,17 @@ from sqlalchemy import Connection, Engine, Row, Table, func, select, text
 from sqlmodel import Session, col
 from sqlmodel import select as select_model
 
-from db.reference import Game, IngestRun, ReferenceModel, create_reference_schema
+from db.reference import Game, IngestRun, Pokemon, ReferenceModel, create_reference_schema
 from db.sqlite import create_sqlite_engine
 from ingest.checks import Check
 from ingest.report import LoadReport
 from ingest.sources import Source
+from ingest.sources.pokeapi.sprites import MissingReason, MissingSpriteError, SpriteCache
 from ingest.user_keys import check_user_keys
 
 ORIGIN_COLUMN_SUFFIX = "origin"
 MAX_DANGLING_VALUES = 5
+MAX_FORMS_WITHOUT_IMAGE = 10
 
 
 class IntegrityCheckError(Exception):
@@ -36,8 +41,12 @@ def build_reference(
     target: Path,
     checks: Sequence[Check] = (),
     user_database: Path | None = None,
+    sprites: SpriteCache | None = None,
 ) -> LoadReport:
     """Build reference.sqlite at ``target`` from ``sources`` and report the outcome.
+
+    If ``sprites`` is given, every form gets the path of its sprite; forms without one are
+    reported as warnings.
 
     ``checks`` run on the new database; any problem they report rejects the load. Then, if
     ``user_database`` is given, the keys of user.sqlite are checked against the new database:
@@ -52,12 +61,14 @@ def build_reference(
         create_reference_schema(engine)
         _store_rows(engine, sources)
         _check_integrity(engine)
+        if sprites is not None:
+            _attach_images(engine, sprites, report)
         problems = _run_checks(engine, checks)
         if problems:
             report.errors.extend(f"Comprobación fallida: {problem}" for problem in problems)
         elif user_database is None or not _rejected_by_user_keys(engine, user_database, report):
             report.checks_passed = len(checks)
-            _record_run(engine, sources, started_at)
+            _record_run(engine, sources, started_at, sprites)
             report.rows_by_table = _count_rows(engine)
             report.origins_by_table = _count_origins(engine)
     except Exception as error:  # any failure must keep the previous database
@@ -121,6 +132,30 @@ def _describe_dangling(
     return f"{len(dangling)} referencias a filas que no existen ({details})"
 
 
+def _attach_images(engine: Engine, sprites: SpriteCache, report: LoadReport) -> None:
+    """Store the sprite of every form and report the forms without one."""
+    without_image: dict[MissingReason, list[str]] = defaultdict(list)
+    with Session(engine) as session:
+        forms = session.exec(select_model(Pokemon).order_by(col(Pokemon.pokeapi_id))).all()
+        for form in forms:
+            try:
+                form.image = sprites.image(form.pokeapi_id)
+            except MissingSpriteError as error:
+                without_image[error.reason].append(form.slug)
+        session.commit()
+    missing = sum(len(slugs) for slugs in without_image.values())
+    report.images = (len(forms) - missing, len(forms))
+    for reason, slugs in without_image.items():
+        shown = ", ".join(slugs[:MAX_FORMS_WITHOUT_IMAGE])
+        more = (
+            f" y {len(slugs) - MAX_FORMS_WITHOUT_IMAGE} más"
+            if len(slugs) > MAX_FORMS_WITHOUT_IMAGE
+            else ""
+        )
+        forms_text = "1 forma" if len(slugs) == 1 else f"{len(slugs)} formas"
+        report.warnings.append(f"{forms_text} sin imagen, {reason}: {shown}{more}")
+
+
 def _rejected_by_user_keys(engine: Engine, user_database: Path, report: LoadReport) -> bool:
     """Adds the problems with user.sqlite's keys to ``report``; true if they reject the load."""
     with Session(engine) as session:
@@ -135,7 +170,9 @@ def _run_checks(engine: Engine, checks: Sequence[Check]) -> list[str]:
         return [problem for check in checks for problem in check(session)]
 
 
-def _record_run(engine: Engine, sources: Sequence[Source], started_at: datetime) -> None:
+def _record_run(
+    engine: Engine, sources: Sequence[Source], started_at: datetime, sprites: SpriteCache | None
+) -> None:
     commits = {source.pokeapi_commit for source in sources} - {None}
     if len(commits) > 1:
         raise IntegrityCheckError(f"varios commits de PokeAPI: {sorted(map(str, commits))}")
@@ -147,6 +184,7 @@ def _record_run(engine: Engine, sources: Sequence[Source], started_at: datetime)
                 started_at=started_at,
                 finished_at=datetime.now(UTC),
                 pokeapi_commit=next(iter(commits), None),
+                sprites_commit=sprites.commit if sprites is not None else None,
                 games=games,
                 summary=summary,
             )

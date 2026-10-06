@@ -5,11 +5,11 @@ import tomllib
 from pathlib import Path
 
 import pytest
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 
 from api import openapi
 from api.config import DATA_DIR_VARIABLE, Settings
-from api.database import NO_REFERENCE_DATA
+from api.database import NO_REFERENCE_DATA, OUTDATED_REFERENCE_DATA
 from db.sqlite import create_sqlite_engine
 from tests.api.conftest import ClientFactory
 from tests.api.factories import reference_database
@@ -42,6 +42,23 @@ def test_without_reference_data_meta_answers_503(make_client: ClientFactory) -> 
     response = make_client().get("/api/meta")
     assert response.status_code == 503
     assert response.json() == {"detail": NO_REFERENCE_DATA}
+
+
+def test_reference_data_of_an_older_version_answers_503(
+    make_client: ClientFactory, data_dir: Path
+) -> None:
+    """A file built before a new column (pokemon.image) asks for a new load, not a 500."""
+    data_dir.mkdir(parents=True)
+    reference_database(data_dir)
+    engine = create_sqlite_engine(data_dir / "reference.sqlite")
+    with engine.begin() as connection:
+        connection.execute(text("ALTER TABLE pokemon DROP COLUMN image"))
+    engine.dispose()
+
+    response = make_client().get("/api/meta")
+
+    assert response.status_code == 503
+    assert response.json() == {"detail": OUTDATED_REFERENCE_DATA}
 
 
 def test_meta_gives_the_versions_of_the_app_and_the_data(

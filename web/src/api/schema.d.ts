@@ -331,7 +331,7 @@ export interface paths {
         /**
          * Versión de la aplicación y de los datos
          * @description Versión de la aplicación y de la carga de datos con la que trabaja (commit de PokeAPI,
-         *     fecha y juegos). `503` si todavía no se han cargado los datos.
+         *     fecha y juegos). `503` si todavía no se han cargado los datos o hay que repetir la carga.
          */
         get: operations["get_meta_api_meta_get"];
         put?: never;

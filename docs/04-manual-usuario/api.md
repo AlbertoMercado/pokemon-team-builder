@@ -266,6 +266,7 @@ curl -X DELETE http://127.0.0.1:8000/api/hall-of-fame/1
 | Respuesta | Causa | Solución |
 |-----------|-------|----------|
 | `503` «No hay datos de referencia…» | No se han cargado los datos. | Ejecuta la [carga](cargar-datos.md); la siguiente petición ya los encuentra. |
+| `503` «Los datos de referencia son de una versión anterior…» | Has actualizado la aplicación y la nueva versión necesita datos que la carga anterior no tiene. | Repite la [carga](cargar-datos.md) y reinicia la API. |
 | `404` al consultar una ficha | La forma no existe en los datos cargados. | Búscala en la lista (`?q=`) para ver su identificador. |
 | `404` al añadir un favorito | La forma no existe en los datos cargados. Hoy solo están las generaciones 1 a 3. | Revisa el identificador (en inglés y en minúsculas, como `mr-mime`). |
 | `409` al cambiar una regla | La regla no se puede desactivar, o no es blanda y le has dado peso. | El mensaje dice cuál de las dos. |

@@ -243,7 +243,7 @@ def _write_pokemon(
                 steps.append(key)
     session.add_all(species.values())
     session.add_all(SpeciesEggGroup(species=s, egg_group=g) for s, g in sorted(egg_groups))
-    for p in pokemon:
+    for pokeapi_id, p in enumerate(pokemon, start=1):
         slug = p["slug"]
         session.add(
             Pokemon(
@@ -252,6 +252,7 @@ def _write_pokemon(
                 name_es=p["name"],
                 is_default=p["region"] is None,
                 region=p["region"],
+                pokeapi_id=pokeapi_id,
             )
         )
         session.add_all(

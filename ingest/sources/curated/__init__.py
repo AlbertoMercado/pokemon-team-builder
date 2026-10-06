@@ -33,6 +33,7 @@ class CuratedData:
     """Every curated file, already validated."""
 
     pokeapi_commit: str
+    sprites_commit: str
     games: GamesFile
     breeding: BreedingFile
     arrival: ArrivalFile
@@ -50,15 +51,17 @@ def _read[M: BaseModel](path: Path, model: type[M]) -> M:
         raise CuratedDataError(f"{path}: {error}") from error
 
 
-def read_pinned_commit(path: Path) -> str:
-    """Read and validate the pinned PokeAPI commit of ``pokeapi.yaml``."""
-    return _read(path, PinnedCommitFile).commit
+def read_pinned_commits(path: Path) -> PinnedCommitFile:
+    """Read and validate the pinned commits of ``pokeapi.yaml``."""
+    return _read(path, PinnedCommitFile)
 
 
 def read_curated(directory: Path) -> CuratedData:
     """Read and validate every curated file of ``directory``."""
+    commits = read_pinned_commits(directory / "pokeapi.yaml")
     return CuratedData(
-        pokeapi_commit=read_pinned_commit(directory / "pokeapi.yaml"),
+        pokeapi_commit=commits.commit,
+        sprites_commit=commits.sprites_commit,
         games=_read(directory / "games.yaml", GamesFile),
         breeding=_read(directory / "breeding.yaml", BreedingFile),
         arrival=_read(directory / "arrival.yaml", ArrivalFile),

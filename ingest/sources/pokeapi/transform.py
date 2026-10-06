@@ -263,6 +263,7 @@ class _Builder:
                 species=species.identifier,
                 name_es=name,
                 is_default=True,
+                pokeapi_id=pokemon.id,
             )
         for row in self.t.species_egg_groups:
             if row.species_id in self.species:

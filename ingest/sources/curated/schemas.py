@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from db.reference import BattleCategory
 
 SLUG_PATTERN = r"^[a-z0-9]+(-[a-z0-9]+)*$"
+COMMIT_PATTERN = r"^[0-9a-f]{40}$"
 
 type Slug = str
 type ReviewableOrigin = Literal["automatic", "inferred", "pending"]
@@ -114,6 +115,11 @@ class KeyBattlesFile(CuratedModel):
 
 
 class PinnedCommitFile(CuratedModel):
-    """``pokeapi.yaml``: full SHA of the pinned PokeAPI commit (ADR-0004)."""
+    """``pokeapi.yaml``: full SHAs of the pinned commits of PokeAPI.
 
-    commit: str = Field(pattern=r"^[0-9a-f]{40}$")
+    ``commit`` is the one of the CSV dump (ADR-0004) and ``sprites_commit`` the one of the
+    PokeAPI/sprites repository (ADR-0010).
+    """
+
+    commit: str = Field(pattern=COMMIT_PATTERN)
+    sprites_commit: str = Field(pattern=COMMIT_PATTERN)

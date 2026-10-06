@@ -264,7 +264,7 @@ juego), el mensaje aparece en el formulario y puedes corregirlo.
 
 | Aviso | Qué significa | Qué hacer |
 |-------|---------------|-----------|
-| **No hay datos cargados** | La API funciona, pero todavía no se han cargado los datos de los juegos. | Ejecuta la carga con `uv run python -m ingest` ([cargar los datos](cargar-datos.md)) y reinicia la API. |
+| **Hay que cargar los datos** | La API funciona, pero todavía no se han cargado los datos de los juegos, o se cargaron con una versión anterior de la aplicación. | Ejecuta la carga con `uv run python -m ingest` ([cargar los datos](cargar-datos.md)) y reinicia la API. |
 | **La API no responde** | La web no puede comunicarse con la API (solo pasa mientras desarrollas, con la web aparte). | Arráncala con `uv run uvicorn api.main:app --reload` y recarga la página. |
 
 Cuando una parte de una pantalla no se puede mostrar por otro motivo, el mensaje de error

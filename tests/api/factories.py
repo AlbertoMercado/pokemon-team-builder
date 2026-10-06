@@ -114,7 +114,7 @@ def reference_database(
             )
             for g in games
         )
-        for f in pokemon:
+        for pokeapi_id, f in enumerate(pokemon, start=1):
             if session.get(Species, f.species) is None:
                 session.add(
                     Species(
@@ -136,6 +136,7 @@ def reference_database(
                     name_es=f.name,
                     is_default=f.region is None,
                     region=f.region,
+                    pokeapi_id=pokeapi_id,
                 )
             )
             session.flush()

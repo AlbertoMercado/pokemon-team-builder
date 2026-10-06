@@ -122,7 +122,7 @@ Son comprobaciones obligatorias para fusionar en `main`, como Python, Documentac
 | Síntoma | Causa y solución |
 |---------|------------------|
 | Aviso «La API no responde» | La API no está arrancada o no está en el puerto 8000. |
-| Aviso «No hay datos cargados» | No existe `reference.sqlite`: [carga los datos](ingesta.md) y reinicia la API. |
+| Aviso «Hay que cargar los datos» | No existe `reference.sqlite`, o es de una versión anterior de la aplicación: [carga los datos](ingesta.md) y reinicia la API. |
 | `npm run typecheck` falla en `src/api/` tras cambiar la API | Falta regenerar el cliente con `npm run api:generate`. |
 | `http://127.0.0.1:8000/` responde `{"detail":"Not Found"}` | No hay compilación de la web: `cd web && npm run build` y reinicia la API. |
 | La web servida por la API no tiene los últimos cambios | Vuelve a ejecutar `npm run build` y recarga. |

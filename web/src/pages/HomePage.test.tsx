@@ -52,7 +52,7 @@ describe("Inicio", () => {
     renderApp("/");
 
     const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent("No hay datos cargados");
+    expect(alert).toHaveTextContent("Hay que cargar los datos");
     expect(alert).toHaveTextContent(LOAD_COMMAND);
     expect(screen.queryByText("Favoritos", { selector: "h2" })).not.toBeInTheDocument();
   });

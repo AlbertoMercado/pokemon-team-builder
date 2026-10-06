@@ -6,6 +6,21 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+### Añadido
+
+- **Ingesta**: descarga la imagen de cada Pokémon (sus *sprites* de PokeAPI, del commit fijado
+  en `data/curated/pokeapi.yaml`) a la caché local, sin versionarlas en git. Una imagen que
+  falta no rompe la carga: el informe la avisa (RF-17, ADR-0010, #49).
+- **API**: si `reference.sqlite` es de una versión anterior y le faltan datos, responde `503`
+  pidiendo repetir la carga, en lugar de fallar.
+
+### Cambiado
+
+- **Hay que repetir la carga de datos** (`uv run python -m ingest`) al actualizar: la tabla
+  `pokemon` guarda ahora el identificador de PokeAPI y la imagen de cada forma. En el
+  servidor, copia también las imágenes ([puesta en producción](docs/05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos)).
+- El aviso de la web cuando no hay datos se titula «Hay que cargar los datos».
+
 ## [1.0.0] - 2026-10-06
 
 Primera versión estable: la aplicación genera equipos de punta a punta, desde la carga de datos
