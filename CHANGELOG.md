@@ -6,11 +6,16 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+## [1.1.1] - 2026-10-06
+
+Corrección de las imágenes de la 1.1.0. Basta con actualizar y compilar la web: no hace falta
+repetir la carga de datos.
+
 ### Corregido
 
 - **Web**: las imágenes de los Pokémon respetan su tamaño, así que todas las filas de las listas
   miden lo mismo. El estilo base de Tailwind (`height: auto`) hacía que los Pokémon altos y
-  estrechos, como Kakuna, salieran casi el doble de altos (RF-17, #65).
+  estrechos, como Kakuna, salieran casi el doble de altos (RF-17, #65, #66).
 
 ## [1.1.0] - 2026-10-06
 
@@ -97,6 +102,7 @@ Hoja**.
   acceso (RF-19, #52).
 - Restricciones de llegada del resto de juegos (CA-28, #8).
 
-[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.0...HEAD
+[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/AlbertoMercado/pokemon-team-builder/releases/tag/v1.0.0
