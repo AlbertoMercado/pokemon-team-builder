@@ -15,6 +15,14 @@ describe("Imagen de un Pokémon (RF-17)", () => {
     expect(image).toHaveAttribute("loading", "lazy");
   });
 
+  it("keeps a square box of a fixed size whatever the shape of the Pokémon (#65)", () => {
+    const { container } = render(<PokemonSprite url="/api/pokemon/kakuna/image" />);
+    const image = container.querySelector("img");
+
+    // The CSS box, not only the attributes: Tailwind's base styles give images `height: auto`.
+    expect(image).toHaveClass("size-10", "max-w-none", "object-contain");
+  });
+
   it("shows nothing when the form has no image", () => {
     const { container } = render(<PokemonSprite url={null} />);
     expect(container).toBeEmptyDOMElement();
@@ -37,6 +45,7 @@ describe("Ilustración de un Pokémon (RF-17)", () => {
     expect(image).toHaveAttribute("src", "/api/pokemon/vulpix/artwork");
     expect(image).toHaveAttribute("alt", "");
     expect(image).toHaveAttribute("width", "160");
+    expect(image).toHaveClass("size-40", "object-contain");
     expect(image?.className).not.toContain("pixelated");
   });
 
