@@ -53,6 +53,7 @@ api/                  API FastAPI: routers → services → repositories, sobre 
 data/                 curated/*.yaml en git; cache/ y *.sqlite fuera de git
 web/                  Frontend React + Vite + TypeScript + Tailwind
 tests/                Tests de Python (pytest + hypothesis)
+.claude/skills/       Skills de Claude Code del proyecto (publicar-version)
 .github/workflows/    CI de GitHub Actions (ci.yml: Python, Documentación, Secretos)
 ```
 
@@ -75,6 +76,11 @@ Cada directorio de código tiene un `README.md` y cada paquete un *docstring* en
 - **Versionado**: SemVer desde la 1.0.0: los cambios incompatibles (API, `user.sqlite` sin
   migración que conserve los datos, CLI) suben la versión mayor. Cada versión se anota en
   `CHANGELOG.md` y se publica con una etiqueta `vX.Y.Z` ([versiones](docs/05-operacion/versiones.md)).
+  Los PR con cambios para el usuario añaden una línea en **Sin publicar** del `CHANGELOG.md`.
+- **Publicar una versión**: cuando el usuario lo pida, usa la skill `publicar-version`
+  (`.claude/skills/publicar-version/`). Claude prepara la rama, el CHANGELOG y el PR hasta
+  que la CI pasa; **no** fusiona, etiqueta ni crea la *release*: da al usuario los comandos
+  exactos y, cuando los ha ejecutado, comprueba que todo ha quedado correcto.
 - **Decisiones de arquitectura**: toda decisión relevante se registra como ADR en
   `docs/03-adr/` a partir de `0000-plantilla.md`, con numeración correlativa.
 - **Tipado**: mypy en modo `strict`; no usar `Any` ni `# type: ignore` sin justificar.
@@ -123,6 +129,7 @@ tests e issues.**
 | Tipos web | `cd web && npm run typecheck` | ✅ |
 | Tests unitarios web | `cd web && npm run test` | ✅ |
 | Compilar la web | `cd web && npm run build` (la sirve la API en `/`) | ✅ |
+| Publicar una versión | Pedírselo a Claude (skill `publicar-version`; [detalle](docs/05-operacion/versiones.md#publicar-una-version)) | ✅ |
 | Tests E2E | `cd web && npm run test:e2e` (una vez: `npx playwright install chromium`) | ✅ Flujo de nuevo juego |
 
 Actualiza esta tabla cuando un comando pendiente pase a existir.
