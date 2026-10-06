@@ -27,6 +27,7 @@ import type {
 } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
 import FavoriteButton from "../components/FavoriteButton";
+import PokemonSprite from "../components/PokemonSprite";
 import TeamSelector from "../components/TeamSelector";
 import { TypeBadges } from "../components/TypeBadge";
 import { formatDate, formatDateTime, formatDexNumber } from "../lib/format";
@@ -235,6 +236,13 @@ function Position({ options }: { options: GeneratedPokemon[] }) {
   const [first] = options;
   return (
     <li className="space-y-1 rounded border border-slate-200 px-3 py-2">
+      {options.some((pokemon) => pokemon.image_url) && (
+        <div className="flex flex-wrap gap-1">
+          {options.map((pokemon) => (
+            <PokemonSprite key={pokemon.pokemon} url={pokemon.image_url} size="medium" />
+          ))}
+        </div>
+      )}
       <p className="font-medium">{alternatives(options.map((pokemon) => pokemon.name))}</p>
       <p className="font-mono text-xs text-slate-500">
         {options.map((pokemon) => formatDexNumber(pokemon.dex_number)).join(" · ")}
@@ -354,6 +362,7 @@ function SuggestionList({
     <ul aria-label={label} className="divide-y divide-slate-100">
       {suggestions.map(({ pokemon, gain, verified }) => (
         <li key={pokemon.pokemon} className="flex flex-wrap items-center gap-3 py-1">
+          <PokemonSprite url={pokemon.image_url} />
           <span className="font-mono text-sm text-slate-500">
             {formatDexNumber(pokemon.dex_number)}
           </span>

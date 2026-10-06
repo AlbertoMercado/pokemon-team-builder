@@ -41,6 +41,22 @@ de la aplicación, a la izquierda, vuelve al Inicio.
 Cada pantalla tiene su propia dirección, así que puedes recargar la página, volver atrás con
 el navegador o guardar un enlace.
 
+### Imágenes de los Pokémon
+
+Cada Pokémon se muestra con su imagen junto al nombre: en el catálogo, la ficha y su línea
+evolutiva, los favoritos, el resultado (las posiciones y las sugerencias), el selector del
+equipo y el *Hall of Fame*. Cada forma tiene la suya: Vulpix y Vulpix de Alola se distinguen.
+
+- La imagen **acompaña** al nombre, no lo sustituye: el nombre sigue siendo lo que identifica al
+  Pokémon, también para los lectores de pantalla.
+- Si un Pokémon no tiene imagen (la carga no pudo descargarla) o no se puede cargar, se muestra
+  igual, solo con su nombre.
+- Las imágenes las descarga la [carga de datos](cargar-datos.md) a tu ordenador y las sirve la
+  propia aplicación, así que funcionan sin conexión.
+
+Al pie de cada pantalla está el aviso de su titularidad (Nintendo, Creatures, GAME FREAK y The
+Pokémon Company), su procedencia (PokeAPI) y la de los datos (PokeAPI y WikiDex).
+
 ## Inicio
 
 Resume tu situación:

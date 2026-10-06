@@ -38,4 +38,16 @@ describe("Navegación", () => {
       screen.getByRole("heading", { level: 1, name: "Página no encontrada" }),
     ).toBeInTheDocument();
   });
+
+  it("says who owns the images and where the data come from (CA-56)", () => {
+    renderApp("/");
+    const footer = within(screen.getByRole("contentinfo"));
+    expect(
+      footer.getByText(/© Nintendo, Creatures, GAME FREAK y The Pokémon Company/),
+    ).toBeVisible();
+    expect(footer.getByRole("link", { name: "WikiDex" })).toHaveAttribute(
+      "href",
+      "https://www.wikidex.net/",
+    );
+  });
 });

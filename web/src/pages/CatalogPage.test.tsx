@@ -41,6 +41,19 @@ describe("Catálogo", () => {
     expect(within(alola as HTMLElement).getByText("Hielo")).toBeInTheDocument();
   });
 
+  it("shows the image of each form next to its name, not instead of it (RF-17)", async () => {
+    renderApp("/pokemon?q=vulpix");
+    await shownNames();
+
+    const alola = screen.getByRole("link", { name: "Vulpix de Alola" }).closest("li");
+    const image = (alola as HTMLElement).querySelector("img");
+    expect(image).toHaveAttribute("src", "/api/pokemon/vulpix-alola/image");
+    expect(image).toHaveAttribute("alt", "");
+    // Vulpix has no image in these data: only its name is shown, without errors.
+    const vulpix = screen.getByRole("link", { name: "Vulpix" }).closest("li");
+    expect((vulpix as HTMLElement).querySelector("img")).toBeNull();
+  });
+
   it("searches by name and keeps the search in the URL", async () => {
     renderApp("/pokemon");
     await shownNames();

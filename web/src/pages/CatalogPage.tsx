@@ -136,7 +136,12 @@ function Results({ query }: { query: ReturnType<typeof useCatalog> }) {
         >
           {pokemon.map((entry) => (
             <li key={entry.pokemon} className="flex flex-wrap items-center gap-3 px-3 py-2">
-              <PokemonName pokemon={entry.pokemon} name={entry.name} dexNumber={entry.dex_number} />
+              <PokemonName
+                pokemon={entry.pokemon}
+                name={entry.name}
+                dexNumber={entry.dex_number}
+                imageUrl={entry.image_url}
+              />
               <TypeBadges types={entry.types} />
               <span className="ml-auto">
                 <FavoriteButton

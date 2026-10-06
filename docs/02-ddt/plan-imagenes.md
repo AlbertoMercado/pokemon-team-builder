@@ -156,6 +156,36 @@ Cambios en `reference.sqlite`, que se reconstruye en cada carga, así que no hay
   PokeAPI y WikiDex que [ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md#acciones-derivadas)
   tiene pendiente.
 
+#### Decisiones tomadas al implementar la fase 3
+
+- **Tamaños**: 40 px en las listas (catálogo, favoritos, línea evolutiva, sugerencias, selector
+  y *Hall of Fame*), 64 px en las posiciones del resultado y 128 px en la cabecera de la ficha.
+  `pixelated` evita que el *pixel art* se vea borroso al ampliarlo.
+- **Posiciones con alternativas**: la tarjeta de una posición («Cloyster o Lapras») muestra la
+  imagen de cada alternativa.
+- **Selector del equipo**: las alternativas de cada posición llevan imagen; las sugerencias no,
+  porque son opciones de un `<select>`, que no admite imágenes.
+- **Revisión de datos**: los equipos de los combates clave siguen solo con nombres. RF-17 no la
+  incluye y son Pokémon de los rivales, no del usuario.
+- **Aviso**: un pie (`ImageNotice`) en todas las pantallas, con la titularidad de las imágenes y
+  la atribución general de PokeAPI y WikiDex. La atribución de la página y la revisión de
+  WikiDex de cada combate clave, pendiente en
+  [ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md#acciones-derivadas), sigue pendiente.
+- **Comprobado con los datos reales** (los favoritos del usuario y la carga de la fase 1):
+  ninguna imagen rota en el catálogo, los favoritos (36), la ficha de Eevee, el resultado de
+  Rojo Fuego y el *Hall of Fame*; sin desplazamiento horizontal a 390 px de ancho.
+
+#### Para la valoración (fase 4)
+
+Lo observado en las capturas de la fase 3:
+
+- Los *sprites* tienen mucho margen transparente dentro de sus 96 × 96 px: a 40 px, los Pokémon
+  pequeños (Marowak, Jolteon, Eevee) se ven diminutos en las listas.
+- En la ficha, la imagen de 128 px se ve bien, pero el margen la separa del número y el nombre.
+- Opciones: recortar el margen con CSS (`object-fit` con un tamaño mayor y recorte), subir el
+  tamaño de las listas a 48-56 px, o usar la ilustración oficial (unos 120 KB cada una) solo en
+  la ficha.
+
 ## Fases
 
 Cada fase es un PR con sus tests y su documentación.
@@ -173,7 +203,7 @@ flowchart LR
 | 0 ✅ | `docs/imagenes-pokemon` | ADR-0010, este plan y las comprobaciones previas. | — |
 | 1 ✅ | `feat/ingesta-imagenes` | `sprites_commit`, `pokemon.pokeapi_id` e `image`, `SpriteCache`, imágenes y avisos en el informe, `ingest_run.sprites_commit`. Operación de la ingesta, modelo de datos y puesta en producción (copiar las imágenes con `reference.sqlite`). | Sin red, con un PNG mínimo creado en el test (CA-56): imagen en caché, descarga del commit fijado, `404`, servidor que no responde, fichero que no es PNG, `--offline` con la caché vacía, peticiones espaciadas, `pokeapi_id` de las formas, carga correcta aunque falten imágenes y caché fuera de git. |
 | 2 ✅ | `feat/api-imagenes` | Endpoint de la imagen, `image_url` en las respuestas, `sprites_commit` en `/api/meta`, cliente regenerado. API, Operación y manual de la API. | `200` con `image/png` y `Cache-Control`; `404` sin forma, sin imagen o sin fichero; una ruta fuera del directorio de datos no se sirve; `image_url` presente o nula en cada respuesta. |
-| 3 | `feat/web-imagenes` | `PokemonSprite`, imágenes en todas las pantallas de RF-17 y aviso de titularidad. Manual de la web, plan de la web y CHANGELOG. | Vitest: con imagen, sin `image_url`, error de carga y `alt` vacío. E2E: el flujo de nuevo juego sigue funcionando sin imágenes. |
+| 3 ✅ | `feat/web-imagenes` | `PokemonSprite`, imágenes en todas las pantallas de RF-17 y aviso de titularidad. Manual de la web, plan de la web y CHANGELOG. | Vitest: con imagen, sin `image_url`, error de carga y `alt` vacío. E2E: el flujo de nuevo juego sigue funcionando sin imágenes. |
 | 4 | `feat/web-imagen-ficha` (si hace falta) | Valorar los *sprites* en la web (CA-54) y, si hace falta, usar una imagen más grande en la ficha, ampliando ADR-0010. Publicar la versión 1.1.0. | Los de la fase 3 para la imagen nueva. |
 
 ## Estrategia de pruebas

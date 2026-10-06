@@ -60,13 +60,19 @@ const form = (
   generation: region ? 7 : 1,
 });
 
-/** The forms of the catalogue, in order of the National Pokédex. */
+/** The same form with its image, as the API gives it when the load obtained it (RF-17). */
+const withImage = <T extends { pokemon: string }>(found: T): T => ({
+  ...found,
+  image_url: `/api/pokemon/${found.pokemon}/image`,
+});
+
+/** The forms of the catalogue, in order of the National Pokédex. Some have an image. */
 export const FORMS: Form[] = [
   form("bulbasaur", "Bulbasaur", 1, ["grass", "poison"], 1),
   form("ivysaur", "Ivysaur", 2, ["grass", "poison"], 2),
-  form("venusaur", "Venusaur", 3, ["grass", "poison"], 3),
+  withImage(form("venusaur", "Venusaur", 3, ["grass", "poison"], 3)),
   form("vulpix", "Vulpix", 37, ["fire"], 1),
-  form("vulpix-alola", "Vulpix de Alola", 37, ["ice"], 1, "alola"),
+  withImage(form("vulpix-alola", "Vulpix de Alola", 37, ["ice"], 1, "alola")),
   form("ninetales", "Ninetales", 38, ["fire"], 2),
   form("ninetales-alola", "Ninetales de Alola", 38, ["ice", "fairy"], 2, "alola"),
   form("gastly", "Gastly", 92, ["ghost", "poison"], 1),
@@ -294,10 +300,12 @@ const INITIAL_ENTRIES: StoredEntry[] = [
 let entries: StoredEntry[] = INITIAL_ENTRIES.map((entry) => ({ ...entry }));
 let nextEntryId = 2;
 
-/** Name and types of a form: from the catalogue or from the generations. */
-function member(pokemon: string): { name: string; types: string[] } | undefined {
+/** Name, types and image of a form: from the catalogue or from the generations. */
+function member(
+  pokemon: string,
+): { name: string; types: string[]; image_url: string | null } | undefined {
   const found = FORMS.find((candidate) => candidate.pokemon === pokemon) ?? NAMES.get(pokemon);
-  return found && { name: found.name, types: found.types };
+  return found && { name: found.name, types: found.types, image_url: found.image_url };
 }
 
 /** The journey as the API answers it: by date and, on the same date, by order of recording. */
@@ -318,7 +326,7 @@ function journey(game: string | null): HallOfFameEntry[] {
         pokemon,
         name: member(pokemon)?.name ?? pokemon,
         types: member(pokemon)?.types ?? [],
-        image_url: null,
+        image_url: member(pokemon)?.image_url ?? null,
       })),
     }))
     .filter((entry) => game === null || entry.game === game);
@@ -359,7 +367,7 @@ const generated = (
 
 const MAGNETON = generated("magneton", "Magneton", 82, ["electric", "steel"]);
 const CLOYSTER = generated("cloyster", "Cloyster", 91, ["water", "ice"]);
-const LAPRAS = generated("lapras", "Lapras", 131, ["water", "ice"]);
+const LAPRAS = withImage(generated("lapras", "Lapras", 131, ["water", "ice"]));
 const EXEGGUTOR = generated("exeggutor", "Exeggutor", 103, ["grass", "psychic"]);
 const RHYDON = generated("rhydon", "Rhydon", 112, ["ground", "rock"]);
 const FLAREON = generated("flareon", "Flareon", 136, ["fire"]);

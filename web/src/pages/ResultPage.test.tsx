@@ -21,6 +21,22 @@ describe("Resultado", () => {
     confirmAll();
   });
 
+  it("shows the image of the alternatives of each position (RF-17)", async () => {
+    addFavorite("dragonite");
+    renderApp(RESULT);
+
+    expect(await screen.findByText("Equipo completo")).toBeInTheDocument();
+    const team = screen.getByRole("region", { name: "Equipo recomendado" });
+    const positions = within(team).getByRole("list", { name: "Posiciones" });
+    const cloysterOrLapras = within(positions).getByText("Cloyster o Lapras").closest("li");
+    // Only Lapras has an image in these data; Cloyster is still named.
+    expect(
+      Array.from((cloysterOrLapras as HTMLElement).querySelectorAll("img")).map((image) =>
+        image.getAttribute("src"),
+      ),
+    ).toEqual(["/api/pokemon/lapras/image"]);
+  });
+
   it("shows the complete team of Rojo Fuego with the group «Cloyster o Lapras» (RF-08, RF-09)", async () => {
     addFavorite("dragonite");
     renderApp(RESULT);

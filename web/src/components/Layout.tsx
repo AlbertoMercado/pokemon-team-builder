@@ -1,7 +1,11 @@
-/** The frame of every screen: navigation bar, notice when the API is unavailable and content. */
+/**
+ * The frame of every screen: navigation bar, notice when the API is unavailable, content and the
+ * notice of the images and the data.
+ */
 import { Link, NavLink, Outlet } from "react-router";
 
 import ApiStatusBanner from "./ApiStatusBanner";
+import ImageNotice from "./ImageNotice";
 
 const SECTIONS = [
   { to: "/pokemon", label: "Catálogo" },
@@ -13,7 +17,7 @@ const SECTIONS = [
 
 export default function Layout() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <Link to="/" className="font-bold text-red-700">
@@ -40,9 +44,10 @@ export default function Layout() {
         </div>
       </header>
       <ApiStatusBanner />
-      <main className="mx-auto max-w-5xl px-4 py-6">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
         <Outlet />
       </main>
+      <ImageNotice />
     </div>
   );
 }

@@ -11,6 +11,10 @@ versión: [versiones](docs/05-operacion/versiones.md).
 - **Ingesta**: descarga la imagen de cada Pokémon (sus *sprites* de PokeAPI, del commit fijado
   en `data/curated/pokeapi.yaml`) a la caché local, sin versionarlas en git. Una imagen que
   falta no rompe la carga: el informe la avisa (RF-17, ADR-0010, #49).
+- **Web**: cada Pokémon se muestra con su imagen junto al nombre en el catálogo, la ficha y su
+  línea evolutiva, los favoritos, el resultado, el selector del equipo y el *Hall of Fame*. Sin
+  imagen se muestra igual. Al pie, el aviso de la titularidad de las imágenes y la procedencia
+  de los datos (RF-17, CA-56).
 - **API**: `GET /api/pokemon/{pokemon}/image` sirve la imagen de cada forma desde la caché
   local, y las respuestas con Pokémon (catálogo, ficha, favoritos, generación y *Hall of Fame*)
   incluyen `image_url`. `/api/meta` da el commit de las imágenes (`sprites_commit`) (RF-17).
