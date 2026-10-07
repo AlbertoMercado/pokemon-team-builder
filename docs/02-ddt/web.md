@@ -20,17 +20,28 @@ flowchart LR
     RES -- "409: datos pendientes" --> REV
 ```
 
-| Ruta | Pantalla | Qué hace | Requisitos | Endpoints |
-|------|----------|----------|------------|-----------|
-| `/` | Inicio | Con qué datos trabaja la aplicación, cuántos favoritos hay, el último juego completado y el acceso a **Nuevo juego**. Si no hay datos cargados (`503`), explica cómo cargarlos. | — | `GET /api/meta`, `/api/favorites`, `/api/hall-of-fame` |
-| `/pokemon` | Catálogo | Lista con búsqueda (`?q=`), filtro por tipo (`?type=`) y por favoritos (`?favorite=`), y una estrella para añadir o quitar cada uno de favoritos. | RF-01, RF-03 | `GET /api/pokemon`, `PUT`/`DELETE /api/favorites/{pokemon}` |
-| `/pokemon/:pokemon` | Ficha | Número, nombre, tipos actuales, línea evolutiva por etapas con el método de cada evolución en texto y la estrella de favorito. Desde la línea se navega a las otras formas. | RF-02, RF-03, RN-09 | `GET /api/pokemon/{pokemon}` |
-| `/favoritos` | Favoritos | La lista con su número total, cada uno con sus tipos y un botón para quitarlo. Recuerda que cada favorito es la evolución a la que se quiere llegar. | RF-04 | `GET /api/favorites`, `DELETE` |
-| `/reglas` | Reglas | Las reglas agrupadas por clase: las duras y de presencia con un interruptor si son configurables, las blandas con interruptor y peso de 0 a 10, y los mecanismos como información. Cada una con su descripción y un enlace a su regla del DDF. | RF-06, RF-07 | `GET /api/rules`, `PATCH /api/rules/{rule_id}` |
-| `/juego` | Nuevo juego | Los juegos objetivo para elegir uno. | RF-05 | `GET /api/games` |
-| `/juego/:game/revision` | Revisión de datos | Los datos que hay que confirmar: mecánicas y combates clave del juego y la llegada de cada favorito, con su propuesta. Se acepta todo de una vez o se confirma o corrige uno a uno (sí o no; en un combate clave, su equipo con un buscador de Pokémon). Los desactualizados se señalan. Con todo confirmado, lleva al resultado. | RF-15, RN-18 | `GET /review`, `PUT /review/{fact_key}`, `POST /review/accept-proposals` |
-| `/juego/:game/resultado` | Resultado | Genera al entrar y con **Volver a generar**. Muestra el estado y su motivo, cada grupo de equipos con sus posiciones (las alternativas, como «Cloyster o Lapras»), el desglose por regla, los huecos con sus sugerencias (las no verificadas, señaladas) y un botón para añadir cada una a favoritos, los descartes agrupados por motivo, las reglas de presencia y los datos confirmados usados. Si la API responde `409`, lleva a la revisión. El **selector** permite elegir un equipo (una alternativa por posición y una sugerencia por hueco), lo comprueba y, si no tiene problemas, lo registra en el *Hall of Fame* con la fecha y las notas que el usuario indique; o descartar todos. | RF-08, RF-09, RF-10, RF-12, CA-53 | `POST /api/games/{game}/generations`, `POST /api/games/{game}/team-checks`, `POST /api/hall-of-fame` |
-| `/hall-of-fame` | Hall of Fame | El recorrido en orden, con el último juego completado señalado y filtro por juego. Registrar a mano un equipo (por ejemplo, de un juego que no es juego objetivo), corregir y eliminar (con confirmación), con un buscador de Pokémon para el equipo. | RF-12, RF-13, RN-16 | `GET`, `POST`, `PATCH`, `DELETE /api/hall-of-fame`, `GET /api/games?all=true` |
+Qué hace cada pantalla, para quien la usa, está en el [manual](../04-manual-usuario/web.md); aquí, su ruta, qué
+requisitos cubre y qué endpoints llama.
+
+| Ruta | Pantalla | Requisitos | Endpoints |
+|------|----------|------------|-----------|
+| `/` | [Inicio](../04-manual-usuario/web.md#inicio) | — | `GET /api/meta`, `/api/favorites`, `/api/hall-of-fame` |
+| `/pokemon` | [Catálogo](../04-manual-usuario/web.md#catalogo) | RF-01, RF-03 | `GET /api/pokemon`, `PUT`/`DELETE /api/favorites/{pokemon}` |
+| `/pokemon/:pokemon` | [Ficha](../04-manual-usuario/web.md#ficha) | RF-02, RF-03, RN-09 | `GET /api/pokemon/{pokemon}` |
+| `/favoritos` | [Favoritos](../04-manual-usuario/web.md#favoritos) | RF-04 | `GET /api/favorites`, `DELETE` |
+| `/reglas` | [Reglas](../04-manual-usuario/web.md#configurar-las-reglas) | RF-06, RF-07 | `GET /api/rules`, `PATCH /api/rules/{rule_id}` |
+| `/juego` | [Nuevo juego](../04-manual-usuario/web.md#elegir-el-juego) | RF-05 | `GET /api/games` |
+| `/juego/:game/revision` | [Revisión de datos](../04-manual-usuario/web.md#revisar-los-datos) | RF-15, RN-18 | `GET /review`, `PUT /review/{fact_key}`, `POST /review/accept-proposals` |
+| `/juego/:game/resultado` | [Resultado](../04-manual-usuario/web.md#ver-el-resultado) y [selector](../04-manual-usuario/web.md#elegir-el-equipo-y-registrarlo) | RF-08, RF-09, RF-10, RF-12, CA-53 | `POST /api/games/{game}/generations`, `POST /api/games/{game}/team-checks`, `POST /api/hall-of-fame` |
+| `/hall-of-fame` | [Hall of Fame](../04-manual-usuario/web.md#hall-of-fame) | RF-12, RF-13, RN-16 | `GET`, `POST`, `PATCH`, `DELETE /api/hall-of-fame`, `GET /api/games?all=true` |
+
+Comportamiento común:
+
+- **La dirección guarda el estado**: los filtros del catálogo (`?q=`, `?type=`, `?favorite=`) y
+  del *Hall of Fame* (`?game=`) van en la URL, así que se conservan al recargar o volver atrás.
+- **El resultado se genera al entrar** y con **Volver a generar**; es una consulta sin estado que
+  se repite al cambiar los favoritos o las confirmaciones. Si la API responde `409`, la web lleva
+  a la revisión.
 
 En todas las pantallas, una barra de navegación lleva a Catálogo, Favoritos, Reglas, Nuevo
 juego y *Hall of Fame*.

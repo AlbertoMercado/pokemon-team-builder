@@ -54,7 +54,8 @@ la ficha, su ilustración oficial, más grande.
 - Si un Pokémon no tiene imagen (la carga no pudo descargarla) o no se puede cargar, se muestra
   igual, solo con su nombre.
 - Las imágenes las descarga la [carga de datos](cargar-datos.md) a tu ordenador y las sirve la
-  propia aplicación, así que funcionan sin conexión.
+  propia aplicación, así que funcionan sin conexión
+  ([de quién son](index.md#imagenes-y-portadas-de-quien-son-y-como-se-usan)).
 
 ### Portadas de los juegos
 
@@ -65,16 +66,13 @@ como Rojo ([RF-18](../01-ddf/requisitos-funcionales.md#rf-18)).
 
 - Como las imágenes de los Pokémon, la portada **acompaña** al nombre del juego, se ajusta a un
   tamaño fijo sin deformarse y, si un juego no la tiene, se muestra solo con su nombre.
-- Las descarga de WikiDex la [carga de datos](cargar-datos.md) a tu ordenador. WikiDex las
-  declara de uso legítimo solo en sus artículos, así que son **solo para tu uso privado**: no
-  publiques la aplicación con ellas. Si no las quieres, carga los datos con `--no-covers` y la
-  web muestra solo los nombres.
+- Son **solo para tu uso privado** y se pueden quitar con `--no-covers`
+  ([de quién son y cómo se usan](index.md#imagenes-y-portadas-de-quien-son-y-como-se-usan)).
 
 ### Aviso de titularidad
 
-Al pie de cada pantalla está el aviso de la titularidad de las imágenes y las portadas (Nintendo,
-Creatures, GAME FREAK y The Pokémon Company), su procedencia (PokeAPI y WikiDex), con un enlace a
-la página de cada portada en WikiDex, y la de los datos (PokeAPI y WikiDex). Si no hay ninguna
+Al pie de cada pantalla está el aviso de la titularidad y la procedencia de las imágenes, las
+portadas y los datos, con un enlace a la página de cada portada en WikiDex. Si no hay ninguna
 portada cargada, no dice nada de ellas.
 
 ## Inicio

@@ -198,8 +198,8 @@ No son tediosos `level-up` y `use-item` con nivel, amistad, cariño, objeto o un
 equipado sin más condiciones. Todo lo que el módulo no conoce cuenta como tedioso, para que
 una condición nueva de PokeAPI nunca haga parecer fácil una evolución.
 
-!!! warning "Provisional hasta la fase 7 del plan de carga"
-    Tras revisar esta fase se decidió que la clasificación sea un dato
+!!! warning "Provisional hasta el catálogo de métodos de evolución (#78)"
+    Se decidió que la clasificación sea un dato
     ([`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml)) y que lo que no esté
     catalogado bloquee la carga para que lo catalogue el arquitecto en una nueva versión
     ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas),
