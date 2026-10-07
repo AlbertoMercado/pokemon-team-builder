@@ -19,6 +19,8 @@ COVER_TITLE = re.compile(r"Archivo:[^|#\[\]{}]+\.(png|jpe?g)", re.IGNORECASE)
 type Slug = str
 type ReviewableOrigin = Literal["automatic", "inferred", "pending"]
 type Mechanic = Literal["day_night_cycle", "contests"]
+# Every mechanic a target game needs in games.yaml to be complete (RF-05).
+MECHANICS: tuple[Mechanic, ...] = ("day_night_cycle", "contests")
 
 
 class CuratedModel(BaseModel):

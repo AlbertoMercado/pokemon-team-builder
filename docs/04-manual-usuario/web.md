@@ -173,9 +173,11 @@ mensaje aparece junto a la regla.
 
 ### Elegir el juego
 
-En **Nuevo juego** aparecen los juegos que puedes elegir: los de la saga principal con datos
-cargados que permiten la crianza ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Pulsa
-uno para revisar sus datos. Cambiar de juego no cambia tus favoritos.
+En **Nuevo juego** aparecen los juegos que puedes elegir: los juegos completos, que permiten la
+crianza y tienen todos los datos que necesitan las reglas
+([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Hoy son Rojo Fuego y Verde Hoja; Rubí,
+Zafiro y Esmeralda no aparecen hasta tener sus combates clave, aunque sí puedes registrarlos en
+el **Hall of Fame**. Pulsa uno para revisar sus datos. Cambiar de juego no cambia tus favoritos.
 
 ### Revisar los datos
 
@@ -290,7 +292,7 @@ o eliminar un registro cambia los equipos que se generan a partir de ese momento
 | Acción | Cómo |
 |--------|------|
 | **Filtrar por juego** | Elige el juego en **Juego**. El filtro se guarda en la dirección de la página. |
-| **Registrar un equipo** | Además de hacerlo desde el resultado, puedes registrar a mano cualquier juego cargado, también los que no pueden ser juego objetivo (como Rojo u Oro). Elige el juego, la fecha y, si quieres, notas, y añade de 1 a 6 Pokémon con el buscador, en orden. **Guardar** lo registra. |
+| **Registrar un equipo** | Además de hacerlo desde el resultado, puedes registrar a mano cualquier juego cargado, también los que no pueden ser juego objetivo (como Rojo, Oro o Rubí). Elige el juego, la fecha y, si quieres, notas, y añade de 1 a 6 Pokémon con el buscador, en orden. **Guardar** lo registra. |
 | **Corregir** | Cambia el juego, la fecha, las notas o el equipo. Si cambias la fecha, el recorrido se reordena. |
 | **Eliminar** | Pide confirmación: **Sí, eliminar** borra el registro y su equipo. |
 

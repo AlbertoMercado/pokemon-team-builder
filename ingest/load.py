@@ -6,9 +6,10 @@ and the keys that user.sqlite uses still exist (``ingest/user_keys.py``) does it
 previous file, in a single atomic rename. If anything fails, the previous database is kept
 untouched (RF-11, ADR-0003).
 
-Once the rows are stored, each form gets its images, the trimmed sprite and the official
-artwork (ADR-0010), and each game its cover (ADR-0011). A missing image is only a warning: the
-form or the game is loaded without it.
+Once the rows are stored, only the complete games stay as target games (``ingest/targets.py``,
+RF-05); the others are reported with what they lack. Each form gets its images, the trimmed
+sprite and the official artwork (ADR-0010), and each game its cover (ADR-0011). A missing image
+is only a warning: the form or the game is loaded without it.
 """
 
 from collections import defaultdict
@@ -28,6 +29,7 @@ from ingest.report import LoadReport
 from ingest.sources import Source
 from ingest.sources.pokeapi.sprites import MissingReason, MissingSpriteError, SpriteCache
 from ingest.sources.wikidex.covers import CoverCache, CoverMissing, MissingCoverError
+from ingest.targets import mark_incomplete_games
 from ingest.user_keys import check_user_keys
 
 ORIGIN_COLUMN_SUFFIX = "origin"
@@ -73,6 +75,7 @@ def build_reference(
         create_reference_schema(engine)
         _store_rows(engine, sources)
         _check_integrity(engine)
+        _mark_target_games(engine, report)
         if images is not None and images.sprites is not None:
             _attach_images(engine, images.sprites, report)
         if images is not None and images.covers is not None:
@@ -113,6 +116,13 @@ def _store_rows(engine: Engine, sources: Sequence[Source]) -> None:
             session.commit()
         finally:
             session.execute(text("PRAGMA foreign_keys = ON"))
+
+
+def _mark_target_games(engine: Engine, report: LoadReport) -> None:
+    """Only the complete games stay as target; the report lists the others (CA-67)."""
+    with Session(engine) as session:
+        report.incomplete_games = mark_incomplete_games(session)
+        session.commit()
 
 
 def _check_integrity(engine: Engine) -> None:

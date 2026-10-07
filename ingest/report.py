@@ -16,7 +16,8 @@ class LoadReport:
     the administrator knows how much the user will have to confirm (RN-18). ``images`` and
     ``artworks`` are the number of forms with a sprite or an official artwork, and the number of
     forms, if the load includes images; ``covers``, the number of games with a cover and the
-    number of games, if it includes covers.
+    number of games, if it includes covers. ``incomplete_games`` are the games that cannot be
+    chosen as target because they lack data, with what they lack (RF-05, CA-67).
     """
 
     target: Path
@@ -28,6 +29,7 @@ class LoadReport:
     images: tuple[int, int] | None = None
     artworks: tuple[int, int] | None = None
     covers: tuple[int, int] | None = None
+    incomplete_games: dict[str, list[str]] = field(default_factory=dict)
 
     @property
     def succeeded(self) -> bool:
@@ -58,6 +60,12 @@ class LoadReport:
         if self.covers is not None:
             with_cover, games = self.covers
             lines.append(f"Portadas: {with_cover} de {games} juegos")
+        if self.incomplete_games:
+            lines.append("Juegos que no se pueden elegir como objetivo (datos incompletos):")
+            lines.extend(
+                f"  {game}: faltan {_listed(missing)}"
+                for game, missing in self.incomplete_games.items()
+            )
         if self.checks_passed:
             lines.append(f"Comprobaciones superadas: {self.checks_passed}")
         lines.extend(self._warnings())
@@ -68,3 +76,8 @@ class LoadReport:
         if not self.warnings:
             return []
         return ["Avisos:", *(f"  - {warning}" for warning in self.warnings)]
+
+
+def _listed(items: list[str]) -> str:
+    """«a, b y c»."""
+    return items[0] if len(items) == 1 else f"{', '.join(items[:-1])} y {items[-1]}"

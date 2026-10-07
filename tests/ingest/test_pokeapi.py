@@ -26,7 +26,13 @@ from db.reference import (
     TypeEfficacy,
 )
 from db.sqlite import create_sqlite_engine
-from ingest.checks import FIRST_LOAD_CHECKS, check_counts, check_key_battles, check_starters
+from ingest.checks import (
+    FIRST_LOAD_CHECKS,
+    check_counts,
+    check_key_battles,
+    check_starters,
+    check_target_games,
+)
 from ingest.load import build_reference
 from ingest.sources.curated import (
     CuratedData,
@@ -177,13 +183,8 @@ def test_loads_the_games_of_the_first_three_generations(loaded: Session) -> None
 
     assert len(games) == 11  # without Colosseum, XD and the Japan-only versions
     assert games["firered"].name_es == "Rojo Fuego"
-    assert {slug for slug, game in games.items() if game.is_target} == {
-        "ruby",
-        "sapphire",
-        "emerald",
-        "firered",
-        "leafgreen",
-    }
+    # The extract has no key battles: no game is complete, so none is a target (CA-67).
+    assert not any(game.is_target for game in games.values())
     assert {slug for slug, game in games.items() if not game.has_breeding} == {
         "red",
         "blue",
@@ -343,6 +344,18 @@ def test_arrival_is_proposed_from_the_kanto_pokedex_in_firered(loaded: Session) 
     assert _arrival(loaded, "firered", "blissey") == (False, Origin.INFERRED)
 
 
+def test_the_games_of_the_target_generation_are_proposed_as_target() -> None:
+    """The source proposes the 3rd generation; the load then keeps the complete ones."""
+    games = [row for row in _offline_source().rows() if isinstance(row, Game)]
+    assert {game.slug for game in games if game.is_target} == {
+        "ruby",
+        "sapphire",
+        "emerald",
+        "firered",
+        "leafgreen",
+    }
+
+
 @pytest.mark.rn("RN-03")
 def test_arrival_without_rule_stays_pending(loaded: Session) -> None:
     rows = loaded.exec(select(GamePokemon).where(GamePokemon.game == "ruby")).all()
@@ -402,11 +415,12 @@ def test_first_load_checks_reject_an_incomplete_load(tmp_path: Path) -> None:
 
 
 def test_known_case_checks_pass_on_the_extract(loaded: Session) -> None:
-    """Every problem of the extract is a count, a key battle (it has no WikiDex teams) or a
-    missing starter (it only has Venusaur)."""
+    """Every problem of the extract is a count, a key battle (it has no WikiDex teams), a
+    missing starter (it only has Venusaur) or, for lack of key battles, a target game."""
     problems = [problem for check in FIRST_LOAD_CHECKS for problem in check(loaded)]
     assert problems
     expected = check_counts(loaded) + check_key_battles(loaded) + check_starters(loaded)
+    expected += check_target_games(loaded)
     assert set(problems) <= set(expected)
 
 
