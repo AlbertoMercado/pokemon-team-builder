@@ -5,25 +5,15 @@
 **Por qué existe**: separa los datos curados a mano, que se versionan, de los generados, que
 no ([ADR-0005](../docs/03-adr/0005-datos-curados-yaml.md)).
 
-**Qué contiene**:
+**Contenido**:
 
-| Ruta | Contenido | ¿En git? |
-|------|-----------|----------|
-| `curated/` | YAML curados a mano (combates clave, mecánicas de juego…), validados con pydantic por la ingesta. | Sí |
-| `cache/` | Descargas de la ingesta: `pokeapi/<commit>/` (CSV) y `wikidex/` (páginas). Se pueden regenerar. | No |
-| `*.sqlite` | `reference.sqlite` y `user.sqlite`. | No |
-| `reports/` | Informes de cada carga en JSON y Markdown (fase 7). Los que importan se registran a mano en [Informes de carga](../docs/05-operacion/informes-carga/index.md) ([ADR-0008](../docs/03-adr/0008-cargas-bloqueadas.md)). | No |
+| Ruta | Qué es | ¿En git? |
+|------|--------|----------|
+| `curated/` | Datos curados a mano en YAML, validados por la ingesta. | Sí |
+| `cache/` | Descargas de la ingesta (CSV de PokeAPI, páginas de WikiDex, imágenes y portadas). Se pueden regenerar. | No |
+| `*.sqlite` | `reference.sqlite` (lo construye la ingesta) y `user.sqlite` (los datos del usuario). | No |
+| `reports/` | Informes de las cargas bloqueadas, cuando estén implementadas (#78). | No |
 
-Más detalle en [Estructura del código](../docs/02-ddt/estructura-codigo.md).
-
-**Ficheros curados**:
-
-| Fichero | Qué contiene |
-|---------|--------------|
-| `curated/pokeapi.yaml` | Commit fijado del volcado CSV de PokeAPI ([ADR-0004](../docs/03-adr/0004-pokeapi-volcado-csv.md)). Cambiarlo es actualizar los datos. |
-| `curated/games.yaml` | Mecánicas de cada juego objetivo (reloj, concursos) que condicionan las evoluciones. |
-| `curated/breeding.yaml` | Bebés que solo nacen con incienso (Azurill, Wynaut). |
-| `curated/arrival.yaml` | Regla con la que se propone qué Pokémon pueden llegar a cada juego objetivo. |
-| `curated/key_battles/*.yaml` | Lista de combates clave de cada grupo de versiones y dónde está su equipo en WikiDex (página, sección y rótulo). |
-
-Esquema, significado y cómo añadir un juego: [Datos curados](../docs/02-ddt/datos-curados.md).
+**Más información**: qué contiene cada fichero curado, su esquema y cómo añadir un juego en
+[datos curados](../docs/02-ddt/datos-curados.md); la caché en
+[ingesta de datos](../docs/05-operacion/ingesta.md#primera-ejecucion-y-cache).

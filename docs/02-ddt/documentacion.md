@@ -33,7 +33,10 @@ desincronizándose y llevando a errores (#76).
 | Cuestiones funcionales (`CA-XX`) | [Cuestiones funcionales](../01-ddf/cuestiones-abiertas.md) | DDF, DDT, ADR |
 | Decisiones de arquitectura y su porqué | [ADR](../03-adr/index.md) | DDT, Operación |
 | Componentes y reglas de dependencia | [Arquitectura](arquitectura.md) | `CLAUDE.md`, READMEs |
-| Qué contiene cada directorio y cada módulo | El `README.md` del directorio y el *docstring* de cada módulo | [Estructura del código](estructura-codigo.md) |
+| Qué hace cada fichero de código o de tests | Su *docstring* (o comentario de cabecera en la web) | El `README.md` de su directorio |
+| Qué hay en cada directorio | Su `README.md`: un índice, una línea por entrada | [Estructura del código](estructura-codigo.md) |
+| Estrategia de pruebas por capa | [Arquitectura](arquitectura.md#estrategia-de-pruebas) | `tests/README.md`, Web |
+| Convenciones de los tests (constructores, escenarios, *fixtures*, sin red) | `tests/README.md` | Motor, ingesta |
 | Cómo se hacen cumplir las dependencias y cómo añadir un paquete | [Estructura del código](estructura-codigo.md) | `CLAUDE.md` |
 | Implementación de las reglas en `core/` | [Motor de reglas](motor.md) | Tests, `core/README.md` |
 | Algoritmo de generación | [Algoritmo de generación](algoritmo-generacion.md) | Motor, ADR-0006 |
@@ -56,12 +59,26 @@ desincronizándose y llevando a errores (#76).
     aún tienen copias en otras páginas, y la referencia de la API todavía no está publicada desde
     OpenAPI: mientras tanto, está en el [DDT de la API](api.md).
 
+## El README de un directorio
+
+Un índice breve, sin repetir lo que dice el código ni el diseño:
+
+- **Qué es** y **por qué existe**, en una frase cada uno, con el enlace a su ADR.
+- **Contenido**: una línea por subdirectorio o fichero importante. El detalle está en su
+  *docstring*.
+- **Más información**: los enlaces a la fuente de su diseño (DDT), de su uso (manual) y de cómo se
+  opera (Operación).
+
+No lleva estado ni fases (eso está en el `CHANGELOG.md` y las issues), ni las reglas de
+dependencia (están en la [arquitectura](arquitectura.md#reglas-de-dependencia)).
+
 ## En cada PR
 
 Todo código o cambio de base de datos se documenta **en el mismo PR**, en la fuente de su tema:
 
-- **Módulo o paquete**: su *docstring* (qué es, por qué existe y qué hace). Un directorio nuevo
-  lleva su `README.md` y una fila en la [estructura del código](estructura-codigo.md).
+- **Módulo, paquete o fichero de tests**: su *docstring* (qué es, por qué existe y qué hace), y
+  su línea en el `README.md` del directorio si es una entrada nueva. Un directorio nuevo lleva su
+  `README.md` y una fila en la [estructura del código](estructura-codigo.md).
 - **Base de datos**: cada tabla, columna o migración, en el [modelo de datos](modelo-datos.md).
 - **API**: las descripciones de OpenAPI (`Field(description=...)` y el *docstring* de cada
   endpoint); el [DDT de la API](api.md) solo si cambia una convención o una decisión.

@@ -514,33 +514,6 @@ pendientes con su estado) y `pending_facts` para responder `409` al generar si q
 
 ## Pruebas
 
-| Fichero | Qué comprueba |
-|---------|---------------|
-| `tests/core/test_type_chart.py` | Factores contra uno y dos tipos, inmunidades, tablas distintas por generación (RN-10) y tablas incompletas o con factores no válidos. |
-| `tests/core/test_catalog.py` | Que el catálogo tenga las 20 reglas, cuáles son configurables, los pesos por defecto (RN-04), que todas empiecen activas (CA-41) y los cambios válidos y no válidos. |
-| `tests/core/test_domain.py` | Formas regionales como Pokémon distintos (RN-05), el favorito como evolución con sus etapas (RN-09), validaciones de los modelos y del contexto, tipos que no existen en la generación (RN-10) y formas de una generación posterior con sus propios tipos. |
-| `tests/core/test_breeding.py` | Crianza por grupos huevo con los ejemplos de RN-11 (Zapdos, Mew, Ditto, Dragonite, Pikachu y Pichu), etapa que nace del huevo (CA-25) y bebés de incienso (CA-36). |
-| `tests/core/test_journey.py` | Qué equipos se excluyen en cada ejemplo del recorrido de RN-16, el equipo de Verde Hoja en Rojo Fuego con las excepciones de Dragonite y Eevee, y que la exclusión es por forma (CA-18). |
-| `tests/core/test_evolution.py` | Gengar, Raichu, Milotic, Espeon y Beautifly en Rojo Fuego y en Esmeralda, cada método de CA-20, condiciones desconocidas, métodos alternativos y pasos anteriores a la etapa que nace del huevo (RN-15, RN-20). |
-| `tests/core/rules/test_soft.py` | RN-06 (Vulpix y Vulpix de Alola), RN-15, RN-20 y RN-17 con el ejemplo de Brock, el peso de cada combate y de cada rival, y la tabla de tipos de la generación. Que cada regla blanda del catálogo esté implementada. |
-| `tests/core/test_scoring.py` | Pesos por defecto en el desglose, el ejemplo de Beautifly y Gengar, reglas desactivadas y con peso 0, desempate de Lapras y Blastoise (RN-19) y, con hypothesis, que el total sea la suma del desglose, esté entre 0 y la suma de pesos y no dependa del orden de los miembros. |
-| `tests/core/rules/test_team.py` | RN-07 (Jolteon y Vaporeon, Rhydon y Rhyperior), RN-12 (Charizard y Pidgeot, Gengar y Nidoking), RN-14 como restricción y los niveles de RN-13 (Kingdra y Garchomp) y de RN-14. |
-| `tests/core/engine/test_generate.py` | `generate` con los ejemplos del DDF: equipos de 6 favoritos (RN-01, RN-02), resultado incompleto con su motivo y el equipo más grande posible, todos los empatados (RN-04), Lapras antes que Blastoise (RN-19), Dragonite antes que un equipo de 6 (RN-13), una sola de Vaporeon, Jolteon y Flareon elegida por puntuación (RN-14) y determinismo. |
-| `tests/core/engine/test_incomplete.py` | RN-08: los 4 candidatos en Rojo Fuego con 2 huecos libres, el orden de las sugerencias (RN-19), las sin verificar (CA-31), el equipo vacío con 6 huecos, el hueco reservado que solo admite lo que encaja y CA-48 (Zekrom y Jolteon). |
-| `tests/core/engine/test_grouping.py` | CA-33 y CA-49: Lapras o Cloyster, Vaporeon que no se agrupa con RN-14 activa y sí sin ella, los equipos que no se agrupan porque una combinación incumpliría RN-07, y que los grupos cubren todos los empates. |
-| `tests/core/test_engine_properties.py` | Con hypothesis, contextos aleatorios de hasta 12 favoritos con un pool para sugerencias: el motor devuelve exactamente los mejores equipos de una búsqueda por fuerza bruta que aplica RN-08 y CA-48, todos cumplen las reglas duras activas, las sugerencias encajan, cumplen su hueco, aportan lo que dicen y están ordenadas, cada grupo son exactamente sus combinaciones, el resultado es reproducible y `Scorer.ranking_key` coincide con la puntuación completa. |
-| `tests/core/test_scenario_firered.py` | Escenario real de Rojo Fuego: los equipos esperados con las reglas por defecto y sus grupos, los descartes, las reglas de presencia, RN-12, que tarda menos de un segundo y que sin RN-12 la cobertura es completa. |
-| `tests/core/test_review.py` | RN-18: Raichu en Rojo Fuego (el ejemplo del DDF) antes y después de confirmar, Zapdos con y sin RN-11, Treecko en Oro, una forma que no existe, el recorrido con y sin RN-16, los datos del juego, los combates clave sin RN-17 y el orden. Con `involved_facts`, que los datos conocidos también intervienen y que el dato que descarta un favorito interviene. |
-| `tests/core/rules/test_candidate.py` | Los tres niveles de RN-03 (Vulpix, Treecko, Growlithe de Hisui y Raichu), RN-11 y RN-16 con su motivo, las reglas desactivadas, el orden entre filtros y el orden canónico. |
-
-`tests/core/builders.py` tiene constructores de datos de prueba legibles, que usarán todas las
-fases: `pokemon("gengar", ("ghost", "poison"), line=("gastly", "haunter"), steps=[...])`,
-`type_chart(overrides={("water", "rock"): 200})`, `candidate(...)`, `battle(...)` y
-`context(...)`. Cada test solo indica lo que le importa. Sin `chain`, cada línea tiene su propia
-cadena de evolución, derivada de su primera etapa, para que RN-07 no relacione Pokémon que no
-tienen nada que ver.
-
-El escenario real (`tests/core/scenario.py`) construye el contexto de Rojo Fuego a partir de
-`tests/core/fixtures/firered.json`, un extracto de un `reference.sqlite` real con los 140
-Pokémon que pueden llegar al juego, la tabla de tipos de la 3.ª generación y los 13 combates
-clave. Cómo se regenera está en el README de ese directorio.
+Los tests del motor están en `tests/core/`: qué comprueba cada fichero, en su *docstring*, y sus
+convenciones (constructores legibles, escenario real de Rojo Fuego y el marcador
+`@pytest.mark.rn`), en [`tests/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/tests/README.md#convenciones).

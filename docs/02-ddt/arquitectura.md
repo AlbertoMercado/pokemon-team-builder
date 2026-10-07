@@ -39,19 +39,10 @@ flowchart LR
 ### `core/`: dominio puro
 
 Contiene toda la lógica de negocio del [DDF](../01-ddf/reglas-negocio.md). No accede a la red,
-a la base de datos ni al sistema de ficheros, y solo depende de la biblioteca estándar. Lo
-implementado está en [Motor de reglas](motor.md) y el plan, en
-[plan de implementación del motor](plan-motor.md).
+a la base de datos ni al sistema de ficheros, y solo depende de la biblioteca estándar. Cómo
+implementa cada regla: [motor de reglas](motor.md).
 
-| Módulo | Responsabilidad |
-|--------|-----------------|
-| `domain/` | Modelos inmutables (`dataclass(frozen=True)`): `Candidate`, `Team`, `TypeChart`, `KeyBattle`, `GameContext`, `RuleSettings`… |
-| `rules/` | Catálogo estático de reglas, una clase por `RN-XX`, agrupadas por clase de regla (ver abajo). |
-| `engine/` | Filtros, grafo de incompatibilidades, búsqueda con retroceso, ordenación, agrupación de empates y sugerencias ([algoritmo](algoritmo-generacion.md)). |
-| `journey.py` | Exclusiones del recorrido a partir del *Hall of Fame* ([RN-16](../01-ddf/reglas-negocio.md#rn-16)). |
-| `review.py` | Qué datos sin verificar intervienen en una generación ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). |
-| `evolution.py` | Clasificación de los métodos de evolución en tediosos o no y en aleatorios o no, y si se pueden hacer en un juego ([RN-15](../01-ddf/reglas-negocio.md#rn-15), [RN-20](../01-ddf/reglas-negocio.md#rn-20)). |
-| `breeding.py` | Si una línea se puede criar y qué etapa nace del huevo ([RN-11](../01-ddf/reglas-negocio.md#rn-11), [CA-25](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+Sus módulos, en [`core/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/core/README.md).
 
 Cada regla implementa la interfaz de su clase y devuelve su resultado junto con su
 identificador. Así salen solos los motivos de descarte
@@ -99,18 +90,15 @@ flowchart LR
     L --> R["Informe<br/>cargado · inferido · pendiente · errores"]
 ```
 
-| Fuente | Adaptador | Detalle |
-|--------|-----------|---------|
-| PokeAPI | `sources/pokeapi/` | Volcado CSV del repositorio de PokeAPI, fijado a un commit ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)), y las imágenes de las formas del repositorio PokeAPI/sprites, recortadas o reducidas con Pillow ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)). |
-| WikiDex | `sources/wikidex/` | API MediaWiki (`action=parse&prop=wikitext`), plantillas `{{Equipo}}` con mwparserfromhell. Caché en disco, una petición por segundo como máximo y `User-Agent` descriptivo. |
-| Datos curados | `sources/curated/` | `data/curated/*.yaml`, validados con pydantic ([ADR-0005](../03-adr/0005-datos-curados-yaml.md), [datos curados](datos-curados.md)). |
+| Fuente | Adaptador | Decisión |
+|--------|-----------|----------|
+| PokeAPI: volcado CSV fijado a un commit e imágenes de PokeAPI/sprites | `sources/pokeapi/` | [ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md), [ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md) |
+| WikiDex: equipos de los combates clave y portadas, con caché y límite de peticiones | `sources/wikidex/` | [ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md), [ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md) |
+| Datos curados: `data/curated/*.yaml` | `sources/curated/` | [ADR-0005](../03-adr/0005-datos-curados-yaml.md) |
 
-La fase de carga construye `reference.sqlite` en un fichero temporal, comprueba su
-integridad y que las claves que usa `user.sqlite` (favoritos, *Hall of Fame*, confirmaciones)
-siguen existiendo, y solo entonces sustituye el fichero anterior. Las de los favoritos y del
-*Hall of Fame* rechazan la carga; las de las confirmaciones solo son avisos. Si algo falla, se conserva
-la base de datos anterior y el informe explica el motivo. Uso, informe y detalle de la
-implementación en [Ingesta de datos](../05-operacion/ingesta.md).
+La carga construye `reference.sqlite` aparte y solo sustituye al anterior si todo es correcto,
+incluido que siga existiendo lo que usa `user.sqlite`. Paso a paso, el informe y las opciones:
+[ingesta de datos](../05-operacion/ingesta.md#que-hace).
 
 ### `api/`: capa de aplicación
 
@@ -136,11 +124,10 @@ Aplicación de una sola página con React, Vite, TypeScript y Tailwind
 - Cliente de la API generado a partir del OpenAPI de FastAPI
   ([ADR-0007](../03-adr/0007-cliente-generado-openapi.md)).
 - TanStack Query para el estado que viene del servidor.
-- Pantallas: Inicio, Catálogo y ficha, Favoritos, Reglas, **Nuevo juego** (elegir juego →
-  revisar datos → generar), Resultado y *Hall of Fame*.
 - No implementa reglas de negocio: muestra lo que calcula la API.
 
-Rutas, fases y pruebas en el [plan de la web](plan-web.md).
+Sus pantallas, en el [manual de usuario](../04-manual-usuario/web.md); cómo se arranca y se
+prueba, en [Operación](../05-operacion/web.md).
 
 ## Reglas de dependencia
 
@@ -210,37 +197,22 @@ generación responde `409 Conflict` con la lista de datos pendientes ([RF-08](..
 
 ## Despliegue
 
-Uso personal, en local o en una máquina virtual gratuita con acceso privado
-([puesta en producción](../05-operacion/puesta-en-produccion.md),
-[ADR-0009](../03-adr/0009-despliegue-vm-gratuita-tailscale.md), *Propuesto*):
-
-- Un único proceso `uvicorn` sirve la API en `/api` y el frontend compilado (`web/dist`, o el
-  directorio de `PTB_WEB_DIR`) como ficheros estáticos en `/`. Las rutas de la web que no son
-  ficheros reciben `index.html`, para poder recargarlas y enlazarlas; las de `/api` nunca
-  (`api/web.py`, [Operación](../05-operacion/web.md#un-solo-proceso)).
-- Los dos ficheros SQLite están en un directorio de datos configurable.
-- Sin autenticación: la aplicación es de un solo usuario
-  ([alcance](../01-ddf/index.md#alcance)). Protegerla es una mejora prevista
-  ([RF-19](../01-ddf/requisitos-funcionales.md#rf-19)); mientras tanto, fuera del ordenador del
-  usuario el acceso tiene que ser privado.
+- **Un solo proceso**: `uvicorn` sirve la API en `/api` y la web compilada en `/`
+  ([un solo proceso](../05-operacion/web.md#un-solo-proceso)), con los dos SQLite en un
+  directorio de datos configurable ([directorio de datos](../05-operacion/api.md#directorio-de-datos)).
+- **Sin autenticación**: la aplicación es de un solo usuario
+  ([alcance](../01-ddf/index.md#alcance)); fuera del ordenador del usuario, el acceso tiene que
+  ser privado ([RF-19](../01-ddf/requisitos-funcionales.md#rf-19)).
+- **Producción**: [puesta en producción](../05-operacion/puesta-en-produccion.md)
+  ([ADR-0009](../03-adr/0009-despliegue-vm-gratuita-tailscale.md), *Propuesto*; sin prioridad).
 
 ## Estrategia de pruebas
 
 | Capa | Herramientas | Qué se prueba |
 |------|--------------|---------------|
 | `core/` | pytest, hypothesis | Cada regla con `@pytest.mark.rn("RN-XX")`; propiedades del motor ([algoritmo](algoritmo-generacion.md#pureza-del-motor)). |
-| `ingest/` | pytest con ficheros de ejemplo | Normalización de CSV y wikitexto reales guardados como datos de prueba; nunca red en los tests. |
+| `ingest/` | pytest con extractos reales | Normalización de CSV y wikitexto reales guardados como datos de prueba; nunca red en los tests. |
 | `api/` | pytest con `TestClient` | Contratos de los endpoints con bases de datos SQLite temporales. |
-| `web/` | Vitest, Playwright | Componentes y el flujo de nuevo juego de extremo a extremo. |
+| `web/` | Vitest, Playwright | Pantallas con la API simulada y el flujo de nuevo juego de extremo a extremo contra la API real ([pruebas de la web](../05-operacion/web.md#pruebas)). |
 
-## Estructura de directorios
-
-```
-core/      domain/, rules/, engine/, journey.py, review.py, evolution.py, breeding.py
-db/        reference/ (SQLModel), user/ (SQLModel + migraciones Alembic)
-ingest/    sources/ (pokeapi/, curated/, wikidex/), cli.py, scope.py, load.py, checks.py, report.py
-api/       routers/, services/, repositories/, main.py
-data/      curated/*.yaml (en git), cache/ y *.sqlite (fuera de git)
-web/       src/ (pages, components, api/ con el cliente generado)
-tests/     core/, ingest/, api/
-```
+Cómo se organizan los tests de Python y sus convenciones: [`tests/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/tests/README.md).

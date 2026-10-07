@@ -467,62 +467,11 @@ SELECT pokeapi_commit, games, started_at, finished_at FROM ingest_run;
 
 ## Implementación
 
-Código en `ingest/` ([estructura del código](../02-ddt/estructura-codigo.md)):
-
-| Fichero | Qué hace |
-|---------|----------|
-| `__main__.py` | Punto de entrada de `python -m ingest`. |
-| `cli.py` | Opciones de la línea de comandos, fuentes de una carga completa (`default_sources`), imágenes del commit fijado (`default_sprites`) y portadas de los juegos (`default_covers`). |
-| `scope.py` | Alcance de la carga: generaciones cargadas, generaciones con juego objetivo, primera generación con crianza y grupos de versiones excluidos ([CA-11](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| `load.py` | `build_reference(sources, target, checks, user_database, images)`: fichero temporal, filas, integridad, imágenes de las formas y portadas de los juegos (`Images`), comprobaciones, datos del usuario, registro y sustitución. |
-| `user_keys.py` | `check_user_keys`: lo que usa `user.sqlite` y no tiene la nueva carga, como errores (favoritos y *Hall of Fame*) o avisos (confirmaciones). |
-| `checks.py` | Comprobaciones de la primera carga: cantidades y casos conocidos. |
-| `report.py` | `LoadReport`: recuentos, imágenes, comprobaciones superadas, errores y texto del informe. |
-| `sources/__init__.py` | `Source`, la interfaz de una fuente: `name`, `pokeapi_commit` y `rows()`, que entrega filas ya validadas. |
-| `sources/curated/__init__.py` | `read_curated`, que lee y valida los ficheros de `data/curated/`, y `CuratedSource`, la fuente de las mecánicas y los combates clave. |
-| `sources/curated/schemas.py` | Un modelo pydantic por fichero curado ([datos curados](../02-ddt/datos-curados.md)). |
-| `sources/wikidex/__init__.py` | `WikidexSource`: lee el equipo de cada combate de la lista curada, traduce los nombres, quita el inicial del rival y, si hay variantes, se queda con los Pokémon comunes. |
-| `sources/wikidex/fetch.py` | `PageCache`: descarga con caché y límite de peticiones de las páginas de WikiDex. |
-| `sources/wikidex/covers.py` | `CoverCache`: información (`fetch_cover_info`), descarga con caché y límite de peticiones, comprobación del `sha1` y reducción de las portadas de los juegos; los motivos por los que un juego no tiene portada (ADR-0011). |
-| `sources/wikidex/parse.py` | Busca la sección, el rótulo y las plantillas `{{Equipo}}` en el wikitexto. |
-| `sources/pokeapi/index.py` | Índice de los Pokémon cargados por su nombre en español, para traducir los nombres de WikiDex. |
-| `sources/pokeapi/__init__.py` | `PokeapiCsvSource`, la fuente de PokeAPI. Recibe los datos curados para los bebés de incienso y las propuestas de llegada. |
-| `sources/pokeapi/download.py` | `CsvCache`: descarga con caché de los CSV de un commit. |
-| `sources/pokeapi/sprites.py` | `SpriteCache`: descarga con caché y peticiones espaciadas de las imágenes de un commit de PokeAPI/sprites; `trimmed` recorta un *sprite* a su figura y `reduced` reduce la ilustración (Pillow); los motivos por los que una forma no tiene imagen. |
-| `sources/pokeapi/rows.py` | Un modelo pydantic por fichero CSV y `read_rows`, que valida cada fila. |
-| `sources/pokeapi/transform.py` | Funciones puras que convierten las filas de PokeAPI en filas de `reference.sqlite`. |
-
-Tests en `tests/ingest/`:
-
-- `test_load.py`: la carga con fuentes en memoria (filas desordenadas, registro, recuento por
-  origen, referencias rotas, fuentes que fallan) y el CLI.
-- `test_user_keys.py`: las claves de `user.sqlite` frente a la nueva carga: sin `user.sqlite`,
-  con todas las claves, favoritos y datos del *Hall of Fame* que desaparecen (la carga se
-  rechaza y se conserva la anterior), confirmaciones que desaparecen (solo avisos), listas
-  largas y la CLI.
-- `test_pokeapi.py`: la fuente de PokeAPI sobre un
-  [extracto real del volcado](https://github.com/AlbertoMercado/pokemon-team-builder/tree/main/tests/ingest/fixtures/pokeapi)
-  con unas 45 especies elegidas por sus casos especiales: caché, validación, juegos, formas,
-  crianza, tipos y eficacias por generación, evoluciones y existencia.
-- `test_curated.py`: los ficheros curados reales del repositorio, sus esquemas, la fuente
-  de datos curados y el error del CLI con un fichero inválido.
-- `test_sprites.py`: las imágenes: caché, descarga del commit fijado, imagen que no existe,
-  descarga que no es un PNG, servidor que no responde (deja de descargar), `--offline`,
-  peticiones espaciadas, la carga con imágenes y sin ellas, y que la caché no se versiona. Usa
-  un PNG mínimo creado en el test: las imágenes reales no se guardan en git (CA-56).
-- `test_covers.py`: las portadas: títulos curados, información de la API con una respuesta real
-  de WikiDex (solo metadatos), descarga y reducción, caché, cambio de título, fichero que no
-  existe, descarga que no coincide con su `sha1`, WikiDex sin responder, `--offline`, 1 s entre
-  peticiones, la carga con y sin portadas y `--no-covers`. Las imágenes se crean en el test.
-- `test_wikidex.py`: la fuente de WikiDex sobre páginas reales recortadas: caché y límite
-  de peticiones, respuesta de la API, rótulos, variantes y Pokémon comunes, desambiguación y
-  filas de los combates.
-
-Ningún test usa la red: `tests/conftest.py` hace fallar cualquier petición HTTP.
+El código está en `ingest/`: su índice, en [`ingest/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/ingest/README.md), y qué hace
+cada módulo, en su *docstring*. Los tests, en `tests/ingest/`
+([`tests/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/tests/README.md)).
 
 ## Pendiente
 
-- **Rubí, Zafiro y Esmeralda** (fase 6): mecánicas, regla de llegada y combates clave.
-- **Elegir juegos**: cargar solo algunos juegos objetivo, cuando haya más de una generación.
-- **Cargas bloqueadas** (fase 7): bloqueos, informe en JSON y Markdown y código de salida 2
-  ([carga bloqueada](#carga-bloqueada)).
+Lo que falta de la ingesta está en las issues: juegos con datos incompletos (#75), cargas
+bloqueadas (#78) y restricciones de llegada del resto de juegos (#8).

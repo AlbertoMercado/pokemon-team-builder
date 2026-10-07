@@ -81,14 +81,6 @@ Al cambiar un modelo de `db/user/models.py`:
 
 ## Implementación
 
-| Fichero | Qué hace |
-|---------|----------|
-| `api/main.py` | `create_app(settings)`: crea la aplicación, abre las bases de datos al arrancar y las cierra al parar. `app` es la que sirve uvicorn. |
-| `api/config.py` | `Settings`: el directorio de datos (`PTB_DATA_DIR`) y el de la web compilada (`PTB_WEB_DIR`). |
-| `api/web.py` | Sirve la web compilada en `/`, después de las rutas de la API, con vuelta a `index.html` para las rutas de la web y sin tapar `/api`. |
-| `api/database.py` | `Databases`: migra y abre `user.sqlite` al arrancar y abre `reference.sqlite` cuando una petición lo necesita (`503` si no existe o si le faltan tablas o columnas porque lo cargó una versión anterior, con `db.reference.missing_columns`). Dependencias `reference_session` y `user_session` para los endpoints. |
-| `api/openapi.py` | Exporta el contrato OpenAPI de `create_app()` sin arrancar la API: `uv run python -m api.openapi [FICHERO]`. Lo usa la web para generar su cliente ([web](web.md#cliente-de-la-api)). |
-| `api/services/images.py` | `image_url` y `artwork_url` de cada forma y `cover_url` de cada juego en las respuestas; `image_file` y `cover_file` dan el fichero de la imagen, la ilustración o la portada dentro del directorio de datos (`404` si no tiene o está fuera de él). Lo usan `GET /api/pokemon/{pokemon}/image`, `/artwork` y `GET /api/games/{game}/cover` ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md), [ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)). |
-| `api/services/wikidex.py` | Enlaces a WikiDex: la página del fichero de cada portada (`cover_source_url`) y la revisión de la que sale el equipo de cada combate clave (`source_url`). Solo construye las URL; la API nunca pide nada a WikiDex. |
-| `api/errors.py` | Errores de los casos de uso (`NotFoundError`, `ConflictError`) y su traducción a `404` y `409`. |
-| `db/user/` | Modelos de `user.sqlite`, `upgrade(path)` y las migraciones. |
+El código está en `api/`: su índice, en [`api/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/api/README.md), y qué hace cada
+módulo, en su *docstring*. Los modelos de `user.sqlite` y sus migraciones están en `db/user/`
+([`db/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/db/README.md)).
