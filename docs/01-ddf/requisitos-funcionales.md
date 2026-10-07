@@ -93,10 +93,20 @@ Hay dos excepciones:
 - **Prioridad**: Must
 - **Descripción**: el usuario elige el juego que quiere completar.
 - **Criterios de aceptación**:
-    - Solo se ofrecen juegos de la saga principal con datos cargados.
-    - Solo se ofrecen juegos que permiten la crianza. Quedan fuera los de la 1.ª generación
-      (Rojo, Azul y Amarillo) ([forma de jugar](index.md#forma-de-jugar),
-      [CA-29](cuestiones-abiertas.md#resueltas)).
+    - Solo se ofrecen los **juegos completos** ([CA-67](cuestiones-abiertas.md#resueltas)):
+      juegos de la saga principal que permiten la crianza y tienen cargado todo lo que
+      necesitan las reglas para operar:
+        - Que permitan la crianza deja fuera los de la 1.ª generación (Rojo, Azul y
+          Amarillo) ([forma de jugar](index.md#forma-de-jugar),
+          [CA-29](cuestiones-abiertas.md#resueltas)).
+        - Qué Pokémon (por forma) existen en el juego y pueden llegar a él
+          ([RN-03](reglas-negocio.md#rn-03)).
+        - Sus mecánicas, como el ciclo de día y noche ([RN-15](reglas-negocio.md#rn-15)).
+        - Sus combates clave, cada uno con su equipo ([RN-17](reglas-negocio.md#rn-17)).
+        - Sus iniciales ([RN-21](reglas-negocio.md#rn-21)).
+    - Un juego que no está completo no se ofrece ni se puede revisar o generar, aunque se
+      intente por su dirección. Sí se puede registrar en el *Hall of Fame*, porque forma parte
+      del recorrido ([RF-12](#rf-12)).
     - Cambiar de juego no modifica la lista de favoritos.
 
 ### RF-06 · Configurar las reglas duras { #rf-06 }
@@ -213,7 +223,8 @@ Hay dos excepciones:
   actualizarlos. La carga se ejecuta a mano desde la terminal, aparte de la aplicación
   ([CA-47](cuestiones-abiertas.md#resueltas)).
 - **Alcance inicial**: las 386 especies de las generaciones 1 a 3 y sus 11 juegos, con los 5
-  de la 3.ª generación como juego objetivo, para validar el algoritmo antes de ampliarlo
+  de la 3.ª generación como posibles juegos objetivo (al principio, solo Rojo Fuego y Verde
+  Hoja están completos, [RF-05](#rf-05)), para validar el algoritmo antes de ampliarlo
   ([CA-11](cuestiones-abiertas.md#resueltas),
   [diseño de la carga](../02-ddt/carga-datos.md#alcance)).
 - **Criterios de aceptación**:
@@ -230,14 +241,16 @@ Hay dos excepciones:
       Pokédex regional).
     - Repetir la carga no duplica datos ni borra las confirmaciones del usuario.
     - Se respetan los límites de uso de cada fuente.
-    - Al terminar, se informa de qué se ha cargado y de los errores, si los hay.
+    - Al terminar, se informa de qué se ha cargado y de los errores, si los hay. El informe
+      dice también qué juegos no están completos y qué les falta: se cargan igualmente, pero
+      no se pueden elegir como juego objetivo ([RF-05](#rf-05),
+      [CA-67](cuestiones-abiertas.md#resueltas)).
     - Si la carga encuentra algo que la aplicación no sabe tratar, queda **bloqueada**: no
       cambia los datos y genera un informe para el arquitecto ([RF-16](#rf-16)). Bloquean la
       carga:
         - Un método de evolución sin catalogar ([CA-42](cuestiones-abiertas.md#resueltas)).
         - Una evolución que exige conocer un movimiento sin que estén cargados los movimientos
           que se aprenden por nivel ([CA-45](cuestiones-abiertas.md#resueltas)).
-        - Un juego objetivo sin combates clave ([CA-46](cuestiones-abiertas.md#resueltas)).
         - El equipo de un combate clave que no se encuentra en WikiDex.
     - Una carga bloqueada solo se resuelve con una nueva versión de la aplicación o de sus
       datos curados. Hasta entonces se sigue usando la base de datos anterior.

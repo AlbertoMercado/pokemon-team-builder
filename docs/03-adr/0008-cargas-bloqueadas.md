@@ -15,7 +15,9 @@ una generación, la carga puede encontrar cosas que la aplicación no sabe trata
   ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas));
 - una evolución que exige un movimiento sin que estén cargados los movimientos por nivel
   ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas));
-- un juego objetivo sin combates clave ([CA-46](../01-ddf/cuestiones-abiertas.md#resueltas));
+- un juego objetivo sin combates clave ([CA-46](../01-ddf/cuestiones-abiertas.md#resueltas)).
+  Ya no bloquea la carga: [CA-67](../01-ddf/cuestiones-abiertas.md#resueltas) lo resuelve
+  cargando el juego sin ofrecerlo como juego objetivo;
 - el equipo de un combate clave que no se encuentra en WikiDex.
 
 Ninguno se puede resolver dentro de la carga: exigen decidir cómo los tratan las reglas
