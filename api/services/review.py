@@ -112,6 +112,13 @@ def fact_name(game: GameReference, value: Reviewable) -> str:
     return game.forms[value.subject].name
 
 
+def source_url(game: GameReference, value: Reviewable) -> str | None:
+    """The WikiDex revision a key battle's team comes from (ADR-0004); ``None`` otherwise."""
+    if value.kind is not FactKind.KEY_BATTLE:
+        return None
+    return next(b.source_url for b in game.key_battles if b.slug == value.subject)
+
+
 def _out(game: GameReference, value: Reviewable, confirmations: Confirmations) -> ReviewFactOut:
     confirmation = value.confirmation(confirmations)
     stale = confirmations.get(value.key)
@@ -126,4 +133,5 @@ def _out(game: GameReference, value: Reviewable, confirmations: Confirmations) -
         value=None if confirmation is None else confirmation.confirmed_value,
         confirmed_at=None if confirmation is None else confirmation.confirmed_at,
         outdated=confirmation is None and stale is not None,
+        source_url=source_url(game, value),
     )

@@ -131,6 +131,19 @@ responde `503` pidiéndolo (`missing_columns`).
 - **Combates clave**: el dato revisable de un combate clave da `source_url`, el enlace a la página
   de WikiDex en la revisión usada (`index.php?title=…&oldid=…`).
 
+#### Decisiones tomadas al implementar la fase 2
+
+- **Los enlaces a WikiDex van aparte** (`api/services/wikidex.py`), no en `images.py`: sirven
+  también para los combates clave, que no son imágenes.
+- **`cover_url` y `cover_source_url` son nulas** en un registro del *Hall of Fame* cuyo juego ya
+  no está cargado, como su `generation`.
+- **`source_url` solo se ve en la revisión**: con los datos actuales los 26 combates clave de Rojo
+  Fuego y Verde Hoja se cargan automáticos y la revisión no los muestra, así que no aparece. Se
+  decidió no añadir otro endpoint para listarlos: la atribución general de WikiDex irá en el aviso
+  de la web (fase 3), y la acción de ADR-0004 sigue abierta para mostrar cada combate.
+- **Comprobado con los datos reales**: 11 de 11 juegos con `cover_url`; la portada de Esmeralda,
+  de 254 × 256 y 149 KB.
+
 ### Web
 
 - Un componente `GameCover`: decorativo, caja de tamaño fijo con `object-contain` (lo aprendido en
@@ -149,7 +162,7 @@ Cada fase es un PR con sus tests y su documentación.
 |------|------|-----------|-------|
 | 0 ✅ | `docs/portadas-juegos` | ADR-0011, este plan, comprobaciones previas, CA-55 y RF-18. | — |
 | 1 ✅ | `feat/ingesta-portadas` | `covers.yaml`, `CoverCache`, `game.cover` y `cover_source`, informe, `--no-covers`. Operación de la ingesta, datos curados, modelo de datos y puesta en producción. | Sin red, con imágenes sintéticas: información y descarga, caché, `--offline`, fichero que no existe, servidor que no responde, reducción, carga con y sin portadas, `--no-covers`, esquema de `covers.yaml`. Comprobación real con red. |
-| 2 | `feat/api-portadas` | Endpoint de la portada, `cover_url` y `cover_source_url`, `source_url` de los combates clave, cliente regenerado. API, Operación y manual. | `200` y `404`; ruta fuera del directorio de datos; juegos que no son objetivo; campos en los juegos, el *Hall of Fame* y la revisión. |
+| 2 ✅ | `feat/api-portadas` | Endpoint de la portada, `cover_url` y `cover_source_url`, `source_url` de los combates clave, cliente regenerado. API, Operación y manual. | `200` y `404`; ruta fuera del directorio de datos; juegos que no son objetivo; campos en los juegos, el *Hall of Fame* y la revisión. |
 | 3 | `feat/web-portadas` | `GameCover` en las cinco pantallas, aviso y fuente de los combates clave. Manual de la web y CHANGELOG. | Vitest de cada pantalla con y sin portada; tamaños medidos con los datos reales. |
 | 4 | `chore/release-1.2.0` | Versión 1.2.0 (MENOR) y cierre de #49. | — |
 

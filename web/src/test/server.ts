@@ -134,13 +134,23 @@ const INITIAL_FAVORITES = ["venusaur", "ninetales-alola"];
 const favoriteSet = new Set(INITIAL_FAVORITES);
 
 export const games: Game[] = [
-  { game: "emerald", name: "Esmeralda", generation: 3, version_group: "emerald", target: true },
+  {
+    game: "emerald",
+    name: "Esmeralda",
+    generation: 3,
+    version_group: "emerald",
+    target: true,
+    cover_url: null,
+    cover_source_url: null,
+  },
   {
     game: "firered",
     name: "Rojo Fuego",
     generation: 3,
     version_group: "firered-leafgreen",
     target: true,
+    cover_url: null,
+    cover_source_url: null,
   },
 ];
 
@@ -161,6 +171,7 @@ const fact = (
   value: null,
   confirmed_at: null,
   outdated: false,
+  source_url: null,
 });
 
 /**
@@ -270,7 +281,15 @@ function detail(found: Form): PokemonDetail {
 
 /** Every loaded game, for the Hall of Fame: also those that are not a target. */
 export const allGames: Game[] = [
-  { game: "red", name: "Rojo", generation: 1, version_group: "red-blue", target: false },
+  {
+    game: "red",
+    name: "Rojo",
+    generation: 1,
+    version_group: "red-blue",
+    target: false,
+    cover_url: null,
+    cover_source_url: null,
+  },
   ...games,
   {
     game: "leafgreen",
@@ -278,6 +297,8 @@ export const allGames: Game[] = [
     generation: 3,
     version_group: "firered-leafgreen",
     target: true,
+    cover_url: null,
+    cover_source_url: null,
   },
 ];
 
@@ -317,20 +338,25 @@ function journey(game: string | null): HallOfFameEntry[] {
   );
   const lastId = ordered.at(-1)?.id;
   return ordered
-    .map((entry, index) => ({
-      ...entry,
-      game_name: allGames.find((candidate) => candidate.game === entry.game)?.name ?? entry.game,
-      generation: allGames.find((candidate) => candidate.game === entry.game)?.generation ?? null,
-      order: index + 1,
-      last: entry.id === lastId,
-      members: entry.members.map((pokemon, position) => ({
-        position: position + 1,
-        pokemon,
-        name: member(pokemon)?.name ?? pokemon,
-        types: member(pokemon)?.types ?? [],
-        image_url: member(pokemon)?.image_url ?? null,
-      })),
-    }))
+    .map((entry, index) => {
+      const found = allGames.find((candidate) => candidate.game === entry.game);
+      return {
+        ...entry,
+        game_name: found?.name ?? entry.game,
+        generation: found?.generation ?? null,
+        cover_url: found?.cover_url ?? null,
+        cover_source_url: found?.cover_source_url ?? null,
+        order: index + 1,
+        last: entry.id === lastId,
+        members: entry.members.map((pokemon, position) => ({
+          position: position + 1,
+          pokemon,
+          name: member(pokemon)?.name ?? pokemon,
+          types: member(pokemon)?.types ?? [],
+          image_url: member(pokemon)?.image_url ?? null,
+        })),
+      };
+    })
     .filter((entry) => game === null || entry.game === game);
 }
 

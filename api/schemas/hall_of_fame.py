@@ -30,6 +30,14 @@ class HallOfFameEntryOut(BaseModel):
     generation: int | None = Field(
         description="Generación del juego (la de su lanzamiento); nula si ya no está cargado."
     )
+    cover_url: str | None = Field(
+        description="URL de su portada en esta API (`/api/games/{game}/cover`); nula si el juego "
+        "no tiene portada (RF-18)."
+    )
+    cover_source_url: str | None = Field(
+        description="Página del fichero de la portada en WikiDex, su titular y procedencia "
+        "(CA-56, ADR-0011); nula si el juego no tiene portada."
+    )
     completed_on: date
     notes: str | None
     order: int = Field(

@@ -79,6 +79,8 @@ class GameRow:
     is_target: bool = True
     has_breeding: bool = True
     release_order: int = 1
+    cover: str | None = None
+    cover_source: str | None = None
 
 
 DEFAULT_GAMES = (
@@ -119,6 +121,8 @@ def reference_database(
                 release_order=g.release_order,
                 has_breeding=g.has_breeding,
                 is_target=g.is_target,
+                cover=g.cover,
+                cover_source=g.cover_source,
             )
             for g in games
         )

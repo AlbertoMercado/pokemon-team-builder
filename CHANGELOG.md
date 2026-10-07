@@ -12,6 +12,10 @@ versión: [versiones](docs/05-operacion/versiones.md).
   límite de peticiones y sin versionarlas en git. Cada portada se indica en
   `data/curated/covers.yaml`. WikiDex las declara de uso legítimo solo en sus artículos, así
   que la aplicación las usa en privado; `--no-covers` carga sin ellas (RF-18, ADR-0011, #49).
+- **API**: `GET /api/games/{game}/cover` sirve la portada de cada juego cargado. Los juegos y el
+  Hall of Fame la indican en `cover_url`, con la página de WikiDex de la que sale en
+  `cover_source_url`. En la revisión de datos, cada combate clave enlaza en `source_url` a la
+  versión de la página de WikiDex de la que sale su equipo (RF-18, ADR-0004, ADR-0011, #49).
 
 ### Cambiado
 

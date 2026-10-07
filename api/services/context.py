@@ -28,6 +28,7 @@ from sqlmodel import Session
 
 from api.errors import NotFoundError
 from api.repositories import reference as reference_repo
+from api.services import wikidex
 from core.domain import (
     Availability,
     Candidate,
@@ -108,12 +109,14 @@ class FormFacts:
 
 @dataclass(frozen=True)
 class LoadedBattle:
-    """A key battle as loaded; its team is the value of ``fact`` (RN-17)."""
+    """A key battle as loaded; its team is the value of ``fact`` (RN-17). ``source_url`` is
+    the WikiDex revision the team was read from, if known (ADR-0004)."""
 
     slug: str
     category: str
     trainer: str
     fact: Reviewable
+    source_url: str | None = None
 
 
 @dataclass(frozen=True)
@@ -323,7 +326,14 @@ def _loaded_battles(reference: Session, game: str) -> tuple[LoadedBattle, ...]:
         origin = Origin(battle.origin)
         team = tuple(teams[battle.slug]) if origin is not Origin.PENDING else None
         fact = Reviewable(battle.fact_key, FactKind.KEY_BATTLE, battle.slug, origin, team)
-        battles.append(LoadedBattle(battle.slug, str(battle.category), battle.trainer_name, fact))
+        source = (
+            wikidex.revision_url(battle.source_page, battle.source_revision)
+            if battle.source_page is not None and battle.source_revision is not None
+            else None
+        )
+        battles.append(
+            LoadedBattle(battle.slug, str(battle.category), battle.trainer_name, fact, source)
+        )
     return tuple(battles)
 
 
