@@ -72,9 +72,10 @@ def check_counts(session: Session) -> list[str]:
 
 
 def check_target_games(session: Session) -> list[str]:
+    """Only the complete games are target games (RF-05, CA-67): those with curated data."""
     targets = set(session.exec(select(Game.slug).where(col(Game.is_target))).all())
-    if targets != TARGET_GAMES:
-        return [f"juegos objetivo {sorted(targets)}, se esperaban {sorted(TARGET_GAMES)}"]
+    if targets != CURATED_GAMES:
+        return [f"juegos objetivo {sorted(targets)}, se esperaban {sorted(CURATED_GAMES)}"]
     return []
 
 

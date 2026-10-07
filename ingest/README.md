@@ -13,6 +13,7 @@ puntual, no en cada arranque ([RF-11](../docs/01-ddf/requisitos-funcionales.md#r
 | `__main__.py`, `cli.py` | Punto de entrada y opciones de la línea de comandos. |
 | `scope.py` | Alcance de la carga: generaciones y juegos. |
 | `load.py` | `build_reference`: construye la base de datos aparte y solo sustituye la anterior si todo es correcto. |
+| `targets.py` | Deja como juego objetivo solo los juegos completos y dice qué les falta a los demás. |
 | `checks.py` | Comprobaciones de la carga: cantidades y casos conocidos. |
 | `user_keys.py` | Que siga existiendo lo que usa `user.sqlite`. |
 | `report.py` | Informe de la carga. |

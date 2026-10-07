@@ -131,10 +131,12 @@ curl http://127.0.0.1:8000/api/games
 ```
 
 Los juegos que puedes elegir para generar un equipo, en orden de lanzamiento. Solo aparecen los
-que tienen datos cargados y permiten la crianza.
+juegos completos: los que permiten la crianza y tienen todos los datos que necesitan las reglas
+([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Hoy, Rojo Fuego y Verde Hoja.
 
 Con `?all=true` aparecen todos los juegos cargados, también los que no pueden ser juego objetivo
-(como Rojo u Oro), que sí se pueden registrar en el [Hall of Fame](#hall-of-fame-tu-recorrido).
+(como Rojo u Oro) o que aún no están completos (como Rubí), que sí se pueden registrar en el
+[Hall of Fame](#hall-of-fame-tu-recorrido).
 `target` dice si cada uno puede ser juego objetivo.
 
 Cada juego trae en `cover_url` la dirección de su portada, o `null` si no la tiene, y en

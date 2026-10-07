@@ -40,7 +40,8 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Rojo Fuego, Verde Hoja |
 | [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). **Pendiente de implementar.** | `evolution_method` | — |
 
-Los datos de Rubí, Zafiro y Esmeralda están pendientes (#75, #8).
+Los datos de Rubí, Zafiro y Esmeralda están pendientes (#8): hasta tenerlos, no se pueden elegir
+como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)).
 
 ### `pokeapi.yaml`
 
@@ -323,4 +324,6 @@ comprobación de los iniciales) y en
    desambiguación o qué rótulos hay en cada sección, para completar `wikidex_page` y
    `wikidex_team`.
 3. Actualizar las comprobaciones de la carga (`ingest/checks.py`) y esta página.
-4. Ejecutar la ingesta y revisar el informe.
+4. Ejecutar la ingesta y revisar el informe. Mientras al juego le falte algo de lo que pide
+   [RF-05](../01-ddf/requisitos-funcionales.md#rf-05), el informe lo dice y el juego no se
+   puede elegir como objetivo.

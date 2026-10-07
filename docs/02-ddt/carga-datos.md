@@ -12,7 +12,7 @@ cómo se usa: el [manual](../04-manual-usuario/cargar-datos.md); el esquema de l
 | Especies | 1.ª a 3.ª generación: de #0001 Bulbasaur a #0386 Deoxys | 386 (151 + 100 + 135) |
 | Formas (`pokemon`) | Solo la forma por defecto de cada especie | 386 |
 | Juegos | Todos los de las generaciones 1 a 3 | 11 juegos en 7 grupos de versiones |
-| Juegos objetivo | Los de la 3.ª generación: Rubí, Zafiro, Esmeralda, Rojo Fuego y Verde Hoja | 5 |
+| Juegos objetivo | Los de la 3.ª generación que están completos ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)): hoy, Rojo Fuego y Verde Hoja | 2 de 5 |
 | Tipos | Los que existen hasta la 3.ª generación | 15 en la 1.ª, 17 desde la 2.ª |
 | Tabla de eficacias | Una por generación | 3 |
 | Combates clave | Los de los 5 juegos objetivo | Unos 30 entrenadores en WikiDex |
@@ -28,9 +28,14 @@ Decisiones de alcance:
   Fame* y el recorrido puedan registrarlos ([RN-16](../01-ddf/reglas-negocio.md#rn-16)), con
   sus tipos y su tabla de eficacias ([RF-12](../01-ddf/requisitos-funcionales.md#rf-12)). No se
   cargan sus combates clave.
-- **Juegos objetivo con datos completos**: hoy, Rojo Fuego y Verde Hoja, cuyas restricciones de
-  llegada están investigadas ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Completar
-  Rubí, Zafiro y Esmeralda está pendiente (#75, #8).
+- **Solo los juegos completos son juego objetivo**
+  ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05),
+  [CA-67](../01-ddf/cuestiones-abiertas.md#resueltas)). La fuente de PokeAPI propone como
+  objetivo los 5 de la 3.ª generación y, con todo cargado, `ingest/targets.py` deja como tales
+  solo los completos; el informe dice qué les falta a los demás, que se cargan igualmente. Hoy
+  son Rojo Fuego y Verde Hoja, cuyas restricciones de llegada están investigadas
+  ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). A Rubí, Zafiro y Esmeralda les faltan
+  sus mecánicas y sus combates clave (#8).
 - **Sin movimientos por nivel**. Ninguna evolución de las especies 1 a 386 exige conocer un
   movimiento (eso empieza en la 4.ª generación: Tangrowth, Mamoswine…). La tabla `level_move`
   y el fichero `pokemon_moves.csv` (10,7 MB) se dejan para cuando haga falta.
@@ -164,7 +169,7 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
 - **Cantidades**: 3 generaciones, 7 grupos de versiones, 11 juegos, 17 tipos, 386 especies,
   386 formas y 5 × 386 filas de disponibilidad. Tablas de eficacias completas: 15 × 15 pares
   en la 1.ª generación y 17 × 17 en la 2.ª y la 3.ª.
-- **Juegos objetivo**: exactamente Rubí, Zafiro, Esmeralda, Rojo Fuego y Verde Hoja.
+- **Juegos objetivo**: exactamente Rojo Fuego y Verde Hoja, los completos.
 - **Tipos por generación**: Clefairy es Normal en la 3.ª, Magnemite es solo Eléctrico en la
   1.ª y Eléctrico/Acero en la 2.ª, y Bulbasaur es Planta/Veneno.
 - **Eficacias**: Fantasma no afecta a Psíquico en la 1.ª y le hace ×2 en la 3.ª, Fantasma

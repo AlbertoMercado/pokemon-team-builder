@@ -28,9 +28,10 @@ def list_games(
         ),
     ] = False,
 ) -> list[GameOut]:
-    """Los juegos que se pueden elegir como objetivo, en orden de lanzamiento: los de la saga
-    principal con datos cargados que permiten la crianza (RF-05). Con `all=true`, todos los
-    juegos cargados; `target` dice cuáles pueden ser juego objetivo."""
+    """Los juegos que se pueden elegir como objetivo, en orden de lanzamiento: los juegos
+    completos, que permiten la crianza y tienen todos los datos que necesitan las reglas
+    (RF-05). Con `all=true`, todos los juegos cargados; `target` dice cuáles pueden ser juego
+    objetivo."""
     return service.list_games(reference, every=every)
 
 

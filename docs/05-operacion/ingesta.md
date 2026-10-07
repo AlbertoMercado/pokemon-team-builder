@@ -180,6 +180,10 @@ Datos revisables por origen:
 Imágenes: 386 de 386 formas
 Ilustraciones: 386 de 386 formas
 Portadas: 11 de 11 juegos
+Juegos que no se pueden elegir como objetivo (datos incompletos):
+  Rubí: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
+  Zafiro: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
+  Esmeralda: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
 Comprobaciones superadas: 10
 Carga completada.
 ```
@@ -197,6 +201,10 @@ Carga completada.
 - **Portadas**: cuántos juegos tienen portada. Con `--no-covers` no aparece. Los que no la
   tienen también van en **Avisos**, por ejemplo:
   `1 juego sin portada, su fichero no está en WikiDex: emerald`.
+- **Juegos que no se pueden elegir como objetivo**: los que no están completos y qué les falta
+  ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Se cargan igualmente y se pueden
+  registrar en el *Hall of Fame*, pero no aparecen al elegir el juego. No es un error: la
+  carga se completa.
 - **Comprobaciones superadas**: número de comprobaciones de la carga que se han cumplido.
 
 Ejemplos de cargas fallidas:
