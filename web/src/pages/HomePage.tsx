@@ -1,6 +1,6 @@
 /**
  * Inicio: the data the application works with, how many favourites there are, the last
- * completed game and the way to a new game (docs/02-ddt/plan-web.md, "Pantallas").
+ * completed game and the way to a new game (docs/02-ddt/web.md, "Pantallas").
  */
 import type { ReactNode } from "react";
 import { Link } from "react-router";

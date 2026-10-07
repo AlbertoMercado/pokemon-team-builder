@@ -14,7 +14,7 @@ aplicación funciona sin conexión.
 
 [CA-55](../01-ddf/cuestiones-abiertas.md#resueltas) decidió sacarlas de WikiDex, que ya es fuente
 de los combates clave, **si tiene la de cada juego y se pueden usar**. Lo comprobado el
-2026-10-06 ([plan](../02-ddt/plan-portadas.md#comprobaciones-previas)):
+2026-10-06 ([plan](../06-historial/plan-portadas.md#comprobaciones-previas)):
 
 - WikiDex tiene la carátula de los 11 juegos cargados, la que muestra la ficha de cada artículo
   de juego. Los nombres de los ficheros no siguen un patrón (`Carátula de Rojo Fuego.png`,
@@ -101,14 +101,14 @@ El nombre del juego sobre el color de su edición (Rojo, Azul, Oro…).
 
 ### Acciones derivadas
 
-- [ ] Implementar las fases del [plan de las portadas](../02-ddt/plan-portadas.md) (#49).
+- [ ] Implementar las fases del [plan de las portadas](../06-historial/plan-portadas.md) (#49).
 - [ ] Mostrar la fuente en WikiDex de cada combate clave, pendiente en
   [ADR-0004](0004-pokeapi-volcado-csv.md#acciones-derivadas), en la misma tanda.
 - [x] Recordar la condición en la [puesta en producción](../05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos).
 
 ## Referencias
 
-- [Plan de las portadas](../02-ddt/plan-portadas.md)
+- [Plan de las portadas](../06-historial/plan-portadas.md)
 - [Plantilla:Carátula de WikiDex](https://www.wikidex.net/wiki/Plantilla:Car%C3%A1tula)
 - [ADR-0010](0010-imagenes-pokemon-cache-local.md): imágenes de los Pokémon
 - Issue #49

@@ -50,7 +50,7 @@ Módulo `db/reference/games.py`.
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
 | `generation` | `number` PK, `slug` único | 1 a 9. |
-| `version_group` | `slug` PK, `generation` FK → `generation`, `order` único | P. ej., `firered-leafgreen`. `order` es el orden cronológico de PokeAPI y decide qué pasos de evolución se aplican a cada grupo ([plan de carga](plan-carga-datos.md#evoluciones)). |
+| `version_group` | `slug` PK, `generation` FK → `generation`, `order` único | P. ej., `firered-leafgreen`. `order` es el orden cronológico de PokeAPI y decide qué pasos de evolución se aplican a cada grupo ([plan de carga](carga-datos.md#evoluciones)). |
 | `game` | `slug` PK, `name_es`, `version_group` FK, `generation` FK, `release_order`, `has_breeding`, `is_target`, `cover`?, `cover_source`? | `is_target` es falso en la 1.ª generación y en juegos sin crianza ([CA-29](../01-ddf/cuestiones-abiertas.md#resueltas)). `cover` es la ruta de su portada relativa al directorio de datos y `cover_source`, el título de su fichero en WikiDex; nulas si no tiene portada ([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)). En la primera carga, solo los 5 de la 3.ª generación ([CA-11](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `game_mechanic` | `game` FK y `mechanic` PK, `value` (sí/no)?, `origin`, `fact_key` único | P. ej., `day_night_cycle`. Datos curados, normalmente inferidos. `value` es nulo solo si `origin` es `pending`. |
 | `game_pokemon` | `game` FK y `pokemon` FK PK, `exists_in_game`?, `exists_origin`, `can_arrive`?, `arrival_origin` | Disponibilidad por forma ([RN-03](../01-ddf/reglas-negocio.md#rn-03)). `can_arrive`: si la etapa que nace del huevo puede llegar y evolucionar antes de completar el juego ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Cada valor es nulo solo si su origen es `pending`. La columna no se llama `exists` porque es palabra reservada de SQL. |
@@ -74,14 +74,14 @@ Módulo `db/reference/evolution.py`.
 
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
-| `evolution_step` | `id` PK, `version_group` FK, `from_pokemon` FK → `pokemon`, `to_pokemon` FK → `pokemon`, `trigger`, `conditions` (JSON) | Paso aplicable en ese grupo de versiones, ya resuelto a partir del `version_group_id` del CSV, que indica el grupo en que se introdujo la evolución ([plan de carga](plan-carga-datos.md#evoluciones)). `trigger` es el disparador de PokeAPI (`level-up`, `trade`, `use-item`, `shed`…) y `conditions`, un objeto JSON con las condiciones no vacías (amistad, hora del día, objeto, belleza, comparación de estadísticas…), tal como vienen. Puede haber varias filas si hay métodos alternativos, por eso la clave es un `id`. |
+| `evolution_step` | `id` PK, `version_group` FK, `from_pokemon` FK → `pokemon`, `to_pokemon` FK → `pokemon`, `trigger`, `conditions` (JSON) | Paso aplicable en ese grupo de versiones, ya resuelto a partir del `version_group_id` del CSV, que indica el grupo en que se introdujo la evolución ([plan de carga](carga-datos.md#evoluciones)). `trigger` es el disparador de PokeAPI (`level-up`, `trade`, `use-item`, `shed`…) y `conditions`, un objeto JSON con las condiciones no vacías (amistad, hora del día, objeto, belleza, comparación de estadísticas…), tal como vienen. Puede haber varias filas si hay métodos alternativos, por eso la clave es un `id`. |
 | `level_move` | `pokemon`, `version_group`, `move`, `level` | Solo los movimientos que exige alguna evolución (`known_move`), para [RN-15](../01-ddf/reglas-negocio.md#rn-15) y [CA-32](../01-ddf/cuestiones-abiertas.md#resueltas). **No implementada**: no hace falta hasta la 4.ª generación. |
 
 Clasificar un paso como tedioso o aleatorio a partir de su disparador y sus condiciones es una
 regla de negocio y se hace en `core/evolution.py`, no en la base de datos. Por eso se guardan
 los datos de PokeAPI sin reducirlos a una categoría.
 
-Pendiente (fase 7 del [plan de carga](plan-carga-datos.md#fases)): la categoría de cada
+Pendiente (#78): la categoría de cada
 disparador y condición pasa a ser un dato
 ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)):
 
@@ -211,8 +211,18 @@ es, el dato está sin verificar.
 ## Contexto del motor (`GameContext`)
 
 Es la única entrada de `core/`. Lo construye `api/services/context.py` a partir de las dos bases
-de datos: la parte de referencia de cada juego se guarda en memoria y la del usuario se lee en
-cada petición ([plan de la API](plan-api.md#construccion-del-gamecontext)).
+de datos, en dos partes:
+
+| Parte | Contenido | Caché |
+|-------|-----------|-------|
+| **De referencia** | Juego y generación, tabla de tipos, todas las formas del juego con sus tipos en la generación, etapas, pasos de evolución y grupos huevo, y los combates clave con los tipos de cada rival. | En memoria, por juego, hasta reiniciar la aplicación: los datos de referencia no cambian mientras está en marcha. |
+| **Del usuario** | Favoritos (que pasan a `favorites`; el resto de formas, al `pool`), configuración de reglas, *Hall of Fame* (con la cadena y la región de cada miembro, sacadas de la referencia) y confirmaciones aplicadas a mecánicas, disponibilidad y combates clave. | En cada petición. |
+
+En el `pool` de sugerencias, un Pokémon con algún dato sin confirmar va marcado como no
+verificado ([CA-31](../01-ddf/cuestiones-abiertas.md#resueltas)). Si el dato es inferido, se
+usa la propuesta; si es pendiente, se trata como posible y va marcado.
+
+Sus campos:
 
 | Campo | Contenido |
 |-------|-----------|

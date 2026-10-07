@@ -1,7 +1,7 @@
 """Data sources of the ingest: each one turns external data into reference.sqlite rows.
 
-Adapters (PokeAPI CSV, curated YAML, WikiDex) are added in the following phases of the
-data load plan (docs/02-ddt/plan-carga-datos.md).
+The adapters (PokeAPI CSV, curated YAML, WikiDex) live in the subpackages; how each source is
+interpreted is in the load design (docs/02-ddt/carga-datos.md).
 """
 
 from collections.abc import Iterable

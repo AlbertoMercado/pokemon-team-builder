@@ -43,6 +43,8 @@ desincronizándose y llevando a errores (#76).
 | Tablas, columnas y migraciones | [Modelo de datos](modelo-datos.md) | Ingesta, API |
 | Qué datos necesita cada regla y de dónde salen | [Datos requeridos](datos-requeridos.md) | DDF, ingesta |
 | Esquema de `data/curated/*.yaml` | [Datos curados](datos-curados.md) | Ingesta, `data/README.md` |
+| Qué se carga y cómo se interpretan las fuentes | [Diseño de la carga](carga-datos.md) | Ingesta, código de `ingest/` |
+| Pantallas, rutas y errores de la web | [Diseño de la web](web.md) | Manual, código de `web/` |
 | Referencia de la API (endpoints, campos, errores) | El código (*docstrings* y `description`), publicado en la [referencia de la API](api-referencia.md) ([ADR-0012](../03-adr/0012-referencia-api-desde-openapi.md)) | Manual, DDT |
 | Convenciones de la API y decisiones de diseño | [API](api.md) | Manual |
 | Cómo se usa cada interfaz (CLI, API y web) | [Manual de usuario](../04-manual-usuario/index.md) | `README.md` |
@@ -52,6 +54,7 @@ desincronizándose y llevando a errores (#76).
 | Numerar y publicar versiones | [Versiones](../05-operacion/versiones.md) | Skill `publicar-version`, `CLAUDE.md` |
 | Cambios de cada versión | `CHANGELOG.md` | *Releases* de GitHub |
 | Lo pendiente | Issues de GitHub | Páginas que lo mencionan |
+| Cómo se planificó cada parte (no vigente) | [Historial](../06-historial/index.md) | ADR |
 | Cómo se documenta | Esta página | `CLAUDE.md` |
 
 !!! note "En curso"

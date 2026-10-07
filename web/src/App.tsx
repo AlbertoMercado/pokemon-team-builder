@@ -1,4 +1,4 @@
-/** Routes of the application (docs/02-ddt/plan-web.md, "Pantallas"). */
+/** Routes of the application (docs/02-ddt/web.md, "Pantallas"). */
 import { Route, Routes } from "react-router";
 
 import Layout from "./components/Layout";

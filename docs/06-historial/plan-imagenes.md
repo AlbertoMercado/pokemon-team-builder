@@ -1,5 +1,10 @@
 # Plan de las imágenes de los Pokémon
 
+!!! warning "Histórico: no se mantiene"
+    Este plan ya se ejecutó y se conserva como historial de cómo y por qué se hizo. No se
+    actualiza: lo vigente sobre las imágenes está en [su documentación](../02-ddt/api.md#imagenes-y-portadas) y lo pendiente, en las
+    [issues](https://github.com/AlbertoMercado/pokemon-team-builder/issues).
+
 Plan para mostrar la imagen de cada Pokémon en la web
 ([RF-17](../01-ddf/requisitos-funcionales.md#rf-17)): obtenerla en la ingesta, servirla desde la
 API y mostrarla en la web, con el aviso de su titularidad. La decisión de arquitectura está en
@@ -37,7 +42,7 @@ API y mostrarla en la web, con el aviso de su titularidad. La decisión de arqui
   lee del directorio de datos.
 - **Las imágenes no se versionan ni se redistribuyen** (CA-56): solo viven en la caché local.
 - **Documentado en el mismo PR**: cada fase actualiza el DDT, el
-  [modelo de datos](modelo-datos.md), Operación y el manual de usuario que le afecten.
+  [modelo de datos](../02-ddt/modelo-datos.md), Operación y el manual de usuario que le afecten.
 
 ## Comprobaciones previas
 
@@ -97,7 +102,7 @@ con el commit `8491ffde1b247e4de574d4bb8e24b7bd9fa876fa` (2026-10-06), el últim
 ### Modelo de datos
 
 Cambios en `reference.sqlite`, que se reconstruye en cada carga, así que no hay migración.
-`user.sqlite` no cambia. Se documentan en el [modelo de datos](modelo-datos.md) en la fase 1:
+`user.sqlite` no cambia. Se documentan en el [modelo de datos](../02-ddt/modelo-datos.md) en la fase 1:
 
 | Tabla | Columnas nuevas | Notas |
 |-------|-----------------|-------|

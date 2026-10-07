@@ -20,7 +20,7 @@ el marco:
   titularidad y su procedencia.
 
 Lo comprobado en el repositorio [PokeAPI/sprites](https://github.com/PokeAPI/sprites) el
-2026-10-06 ([plan](../02-ddt/plan-imagenes.md#comprobaciones-previas)):
+2026-10-06 ([plan](../06-historial/plan-imagenes.md#comprobaciones-previas)):
 
 - Ocupa unos 10 GB: no se puede clonar ni descargar entero en cada carga.
 - `sprites/pokemon/{id}.png` es un PNG de 96 × 96 px, de 0,6 a 1,1 KB, nombrado por el
@@ -143,7 +143,7 @@ Tras comparar las opciones en la propia web, el usuario eligió:
 
 ### Acciones derivadas
 
-- [ ] Implementar las fases del [plan de imágenes de los Pokémon](../02-ddt/plan-imagenes.md)
+- [ ] Implementar las fases del [plan de imágenes de los Pokémon](../06-historial/plan-imagenes.md)
   (#49).
 - [x] Valorar cómo quedan los *sprites* y si la ficha usa una imagen más grande (CA-54): ver
   la ampliación.
@@ -152,7 +152,7 @@ Tras comparar las opciones en la propia web, el usuario eligió:
 
 ## Referencias
 
-- [Plan de imágenes de los Pokémon](../02-ddt/plan-imagenes.md)
+- [Plan de imágenes de los Pokémon](../06-historial/plan-imagenes.md)
 - [PokeAPI/sprites](https://github.com/PokeAPI/sprites) y su
   [`LICENCE.txt`](https://github.com/PokeAPI/sprites/blob/master/LICENCE.txt)
 - [ADR-0004](0004-pokeapi-volcado-csv.md): PokeAPI mediante su volcado CSV

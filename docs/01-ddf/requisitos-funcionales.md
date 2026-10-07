@@ -213,7 +213,7 @@ Hay dos excepciones:
 - **Alcance inicial**: las 386 especies de las generaciones 1 a 3 y sus 11 juegos, con los 5
   de la 3.ª generación como juego objetivo, para validar el algoritmo antes de ampliarlo
   ([CA-11](cuestiones-abiertas.md#resueltas),
-  [plan de carga](../02-ddt/plan-carga-datos.md)).
+  [diseño de la carga](../02-ddt/carga-datos.md#alcance)).
 - **Criterios de aceptación**:
     - Se cargan las generaciones, los juegos de cada generación y qué Pokémon (por forma)
       existen en cada juego ([RN-03](reglas-negocio.md#rn-03)).

@@ -1,5 +1,10 @@
 # Plan de las portadas de los juegos
 
+!!! warning "Histórico: no se mantiene"
+    Este plan ya se ejecutó y se conserva como historial de cómo y por qué se hizo. No se
+    actualiza: lo vigente sobre las portadas está en [su documentación](../02-ddt/api.md#imagenes-y-portadas) y lo pendiente, en las
+    [issues](https://github.com/AlbertoMercado/pokemon-team-builder/issues).
+
 Plan para mostrar la portada de cada juego en la web
 ([RF-18](../01-ddf/requisitos-funcionales.md#rf-18)) y la fuente en WikiDex de cada combate
 clave ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md#acciones-derivadas)), lo que queda de la

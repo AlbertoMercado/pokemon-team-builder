@@ -1,7 +1,7 @@
 """Transformation of validated PokeAPI rows into reference.sqlite rows.
 
-Pure functions: no files, no network. Every rule applied here is described in the data load
-plan (docs/02-ddt/plan-carga-datos.md), section "Revisión del volcado de PokeAPI".
+Pure functions: no files, no network. Every rule applied here is described in the load design
+(docs/02-ddt/carga-datos.md), section "Cómo se interpreta el volcado de PokeAPI".
 """
 
 from collections import defaultdict

@@ -1,10 +1,15 @@
 # Plan de implementación del motor (`core/`)
 
+!!! warning "Histórico: no se mantiene"
+    Este plan ya se ejecutó y se conserva como historial de cómo y por qué se hizo. No se
+    actualiza: lo vigente sobre el motor está en [su documentación](../02-ddt/motor.md) y lo pendiente, en las
+    [issues](https://github.com/AlbertoMercado/pokemon-team-builder/issues).
+
 Plan para implementar `core/`, el dominio puro que aplica las reglas de negocio y genera los
 equipos. Parte del [catálogo de reglas](../01-ddf/reglas-negocio.md), de la
-[arquitectura](arquitectura.md#core-dominio-puro), del
-[algoritmo de generación](algoritmo-generacion.md) y del
-[contexto del motor](modelo-datos.md#contexto-del-motor-gamecontext).
+[arquitectura](../02-ddt/arquitectura.md#core-dominio-puro), del
+[algoritmo de generación](../02-ddt/algoritmo-generacion.md) y del
+[contexto del motor](../02-ddt/modelo-datos.md#contexto-del-motor-gamecontext).
 
 ## Alcance
 
@@ -28,7 +33,7 @@ en memoria.
 ## Principios
 
 - **Puro**: solo biblioteca estándar, sin E/S. Lo comprueban `import-linter` y
-  `tests/test_architecture.py` ([estructura del código](estructura-codigo.md#reglas-de-dependencia)).
+  `tests/test_architecture.py` ([estructura del código](../02-ddt/estructura-codigo.md#reglas-de-dependencia)).
 - **Inmutable**: modelos `dataclass(frozen=True)` con tuplas y `frozenset`, para que el motor
   no pueda modificar su entrada y los resultados sean reproducibles.
 - **Exacto y determinista**: puntuaciones con `fractions.Fraction`
@@ -36,11 +41,11 @@ en memoria.
   orden canónico (número de la Pokédex y forma). Misma entrada, mismo resultado (RF-08).
 - **Una clase por regla**: cada `RN-XX` es una clase con su identificador, que implementa la
   interfaz de su clase de regla. Así salen solos los motivos de descarte y el desglose de la
-  puntuación ([arquitectura](arquitectura.md#core-dominio-puro)).
+  puntuación ([arquitectura](../02-ddt/arquitectura.md#core-dominio-puro)).
 - **Trazabilidad**: cada regla tiene sus tests con `@pytest.mark.rn("RN-XX")` y aparece en la
   [tabla de trazabilidad](#trazabilidad-de-las-reglas), que se completa en cada PR.
 - **Documentado en el mismo PR**: cada fase actualiza la página del motor y esta tabla
-  ([documentación del código](estructura-codigo.md#documentacion-del-codigo)).
+  ([documentación del código](../02-ddt/estructura-codigo.md#documentacion-del-codigo)).
 
 ## Interfaz pública
 
@@ -61,7 +66,7 @@ flowchart LR
 | `review.pending_facts(...)` | Favoritos, datos del juego y su origen | Datos inferidos o pendientes que intervienen | RN-18 |
 
 `generate` nunca recibe datos sin confirmar: si queda alguno, la API responde `409` antes de
-llamarla ([API](api.md#generacion)). Por eso el motor no conoce el origen de los datos; solo
+llamarla ([API](../02-ddt/api.md#generacion)). Por eso el motor no conoce el origen de los datos; solo
 `review` lo usa.
 
 ## Modelos del dominio
@@ -132,7 +137,7 @@ Revisadas tras la fase 3, sobre las interpretaciones que fijó su implementació
 - **[CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)** y
   **[CA-47](../01-ddf/cuestiones-abiertas.md#resueltas)**: un método de evolución sin
   catalogar bloquea la carga y lo cataloga el arquitecto en una nueva versión. La clasificación pasa a ser un dato
-  ([`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml)) y el motor la recibe
+  ([`evolution_methods.yaml`](../02-ddt/datos-curados.md#evolution_methodsyaml)) y el motor la recibe
   en el contexto (fase 7 del [plan de carga](plan-carga-datos.md#fases)).
 - **[CA-43](../01-ddf/cuestiones-abiertas.md#resueltas)**: el sexo y el objeto equipado no
   son tediosos. Hoy `core/evolution.py` trata el sexo como tedioso (`other`); se corrige en
@@ -181,7 +186,7 @@ flowchart LR
 
 | Fase | Rama | Contenido | Tests |
 |------|------|-----------|-------|
-| 1 ✅ | `feat/core-dominio` | Modelos de entrada de `core/domain/`, `TypeChart` con el factor contra dos tipos, catálogo de reglas con sus valores por defecto y `RuleSettings`. Nueva página del DDT [Motor de reglas](motor.md). Los modelos de salida (`GenerationResult`) se añaden en las fases que los usan. | Modelos, tabla de tipos (Fantasma contra Psíquico en la 1.ª generación, Agua contra Roca/Tierra ×4) y catálogo. |
+| 1 ✅ | `feat/core-dominio` | Modelos de entrada de `core/domain/`, `TypeChart` con el factor contra dos tipos, catálogo de reglas con sus valores por defecto y `RuleSettings`. Nueva página del DDT [Motor de reglas](../02-ddt/motor.md). Los modelos de salida (`GenerationResult`) se añaden en las fases que los usan. | Modelos, tabla de tipos (Fantasma contra Psíquico en la 1.ª generación, Agua contra Roca/Tierra ×4) y catálogo. |
 | 2 ✅ | `feat/core-filtros` | `breeding.py`, `journey.py` y los filtros RN-03, RN-11 y RN-16 con su motivo de descarte. Ajustes de los modelos: los grupos huevo pasan a ser de toda la línea (Pichu se puede criar), cada forma lleva su generación (para explicar el nivel de RN-03) y el contexto recibe el *Hall of Fame* en lugar de una lista de exclusiones. | Ejemplos de RN-03, RN-11 y RN-16 del DDF, incluidas las excepciones de Dragonite y Eevee. |
 | 3 ✅ | `feat/core-puntuacion` | `evolution.py`, las reglas blandas RN-06, RN-15, RN-17 y RN-20, la puntuación ponderada con desglose y la clave de RN-19. | Ejemplos de RN-15 (Gengar, Raichu, Milotic), RN-20 (Wurmple) y RN-17 (Brock); suma del desglose. |
 | 4 ✅ | `feat/core-busqueda` | Restricciones RN-07, RN-12 y RN-14, niveles de presencia de RN-13 y RN-14, grafo de incompatibilidades, búsqueda con retroceso y `generate` para equipos completos. | Ejemplos de RN-07, RN-12, RN-13 y RN-14; propiedades con hypothesis y fuerza bruta; escenario real de Rojo Fuego. |
@@ -195,7 +200,7 @@ reales de extremo a extremo.
 ## Trazabilidad de las reglas
 
 Se completa en cada fase con el módulo y los tests de cada regla. Detalle de lo implementado en
-[Motor de reglas](motor.md).
+[Motor de reglas](../02-ddt/motor.md).
 
 | Regla | Módulo | Fase | Estado |
 |-------|--------|------|--------|
@@ -225,5 +230,5 @@ Se completa en cada fase con el módulo y los tests de cada regla. Detalle de lo
 | Riesgo | Mitigación |
 |--------|------------|
 | Demasiados equipos empatados para mostrarlos, porque la puntuación depende sobre todo de los tipos. | Desempate RN-19 y agrupación CA-33. El escenario real de Rojo Fuego medirá cuántos grupos salen; si son demasiados, se plantea en el DDF cómo limitarlos. |
-| Búsqueda lenta sin RN-12 y con muchos favoritos (unos 20 s con 120 candidatos). | Con RN-12 activa y los tamaños esperados basta la búsqueda exhaustiva: Rojo Fuego con 28 candidatos tarda 0,04 s con las reglas por defecto y 5,6 s sin RN-12 ni reglas de presencia ([rendimiento](motor.md#rendimiento)). Si hace falta, ramificación y poda con una cota de la puntuación ([algoritmo](algoritmo-generacion.md#tamano-de-la-busqueda)). |
+| Búsqueda lenta sin RN-12 y con muchos favoritos (unos 20 s con 120 candidatos). | Con RN-12 activa y los tamaños esperados basta la búsqueda exhaustiva: Rojo Fuego con 28 candidatos tarda 0,04 s con las reglas por defecto y 5,6 s sin RN-12 ni reglas de presencia ([rendimiento](../02-ddt/motor.md#rendimiento)). Si hace falta, ramificación y poda con una cota de la puntuación ([algoritmo](../02-ddt/algoritmo-generacion.md#tamano-de-la-busqueda)). |
 | Interpretaciones de reglas que no coinciden con lo que se quiere. | Están escritas en [esta tabla](#como-se-interpreta-cada-regla) para revisarlas antes de implementar; los tests usan los ejemplos del DDF. |

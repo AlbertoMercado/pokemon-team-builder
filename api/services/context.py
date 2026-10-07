@@ -1,6 +1,6 @@
 """The engine's ``GameContext`` of a target game, built from both databases (RN-10, RN-18).
 
-It has two parts (docs/02-ddt/plan-api.md, "Construcción del GameContext"):
+It has two parts (docs/02-ddt/modelo-datos.md, "Contexto del motor"):
 
 - ``GameReference``: what reference.sqlite says about the game. Every form with its data in
   the game's generation, the type chart and the reviewable values as loaded, with their

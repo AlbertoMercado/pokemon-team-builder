@@ -92,7 +92,7 @@ guardar decisiones del modelo en `user.sqlite`, fuera de git.
 
 ### Acciones derivadas
 
-- [ ] Fase 7 del [plan de carga](../02-ddt/plan-carga-datos.md#fases): bloqueos, informe en
+- [ ] Fase 7 del [plan de carga](../06-historial/plan-carga-datos.md#fases) (#78): bloqueos, informe en
   JSON y Markdown y código de salida 2.
 - [ ] Registrar en git el informe de la primera carga que siga el protocolo.
 

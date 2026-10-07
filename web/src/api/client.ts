@@ -3,7 +3,7 @@
  *
  * `api` makes the calls; `unwrap` turns an error answer into an `ApiError` and `api` turns a
  * failed connection into a `NetworkError`, so every query fails with one of the two and the
- * screens show it as the plan says (docs/02-ddt/plan-web.md, "Cómo se muestran los errores").
+ * screens show it as the design says (docs/02-ddt/web.md, "Cómo se muestran los errores").
  */
 import createClient from "openapi-fetch";
 
