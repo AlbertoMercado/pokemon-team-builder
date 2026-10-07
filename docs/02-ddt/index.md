@@ -9,8 +9,10 @@ arquitectura se registran como [ADR](../03-adr/index.md).
   estrategia de pruebas.
 - [Motor de reglas](motor.md): lo implementado en `core/`: modelos del dominio, reglas,
   puntuación, generación de equipos, revisión de datos y comprobación de un equipo elegido.
-- [Estructura del código](estructura-codigo.md): qué es y qué hace cada directorio, contratos
-  de dependencia entre paquetes y cómo se documenta el código.
+- [Estructura del código](estructura-codigo.md): qué es y qué hace cada directorio y contratos
+  de dependencia entre paquetes.
+- [Cómo se documenta](documentacion.md): la fuente única de cada tema (mapa de fuentes) y qué
+  se documenta en cada PR.
 - [Modelo de datos](modelo-datos.md): las dos bases de datos SQLite, los datos revisables y el
   contexto del motor.
 - [API](api.md): endpoints HTTP y formato de la generación.

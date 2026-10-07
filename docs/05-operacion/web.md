@@ -1,12 +1,9 @@
-# Web: un solo proceso, desarrollo y comprobaciones
+# Web: un solo proceso, desarrollo y pruebas
 
 Cómo se sirve la web con la API en un solo proceso, cómo se arranca en desarrollo, cómo se
-regenera su cliente de la API y qué comprueba la CI. Qué pantallas tiene y cómo se construye, en el [plan de la web](../02-ddt/plan-web.md);
-cómo se usa, en el [manual de usuario](../04-manual-usuario/web.md).
-
-!!! note "Estado"
-    Las 8 fases del [plan de la web](../02-ddt/plan-web.md#fases): todas las pantallas, la
-    API sirve la web compilada en un solo proceso y hay pruebas de extremo a extremo.
+regenera su cliente de la API y cómo se prueba. Qué pantallas tiene y cómo se construye, en el
+[plan de la web](../02-ddt/plan-web.md); cómo se usa, en el
+[manual de usuario](../04-manual-usuario/web.md).
 
 ## Requisitos
 
@@ -77,25 +74,14 @@ Si un cambio de la API rompe la web, `npm run typecheck` lo señala.
     `openapi-typescript` ni `typescript-eslint` funcionan sin la API de JavaScript del
     compilador, que TypeScript 7.0 no ofrece.
 
-## Comprobaciones
+## Pruebas
 
-| Tarea | Comando (en `web/`) |
-|-------|---------------------|
-| Lint (ESLint con las reglas estrictas con tipos de typescript-eslint) | `npm run lint` |
-| Formatear / comprobar el formato (Prettier) | `npm run format` / `npm run format:check` |
-| Tipos | `npm run typecheck` |
-| Tests unitarios y de pantallas (Vitest, Testing Library, MSW) | `npm run test` (`npm run test:watch` mientras se trabaja) |
-| Compilar en `web/dist` | `npm run build` |
+Los comandos están en [Comandos y CI](comandos.md#web-en-web).
 
-Los tests de pantallas no usan la API real: `src/test/server.ts` la simula con MSW y falla si
-una pantalla hace una petición sin respuesta simulada.
+Los tests de pantallas (Vitest, Testing Library) no usan la API real: `src/test/server.ts` la
+simula con MSW y falla si una pantalla hace una petición sin respuesta simulada.
 
 ### Pruebas de extremo a extremo
-
-```bash
-cd web && npx playwright install chromium   # una vez: el navegador de Playwright
-npm run test:e2e                            # compila la web y ejecuta e2e/ con Playwright
-```
 
 `e2e/new-game.spec.ts` recorre el flujo de un juego nuevo contra la **API real**: favoritos →
 reglas → nuevo juego en Rojo Fuego → revisión → resultado → elegir el equipo y registrarlo →
@@ -103,19 +89,8 @@ la siguiente generación excluye lo usado (RN-16). Playwright arranca la API con
 `uv run python -m tests.e2e.serve` (`playwright.config.ts`), que escribe el escenario de Rojo
 Fuego de los tests en un directorio temporal y sirve la web compilada en el puerto 8765. No usa
 la red ni tus datos; los juegos aparecen como «Firered» porque el escenario no tiene sus
-nombres en español. Si falla, el informe queda en `web/playwright-report/`.
-
-### CI
-
-`.github/workflows/ci.yml` tiene dos jobs para la web:
-
-- **Web**: `npm ci`, regenera el cliente y falla si `schema.d.ts` cambia, y después el lint, el
-  formato, los tipos, los tests y la compilación.
-- **E2E**: instala Python, Node y Chromium y ejecuta `npm run test:e2e`. Si falla, sube el
-  informe de Playwright como artefacto.
-
-Son comprobaciones obligatorias para fusionar en `main`, como Python, Documentación y Secretos
-(protección de la rama en GitHub).
+nombres en español. Si falla, el informe queda en `web/playwright-report/`. En la CI es el job
+**E2E** ([CI](comandos.md#ci)).
 
 ## Problemas habituales
 

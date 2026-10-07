@@ -224,7 +224,7 @@ Desde la raíz del proyecto:
 claude
 ```
 
-Claude Code lee automáticamente `CLAUDE.md`, que contiene el stack, la estructura y las convenciones del proyecto. Forma habitual de trabajo:
+Claude Code lee automáticamente `CLAUDE.md`: las reglas imprescindibles del proyecto y el [mapa de fuentes](../02-ddt/documentacion.md#mapa-de-fuentes) de la documentación. Forma habitual de trabajo:
 
 - Una tarea o issue por sesión, por ejemplo: *"Resuelve el issue #12"*.
 - Pídele el plan antes de que haga cambios en tareas grandes.

@@ -1,150 +1,43 @@
 # CLAUDE.md
 
-Guía para trabajar en este repositorio con Claude Code.
+Índice para trabajar en este repositorio con Claude Code. Cada regla está en una línea y enlaza
+a su fuente: lee solo la sección que necesites.
 
-## Descripción del proyecto
+**pokemon-team-builder**: aplicación personal y sin ánimo de lucro que, a partir de una lista de
+Pokémon favoritos y un juego objetivo, genera un equipo de 6 con reglas duras (filtros) y blandas
+(puntuación ponderada). Detalle: [DDF](docs/01-ddf/index.md).
 
-**pokemon-team-builder** es una aplicación personal y sin ánimo de lucro. A partir de una lista
-de Pokémon favoritos y un juego objetivo, genera un equipo de 6 según reglas configurables:
+## Reglas imprescindibles
 
-- **Reglas duras**: actúan como filtros; un candidato o equipo que no las cumple se descarta.
-- **Reglas blandas**: puntuación ponderada; cada regla aporta una puntuación multiplicada por
-  su peso configurable, y se elige el equipo con mayor puntuación total.
+- **Idioma**: documentación, commits, issues y PR en español; código, identificadores, ficheros
+  de código y comentarios técnicos en inglés.
+- **Flujo**: GitHub Flow. `main` está protegida; todo entra por PR desde una rama `feat/`, `fix/`,
+  `docs/`, `chore/` o `test/`, con [Conventional Commits](https://www.conventionalcommits.org/es/)
+  en español. Los cinco jobs de la [CI](docs/05-operacion/comandos.md#ci) deben pasar.
+- **Reglas de negocio**: el [DDF](docs/01-ddf/index.md#convenciones) es la fuente de verdad. No
+  implementes una regla (`RN-XX`), requisito (`RF-XX`) o decisión (`CA-XX`) sin documentarla
+  antes; los números no se reutilizan. Cada test de una regla lleva
+  `@pytest.mark.rn("RN-XX")` y la cita en su nombre o *docstring*; issues, PR y commits citan su
+  identificador.
+- **Arquitectura**: `core/` es puro (solo biblioteca estándar, sin red ni BD). Dependencias
+  permitidas: `api → core, db` e `ingest → db`
+  ([arquitectura](docs/02-ddt/arquitectura.md#reglas-de-dependencia)). Una decisión relevante,
+  un [ADR](docs/03-adr/index.md) desde la plantilla.
+- **Tipado**: mypy estricto; nada de `Any` ni `# type: ignore` sin justificar.
+- **Datos externos**: los tests nunca usan la red (`tests/conftest.py`); usan extractos reales en
+  `tests/<paquete>/fixtures/`. WikiDex, siempre con caché local, límite de peticiones y
+  `User-Agent` descriptivo ([ingesta](docs/05-operacion/ingesta.md#wikidex)).
+- **Documentación**: en el mismo PR y en la fuente única de su tema, enlazando desde el resto en
+  lugar de copiar ([cómo se documenta](docs/02-ddt/documentacion.md#en-cada-pr)). Los cambios
+  para el usuario, una línea en **Sin publicar** del `CHANGELOG.md`.
+- **Versiones**: SemVer. Para publicar, la skill `publicar-version`: Claude prepara hasta el PR
+  en verde y **no** fusiona, etiqueta ni crea la *release*
+  ([versiones](docs/05-operacion/versiones.md#publicar-una-version)).
 
-## Stack
+## Dónde está cada cosa
 
-| Capa | Tecnología |
-|------|------------|
-| Ingesta de datos | Python 3.13, httpx, mwparserfromhell, pydantic, Pillow (imágenes, ADR-0010) |
-| Motor y API | FastAPI, SQLModel |
-| Base de datos | SQLite |
-| Frontend | React + Vite + TypeScript + Tailwind |
-| Calidad (Python) | ruff, mypy (strict), import-linter, pytest, hypothesis, pre-commit, gitleaks |
-| Calidad (web) | ESLint, Prettier, Vitest, Playwright |
-| Documentación | MkDocs Material (docs-as-code en Markdown), diagramas Mermaid |
-| Gestión de entorno | uv |
+Comandos de desarrollo: [Comandos y CI](docs/05-operacion/comandos.md). Lo pendiente: las
+[issues](https://github.com/AlbertoMercado/pokemon-team-builder/issues). Mapa de fuentes (los
+enlaces son relativos a `docs/02-ddt/`):
 
-### Fuentes de datos
-
-- **PokeAPI**: datos base (especies, tipos, evoluciones, movimientos, juegos). Se carga desde
-  su **volcado CSV fijado a un commit**, no desde la API REST (ADR-0004).
-- **WikiDex**: equipos de los combates clave, vía API MediaWiki. **Siempre con caché local y
-  rate limit**; nunca hacer peticiones masivas sin caché. Identificarse con un `User-Agent`
-  descriptivo.
-- **Datos curados**: `data/curated/*.yaml`, versionados y validados con pydantic (ADR-0005,
-  [datos curados](docs/02-ddt/datos-curados.md)).
-- **Tests sin red**: `tests/conftest.py` hace fallar cualquier petición HTTP; los tests usan
-  extractos reales guardados en `tests/<paquete>/fixtures/`.
-- **Pokémon Showdown**: aplazado; ninguna regla lo necesita por ahora (ADR-0004).
-
-## Estructura
-
-```
-docs/
-  01-ddf/             Documento de Diseño Funcional (requisitos y reglas RN-XX)
-  02-ddt/             Documento de Diseño Técnico
-  03-adr/             Architecture Decision Records (0000-plantilla.md + NNNN-titulo.md)
-  04-manual-usuario/  Manual de usuario
-  05-operacion/       Instalación, despliegue, ingesta y mantenimiento
-ingest/               Descarga, parseo y normalización de fuentes → reference.sqlite
-core/                 Dominio puro: reglas RN-XX y motor de generación, sin I/O
-db/                   Modelos SQLModel de reference.sqlite y user.sqlite (Alembic)
-api/                  API FastAPI: routers → services → repositories, sobre core/ y db/
-data/                 curated/*.yaml en git; cache/ y *.sqlite fuera de git
-web/                  Frontend React + Vite + TypeScript + Tailwind
-tests/                Tests de Python (pytest + hypothesis)
-.claude/skills/       Skills de Claude Code del proyecto (publicar-version)
-.github/workflows/    CI de GitHub Actions (ci.yml: Python, Documentación, Secretos)
-```
-
-`core/` debe mantenerse puro (sin acceso a red ni BD, solo biblioteca estándar) para poder
-testearlo con hypothesis. Dependencias permitidas: `api → core, db` e `ingest → db`
-([arquitectura](docs/02-ddt/arquitectura.md), ADR-0002). Se comprueban con los contratos de
-`import-linter` de `pyproject.toml` y con `tests/test_architecture.py`.
-
-Qué es, por qué existe y qué hace cada directorio: [estructura del código](docs/02-ddt/estructura-codigo.md).
-Cada directorio de código tiene un `README.md` y cada paquete un *docstring* en su `__init__.py`.
-
-## Convenciones
-
-- **Idioma**: documentación, commits, issues y PR en **español**; código, identificadores,
-  nombres de ficheros de código y comentarios técnicos en **inglés**.
-- **Flujo de trabajo**: GitHub Flow. `main` está protegida; todo cambio entra por PR desde una
-  rama `feat/`, `fix/`, `docs/`, `chore/` o `test/`.
-- **Commits**: [Conventional Commits](https://www.conventionalcommits.org/es/) en español,
-  p. ej. `feat(core): añadir filtro por juego objetivo (RN-03)`.
-- **Versionado**: SemVer desde la 1.0.0: los cambios incompatibles (API, `user.sqlite` sin
-  migración que conserve los datos, CLI) suben la versión mayor. Cada versión se anota en
-  `CHANGELOG.md` y se publica con una etiqueta `vX.Y.Z` ([versiones](docs/05-operacion/versiones.md)).
-  Los PR con cambios para el usuario añaden una línea en **Sin publicar** del `CHANGELOG.md`.
-- **Publicar una versión**: cuando el usuario lo pida, usa la skill `publicar-version`
-  (`.claude/skills/publicar-version/`). Claude prepara la rama, el CHANGELOG y el PR hasta
-  que la CI pasa; **no** fusiona, etiqueta ni crea la *release*: da al usuario los comandos
-  exactos y, cuando los ha ejecutado, comprueba que todo ha quedado correcto.
-- **Decisiones de arquitectura**: toda decisión relevante se registra como ADR en
-  `docs/03-adr/` a partir de `0000-plantilla.md`, con numeración correlativa.
-- **Tipado**: mypy en modo `strict`; no usar `Any` ni `# type: ignore` sin justificar.
-- **Documentación del código**: todo código o cambio de base de datos se documenta **en el
-  mismo PR**: qué es, por qué existe y qué hace (docstring de módulo, `README.md` en
-  directorios nuevos), tablas y migraciones en el [modelo de datos](docs/02-ddt/modelo-datos.md),
-  y el DDT u Operación afectados. Toda interfaz de uso (la CLI, la API y la web) se documenta
-  además en el [manual de usuario](docs/04-manual-usuario/index.md). Si hace falta, se crea
-  una página nueva y se enlaza en `mkdocs.yml`. Detalle en [estructura del código](docs/02-ddt/estructura-codigo.md#documentacion-del-codigo).
-
-### Reglas de negocio (RN-XX)
-
-**Toda regla de negocio se numera como `RN-XX` en el DDF (`docs/01-ddf/`) y se referencia en
-tests e issues.**
-
-- El DDF es la fuente de verdad: cada regla tiene un identificador `RN-XX` estable (no se
-  reutilizan números de reglas eliminadas), su tipo (dura/blanda) y su descripción.
-- Cada test que verifica una regla lleva el marcador `@pytest.mark.rn("RN-XX")` y menciona la
-  regla en su nombre o docstring.
-- Issues, PR y commits que implementan o modifican una regla citan su `RN-XX`.
-- No implementar una regla de negocio que no esté documentada en el DDF: primero se documenta.
-- Con el mismo criterio de identificadores estables, los requisitos funcionales se numeran
-  `RF-XX` y las decisiones funcionales pendientes `CA-XX` (cuestiones abiertas del DDF).
-
-## Comandos habituales
-
-| Tarea | Comando | Estado |
-|-------|---------|--------|
-| Instalar dependencias | `uv sync` | ✅ |
-| Lint | `uv run ruff check .` | ✅ |
-| Formatear | `uv run ruff format .` | ✅ |
-| Tipos | `uv run mypy` | ✅ |
-| Contratos de dependencia | `uv run lint-imports` | ✅ |
-| Tests | `uv run pytest` | ✅ |
-| Hooks de pre-commit | `uv run pre-commit install` / `uv run pre-commit run --all-files` | ✅ |
-| Documentación en local | `uv run mkdocs serve` | ✅ |
-| Construir documentación | `uv run mkdocs build --strict` | ✅ |
-| Ejecutar ingesta | `uv run python -m ingest [--data-dir DIR] [--offline] [--no-covers]` ([detalle](docs/05-operacion/ingesta.md)) | ✅ Rojo Fuego y Verde Hoja completos |
-| Ver la base de datos | `uvx datasette data/reference.sqlite` ([otras opciones](docs/05-operacion/ingesta.md#consultar-los-datos)) | ✅ |
-| Arrancar la aplicación | `uv run uvicorn api.main:app --reload` (sirve también `web/dist` si se ha compilado; `PTB_DATA_DIR`, `PTB_WEB_DIR`; [detalle](docs/05-operacion/api.md)) | ✅ Metadatos, catálogo, favoritos, reglas, juegos, revisión de datos, generación, comprobación del equipo y Hall of Fame |
-| Migraciones de `user.sqlite` | `uv run alembic -c db/user/alembic.ini upgrade head` (la API las aplica al arrancar) | ✅ |
-| Instalar dependencias web | `cd web && npm ci` | ✅ |
-| Frontend en desarrollo | `cd web && npm run dev` (con la API arrancada; [detalle](docs/05-operacion/web.md)) | ✅ Todas las pantallas |
-| Regenerar el cliente de la API | `cd web && npm run api:generate` (al cambiar la API, en el mismo PR) | ✅ |
-| Lint / formato web | `cd web && npm run lint` / `npm run format` | ✅ |
-| Tipos web | `cd web && npm run typecheck` | ✅ |
-| Tests unitarios web | `cd web && npm run test` | ✅ |
-| Compilar la web | `cd web && npm run build` (la sirve la API en `/`) | ✅ |
-| Revisar dependencias desactualizadas | `uv tree --outdated --depth 1` / `cd web && npm outdated` ([detalle](docs/05-operacion/dependencias.md)) | ✅ |
-| Publicar una versión | Pedírselo a Claude (skill `publicar-version`; [detalle](docs/05-operacion/versiones.md#publicar-una-version)) | ✅ |
-| Tests E2E | `cd web && npm run test:e2e` (una vez: `npx playwright install chromium`) | ✅ Flujo de nuevo juego |
-
-Actualiza esta tabla cuando un comando pendiente pase a existir.
-
-### CI
-
-`.github/workflows/ci.yml` se ejecuta en cada PR y en cada push a `main` con cinco jobs:
-
-- **Python**: pre-commit (sin gitleaks, mypy ni lint-imports), `mypy` con el entorno del
-  proyecto, contratos de dependencia (`lint-imports`) y `pytest`.
-- **Documentación**: `mkdocs build --strict`.
-- **Web**: cliente de la API al día (`npm run api:generate` sin diferencias), lint, formato,
-  tipos, tests y compilación.
-- **E2E**: Playwright con el flujo de nuevo juego contra la API real (`npm run test:e2e`).
-- **Secretos**: gitleaks sobre todo el historial.
-
-Los cinco son comprobaciones obligatorias para fusionar en `main`.
+@docs/02-ddt/documentacion.md
