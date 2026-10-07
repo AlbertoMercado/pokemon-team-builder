@@ -26,7 +26,7 @@ from api.services.context import (
 )
 from api.services.rules import current_settings
 from core.domain import GameInfo
-from core.review import FactKind, Origin, involved_facts
+from core.review import FactKind, Origin, involved_facts, with_starters
 from db.user import ConfirmedValue
 
 MECHANIC_NAMES = {"day_night_cycle": "Ciclo de día y noche", "contests": "Concursos"}
@@ -34,14 +34,19 @@ MECHANIC_NAMES = {"day_night_cycle": "Ciclo de día y noche", "contests": "Concu
 
 def involved_values(user: Session, reference: Session, game: GameReference) -> list[Reviewable]:
     """The values that take part in a generation for the user's favourites, settings and
-    journey."""
+    journey, and for the game's starters if RN-21 is active (CA-66)."""
     confirmations = user_repo.confirmations(user, game.slug)
     favorites = [favorite.pokemon for favorite in user_repo.favorites(user)]
+    settings = current_settings(user)
     facts = involved_facts(
-        GameInfo(game.slug, game.generation, name=game.name),
+        GameInfo(game.slug, game.generation, name=game.name, starters=game.starters),
         game.game_facts(confirmations),
-        game.favorite_facts(favorites, confirmations),
-        current_settings(user),
+        with_starters(
+            game.favorite_facts(favorites, confirmations),
+            game.favorite_facts(sorted(game.starters), confirmations),
+            settings,
+        ),
+        settings,
         hall_of_fame.journey(user, reference, game),
     )
     values = [game.reviewable(fact.key) for fact in facts]

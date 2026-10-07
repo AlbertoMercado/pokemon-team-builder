@@ -95,11 +95,13 @@ class DiscardOut(BaseModel):
 
 
 class PresenceOut(BaseModel):
-    rule_id: str = Field(description="Regla de presencia, `RN-13` o `RN-14`.")
+    rule_id: str = Field(description="Regla de presencia: `RN-13`, `RN-14` o `RN-21`.")
     level: int = Field(description="Nivel de la regla en el DDF que se aplica.")
     status: PresenceStatus = Field(
-        description="`candidates` (el equipo incluye una de `options`), `reserved` (se reserva "
-        "un hueco para una de `options`, que no son favoritos) o `unmet` (no se puede cumplir)."
+        description="`candidates` (el equipo incluye una de `options`, que son favoritos), "
+        "`chosen` (el equipo incluye una de `options`, que no son favoritos: solo RN-21), "
+        "`reserved` (se reserva un hueco para una de `options`, que no son favoritos) o "
+        "`unmet` (no se puede cumplir)."
     )
     options: list[str] = Field(description="Los Pokémon que la cumplen en ese nivel.")
     detail: str = Field(description="Explicación en español.")

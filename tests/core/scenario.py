@@ -170,7 +170,12 @@ def firered_context(
     known = all_pokemon()
     chosen = list(favorites)
     return GameContext(
-        game=GameInfo(game["slug"], game["generation"], frozenset(game["mechanics"])),
+        game=GameInfo(
+            game["slug"],
+            game["generation"],
+            frozenset(game["mechanics"]),
+            starters=frozenset(game["starters"]),
+        ),
         type_chart=_type_chart(),
         favorites=tuple(Candidate(*known[slug]) for slug in chosen),
         pool=tuple(PoolEntry(*known[slug], True) for slug in known if slug not in chosen),

@@ -35,6 +35,7 @@ import { TypeBadges } from "../components/TypeBadge";
 import { formatDate, formatDateTime, formatDexNumber } from "../lib/format";
 import {
   alternatives,
+  chosenBy,
   DISCARD_REASONS,
   discardsByReason,
   discardSummary,
@@ -142,6 +143,7 @@ interface ResultProps {
 }
 
 function Result({ game, generation, selector }: ResultProps) {
+  const chosen = chosenBy(generation.presence);
   return (
     <>
       <Status generation={generation} />
@@ -149,6 +151,7 @@ function Result({ game, generation, selector }: ResultProps) {
         <GroupCard
           key={group.teams.map((team) => team.members.join("+")).join("|")}
           group={group}
+          chosen={chosen}
           title={
             generation.groups.length === 1 ? "Equipo recomendado" : `Opción ${String(index + 1)}`
           }
@@ -200,7 +203,14 @@ function shared<T>(teams: readonly Team[], pick: (team: Team) => T): T | null {
     : null;
 }
 
-function GroupCard({ group, title }: { group: TeamGroup; title: string }) {
+interface GroupCardProps {
+  group: TeamGroup;
+  title: string;
+  /** The members that are not favourites, with the rule that chose them (RN-21). */
+  chosen: ReadonlyMap<string, string>;
+}
+
+function GroupCard({ group, title, chosen }: GroupCardProps) {
   const names = new Map(group.positions.flat().map((pokemon) => [pokemon.pokemon, pokemon.name]));
   const nameOf = (pokemon: string) => names.get(pokemon) ?? pokemon;
   const breakdown = shared(group.teams, (team) => team.breakdown);
@@ -212,7 +222,11 @@ function GroupCard({ group, title }: { group: TeamGroup; title: string }) {
       <h2 className="text-lg font-semibold">{title}</h2>
       <ol aria-label="Posiciones" className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
         {group.positions.map((position) => (
-          <Position key={position.map((pokemon) => pokemon.pokemon).join("+")} options={position} />
+          <Position
+            key={position.map((pokemon) => pokemon.pokemon).join("+")}
+            options={position}
+            chosenBy={position.map((pokemon) => chosen.get(pokemon.pokemon)).find(Boolean)}
+          />
         ))}
       </ol>
       {group.teams.length > 1 && (
@@ -238,7 +252,13 @@ function GroupCard({ group, title }: { group: TeamGroup; title: string }) {
   );
 }
 
-function Position({ options }: { options: GeneratedPokemon[] }) {
+function Position({
+  options,
+  chosenBy,
+}: {
+  options: GeneratedPokemon[];
+  chosenBy: string | undefined;
+}) {
   const [first] = options;
   return (
     <li className="space-y-1 rounded border border-slate-200 px-3 py-2">
@@ -254,6 +274,9 @@ function Position({ options }: { options: GeneratedPokemon[] }) {
         {options.map((pokemon) => formatDexNumber(pokemon.dex_number)).join(" · ")}
       </p>
       {first !== undefined && <TypeBadges types={first.types} />}
+      {chosenBy !== undefined && (
+        <p className="text-xs text-slate-600">{`No es favorito: lo elige ${chosenBy}.`}</p>
+      )}
     </li>
   );
 }

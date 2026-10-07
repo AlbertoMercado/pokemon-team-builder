@@ -3,7 +3,8 @@
 **Qué es**: `firered.json`, un extracto de un `reference.sqlite` real con lo que el motor
 necesita para generar equipos en Pokémon Rojo Fuego:
 
-- el juego y sus mecánicas (ninguna: Rojo Fuego no tiene reloj ni concursos);
+- el juego, sus mecánicas (ninguna: Rojo Fuego no tiene reloj ni concursos) y sus iniciales
+  (Venusaur, Charizard y Blastoise);
 - los 17 tipos de la 3.ª generación y sus 289 eficacias;
 - los 140 Pokémon que pueden llegar al juego antes de completarlo, cada uno con sus tipos en
   la 3.ª generación, sus etapas desde la primera de la línea, los grupos huevo de toda la

@@ -60,6 +60,8 @@ _DESCRIPTIONS = {
     "de generar.",
     "RN-19": "A igual puntuación, se prefieren los equipos con más Pokémon de dos tipos.",
     "RN-20": "Puntúa en contra los miembros que necesitan una evolución aleatoria, como Wurmple.",
+    "RN-21": "El equipo incluye un inicial del juego en su evolución final, y solo uno; si no "
+    "es favorito, se elige entre los del juego.",
 }
 
 
@@ -134,6 +136,7 @@ CATALOG: Mapping[str, RuleDefinition] = MappingProxyType(
                 configurable=True,
                 default_weight=5,
             ),
+            _rule("RN-21", "Un inicial del juego, y solo uno", _PRESENCE, configurable=True),
         )
     }
 )

@@ -6,8 +6,9 @@ before it is recorded. The check uses the same rules as the engine, so no rule i
 twice:
 
 - every member passes the candidate filters (RN-03, RN-11, RN-16);
-- no two members conflict (RN-07, RN-12, RN-14 "only one");
-- the presence rules are met at the level that applies in the generation (RN-13, RN-14).
+- no two members conflict (RN-07, RN-12, RN-14 and RN-21 "only one");
+- the presence rules are met at the level that applies in the generation (RN-13, RN-14,
+  RN-21).
 
 The members may be favourites or Pokémon of the pool (the suggestions). A member with
 unconfirmed data (CA-31) is not a problem, but it is reported.
@@ -26,6 +27,7 @@ _PAIR_DETAILS = {
     "RN-07": "{a} y {b} son de la misma línea evolutiva",
     "RN-12": "{a} y {b} comparten tipo",
     "RN-14": "{a} y {b} son dos evoluciones de Eevee",
+    "RN-21": "{a} y {b} son de las líneas de los iniciales del juego",
 }
 
 
@@ -87,7 +89,7 @@ def check_team(ctx: GameContext, members: Sequence[str]) -> TeamCheck:
         if discard is not None:
             problems.append(TeamProblem(discard.rule_id, (pokemon.slug,), discard.detail))
 
-    constraints = active_pair_constraints(ctx.settings)
+    constraints = active_pair_constraints(ctx)
     for (a, _), (b, _) in combinations(team, 2):
         rule_id = conflict(a, b, constraints)
         if rule_id is not None:

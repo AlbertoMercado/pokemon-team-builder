@@ -2,7 +2,13 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { currentLocation, renderApp } from "../test/render";
-import { addFavorite, confirmAll, generationCalls, withoutCovers } from "../test/server";
+import {
+  addFavorite,
+  confirmAll,
+  generationCalls,
+  withChosenStarter,
+  withoutCovers,
+} from "../test/server";
 
 const RESULT = "/juego/firered/resultado";
 
@@ -105,6 +111,22 @@ describe("Resultado", () => {
     );
     const presence = screen.getByRole("region", { name: "Reglas de presencia" });
     expect(within(presence).getByText(/Se reserva un hueco \(nivel 3\)/)).toBeVisible();
+  });
+
+  it("marks the starter that RN-21 chose although it is not a favourite (CA-65)", async () => {
+    withChosenStarter();
+    renderApp(RESULT);
+
+    const team = await screen.findByRole("region", { name: "Equipo recomendado" });
+    const charizard = within(team).getByText("Charizard").closest("li") as HTMLElement;
+    expect(within(charizard).getByText("No es favorito: lo elige RN-21.")).toBeInTheDocument();
+    expect(within(team).getAllByText(/No es favorito/)).toHaveLength(1);
+    const presence = screen.getByRole("region", { name: "Reglas de presencia" });
+    expect(
+      within(presence).getByText(
+        /^Se cumple con un Pokémon del juego que no es favorito \(nivel 2\)/,
+      ),
+    ).toBeInTheDocument();
   });
 
   it("adds a suggestion to the favourites and generates again", async () => {

@@ -126,7 +126,8 @@ class GameReference:
     ``forms`` has every form with its data in the game's generation (RN-10): a form of a later
     generation keeps the types it appeared with and has no evolution steps, because RN-03
     discards it first. ``types`` are the types in the game's generation of every form that
-    has them, to give a key battle's team corrected by the user its types.
+    has them, to give a key battle's team corrected by the user its types. ``starters`` are
+    the game's starters (RN-21).
     """
 
     slug: str
@@ -138,6 +139,7 @@ class GameReference:
     availability: Mapping[str, FormFacts]
     mechanics: tuple[Reviewable, ...]
     key_battles: tuple[LoadedBattle, ...]
+    starters: frozenset[str] = frozenset()
 
     def form_facts(self, pokemon: str) -> FormFacts:
         """A form without a row in the game does not exist there (automatic)."""
@@ -232,7 +234,7 @@ def build_context(
         value.subject for value in game.mechanics if value.fact(confirmations).value is True
     )
     return GameContext(
-        game=GameInfo(game.slug, game.generation, mechanics, game.name),
+        game=GameInfo(game.slug, game.generation, mechanics, game.name, game.starters),
         type_chart=game.type_chart,
         favorites=tuple(candidates),
         pool=tuple(pool),
@@ -291,6 +293,7 @@ def load_game_reference(reference: Session, slug: str) -> GameReference:
             for row in reference_repo.game_mechanics(reference, slug)
         ),
         key_battles=_loaded_battles(reference, slug),
+        starters=frozenset(reference_repo.game_starters(reference, slug)),
     )
 
 

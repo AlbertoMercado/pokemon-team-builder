@@ -493,6 +493,9 @@ parámetros son fijos.
   si ningún inicial favorito cabe en un equipo con los candidatos que cumplen RN-13 y RN-14,
   ellas tienen prioridad. Esos iniciales se descartan y la regla pasa al nivel 2: elige entre
   los demás iniciales del juego que encajan.
+- **Datos sin verificar** ([CA-66](cuestiones-abiertas.md#resueltas)): como la regla puede
+  elegir un inicial que no es favorito, los datos sin verificar de los iniciales del juego se
+  confirman antes de generar, igual que los de los favoritos ([RN-18](#rn-18)).
 - **Recorrido** ([CA-62](cuestiones-abiertas.md#resueltas)): el inicial usado queda excluido
   como cualquier otro Pokémon ([RN-16](#rn-16)), así que la regla elige entre los demás, sean
   favoritos o no.
@@ -599,6 +602,9 @@ parámetros son fijos.
     - Los del juego objetivo, como sus mecánicas o sus combates clave.
     - Los de los favoritos que no se han descartado ya con datos automáticos, como si pueden
       llegar al juego antes de completarlo ([RN-03](#rn-03)).
+    - Con [RN-21](#rn-21) activa, los de los iniciales del juego que no son favoritos, porque
+      la regla puede elegir uno como miembro del equipo
+      ([CA-66](cuestiones-abiertas.md#resueltas)).
 - **Responsabilidad**: los datos confirmados se usan tal cual. Si el usuario confirma un dato
   erróneo, el resultado puede ser inexacto. Es un mal uso de la aplicación, no un error del
   algoritmo.

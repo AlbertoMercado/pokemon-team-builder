@@ -2,8 +2,9 @@
 
 With up to 12 favourites, every combination can be checked: the brute force tries every
 size from 6 minus the reserved slots down, keeps the combinations that meet the active hard
-rules and the presence rules, scores them and keeps the best after the tie-break; if the
-presence rules cannot be met together, RN-14 gives way (CA-48). The engine must return
+rules and the presence rules, scores them and keeps the best after the tie-break; the
+presence rules are added in catalogue order and one that cannot be met with those before it
+gives way (CA-48, CA-61). The engine must return
 exactly those teams (RN-04, RN-08, RN-19), all of them valid, with the right suggestions and
 groups, and the same result for the same input (RF-08).
 """
@@ -14,7 +15,7 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from core.domain import GameContext, PokemonData
+from core.domain import GameContext, GameInfo, PokemonData
 from core.engine import (
     TEAM_SIZE,
     GenerationResult,
@@ -28,12 +29,12 @@ from core.rules.candidate import valid_candidates
 from core.rules.catalog import RuleSettings
 from core.rules.check import check_team
 from core.rules.team import (
-    EeveePresence,
     PairConstraint,
     PresenceRequirement,
     PresenceStatus,
     active_pair_constraints,
     conflict,
+    presence_rules,
 )
 from core.scoring import Scorer
 from tests.core.builders import (
@@ -50,8 +51,12 @@ TYPES = (
     "normal", "fire", "water", "grass", "electric", "dragon", "flying", "rock",
     "ice", "ground", "psychic", "bug", "ghost", "steel",
 )  # fmt: skip
-# Named slots so that the special lines of RN-13 and RN-14 appear in the contexts.
-NAMES = ("dragonite", "vaporeon", "jolteon", "flareon", "espeon", *(f"p{i}" for i in range(7)))
+# Named slots so that the special lines of RN-13, RN-14 and RN-21 appear in the contexts.
+NAMES = (
+    "dragonite", "vaporeon", "jolteon", "flareon", "espeon", "venusaur", "charizard",
+    *(f"p{i}" for i in range(5)),
+)  # fmt: skip
+GAME = GameInfo("firered", 3, starters=frozenset({"venusaur", "charizard", "blastoise"}))
 CHART = type_chart(
     overrides={
         ("water", "fire"): 200,
@@ -73,7 +78,7 @@ BATTLES = (
     battle("misty", ("starmie", ("water",))),
     battle("lance", ("dragonite", ("dragon", "flying")), ("gyarados", ("water", "flying"))),
 )
-CONFIGURABLE = ("RN-07", "RN-11", "RN-12", "RN-13", "RN-14")
+CONFIGURABLE = ("RN-07", "RN-11", "RN-12", "RN-13", "RN-14", "RN-21")
 SOFT = ("RN-06", "RN-15", "RN-17", "RN-20")
 
 
@@ -111,6 +116,7 @@ def contexts(draw: st.DrawFn) -> GameContext:
         pool=pool,
         key_battles=BATTLES,
         chart=CHART,
+        game=GAME,
         settings=rules,
     )
 
@@ -122,7 +128,7 @@ def _valid(team: tuple[PokemonData, ...], constraints: tuple[PairConstraint, ...
 def _best_of_size(
     ctx: GameContext, valid: list[PokemonData], size: int, required: list[set[str]]
 ) -> list[tuple[PokemonData, ...]]:
-    constraints = active_pair_constraints(ctx.settings)
+    constraints = active_pair_constraints(ctx)
     scorer = Scorer(ctx)
     best: tuple[object, ...] | None = None
     winners: list[tuple[PokemonData, ...]] = []
@@ -138,24 +144,54 @@ def _best_of_size(
     return winners
 
 
+def _members(
+    valid: list[PokemonData], presence: list[PresenceRequirement], suggestible: list[PokemonData]
+) -> list[PokemonData]:
+    """The valid candidates and the Pokémon chosen outside the favourites (CA-65)."""
+    chosen = {s for p in presence if p.status is PresenceStatus.CHOSEN for s in p.options}
+    extra = [p for p in suggestible if p.slug in chosen]
+    return sorted([*valid, *extra], key=lambda p: (p.dex_number, p.slug))
+
+
+def _best(
+    ctx: GameContext,
+    valid: list[PokemonData],
+    presence: list[PresenceRequirement],
+    suggestible: list[PokemonData],
+) -> list[tuple[PokemonData, ...]]:
+    """The best teams of the largest size that meets ``presence``, or none."""
+    reserved = sum(1 for p in presence if p.status is PresenceStatus.RESERVED)
+    required = [set(p.options) for p in presence if p.requires_member]
+    members = _members(valid, presence, suggestible)
+    for size in range(TEAM_SIZE - reserved, -1, -1):
+        winners = _best_of_size(ctx, members, size, required)
+        if winners:
+            return winners
+    return []
+
+
 def brute_force(
     ctx: GameContext,
 ) -> tuple[list[tuple[PokemonData, ...]], list[PresenceRequirement]]:
-    """The best teams of the largest possible size, and the presence rules that apply."""
+    """The best teams of the largest possible size, and the presence rules that apply.
+
+    The presence rules are added in catalogue order; one that no team meets with those before
+    it goes to its next level until some team does (CA-48, CA-61).
+    """
     candidates, _ = valid_candidates(ctx)
     valid = [c.pokemon for c in candidates]
-    presence = list(presence_requirements(ctx, valid))
     suggestible = [e.pokemon for e in suggestible_entries(ctx)]
-    while True:
-        reserved = sum(1 for p in presence if p.status is PresenceStatus.RESERVED)
-        required = [set(p.options) for p in presence if p.status is PresenceStatus.CANDIDATES]
-        for size in range(TEAM_SIZE - reserved, -1, -1):
-            winners = _best_of_size(ctx, valid, size, required)
-            if winners:
-                return winners, presence
-        # Only RN-13 and RN-14 together can fail: RN-14 gives way (CA-48).
-        [index] = [i for i, p in enumerate(presence) if p.rule_id == "RN-14"]
-        presence[index] = EeveePresence().requirement((), suggestible)
+    rules = {rule.rule_id: rule for rule in presence_rules(ctx.game)}
+    presence: list[PresenceRequirement] = []
+    for requirement in presence_requirements(ctx, valid):
+        current = requirement
+        while current.requires_member and not _best(ctx, valid, [*presence, current], suggestible):
+            lower = rules[current.rule_id].requirement((), suggestible)
+            if lower.level <= current.level:
+                lower = rules[current.rule_id].requirement((), ())
+            current = lower
+        presence.append(current)
+    return _best(ctx, valid, presence, suggestible), presence
 
 
 @pytest.mark.rn("RN-04")
@@ -180,17 +216,19 @@ def test_engine_returns_exactly_the_best_teams_of_the_brute_force(ctx: GameConte
 @pytest.mark.rn("RN-12")
 @pytest.mark.rn("RN-13")
 @pytest.mark.rn("RN-14")
+@pytest.mark.rn("RN-21")
 @settings(max_examples=200, deadline=None)
 @given(ctx=contexts())
 def test_every_team_meets_the_active_hard_rules(ctx: GameContext) -> None:
     result = generate(ctx)
-    favourites = {c.pokemon.slug for c in ctx.favorites}
-    constraints = active_pair_constraints(ctx.settings)
-    required = [set(p.options) for p in result.presence if p.status is PresenceStatus.CANDIDATES]
+    chosen = {s for p in result.presence if p.status is PresenceStatus.CHOSEN for s in p.options}
+    constraints = active_pair_constraints(ctx)
+    required = [set(p.options) for p in result.presence if p.requires_member]
     for team in result.teams:
         assert len(team.members) + sum(s.count for s in team.open_slots) == TEAM_SIZE
-        assert set(team.slugs) <= favourites
-        assert set(team.slugs) <= set(result.valid_candidates)
+        # Only RN-21 puts a Pokémon that is not a favourite in the team, and only one (CA-65).
+        assert set(team.slugs) <= set(result.valid_candidates) | chosen
+        assert len(set(team.slugs) & chosen) <= 1
         assert _valid(team.members, constraints)
         assert all(set(team.slugs) & options for options in required)
 
@@ -201,29 +239,36 @@ def test_every_team_meets_the_active_hard_rules(ctx: GameContext) -> None:
 @pytest.mark.rn("RN-12")
 @pytest.mark.rn("RN-13")
 @pytest.mark.rn("RN-14")
+@pytest.mark.rn("RN-21")
 @pytest.mark.rn("RN-16")
 @settings(max_examples=200, deadline=None)
 @given(ctx=contexts())
 def test_check_finds_no_problem_in_the_teams_of_the_engine(ctx: GameContext) -> None:
-    """``check_team`` uses the engine's rules: its teams only miss their reserved slots."""
+    """``check_team`` uses the engine's rules: its teams only miss their reserved slots.
+
+    Only a starter chosen by RN-21 can be unverified, because it is not a favourite; the API
+    asks to confirm its data before generating (CA-66).
+    """
     result = generate(ctx)
     reserved = {p.rule_id for p in result.presence if p.status is PresenceStatus.RESERVED}
+    chosen = {s for p in result.presence if p.status is PresenceStatus.CHOSEN for s in p.options}
     for team in result.teams:
         check = check_team(ctx, team.slugs)
         assert {problem.rule_id for problem in check.problems} <= reserved
         assert all(problem.members == () for problem in check.problems)
-        assert check.unverified == ()
+        assert set(check.unverified) <= chosen
         if not reserved:
             assert check.valid
 
 
 @pytest.mark.rn("RN-13")
 @pytest.mark.rn("RN-14")
+@pytest.mark.rn("RN-21")
 @settings(max_examples=200, deadline=None)
 @given(ctx=contexts())
 def test_resolved_presence_is_the_one_of_the_generation(ctx: GameContext) -> None:
-    """``resolved_presence`` (used by ``check_team``) resolves RN-13 and RN-14 to the same
-    level as ``generate``, also when one of them gives way (CA-48)."""
+    """``resolved_presence`` (used by ``check_team``) resolves RN-13, RN-14 and RN-21 to the
+    same level as ``generate``, also when one of them gives way (CA-48, CA-61)."""
     assert resolved_presence(ctx) == generate(ctx).presence
 
 
@@ -237,7 +282,7 @@ def _suggestion_order(gain: object, pokemon: PokemonData) -> tuple[object, ...]:
 @given(ctx=contexts())
 def test_suggestions_fit_meet_their_slot_and_are_ordered(ctx: GameContext) -> None:
     result = generate(ctx)
-    constraints = active_pair_constraints(ctx.settings)
+    constraints = active_pair_constraints(ctx)
     scorer = Scorer(ctx)
     suggestible = {e.pokemon.slug: e for e in suggestible_entries(ctx)}
     reserved = {p.rule_id: set(p.options) for p in result.presence}

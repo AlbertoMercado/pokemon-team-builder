@@ -24,6 +24,7 @@ from db.reference import (
     Game,
     GameMechanic,
     GamePokemon,
+    GameStarter,
     Generation,
     IngestRun,
     KeyBattle,
@@ -179,6 +180,7 @@ def _write(session: Session, data: ScenarioData, load: Load) -> None:
                 fact_key=f"mechanic:{GAME}:{mechanic}",
             )
         )
+    session.add_all(GameStarter(game=GAME, pokemon=slug) for slug in data["game"]["starters"])
     for order, battle in enumerate(data["key_battles"], start=1):
         origin = load.battle_origins.get(battle["slug"], Origin.AUTOMATIC)
         session.add(

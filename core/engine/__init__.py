@@ -1,22 +1,24 @@
 """Team generation engine: ``generate(ctx)`` (docs/02-ddt/algoritmo-generacion.md).
 
 1. Filter the favourites with the candidate rules (RN-03, RN-11, RN-16).
-2. Resolve the presence rules (RN-13, RN-14) to the first level that can be met. A level
-   that needs a Pokémon that is not a favourite reserves a slot (RN-08).
+2. Resolve the presence rules (RN-13, RN-14, RN-21) to the first level that can be met. A
+   level that needs a Pokémon that is not a favourite reserves a slot (RN-08), except in
+   RN-21, which chooses a starter of the game as a member (CA-65).
 3. Search the teams with the most favourites possible, up to 6 minus the reserved slots,
-   without conflicts between members (RN-07, RN-12, RN-14) and meeting the presence rules,
-   which come before the size of the team (CA-19).
+   without conflicts between members (RN-07, RN-12, RN-14, RN-21) and meeting the presence
+   rules, which come before the size of the team (CA-19).
 4. Keep every team with the highest score, after the RN-19 tie-break (RN-04), and group the
    tied teams that only differ in interchangeable members (CA-33).
 5. If the teams are not of 6, suggest Pokémon that are not favourites for their open slots
    (RN-08).
 
-If no team can meet every presence rule at once, RN-13 comes first: RN-14 goes to its next
-level, which reserves a slot for the evolutions of Eevee that are not favourites (CA-48).
+The presence rules are met in catalogue order: RN-13, RN-14 and RN-21. One whose members fit
+in no team with those of the rules before it gives way and goes to its next level (CA-48,
+CA-61).
 """
 
 import dataclasses
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from functools import partial
 
 from core.domain import GameContext, PokemonData, PoolEntry
@@ -34,12 +36,12 @@ from core.engine.result import (
 from core.engine.suggestions import Suggester
 from core.rules.candidate import first_exclusion, valid_candidates
 from core.rules.team import (
-    PRESENCE_RULES,
     PairConstraint,
     PresenceRequirement,
     PresenceStatus,
     active_pair_constraints,
     conflict,
+    presence_rules,
 )
 from core.scoring import Scorer
 
@@ -71,28 +73,37 @@ def suggestible_entries(ctx: GameContext) -> list[PoolEntry]:
 def presence_requirements(
     ctx: GameContext, valid: Sequence[PokemonData]
 ) -> tuple[PresenceRequirement, ...]:
-    """The level of each active presence rule (RN-13, RN-14), in catalogue order."""
+    """The level of each active presence rule (RN-13, RN-14, RN-21), in catalogue order."""
     suggestible = [e.pokemon for e in suggestible_entries(ctx)]
     return tuple(
         rule.requirement(valid, suggestible)
-        for rule in PRESENCE_RULES
+        for rule in presence_rules(ctx.game)
         if ctx.settings.is_enabled(rule.rule_id)
     )
 
 
 def displace(
-    requirement: PresenceRequirement, by: PresenceRequirement, ctx: GameContext
+    requirement: PresenceRequirement, by: Sequence[PresenceRequirement], ctx: GameContext
 ) -> PresenceRequirement:
-    """``requirement`` at its next level, because its candidates never fit with ``by``'s.
+    """``requirement`` at its next level, because its options never fit with ``by``'s.
 
-    The rule is resolved again as if no favourite met it (CA-48).
+    The rule is resolved again as if no favourite met it (CA-48) and, if that is already its
+    level (RN-21 choosing a starter that is not a favourite), as if nothing in the game did.
     """
-    [rule] = [r for r in PRESENCE_RULES if r.rule_id == requirement.rule_id]
+    [rule] = [r for r in presence_rules(ctx.game) if r.rule_id == requirement.rule_id]
     suggestible = [e.pokemon for e in suggestible_entries(ctx)]
     lower = rule.requirement((), suggestible)
+    if lower.level <= requirement.level:
+        lower = rule.requirement((), ())
+    ids = [r.rule_id for r in by]
+    priority = (
+        f"{ids[0]}, que tiene prioridad"
+        if len(ids) == 1
+        else f"{', '.join(ids[:-1])} y {ids[-1]}, que tienen prioridad"
+    )
     reason = (
-        f"Sus candidatos ({', '.join(requirement.options)}) no caben en ningún equipo junto "
-        f"con {by.rule_id}, que tiene prioridad"
+        f"Sus opciones ({', '.join(requirement.options)}) no caben en ningún equipo junto "
+        f"con {priority}"
     )
     return dataclasses.replace(lower, detail=f"{reason}. {lower.detail}")
 
@@ -101,8 +112,27 @@ def _conflicts(constraints: tuple[PairConstraint, ...], a: PokemonData, b: Pokem
     return conflict(a, b, constraints) is not None
 
 
-def _largest_best_teams(
+def _members(
     valid: Sequence[PokemonData],
+    presence: Sequence[PresenceRequirement],
+    suggestible: Sequence[PokemonData],
+) -> list[PokemonData]:
+    """Who can be in the team: the valid candidates and the Pokémon that a presence rule
+    chooses although they are not favourites (CA-65), in canonical order."""
+    chosen = {slug for p in presence if p.status is PresenceStatus.CHOSEN for slug in p.options}
+    extra = [p for p in suggestible if p.slug in chosen]
+    return sorted([*valid, *extra], key=lambda p: (p.dex_number, p.slug))
+
+
+def _sizes(presence: Sequence[PresenceRequirement]) -> tuple[range, list[frozenset[str]]]:
+    """The team sizes to try, largest first, and the sets the team must take one from."""
+    reserved = sum(1 for p in presence if p.status is PresenceStatus.RESERVED)
+    required = [frozenset(p.options) for p in presence if p.requires_member]
+    return range(TEAM_SIZE - reserved, len(required) - 1, -1), required
+
+
+def _largest_best_teams(
+    members: Sequence[PokemonData],
     presence: Sequence[PresenceRequirement],
     constraints: tuple[PairConstraint, ...],
     scorer: Scorer,
@@ -111,57 +141,57 @@ def _largest_best_teams(
 
     Empty if no team meets every presence rule at once.
     """
-    reserved = sum(1 for p in presence if p.status is PresenceStatus.RESERVED)
-    required = [frozenset(p.options) for p in presence if p.status is PresenceStatus.CANDIDATES]
-    for size in range(TEAM_SIZE - reserved, len(required) - 1, -1):
+    sizes, required = _sizes(presence)
+    for size in sizes:
         if size == 0:
             return [()]
-        found = search.teams(valid, size, partial(_conflicts, constraints), required)
+        found = search.teams(members, size, partial(_conflicts, constraints), required)
         _, winners = search.best_teams(found, scorer.ranking_key)
         if winners:
             return winners
     return []
 
 
-def _first_team(
-    valid: Sequence[PokemonData],
+def _some_team(
+    members: Sequence[PokemonData],
     presence: Sequence[PresenceRequirement],
     constraints: tuple[PairConstraint, ...],
-) -> list[tuple[PokemonData, ...]]:
-    """A team of the sizes ``_largest_best_teams`` tries, or none: whether one exists.
+) -> bool:
+    """Whether some team of the sizes ``_largest_best_teams`` tries meets the presence rules.
 
     The search is lazy, so it stops at the first team, without scoring any.
     """
-    reserved = sum(1 for p in presence if p.status is PresenceStatus.RESERVED)
-    required = [frozenset(p.options) for p in presence if p.status is PresenceStatus.CANDIDATES]
-    for size in range(TEAM_SIZE - reserved, len(required) - 1, -1):
+    sizes, required = _sizes(presence)
+    for size in sizes:
         if size == 0:
-            return [()]
-        found = search.teams(valid, size, partial(_conflicts, constraints), required)
-        team = next(found, None)
-        if team is not None:
-            return [team]
-    return []
+            return True
+        found = search.teams(members, size, partial(_conflicts, constraints), required)
+        if next(found, None) is not None:
+            return True
+    return False
 
 
 def _meet_presence(
     ctx: GameContext,
-    presence: Sequence[PresenceRequirement],
-    find: Callable[[Sequence[PresenceRequirement]], list[tuple[PokemonData, ...]]],
-) -> tuple[list[PresenceRequirement], list[tuple[PokemonData, ...]]]:
-    """The presence rules at the level some team meets, and the teams ``find`` gives for it.
+    valid: Sequence[PokemonData],
+    constraints: tuple[PairConstraint, ...],
+) -> list[PresenceRequirement]:
+    """The presence rules at the level some team meets them together.
 
-    While ``find`` finds no team, the presence rules cannot be met together: the last one
-    gives way (CA-48).
+    They are added in catalogue order. While no team meets one together with the rules before
+    it, it gives way and goes to its next level (CA-48, CA-61).
     """
-    resolved = list(presence)
-    teams = find(resolved)
-    while not teams:
-        required = [i for i, p in enumerate(resolved) if p.status is PresenceStatus.CANDIDATES]
-        last = required[-1]
-        resolved[last] = displace(resolved[last], resolved[required[0]], ctx)
-        teams = find(resolved)
-    return resolved, teams
+    suggestible = [e.pokemon for e in suggestible_entries(ctx)]
+    resolved: list[PresenceRequirement] = []
+    for requirement in presence_requirements(ctx, valid):
+        current = requirement
+        while current.requires_member:
+            trial = [*resolved, current]
+            if _some_team(_members(valid, trial, suggestible), trial, constraints):
+                break
+            current = displace(current, [r for r in resolved if r.requires_member], ctx)
+        resolved.append(current)
+    return resolved
 
 
 def resolved_presence(ctx: GameContext) -> tuple[PresenceRequirement, ...]:
@@ -172,39 +202,34 @@ def resolved_presence(ctx: GameContext) -> tuple[PresenceRequirement, ...]:
     """
     candidates, _ = valid_candidates(ctx)
     valid = [c.pokemon for c in candidates]
-    constraints = active_pair_constraints(ctx.settings)
-    presence, _ = _meet_presence(
-        ctx,
-        presence_requirements(ctx, valid),
-        lambda presence: _first_team(valid, presence, constraints),
-    )
-    return tuple(presence)
+    return tuple(_meet_presence(ctx, valid, active_pair_constraints(ctx)))
 
 
 def generate(ctx: GameContext) -> GenerationResult:
     """Generate the best teams of favourites for the context's game."""
     candidates, discards = valid_candidates(ctx)
     valid = [c.pokemon for c in candidates]  # already in canonical order
-    constraints = active_pair_constraints(ctx.settings)
+    constraints = active_pair_constraints(ctx)
     scorer = Scorer(ctx)
-    presence, winners = _meet_presence(
-        ctx,
-        presence_requirements(ctx, valid),
-        lambda presence: _largest_best_teams(valid, presence, constraints, scorer),
-    )
+    presence = _meet_presence(ctx, valid, constraints)
+    suggestible = suggestible_entries(ctx)
+    members = _members(valid, presence, [e.pokemon for e in suggestible])
+    winners = _largest_best_teams(members, presence, constraints, scorer)
 
     reserved = [p for p in presence if p.status is PresenceStatus.RESERVED]
-    suggester = Suggester(suggestible_entries(ctx), constraints, scorer)
+    suggester = Suggester(suggestible, constraints, scorer)
     teams = []
     for team in winners:
         free = TEAM_SIZE - len(reserved) - len(team)
         slots = suggester.open_slots(team, reserved, free)
         teams.append(RankedTeam(team, scorer.score(team), slots))
 
+    # A starter chosen by RN-21 adds one possible member, not all its options (CA-65).
+    chosen = sum(1 for p in presence if p.status is PresenceStatus.CHOSEN)
     reason = None
     if reserved:
         reason = IncompleteReason.RESERVED_SLOT
-    elif len(valid) < TEAM_SIZE:
+    elif len(valid) + chosen < TEAM_SIZE:
         reason = IncompleteReason.NOT_ENOUGH_CANDIDATES
     elif len(winners[0]) < TEAM_SIZE:
         reason = IncompleteReason.NO_VALID_TEAM

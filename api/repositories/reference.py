@@ -11,6 +11,7 @@ from db.reference import (
     Game,
     GameMechanic,
     GamePokemon,
+    GameStarter,
     KeyBattle,
     KeyBattlePokemon,
     Pokemon,
@@ -212,6 +213,15 @@ def game_pokemon(reference: Session, game: str) -> Sequence[GamePokemon]:
 def game_mechanics(reference: Session, game: str) -> Sequence[GameMechanic]:
     return reference.exec(
         select(GameMechanic).where(GameMechanic.game == game).order_by(col(GameMechanic.mechanic))
+    ).all()
+
+
+def game_starters(reference: Session, game: str) -> Sequence[str]:
+    """The starters of ``game``, as the form of their final evolution (RN-21)."""
+    return reference.exec(
+        select(GameStarter.pokemon)
+        .where(GameStarter.game == game)
+        .order_by(col(GameStarter.pokemon))
     ).all()
 
 

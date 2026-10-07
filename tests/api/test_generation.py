@@ -14,6 +14,7 @@ from tests.core.scenario import FAVORITES, firered_context
 
 GENERATIONS = "/api/games/firered/generations"
 REVIEW = "/api/games/firered/review"
+STARTERS = ["venusaur", "charizard", "blastoise"]
 
 
 @pytest.fixture
@@ -58,6 +59,7 @@ def test_nothing_is_generated_with_unverified_data(client: TestClient) -> None:
     assert [f["fact_key"] for f in detail["pending"]] == [
         "mechanic:firered:contests",
         "mechanic:firered:day_night_cycle",
+        *(f"pokemon:firered:{slug}:arrival" for slug in STARTERS),  # RN-21 (CA-66)
         "pokemon:firered:raichu:arrival",
     ]
 
@@ -73,10 +75,10 @@ def test_firered_gives_the_engine_teams(client: TestClient) -> None:
         None,
     )
     expected = generate(firered_context())
-    assert _teams(body) == [team.slugs for team in expected.teams]
+    assert _teams(body) == [team.slugs for group in expected.groups for team in group.teams]
     positions = [[[p["pokemon"] for p in a] for a in g["positions"]] for g in body["groups"]]
-    assert positions[1][1] == ["cloyster", "lapras"]
-    lapras = next(p for p in body["groups"][1]["positions"][1] if p["pokemon"] == "lapras")
+    assert positions[0][3] == ["cloyster", "lapras"]
+    lapras = next(p for p in body["groups"][0]["positions"][3] if p["pokemon"] == "lapras")
     assert lapras == {
         "pokemon": "lapras",
         "name": "Lapras",
@@ -92,7 +94,7 @@ def test_scores_are_rounded_integers_that_add_up(client: TestClient) -> None:
     body = _ready(client, *FAVORITES)
     assert body["score"] == 19
     team = body["groups"][0]["teams"][0]
-    assert (team["score"], team["dual_type_members"]) == (19, 5)
+    assert (team["score"], team["dual_type_members"]) == (19, 4)
     breakdown = [
         (r["rule_id"], r["weight"], r["score"], r["contribution"]) for r in team["breakdown"]
     ]
@@ -122,6 +124,7 @@ def test_weights_and_disabled_rules_change_the_breakdown(client: TestClient) -> 
 @pytest.mark.rn("RN-11")
 @pytest.mark.rn("RN-13")
 @pytest.mark.rn("RN-14")
+@pytest.mark.rn("RN-21")
 def test_discards_and_presence_rules(client: TestClient) -> None:
     body = _ready(client, *FAVORITES)
     assert [
@@ -134,6 +137,7 @@ def test_discards_and_presence_rules(client: TestClient) -> None:
     assert [(p["rule_id"], p["level"], p["status"], p["options"]) for p in body["presence"]] == [
         ("RN-13", 1, "candidates", ["dragonite"]),
         ("RN-14", 1, "candidates", ["vaporeon", "jolteon", "flareon"]),
+        ("RN-21", 1, "candidates", STARTERS),
     ]
 
 
@@ -148,6 +152,7 @@ def test_confirmed_data_used_is_listed(client: TestClient) -> None:
     assert used == [
         ("mechanic:firered:contests", False),
         ("mechanic:firered:day_night_cycle", False),
+        *((f"pokemon:firered:{slug}:arrival", True) for slug in STARTERS),
         ("pokemon:firered:raichu:arrival", False),
         ("pokemon:firered:gengar:arrival", True),
     ]
@@ -160,8 +165,8 @@ def test_confirmed_data_used_is_listed(client: TestClient) -> None:
 def test_an_incomplete_team_has_suggestions(client: TestClient) -> None:
     """RF-10: with 4 favourites the team has 2 free slots; suggestions whose own data was not
     confirmed are marked as unverified (CA-31)."""
-    client.patch("/api/rules/RN-13", json={"enabled": False})
-    client.patch("/api/rules/RN-14", json={"enabled": False})
+    for rule in ("RN-13", "RN-14", "RN-21"):
+        client.patch(f"/api/rules/{rule}", json={"enabled": False})
     client.put(f"{REVIEW}/pokemon:firered:jolteon:arrival", json={"value": True})
     body = _ready(client, "venusaur", "charizard", "blastoise", "pikachu")
     assert (body["status"], body["incomplete_reason"]) == ("incomplete", "not_enough_candidates")
@@ -181,7 +186,7 @@ def test_an_incomplete_team_has_suggestions(client: TestClient) -> None:
 @pytest.mark.rn("RN-08")
 @pytest.mark.rn("RN-13")
 def test_a_reserved_slot_says_which_rule_reserves_it(client: TestClient) -> None:
-    body = _ready(client, "venusaur", "charizard", "blastoise", "jolteon", "alakazam", "machamp")
+    body = _ready(client, "venusaur", "jolteon", "alakazam", "machamp", "golem")
     assert body["incomplete_reason"] == "reserved_slot"
     slots = body["groups"][0]["teams"][0]["open_slots"]
     assert [(s["count"], s["rule_id"]) for s in slots] == [(1, "RN-13")]
@@ -218,12 +223,16 @@ def test_the_answer_says_which_data_was_used(client: TestClient) -> None:
     assert version["games"] == ["firered"]
 
 
-def test_without_favourites_the_team_is_empty_with_suggestions(client: TestClient) -> None:
+@pytest.mark.rn("RN-21")
+def test_without_favourites_the_team_has_a_starter_and_suggestions(client: TestClient) -> None:
+    """RN-21 chooses a starter of the game (CA-65); the rest are open slots."""
     body = _ready(client)
     assert (body["status"], body["incomplete_reason"]) == ("incomplete", "reserved_slot")
     team = body["groups"][0]["teams"][0]
-    assert (team["members"], team["score"]) == ([], body["score"])
-    assert sum(slot["count"] for slot in team["open_slots"]) == 6
+    [member] = team["members"]
+    assert member in STARTERS
+    assert team["score"] == body["score"]
+    assert sum(slot["count"] for slot in team["open_slots"]) == 5
 
 
 def test_a_game_that_is_not_a_target_is_not_found(client: TestClient) -> None:

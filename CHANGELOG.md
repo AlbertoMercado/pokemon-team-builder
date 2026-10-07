@@ -11,9 +11,13 @@ versión: [versiones](docs/05-operacion/versiones.md).
 - **Documentación**: [referencia de la API](docs/02-ddt/api-referencia.md) generada del contrato
   OpenAPI al construir la documentación, con todos los endpoints, parámetros y campos descritos;
   un test exige que no falte ninguna descripción (ADR-0012, #76).
-- **Datos**: la carga guarda los iniciales de cada juego objetivo, que usará la regla RN-21
-  (#85). Al actualizar hay que repetir la carga de datos (`uv run python -m ingest`): hasta
-  entonces, la API responde `503` pidiéndolo.
+- **Reglas**: nueva regla de presencia RN-21, activa por defecto: el equipo incluye un inicial
+  del juego en su evolución final, y solo uno. Si ningún inicial es favorito, la regla elige
+  uno del juego, que el resultado marca como «No es favorito», y antes de generar se piden
+  también los datos sin verificar de los iniciales (#85).
+- **Datos**: la carga guarda los iniciales de cada juego objetivo (#85). Al actualizar hay que
+  repetir la carga de datos (`uv run python -m ingest`): hasta entonces, la API responde `503`
+  pidiéndolo.
 
 ## [1.2.0] - 2026-10-07
 

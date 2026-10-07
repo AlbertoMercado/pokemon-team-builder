@@ -5,9 +5,9 @@ Usage (from the repository root, after a real load):
     uv run python tests/core/fixtures/extract_firered.py data/reference.sqlite
 
 It writes ``tests/core/fixtures/firered.json`` with the data ``tests/core/scenario.py`` needs
-to build a ``GameContext``: the game and its mechanics, the 3rd generation type chart, every
-form that can arrive at FireRed with its line, egg groups and evolution steps, and the key
-battles with the types of each rival. See the README next to this script.
+to build a ``GameContext``: the game with its mechanics and starters, the 3rd generation
+type chart, every form that can arrive at FireRed with its line, egg groups and evolution
+steps, and the key battles with the types of each rival. See the README next to this script.
 """
 
 import json
@@ -145,12 +145,14 @@ def extract(db: sqlite3.Connection) -> dict[str, object]:
             }
         )
     mechanics = _rows(db, "SELECT mechanic FROM game_mechanic WHERE game = ? AND value", GAME)
+    starters = _rows(db, "SELECT pokemon FROM game_starter WHERE game = ? ORDER BY pokemon", GAME)
     return {
         "source": {"game": GAME, "pokeapi": {"commit": run["pokeapi_commit"]}},
         "game": {
             "slug": GAME,
             "generation": generation,
             "mechanics": [r["mechanic"] for r in mechanics],
+            "starters": [r["pokemon"] for r in starters],
         },
         "types": types,
         "type_efficacy": [[r["attacking"], r["defending"], r["factor"]] for r in efficacy],

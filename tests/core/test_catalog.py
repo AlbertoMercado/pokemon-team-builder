@@ -15,11 +15,12 @@ CONFIGURABLE = {
     "RN-16",
     "RN-17",
     "RN-20",
+    "RN-21",
 }
 
 
 def test_catalog_has_every_rule_of_the_ddf() -> None:
-    assert list(CATALOG) == [f"RN-{n:02d}" for n in range(1, 21)]
+    assert list(CATALOG) == [f"RN-{n:02d}" for n in range(1, 22)]
 
 
 def test_configurable_rules_are_the_ones_of_the_ddf() -> None:

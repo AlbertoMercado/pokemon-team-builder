@@ -17,7 +17,8 @@ import TeamEditor from "../components/TeamEditor";
 const GROUPS = [
   { title: "Mecánicas del juego", kinds: ["mechanic"] },
   { title: "Combates clave", kinds: ["key_battle"] },
-  { title: "Favoritos", kinds: ["exists", "arrival"] },
+  // The starters of the game are reviewed too: RN-21 can put one in the team (CA-66).
+  { title: "Favoritos e iniciales del juego", kinds: ["exists", "arrival"] },
 ] as const;
 
 const BUTTON =

@@ -52,7 +52,7 @@ classDiagram
 | `Availability` | `pokemon.py` | Si la forma existe en el juego y puede llegar a tiempo ([RN-03](../01-ddf/reglas-negocio.md#rn-03)), ya confirmado. |
 | `Candidate` | `pokemon.py` | Un favorito con su disponibilidad ([RN-02](../01-ddf/reglas-negocio.md#rn-02)). |
 | `PoolEntry` | `pokemon.py` | Un Pokémon del juego que no es favorito, para las sugerencias, y si sus datos están verificados ([RN-08](../01-ddf/reglas-negocio.md#rn-08), [CA-31](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| `GameInfo` | `game.py` | Juego objetivo, su generación, las mecánicas que tiene (`day_night_cycle`, `contests`) y su nombre en español para las explicaciones (`label`, el identificador si no lo tiene). |
+| `GameInfo` | `game.py` | Juego objetivo, su generación, las mecánicas que tiene (`day_night_cycle`, `contests`), sus iniciales (`starters`, la forma de su evolución final, [RN-21](../01-ddf/reglas-negocio.md#rn-21)) y su nombre en español para las explicaciones (`label`, el identificador si no lo tiene). |
 | `KeyBattle`, `Rival` | `game.py` | Combate clave y los tipos de cada Pokémon rival ([RN-17](../01-ddf/reglas-negocio.md#rn-17)). |
 | `HallOfFameEntry`, `JourneyMember` | `journey.py` | Un juego completado, su orden en el recorrido y su equipo, con la cadena evolutiva y la región de cada miembro ([RN-16](../01-ddf/reglas-negocio.md#rn-16), [RF-12](../01-ddf/requisitos-funcionales.md#rf-12)), y los nombres del juego y de cada miembro para las explicaciones. |
 | `GameContext` | `context.py` | La única entrada del motor: todo lo anterior más la configuración del usuario y su recorrido. |
@@ -98,7 +98,7 @@ reglas del DDF con su nombre, una descripción de una frase para la interfaz
 |-------|--------|--------------|
 | Dura (`hard`) | RN-01, RN-02, RN-03, RN-05, RN-09 | No |
 | Dura (`hard`) | RN-07, RN-11, RN-12, RN-16 | Sí: activar o desactivar |
-| Presencia (`presence`) | RN-13, RN-14 | Sí: activar o desactivar |
+| Presencia (`presence`) | RN-13, RN-14, RN-21 | Sí: activar o desactivar |
 | Blanda (`soft`) | RN-06 (peso 1), RN-15 (3), RN-17 (10), RN-20 (5) | Sí: activar o desactivar y peso de 0 a 10 |
 | Mecanismo (`mechanism`) | RN-04, RN-08, RN-10, RN-18, RN-19 | No |
 
@@ -292,8 +292,9 @@ forman el grafo de incompatibilidades de la búsqueda.
 | `SameLineConstraint` | [RN-07](../01-ddf/reglas-negocio.md#rn-07) | son de la misma cadena de evolución (Jolteon y Vaporeon, Rhydon y Rhyperior). |
 | `SharedTypeConstraint` | [RN-12](../01-ddf/reglas-negocio.md#rn-12) | comparten algún tipo en el juego objetivo, como primario o secundario (Charizard y Pidgeot, Gengar y Nidoking). |
 | `SingleEeveeEvolutionConstraint` | [RN-14](../01-ddf/reglas-negocio.md#rn-14) | los dos son evoluciones de Eevee. Eevee no cuenta como evolución. |
+| `SingleStarterConstraint` | [RN-21](../01-ddf/reglas-negocio.md#rn-21) | los dos son de las cadenas de evolución de los iniciales del juego (`starter_chains`), aunque no sean los iniciales: Charizard y Wartortle ([CA-60](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 
-`active_pair_constraints(settings)` devuelve las activas y `conflict(a, b, restricciones)`, la
+`active_pair_constraints(ctx)` devuelve las activas y `conflict(a, b, restricciones)`, la
 primera regla que impide que dos miembros vayan juntos, para explicarlo.
 
 ### Reglas de presencia
@@ -312,10 +313,15 @@ son favoritos y pasan los filtros por candidato ([CA-40](../01-ddf/cuestiones-ab
 | [RN-14](../01-ddf/reglas-negocio.md#rn-14) (`EeveePresence`) | 1 | `candidates` | Las evoluciones de Eevee candidatas. |
 | | 2 | `reserved` | Las evoluciones de Eevee sugeribles. |
 | | 3 | `unmet` | Ninguna. |
+| [RN-21](../01-ddf/reglas-negocio.md#rn-21) (`StarterPresence`) | 1 | `candidates` | Los iniciales del juego candidatos. |
+| | 2 | `chosen` | Los iniciales del juego sugeribles: la regla elige uno como miembro, aunque no sea favorito ([CA-65](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| | 3 | `unmet` | Ninguno. |
 
-Con el estado `candidates`, el equipo tiene que incluir **al menos uno** de `options`. Que
-incluya solo uno lo garantizan RN-12 (dos de tipo primario Dragón comparten tipo) y la
-restricción de RN-14.
+Con los estados `candidates` y `chosen` (`requires_member`), el equipo tiene que incluir **al
+menos uno** de `options`; con `chosen`, esos Pokémon entran en la búsqueda aunque no sean
+favoritos. Que incluya solo uno lo garantizan RN-12 (dos de tipo primario Dragón comparten
+tipo) y las restricciones de RN-14 y RN-21. `presence_rules(juego)` devuelve las tres en el
+orden del catálogo, que es también su prioridad.
 
 ## Comprobación de un equipo elegido (`core/rules/check.py`)
 
@@ -329,8 +335,8 @@ funciones que el motor, así que no duplica ninguna regla:
 | Comprobación | Reglas | Cómo |
 |--------------|--------|------|
 | Cada miembro pasa los filtros por candidato | [RN-03](../01-ddf/reglas-negocio.md#rn-03), [RN-11](../01-ddf/reglas-negocio.md#rn-11), [RN-16](../01-ddf/reglas-negocio.md#rn-16) | `first_exclusion`, con el texto del descarte. |
-| No hay dos miembros incompatibles | [RN-07](../01-ddf/reglas-negocio.md#rn-07), [RN-12](../01-ddf/reglas-negocio.md#rn-12), [RN-14](../01-ddf/reglas-negocio.md#rn-14) | `conflict` con las restricciones activas, para cada par. |
-| Se cumplen las reglas de presencia en el nivel que se aplica | [RN-13](../01-ddf/reglas-negocio.md#rn-13), RN-14 | El equipo incluye uno de los `options` de cada regla `candidates` o `reserved` de `resolved_presence(ctx)`: el mismo nivel que `generate(ctx).presence`, con el desplazamiento de [CA-48](../01-ddf/cuestiones-abiertas.md#resueltas), pero sin buscar los mejores equipos. |
+| No hay dos miembros incompatibles | [RN-07](../01-ddf/reglas-negocio.md#rn-07), [RN-12](../01-ddf/reglas-negocio.md#rn-12), [RN-14](../01-ddf/reglas-negocio.md#rn-14), [RN-21](../01-ddf/reglas-negocio.md#rn-21) | `conflict` con las restricciones activas, para cada par. |
+| Se cumplen las reglas de presencia en el nivel que se aplica | [RN-13](../01-ddf/reglas-negocio.md#rn-13), RN-14, RN-21 | El equipo incluye uno de los `options` de cada regla `candidates`, `chosen` o `reserved` de `resolved_presence(ctx)`: el mismo nivel que `generate(ctx).presence`, con el desplazamiento de [CA-48](../01-ddf/cuestiones-abiertas.md#resueltas) y [CA-61](../01-ddf/cuestiones-abiertas.md#resueltas), pero sin buscar los mejores equipos. |
 
 Devuelve un `TeamCheck` con los problemas (`TeamProblem`: regla, miembros afectados y
 explicación en español), en ese orden, y los miembros del pool sin verificar
@@ -345,12 +351,13 @@ comprueba: uno incompleto puede tener huecos sin sugerencias.
 ([algoritmo](algoritmo-generacion.md#procedimiento)):
 
 1. **Filtros por candidato** (`valid_candidates`): candidatos válidos y descartes.
-2. **Presencia** (`presence_requirements`): el nivel de RN-13 y RN-14, si están activas. Un
-   nivel `reserved` reserva un hueco.
+2. **Presencia** (`presence_requirements` y `_meet_presence`): el nivel de RN-13, RN-14 y
+   RN-21, si están activas. Un nivel `reserved` reserva un hueco; uno `chosen` añade sus
+   `options` a los candidatos de la búsqueda (`_members`).
 3. **Búsqueda** (`search.teams`): los equipos sin conflictos entre sus miembros que incluyen
-   al menos uno de cada `options` con estado `candidates`. Se prueba primero con 6 menos los
-   huecos reservados y, si no hay ninguno, con un miembro menos cada vez: la presencia va
-   antes que el tamaño ([RN-08](../01-ddf/reglas-negocio.md#rn-08),
+   al menos uno de cada `options` con estado `candidates` o `chosen`. Se prueba primero con 6
+   menos los huecos reservados y, si no hay ninguno, con un miembro menos cada vez: la
+   presencia va antes que el tamaño ([RN-08](../01-ddf/reglas-negocio.md#rn-08),
    [CA-19](../01-ddf/cuestiones-abiertas.md#resueltas)).
 4. **Puntuación** (`search.best_teams` con un `Scorer`): se quedan los de mayor clave
    `(puntuación, miembros con dos tipos)`, es decir, la mejor puntuación con el desempate de
@@ -361,15 +368,18 @@ comprueba: uno incompleto puede tener huecos sin sugerencias.
 6. **Grupos** (`group_teams`): los equipos empatados que solo se diferencian en miembros
    intercambiables.
 
-Si ningún tamaño permite cumplir a la vez RN-13 y RN-14, RN-14 cede (`displace`): pasa a su
-nivel siguiente, como si ninguna evolución de Eevee favorita la cumpliera, y se repite la
-búsqueda ([CA-48](../01-ddf/cuestiones-abiertas.md#resueltas)). Su `detail` explica qué
-candidatos no cabían.
+Las reglas de presencia se añaden de una en una, en el orden del catálogo (RN-13, RN-14,
+RN-21). Si con una no hay ningún equipo que la cumpla junto con las anteriores, esa cede
+(`displace`): pasa a su nivel siguiente, como si ningún favorito la cumpliera, y se vuelve a
+probar ([CA-48](../01-ddf/cuestiones-abiertas.md#resueltas),
+[CA-61](../01-ddf/cuestiones-abiertas.md#resueltas)). Si ya estaba en ese nivel (RN-21 con un
+inicial que no es favorito), pasa a `unmet`. Su `detail` explica qué opciones no cabían y con
+qué reglas. Así solo cede la regla que choca con las anteriores, no la última de la lista.
 
-`resolved_presence(ctx)` resuelve la presencia igual, con el mismo bucle de desplazamiento
-(`_meet_presence`), pero solo comprueba si **existe** algún equipo de cada tamaño: pide el
-primero a la búsqueda, que es perezosa, y no puntúa ninguno. La usa `check_team`, que solo
-necesita el nivel de cada regla. Llamar a `generate` para eso costaba una generación completa
+`_meet_presence` solo comprueba si **existe** algún equipo de cada tamaño: pide el primero a
+la búsqueda, que es perezosa, y no puntúa ninguno. Después, `generate` busca los mejores
+equipos una sola vez. `resolved_presence(ctx)` resuelve la presencia con la misma función, sin
+generar. La usa `check_team`, que solo necesita el nivel de cada regla. Llamar a `generate` para eso costaba una generación completa
 por comprobación (37 ms en el escenario de Rojo Fuego frente a menos de 1 ms, #59). Un test
 de propiedades comprueba que coincide siempre con `generate(ctx).presence`.
 
@@ -395,8 +405,8 @@ favoritos no importa.
 | `groups` | Los mismos equipos agrupados (`TeamGroup`, [CA-33](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `discards` | Los favoritos descartados por los filtros, con su motivo ([RF-10](../01-ddf/requisitos-funcionales.md#rf-10)). |
 | `presence` | El `PresenceRequirement` de cada regla de presencia activa. |
-| `valid_candidates` | Los candidatos válidos, en orden canónico. |
-| `incomplete_reason` | Si es incompleto: `reserved_slot` (una regla de presencia necesita un Pokémon que no es favorito), `not_enough_candidates` (menos de 6 válidos) o `no_valid_team` (hay 6 o más, pero no 6 que cumplan juntos las reglas). |
+| `valid_candidates` | Los candidatos válidos, en orden canónico. No incluyen el inicial que elige RN-21 si no es favorito: ese está en los `options` de su regla, con estado `chosen`. |
+| `incomplete_reason` | Si es incompleto: `reserved_slot` (una regla de presencia necesita un Pokémon que no es favorito y le reserva un hueco), `not_enough_candidates` (menos de 6 válidos, contando el inicial que elige RN-21) o `no_valid_team` (hay 6 o más, pero no 6 que cumplan juntos las reglas). |
 
 Cada hueco (`OpenSlots`) tiene cuántos huecos son (`count`), la regla de presencia que lo
 reserva (`rule_id`, o nada si es libre) y sus sugerencias. Cada `Suggestion` tiene el Pokémon,
@@ -437,9 +447,9 @@ los mismos tipos en el juego objetivo ([CA-33](../01-ddf/cuestiones-abiertas.md#
    separado ([CA-49](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 Una evolución de Eevee nunca se agrupa con otro Pokémon mientras RN-14 está activa: el equipo
-con el otro no la cumpliría y no estaría en el empate. En Rojo Fuego, con las reglas por defecto,
-los 3 equipos empatados forman 2 grupos (uno con «Cloyster o Lapras»); sin RN-12, RN-13 ni
-RN-14, los 51 empates forman 20.
+con el otro no la cumpliría y no estaría en el empate; lo mismo pasa con los iniciales y
+RN-21. En Rojo Fuego, con las reglas por defecto, los 4 equipos empatados forman 3 grupos (uno
+con «Cloyster o Lapras»); sin RN-12, RN-13, RN-14 ni RN-21, los 51 empates forman 20.
 
 ### Rendimiento
 
@@ -448,9 +458,10 @@ Pokémon rivales), en un Mac con Apple Silicon:
 
 | Configuración | Tiempo | Equipos empatados |
 |---------------|--------|-------------------|
-| Por defecto | 0,04 s | 3 |
-| Sin RN-12 | 0,7 s | 6 |
-| Sin RN-12, RN-13 ni RN-14 | 5,6 s | 51 |
+| Por defecto | 0,02 s | 4 |
+| Sin RN-12 | 0,3 s | 8 |
+| Sin RN-12, RN-13 ni RN-14 | 2,4 s | 12 |
+| Sin RN-12, RN-13, RN-14 ni RN-21 | 5,6 s | 51 |
 
 RN-12 y las reglas de presencia podan la mayor parte de la búsqueda. Sin ellas se recorren
 unos 300 000 equipos; si llega a hacer falta, se añadirá ramificación y poda con una cota de la
@@ -466,7 +477,13 @@ una función aparte, que sí conoce el origen de cada dato:
 ```python
 involved_facts(juego, datos_del_juego, favoritos, configuración, recorrido) -> tuple[Fact, ...]
 pending_facts(juego, datos_del_juego, favoritos, configuración, recorrido) -> tuple[Fact, ...]
+with_starters(favoritos, iniciales, configuración) -> list[FavoriteFacts]
 ```
+
+Con [RN-21](../01-ddf/reglas-negocio.md#rn-21) activa, los iniciales del juego que no son
+favoritos se revisan como si lo fueran, porque la regla puede elegir uno como miembro
+([CA-66](../01-ddf/cuestiones-abiertas.md#resueltas)). `with_starters` los añade a los
+favoritos antes de llamar a las otras dos.
 
 | Modelo | Qué es |
 |--------|--------|
