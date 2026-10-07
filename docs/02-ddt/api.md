@@ -90,6 +90,22 @@ local ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)). La API la si
   en el directorio de datos (por ejemplo, porque se borró la caché). La ruta del fichero sale de
   `reference.sqlite`, nunca de la URL, y se comprueba que queda dentro del directorio de datos.
 
+#### Portadas
+
+Cada juego cargado tiene su portada, la carátula de su artículo en WikiDex, que la carga de
+datos descarga y reduce a 256 px en la caché local
+([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md),
+[RF-18](../01-ddf/requisitos-funcionales.md#rf-18)). Se sirve igual que las imágenes de los
+Pokémon, en `/api/games/{game}/cover`:
+
+- **`cover_url`**: la URL de la portada, o `null` si el juego no tiene (se cargó con
+  `--no-covers` o WikiDex no la dio). Está en los juegos (`GET /api/games`, también con
+  `all=true`) y en los registros del *Hall of Fame*, `null` si su juego ya no está cargado.
+- **`cover_source_url`**: la página del fichero en WikiDex, su titular y procedencia, para el
+  aviso de la web ([CA-56](../01-ddf/cuestiones-abiertas.md#resueltas)); `null` si no hay
+  portada. La API solo construye el enlace: nunca pide nada a WikiDex.
+- **Respuesta y `404`**: como en las imágenes. Cada portada pesa unos 150 KB.
+
 ### Favoritos
 
 | Método | Ruta | Descripción | Requisitos |
@@ -115,7 +131,8 @@ defecto del catálogo ([CA-41](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 | Método | Ruta | Descripción | Requisitos |
 |--------|------|-------------|------------|
-| `GET` | `/api/games` | Juegos que pueden ser juego objetivo: los marcados como objetivo y con crianza, en orden de lanzamiento. Con `all=true`, todos los juegos cargados, para registrarlos en el *Hall of Fame*. Cada juego indica con `target` si puede ser juego objetivo. ✅ | RF-05, RF-12 |
+| `GET` | `/api/games` | Juegos que pueden ser juego objetivo: los marcados como objetivo y con crianza, en orden de lanzamiento. Con `all=true`, todos los juegos cargados, para registrarlos en el *Hall of Fame*. Cada juego indica con `target` si puede ser juego objetivo y con `cover_url` y `cover_source_url` su portada ([portadas](#portadas)). ✅ | RF-05, RF-12, RF-18 |
+| `GET` | `/api/games/{game}/cover` | Portada del juego, de hasta 256 px, en PNG. Vale para cualquier juego cargado, no solo los objetivo. `404` si el juego no está cargado o no tiene portada. ✅ | RF-18 |
 | `GET` | `/api/games/{game}/review` | Datos inferidos o pendientes que intervienen en la generación, con su propuesta y su estado, y cuántos faltan por confirmar. `404` si el juego no es juego objetivo. ✅ | RF-15 |
 | `PUT` | `/api/games/{game}/review/{fact_key}` | Confirma un dato con el valor propuesto o corregido (`{"value": ...}`): un booleano, o la lista de Pokémon del equipo si es un combate clave. Devuelve el dato. `404` si el dato no existe en el juego; `409` si es automático; `422` si el valor no es del tipo del dato o el equipo tiene Pokémon que no existen en la generación del juego. ✅ | RF-15 |
 | `POST` | `/api/games/{game}/review/accept-proposals` | Acepta de una vez las propuestas inferidas que intervienen y aún no están confirmadas, y devuelve la revisión. Los datos pendientes, sin propuesta, se siguen tratando uno a uno. ✅ | RF-15 |
@@ -142,7 +159,8 @@ de favorito en Rojo Fuego, tras confirmar su llegada:
       "status": "pending",
       "value": null,
       "confirmed_at": null,
-      "outdated": false
+      "outdated": false,
+      "source_url": null
     },
     {"fact_key": "mechanic:firered:day_night_cycle", "...": "..."},
     {
@@ -155,7 +173,8 @@ de favorito en Rojo Fuego, tras confirmar su llegada:
       "status": "confirmed",
       "value": false,
       "confirmed_at": "2026-10-04T20:15:02Z",
-      "outdated": false
+      "outdated": false,
+      "source_url": null
     }
   ]
 }
@@ -170,6 +189,7 @@ de favorito en Rojo Fuego, tras confirmar su llegada:
 | `proposal`, `value` | Lo que propone la carga y lo que confirmó el usuario: booleanos o, en un combate clave, la lista de Pokémon de su equipo en orden. |
 | `status` | `confirmed` si hay una confirmación para la propuesta actual; si no, `pending`. |
 | `outdated` | Había una confirmación, pero una carga posterior propone otro valor: se vuelve a pedir ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). |
+| `source_url` | En un combate clave, la revisión de la página de WikiDex de la que sale su equipo (`https://www.wikidex.net/index.php?title=Misty&oldid=3508255`), por su licencia CC BY-NC-SA ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)); `null` en los demás datos o si la carga no la guardó. Con los datos actuales los combates clave se cargan automáticos y no se revisan, así que no aparece. |
 
 Los datos salen en el orden en que se piden: primero los del juego (mecánicas, combates clave)
 y después los de cada favorito en orden de la Pokédex Nacional, la existencia antes que la

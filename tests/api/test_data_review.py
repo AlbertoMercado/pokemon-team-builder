@@ -56,6 +56,7 @@ def test_without_favourites_only_the_game_mechanics_are_asked(client: TestClient
         "value": None,
         "confirmed_at": None,
         "outdated": False,
+        "source_url": None,
     }
 
 

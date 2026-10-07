@@ -21,7 +21,7 @@ partir de las dos bases de datos y llaman a `core/`, y los repositorios acceden 
 | `errors.py` | Errores de los casos de uso y su código HTTP (`404`, `409`, `422`). |
 | `dependencies.py` | Dependencias de los routers: sesiones de las bases de datos, directorio de datos y datos de referencia del juego de la ruta (`404` si no es juego objetivo). |
 | `routers/` | Un router por grupo de endpoints de la [API](../docs/02-ddt/api.md). |
-| `services/` | Casos de uso. `context.py` construye el `GameContext` (con la parte de referencia de cada juego en caché), `review.py` revisa los datos, `generation.py` genera los equipos y comprueba el equipo elegido en el resultado, `hall_of_fame.py` gestiona el recorrido (RN-16), `catalog.py` busca Pokémon y monta su ficha, `images.py` da la URL y el fichero de la imagen de cada forma (ADR-0010) y `rounding.py` redondea las puntuaciones con el método del mayor resto (CA-51). |
+| `services/` | Casos de uso. `context.py` construye el `GameContext` (con la parte de referencia de cada juego en caché), `review.py` revisa los datos, `generation.py` genera los equipos y comprueba el equipo elegido en el resultado, `hall_of_fame.py` gestiona el recorrido (RN-16), `catalog.py` busca Pokémon y monta su ficha, `images.py` da la URL y el fichero de la imagen de cada forma y de la portada de cada juego (ADR-0010, ADR-0011), `wikidex.py` construye los enlaces a las fuentes en WikiDex y `rounding.py` redondea las puntuaciones con el método del mayor resto (CA-51). |
 | `repositories/` | Acceso a `db/`. |
 | `schemas/` | Modelos pydantic de las peticiones y respuestas (el contrato OpenAPI). |
 

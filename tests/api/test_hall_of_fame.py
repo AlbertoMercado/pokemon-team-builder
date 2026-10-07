@@ -53,6 +53,8 @@ def test_register_a_team(client: TestClient) -> None:
         "game": "firered",
         "game_name": "Firered",
         "generation": 3,
+        "cover_url": None,
+        "cover_source_url": None,
         "completed_on": "2026-05-01",
         "notes": "Sin objetos",
         "order": 1,

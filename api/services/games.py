@@ -4,6 +4,9 @@ from sqlmodel import Session
 
 from api.repositories import reference as reference_repo
 from api.schemas.games import GameOut
+from api.services import wikidex
+from api.services.images import cover_url
+from db.reference import Game
 
 
 def list_games(reference: Session, *, every: bool = False) -> list[GameOut]:
@@ -24,6 +27,15 @@ def list_games(reference: Session, *, every: bool = False) -> list[GameOut]:
             generation=game.generation,
             version_group=game.version_group,
             target=game.slug in targets,
+            cover_url=cover_url(game.slug, game.cover is not None),
+            cover_source_url=cover_source_url(game),
         )
         for game in games
     ]
+
+
+def cover_source_url(game: Game | None) -> str | None:
+    """The WikiDex page of the game's cover, or ``None`` if it has none (CA-56, ADR-0011)."""
+    if game is None or game.cover is None or game.cover_source is None:
+        return None
+    return wikidex.page_url(game.cover_source)

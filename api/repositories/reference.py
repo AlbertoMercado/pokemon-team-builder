@@ -54,6 +54,13 @@ def pokemon_image(reference: Session, slug: str, *, artwork: bool = False) -> st
     return form.artwork if artwork else form.image
 
 
+def game_cover(reference: Session, slug: str) -> str | None:
+    """Path of the game's cover relative to the data directory; ``None`` if the game is not
+    loaded or has no cover (RF-18)."""
+    game = reference.get(Game, slug)
+    return game.cover if game else None
+
+
 def forms_with_image(reference: Session) -> set[str]:
     """The forms whose sprite the load obtained."""
     return set(reference.exec(select(Pokemon.slug).where(col(Pokemon.image).is_not(None))).all())

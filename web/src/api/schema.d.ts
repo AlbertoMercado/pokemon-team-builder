@@ -199,6 +199,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/games/{game}/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Portada de un juego
+         * @description La portada del juego, de hasta 256 px, que la carga de datos descarga de WikiDex y guarda
+         *     en la caché local (ADR-0011). Vale para cualquier juego cargado, también los que no son
+         *     juego objetivo. Es la URL que dan las respuestas en `cover_url`. `404` si el juego no está
+         *     cargado o no tiene portada.
+         */
+        get: operations["game_cover_api_games__game__cover_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/games/{game}/review": {
         parameters: {
             query?: never;
@@ -619,6 +642,16 @@ export interface components {
              * @description Si se puede elegir como juego objetivo (RF-05).
              */
             target: boolean;
+            /**
+             * Cover Url
+             * @description URL de su portada en esta API (`/api/games/{game}/cover`); nula si el juego no tiene portada (RF-18).
+             */
+            cover_url: string | null;
+            /**
+             * Cover Source Url
+             * @description Página del fichero de la portada en WikiDex, su titular y procedencia (CA-56, ADR-0011); nula si el juego no tiene portada.
+             */
+            cover_source_url: string | null;
         };
         /** GenerationOut */
         GenerationOut: {
@@ -719,6 +752,16 @@ export interface components {
              * @description Generación del juego (la de su lanzamiento); nula si ya no está cargado.
              */
             generation: number | null;
+            /**
+             * Cover Url
+             * @description URL de su portada en esta API (`/api/games/{game}/cover`); nula si el juego no tiene portada (RF-18).
+             */
+            cover_url: string | null;
+            /**
+             * Cover Source Url
+             * @description Página del fichero de la portada en WikiDex, su titular y procedencia (CA-56, ADR-0011); nula si el juego no tiene portada.
+             */
+            cover_source_url: string | null;
             /**
              * Completed On
              * Format: date
@@ -1034,6 +1077,11 @@ export interface components {
              * @description Se confirmó, pero una carga posterior propone otro valor: hay que volver a confirmarlo.
              */
             outdated: boolean;
+            /**
+             * Source Url
+             * @description En un combate clave, la revisión de la página de WikiDex de la que sale su equipo (ADR-0004); nula en los demás datos o si no se conoce.
+             */
+            source_url: string | null;
         };
         /** ReviewOut */
         ReviewOut: {
@@ -1526,6 +1574,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["GameOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    game_cover_api_games__game__cover_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                game: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description La portada, en PNG. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
                 };
             };
             /** @description Validation Error */

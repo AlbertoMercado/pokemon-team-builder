@@ -142,6 +142,19 @@ Con `?all=true` aparecen todos los juegos cargados, también los que no pueden s
 (como Rojo u Oro), que sí se pueden registrar en el [Hall of Fame](#hall-of-fame-tu-recorrido).
 `target` dice si cada uno puede ser juego objetivo.
 
+Cada juego trae en `cover_url` la dirección de su portada, o `null` si no la tiene, y en
+`cover_source_url` la página de esa portada en WikiDex. Los registros del Hall of Fame traen las
+mismas dos. Puedes abrirla en el navegador o descargarla:
+
+```bash
+curl -o rojo-fuego.png http://127.0.0.1:8000/api/games/firered/cover
+```
+
+Las portadas son de Nintendo, Creatures, GAME FREAK y The Pokémon Company. WikiDex las declara de
+uso legítimo solo en sus artículos, así que son **solo para tu uso privado**: no las publiques ni
+las compartas. La carga de datos las descarga a tu ordenador y la API las sirve desde ahí; si no
+las quieres, carga los datos con `--no-covers` ([cargar datos](cargar-datos.md)).
+
 ## Revisar los datos de un juego
 
 Algunos datos no se pueden cargar con certeza: la carga los deja **inferidos** (con una
@@ -180,6 +193,8 @@ curl -X PUT http://127.0.0.1:8000/api/games/firered/review/battle:firered:misty 
   aparecer como `pending` con `outdated` a `true`.
 - Los datos que la carga obtuvo sin ambigüedad (automáticos) no aparecen y no se pueden
   cambiar.
+- En un combate clave, `source_url` enlaza a la versión de la página de WikiDex de la que sale
+  su equipo, para que puedas comprobarlo antes de confirmarlo.
 
 ## Generar un equipo
 
@@ -277,6 +292,7 @@ curl -X DELETE http://127.0.0.1:8000/api/hall-of-fame/1
 | Respuesta | Causa | Solución |
 |-----------|-------|----------|
 | `404` al pedir una imagen | Esa forma no tiene imagen: la carga no pudo descargarla, o se ha borrado la caché. | Repite la [carga](cargar-datos.md) con conexión; el informe dice qué formas no tienen imagen. |
+| `404` al pedir una portada | Ese juego no tiene portada: se cargó con `--no-covers`, WikiDex no la dio o se ha borrado la caché. | Repite la [carga](cargar-datos.md) con conexión y sin `--no-covers`; el informe dice qué juegos no tienen portada. |
 | `503` «No hay datos de referencia…» | No se han cargado los datos. | Ejecuta la [carga](cargar-datos.md); la siguiente petición ya los encuentra. |
 | `503` «Los datos de referencia son de una versión anterior…» | Has actualizado la aplicación y la nueva versión necesita datos que la carga anterior no tiene. | Repite la [carga](cargar-datos.md) y reinicia la API. |
 | `404` al consultar una ficha | La forma no existe en los datos cargados. | Búscala en la lista (`?q=`) para ver su identificador. |

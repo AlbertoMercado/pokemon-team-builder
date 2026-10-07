@@ -23,7 +23,8 @@ from api.schemas.hall_of_fame import (
     HallOfFamePatch,
 )
 from api.services.context import GameReference
-from api.services.images import image_url
+from api.services.games import cover_source_url
+from api.services.images import cover_url, image_url
 from core.domain import HallOfFameEntry, JourneyMember
 from db import user as user_db
 from db.reference import Game
@@ -171,6 +172,8 @@ def _out(
         game=entry.game,
         game_name=game.name_es if game else entry.game,
         generation=game.generation if game else None,
+        cover_url=cover_url(entry.game, game is not None and game.cover is not None),
+        cover_source_url=cover_source_url(game),
         completed_on=entry.completed_on,
         notes=entry.notes,
         order=order,

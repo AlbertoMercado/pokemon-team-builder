@@ -33,6 +33,8 @@ def test_target_games_or_every_loaded_game_in_release_order(
             "generation": 3,
             "version_group": "firered-leafgreen",
             "target": True,
+            "cover_url": None,
+            "cover_source_url": None,
         },
         {
             "game": "leafgreen",
@@ -40,6 +42,8 @@ def test_target_games_or_every_loaded_game_in_release_order(
             "generation": 3,
             "version_group": "firered-leafgreen",
             "target": True,
+            "cover_url": None,
+            "cover_source_url": None,
         },
     ]
     every = make_client().get("/api/games", params={"all": "true"}).json()

@@ -53,6 +53,10 @@ class ReviewFactOut(BaseModel):
         description="Se confirmó, pero una carga posterior propone otro valor: hay que volver a "
         "confirmarlo."
     )
+    source_url: str | None = Field(
+        description="En un combate clave, la revisión de la página de WikiDex de la que sale su "
+        "equipo (ADR-0004); nula en los demás datos o si no se conoce."
+    )
 
 
 class ReviewOut(BaseModel):
