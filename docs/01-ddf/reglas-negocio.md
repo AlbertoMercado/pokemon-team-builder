@@ -35,6 +35,7 @@ juego y se transfiere al juego objetivo en su etapa inicial.
 | [RN-18](#rn-18) | Los datos sin verificar los confirma el usuario | Mecanismo | No | Vigente |
 | [RN-19](#rn-19) | A igual puntuación, se prefieren los Pokémon con dos tipos | Mecanismo | No | Vigente |
 | [RN-20](#rn-20) | Penalizar las evoluciones aleatorias | Blanda | Activable y peso | Vigente |
+| [RN-21](#rn-21) | Un inicial del juego obligatorio, y solo uno | Dura (presencia) | Activable | Vigente |
 
 Estados posibles:
 
@@ -47,9 +48,11 @@ Las reglas duras son de dos clases:
 - **De exclusión**: descartan candidatos o combinaciones de candidatos (p. ej.,
   [RN-11](#rn-11) o [RN-12](#rn-12)).
 - **De presencia**: obligan a que el equipo incluya un Pokémon con ciertas características
-  ([RN-13](#rn-13), [RN-14](#rn-14)). Tienen prioridad sobre el tamaño del equipo: antes que
-  un equipo de 6 que no las cumpla, se muestra un equipo incompleto que sí las cumple
-  ([RN-08](#rn-08)).
+  ([RN-13](#rn-13), [RN-14](#rn-14), [RN-21](#rn-21)). Tienen prioridad sobre el tamaño del
+  equipo: antes que un equipo de 6 que no las cumpla, se muestra un equipo incompleto que sí
+  las cumple ([RN-08](#rn-08)). Si no se pueden cumplir todas a la vez, se cumplen por este
+  orden: RN-13, RN-14 y RN-21 ([CA-48](cuestiones-abiertas.md#resueltas),
+  [CA-61](cuestiones-abiertas.md#resueltas)).
 
 ## Proceso de generación
 
@@ -68,10 +71,10 @@ favoritos ([RN-18](#rn-18)). Después, las reglas se aplican en este orden:
     ([RF-10](requisitos-funcionales.md#rf-10)).
 3. **Restricciones de equipo**. Solo se forman equipos de como máximo 6 miembros
    ([RN-01](#rn-01)) que cumplen las reglas de exclusión entre miembros: sin líneas evolutivas
-   repetidas ([RN-07](#rn-07)), sin tipos repetidos ([RN-12](#rn-12)) y con una sola evolución
-   de Eevee ([RN-14](#rn-14)).
+   repetidas ([RN-07](#rn-07)), sin tipos repetidos ([RN-12](#rn-12)), con una sola evolución
+   de Eevee ([RN-14](#rn-14)) y con un solo inicial ([RN-21](#rn-21)).
 4. **Presencia obligatoria**. De esos equipos, solo valen los que cumplen las reglas de
-   presencia activas ([RN-13](#rn-13), [RN-14](#rn-14)).
+   presencia activas ([RN-13](#rn-13), [RN-14](#rn-14), [RN-21](#rn-21)).
 5. **Puntuación**. Entre los equipos de 6 que cumplen todo lo anterior, se eligen los de mayor
    puntuación ([RN-04](#rn-04)) según las reglas blandas activas ([RN-06](#rn-06),
    [RN-15](#rn-15), [RN-17](#rn-17), [RN-20](#rn-20)). Los empates se resuelven prefiriendo a los Pokémon con
@@ -83,8 +86,8 @@ favoritos ([RN-18](#rn-18)). Después, las reglas se aplican en este orden:
 ```mermaid
 flowchart LR
     F[Favoritos] -- "RN-03 · RN-11 · RN-16<br/>filtros por candidato" --> V[Candidatos<br/>válidos]
-    V -- "RN-01 · RN-07 · RN-12 · RN-14<br/>restricciones de equipo" --> C[Combinaciones<br/>válidas]
-    C -- "RN-13 · RN-14<br/>presencia obligatoria" --> P[Equipos<br/>admisibles]
+    V -- "RN-01 · RN-07 · RN-12 · RN-14 · RN-21<br/>restricciones de equipo" --> C[Combinaciones<br/>válidas]
+    C -- "RN-13 · RN-14 · RN-21<br/>presencia obligatoria" --> P[Equipos<br/>admisibles]
     P -- "RN-04: RN-06 · RN-15 · RN-17 · RN-20<br/>puntuación · RN-19 desempate" --> E[Mejores<br/>equipos de 6]
     P -. "ninguno de 6<br/>RN-08" .-> A[Equipo incompleto<br/>y sugerencias]
 ```
@@ -255,8 +258,9 @@ parámetros son fijos.
       recorrido ([RN-16](#rn-16)).
 - **Nota**: Dragonite tiene que estar en favoritos para ser candidato ([RN-02](#rn-02),
   [CA-23](cuestiones-abiertas.md#resueltas)).
-- **Junto con [RN-14](#rn-14)**: si ningún equipo puede cumplir las dos a la vez, RN-13 tiene
-  prioridad ([CA-48](cuestiones-abiertas.md#resueltas)).
+- **Junto con [RN-14](#rn-14) y [RN-21](#rn-21)**: si ningún equipo puede cumplirlas a la vez,
+  RN-13 tiene prioridad ([CA-48](cuestiones-abiertas.md#resueltas),
+  [CA-61](cuestiones-abiertas.md#resueltas)).
 
 ### RN-14 · Una evolución de Eevee obligatoria, y solo una { #rn-14 }
 
@@ -291,6 +295,8 @@ parámetros son fijos.
   hueco para las demás evoluciones de Eevee del juego que encajan. Por ejemplo, con Zekrom
   (Dragón/Eléctrico) como único Dragón y Jolteon como única evolución de Eevee en favoritos,
   que comparten tipo ([RN-12](#rn-12)), se descarta Jolteon y se sugieren Vaporeon o Flareon.
+- **Junto con [RN-21](#rn-21)**: RN-14 tiene prioridad
+  ([CA-61](cuestiones-abiertas.md#resueltas)).
 
 ### RN-15 · Penalizar evoluciones tediosas { #rn-15 }
 
@@ -373,6 +379,8 @@ parámetros son fijos.
       ([RN-13](#rn-13)).
     - De la línea de Eevee solo se excluye la evolución usada. Eevee y el resto de sus
       evoluciones siguen siendo candidatos ([RN-14](#rn-14)).
+- **Iniciales**: no son una excepción. Se excluye la línea del inicial usado, y [RN-21](#rn-21)
+  elige entre los demás iniciales del juego ([CA-62](cuestiones-abiertas.md#resueltas)).
 - **Ejemplos** (cada flecha es el siguiente juego completado):
     - Verde Hoja (3.ª) → Rojo Fuego (3.ª): se excluye el equipo de Verde Hoja.
     - Verde Hoja (3.ª) → Platino (4.ª): se excluye el equipo de Verde Hoja.
@@ -446,6 +454,42 @@ parámetros son fijos.
       ([RN-15](#rn-15)), pero no aleatorio.
     - Con los pesos por defecto, Beautifly resta 5,5 puntos al equipo (0,5 por RN-15 y 5 por
       RN-20), y Gengar, 0,5.
+
+### RN-21 · Un inicial del juego obligatorio, y solo uno { #rn-21 }
+
+- **Tipo**: dura de presencia, activable
+- **Descripción**: si está activa, el equipo incluye **exactamente un** inicial del juego
+  objetivo.
+- **Qué es un inicial** ([CA-59](cuestiones-abiertas.md#resueltas),
+  [CA-63](cuestiones-abiertas.md#resueltas)): la **evolución final**, en la forma de ese
+  juego, de cada Pokémon que el juego ofrece para empezar. En Rojo Fuego y Verde Hoja son
+  Venusaur, Charizard y Blastoise. Las preevoluciones (Bulbasaur, Ivysaur…) no cuentan. Una
+  forma regional solo es inicial en el juego que la ofrece: Typhlosion de Hisui lo es en
+  Leyendas Pokémon: Arceus, pero no en otros juegos.
+- **Solo uno** ([CA-60](cuestiones-abiertas.md#resueltas)): el equipo no incluye ningún otro
+  miembro de las líneas de los iniciales del juego, para no gastar los demás iniciales de cara
+  a los otros juegos de la misma generación ([RN-16](#rn-16)). Por ejemplo, Charizard y
+  Wartortle no pueden estar juntos.
+- **Niveles**: como en [RN-14](#rn-14):
+    1. Hay algún inicial entre los candidatos válidos: uno de ellos forma parte del equipo.
+       Cuál se decide por puntuación ([RN-04](#rn-04)).
+    2. Si no, alguno se puede sugerir: se reserva un hueco y se sugieren ([RN-08](#rn-08)).
+    3. Si tampoco, la regla no se puede cumplir y se explica el motivo.
+- **Prioridad**: igual que en [RN-13](#rn-13), tiene prioridad sobre el tamaño del equipo.
+- **Junto con [RN-13](#rn-13) y [RN-14](#rn-14)** ([CA-61](cuestiones-abiertas.md#resueltas)):
+  si ningún inicial candidato cabe en un equipo con los candidatos que cumplen RN-13 y RN-14,
+  ellas tienen prioridad. Esos iniciales se descartan y la regla pasa al nivel 2: se reserva un
+  hueco para los demás iniciales del juego que encajan.
+- **Recorrido** ([CA-62](cuestiones-abiertas.md#resueltas)): el inicial usado queda excluido
+  como cualquier otro Pokémon ([RN-16](#rn-16)), así que la regla elige entre los demás.
+- **Ejemplos**:
+    - En Rojo Fuego, con Venusaur, Charizard y Blastoise en favoritos, el equipo incluye uno
+      solo: el que dé mayor puntuación al equipo.
+    - Si en Rojo Fuego se usó Venusaur, en Verde Hoja se elige entre Charizard y Blastoise.
+    - En Rojo Fuego, con Dragonite (Dragón/Volador) y Charizard (Fuego/Volador) como únicos
+      candidatos de RN-13 y RN-21, que comparten tipo ([RN-12](#rn-12)), RN-13 tiene
+      prioridad: se descarta Charizard y se sugieren Venusaur o Blastoise.
+    - Lo mismo con Flareon y Charizard, que comparten el tipo Fuego: RN-14 tiene prioridad.
 
 ## Mecanismos
 
@@ -576,6 +620,5 @@ decida incluirla.
 
 | Idea | Tipo probable | Notas |
 |------|---------------|-------|
-| Excluir el inicial | Dura (opcional) | |
 | Pocas debilidades compartidas | Blanda | Con [RN-12](#rn-12) activa pierde sentido, porque los miembros no comparten tipos. La defensa de [RN-17](#rn-17) cubre parte de la idea. |
 | Estadísticas base | Blanda | Suma o media de estadísticas base de la evolución favorita (RN-09). |
