@@ -3,6 +3,7 @@ import { Link } from "react-router";
 
 import { useGames } from "../api/queries/games";
 import ErrorMessage from "../components/ErrorMessage";
+import GameCover from "../components/GameCover";
 
 export default function GamesPage() {
   const games = useGames();
@@ -25,10 +26,13 @@ export default function GamesPage() {
             <li key={game.game}>
               <Link
                 to={`/juego/${game.game}/revision`}
-                className="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-red-700"
+                className="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-red-700"
               >
-                <span className="block text-lg font-semibold">{game.name}</span>
-                <span className="text-sm text-slate-600">{`${String(game.generation)}.ª generación`}</span>
+                <GameCover url={game.cover_url} size="large" />
+                <span>
+                  <span className="block text-lg font-semibold">{game.name}</span>
+                  <span className="text-sm text-slate-600">{`${String(game.generation)}.ª generación`}</span>
+                </span>
               </Link>
             </li>
           ))}

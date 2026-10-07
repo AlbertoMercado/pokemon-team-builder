@@ -154,6 +154,22 @@ responde `503` pidiéndolo (`missing_columns`).
 - La revisión de datos muestra, en cada combate clave, «Fuente: WikiDex» con el enlace a la
   revisión usada.
 
+#### Decisiones tomadas al implementar la fase 3
+
+- **`Picture` compartido**: la caja de tamaño fijo, el `alt=""` y la ocultación si no carga
+  salen de `PokemonSprite` a `components/Picture.tsx`, que usan las imágenes de los Pokémon y
+  las portadas. Las portadas no se pixelan: son fotografías.
+- **Tamaños**: 96 px en las tarjetas de **Nuevo juego**, 64 px en las cabeceras de la revisión y
+  del resultado y 40 px en el Inicio y el *Hall of Fame*, junto al nombre del juego.
+- **El enlace a cada portada va en el pie** (ADR-0011): una lista «portada de Rojo Fuego…» con la
+  página de cada una en WikiDex, de los juegos cargados con portada (`GET /api/games?all=true`).
+  Un enlace sobre la propia portada no cabe en las tarjetas, que ya son un enlace, y repetirlo en
+  cada pantalla las recargaría. El texto «portada de…» evita que los enlaces se llamen igual que
+  el juego. Sin portadas (`--no-covers`), el pie no dice nada de ellas.
+- **Comprobado con los datos reales** (Playwright, a 1280 y 360 px): las cinco portadas de
+  **Nuevo juego**, de 96 × 96, con todas las tarjetas de 130 px; 64 × 64 en las cabeceras y
+  40 × 40 en el Inicio y el *Hall of Fame*; 11 enlaces en el pie.
+
 ## Fases
 
 Cada fase es un PR con sus tests y su documentación.
@@ -163,7 +179,7 @@ Cada fase es un PR con sus tests y su documentación.
 | 0 ✅ | `docs/portadas-juegos` | ADR-0011, este plan, comprobaciones previas, CA-55 y RF-18. | — |
 | 1 ✅ | `feat/ingesta-portadas` | `covers.yaml`, `CoverCache`, `game.cover` y `cover_source`, informe, `--no-covers`. Operación de la ingesta, datos curados, modelo de datos y puesta en producción. | Sin red, con imágenes sintéticas: información y descarga, caché, `--offline`, fichero que no existe, servidor que no responde, reducción, carga con y sin portadas, `--no-covers`, esquema de `covers.yaml`. Comprobación real con red. |
 | 2 ✅ | `feat/api-portadas` | Endpoint de la portada, `cover_url` y `cover_source_url`, `source_url` de los combates clave, cliente regenerado. API, Operación y manual. | `200` y `404`; ruta fuera del directorio de datos; juegos que no son objetivo; campos en los juegos, el *Hall of Fame* y la revisión. |
-| 3 | `feat/web-portadas` | `GameCover` en las cinco pantallas, aviso y fuente de los combates clave. Manual de la web y CHANGELOG. | Vitest de cada pantalla con y sin portada; tamaños medidos con los datos reales. |
+| 3 ✅ | `feat/web-portadas` | `GameCover` en las cinco pantallas, aviso y fuente de los combates clave. Manual de la web y CHANGELOG. | Vitest de cada pantalla con y sin portada; tamaños medidos con los datos reales. |
 | 4 | `chore/release-1.2.0` | Versión 1.2.0 (MENOR) y cierre de #49. | — |
 
 ## Riesgos

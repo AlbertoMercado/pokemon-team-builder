@@ -149,8 +149,8 @@ export const games: Game[] = [
     generation: 3,
     version_group: "firered-leafgreen",
     target: true,
-    cover_url: null,
-    cover_source_url: null,
+    cover_url: "/api/games/firered/cover",
+    cover_source_url: "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Rojo_Fuego.png",
   },
 ];
 
@@ -181,7 +181,10 @@ const fact = (
 function initialFirered(): ReviewFact[] {
   return [
     fact("mechanic:firered:contests", "mechanic", "contests", "Concursos", false),
-    fact("battle:firered:brock", "key_battle", "brock", "Brock", ["geodude", "onix"]),
+    {
+      ...fact("battle:firered:brock", "key_battle", "brock", "Brock", ["geodude", "onix"]),
+      source_url: "https://www.wikidex.net/index.php?title=Brock&oldid=3562807",
+    },
     fact("battle:firered:misty", "key_battle", "misty", "Misty", null),
     fact("pokemon:firered:raichu:arrival", "arrival", "raichu", "Raichu", false),
     {
@@ -287,8 +290,8 @@ export const allGames: Game[] = [
     generation: 1,
     version_group: "red-blue",
     target: false,
-    cover_url: null,
-    cover_source_url: null,
+    cover_url: "/api/games/red/cover",
+    cover_source_url: "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Pok%C3%A9mon_Rojo.jpg",
   },
   ...games,
   {
@@ -812,4 +815,26 @@ export function withoutData(): void {
 /** Every request fails to connect, as when the API is not running. */
 export function withoutApi(): void {
   server.use(http.all("/api/*", () => HttpResponse.error()));
+}
+
+/** No game has a cover, as after a load with `--no-covers` (ADR-0011). */
+export function withoutCovers(): void {
+  const bare = (list: Game[]) =>
+    list.map((game) => ({ ...game, cover_url: null, cover_source_url: null }));
+  server.use(
+    http.get("/api/games", ({ request }) =>
+      HttpResponse.json(
+        bare(new URL(request.url).searchParams.get("all") === "true" ? allGames : games),
+      ),
+    ),
+    http.get("/api/hall-of-fame", ({ request }) =>
+      HttpResponse.json(
+        journey(new URL(request.url).searchParams.get("game")).map((entry) => ({
+          ...entry,
+          cover_url: null,
+          cover_source_url: null,
+        })),
+      ),
+    ),
+  );
 }

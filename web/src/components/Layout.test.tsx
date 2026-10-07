@@ -2,6 +2,7 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { renderApp } from "../test/render";
+import { withoutCovers } from "../test/server";
 
 describe("Navegación", () => {
   it("links every section and marks the current one", async () => {
@@ -42,12 +43,45 @@ describe("Navegación", () => {
   it("says who owns the images and where the data come from (CA-56)", () => {
     renderApp("/");
     const footer = within(screen.getByRole("contentinfo"));
-    expect(
-      footer.getByText(/© Nintendo, Creatures, GAME FREAK y The Pokémon Company/),
-    ).toBeVisible();
+    expect(footer.getByText(/Las imágenes de los Pokémon son © Nintendo/)).toBeVisible();
     expect(footer.getByRole("link", { name: "WikiDex" })).toHaveAttribute(
       "href",
       "https://www.wikidex.net/",
     );
+  });
+});
+
+describe("Aviso de las portadas (RF-18, ADR-0011)", () => {
+  it("says who owns the covers and links to the page of each one in WikiDex", async () => {
+    renderApp("/");
+    const footer = within(screen.getByRole("contentinfo"));
+
+    expect(await footer.findByText(/Las portadas de los juegos son © Nintendo/)).toHaveTextContent(
+      "solo en privado",
+    );
+    expect(
+      footer
+        .getAllByRole("link", { name: /^portada de / })
+        .map((link) => [link.textContent, link.getAttribute("href")]),
+    ).toEqual([
+      [
+        "portada de Rojo",
+        "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Pok%C3%A9mon_Rojo.jpg",
+      ],
+      [
+        "portada de Rojo Fuego",
+        "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Rojo_Fuego.png",
+      ],
+    ]);
+  });
+
+  it("says nothing about covers after a load without them", async () => {
+    withoutCovers();
+    renderApp("/");
+    await screen.findByRole("heading", { level: 1, name: "Inicio" });
+    // Wait until the games have answered: the paragraph would appear then.
+    await screen.findByRole("link", { name: "Rojo Fuego" });
+
+    expect(screen.queryByText(/Las portadas de los juegos/)).not.toBeInTheDocument();
   });
 });

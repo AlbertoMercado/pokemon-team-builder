@@ -56,8 +56,26 @@ la ficha, su ilustración oficial, más grande.
 - Las imágenes las descarga la [carga de datos](cargar-datos.md) a tu ordenador y las sirve la
   propia aplicación, así que funcionan sin conexión.
 
-Al pie de cada pantalla está el aviso de su titularidad (Nintendo, Creatures, GAME FREAK y The
-Pokémon Company), su procedencia (PokeAPI) y la de los datos (PokeAPI y WikiDex).
+### Portadas de los juegos
+
+Cada juego se muestra con su portada junto al nombre: en las tarjetas de **Nuevo juego**, en la
+cabecera de la revisión de datos y del resultado, en el último juego completado del **Inicio** y
+en cada registro del **Hall of Fame**, también de los juegos que no pueden ser juego objetivo,
+como Rojo ([RF-18](../01-ddf/requisitos-funcionales.md#rf-18)).
+
+- Como las imágenes de los Pokémon, la portada **acompaña** al nombre del juego, se ajusta a un
+  tamaño fijo sin deformarse y, si un juego no la tiene, se muestra solo con su nombre.
+- Las descarga de WikiDex la [carga de datos](cargar-datos.md) a tu ordenador. WikiDex las
+  declara de uso legítimo solo en sus artículos, así que son **solo para tu uso privado**: no
+  publiques la aplicación con ellas. Si no las quieres, carga los datos con `--no-covers` y la
+  web muestra solo los nombres.
+
+### Aviso de titularidad
+
+Al pie de cada pantalla está el aviso de la titularidad de las imágenes y las portadas (Nintendo,
+Creatures, GAME FREAK y The Pokémon Company), su procedencia (PokeAPI y WikiDex), con un enlace a
+la página de cada portada en WikiDex, y la de los datos (PokeAPI y WikiDex). Si no hay ninguna
+portada cargada, no dice nada de ellas.
 
 ## Inicio
 
@@ -191,7 +209,8 @@ Formas de confirmar:
   añádelos al final escribiendo parte del nombre en el buscador y pulsando **Añadir**; el equipo
   tiene hasta 6 en el orden en que los añades. **Guardar el equipo** lo confirma. Si la API lo
   rechaza (por ejemplo, porque un Pokémon no existe en la generación del juego), el mensaje
-  aparece debajo y puedes corregirlo.
+  aparece debajo y puedes corregirlo. Si se conoce de dónde sale el equipo, **Fuente: WikiDex**
+  enlaza a la versión de su página que usó la carga, para que lo compruebes.
 
 Por ejemplo, si Raichu es favorito, en Rojo Fuego se propone que **No** puede llegar antes de
 completar el juego, porque de su huevo nace Pichu y Pichu no aparece en la Pokédex de Kanto. Si

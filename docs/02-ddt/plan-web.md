@@ -185,7 +185,7 @@ web/
       types.ts              nombres cortos de los esquemas del contrato
       queries/              una consulta o mutación por recurso, con sus invalidaciones
     pages/                  una por pantalla
-    components/             Layout, ApiStatusBanner, TypeBadge, PokemonName, PokemonSprite, ImageNotice, FavoriteButton, PokemonPicker, ErrorMessage…
+    components/             Layout, ApiStatusBanner, TypeBadge, PokemonName, Picture, PokemonSprite, GameCover, ImageNotice, FavoriteButton, PokemonPicker, ErrorMessage…
     lib/
       format.ts             fechas en español
       commands.ts           comandos que la web indica (carga, arranque de la API)
