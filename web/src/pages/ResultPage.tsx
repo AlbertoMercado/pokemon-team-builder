@@ -28,6 +28,7 @@ import type {
 import ErrorMessage from "../components/ErrorMessage";
 import FavoriteButton from "../components/FavoriteButton";
 import GameCover from "../components/GameCover";
+import PokemonRow from "../components/PokemonRow";
 import PokemonSprite from "../components/PokemonSprite";
 import TeamSelector from "../components/TeamSelector";
 import { TypeBadges } from "../components/TypeBadge";
@@ -366,27 +367,30 @@ function SuggestionList({
   return (
     <ul aria-label={label} className="divide-y divide-slate-100">
       {suggestions.map(({ pokemon, gain, verified }) => (
-        <li key={pokemon.pokemon} className="flex flex-wrap items-center gap-3 py-1">
-          <PokemonSprite url={pokemon.image_url} />
-          <span className="font-mono text-sm text-slate-500">
-            {formatDexNumber(pokemon.dex_number)}
-          </span>
-          <Link to={`/pokemon/${pokemon.pokemon}`} className="font-medium hover:text-red-700">
-            {pokemon.name}
-          </Link>
-          <TypeBadges types={pokemon.types} />
-          <span className="text-sm text-slate-700">{`+${String(gain)}`}</span>
-          {!verified && (
-            <span
-              title="Algún dato de este Pokémon está sin confirmar"
-              className="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900"
-            >
-              Sin verificar
-            </span>
-          )}
-          <span className="ml-auto">
-            <FavoriteButton pokemon={pokemon.pokemon} name={pokemon.name} favorite={false} />
-          </span>
+        <li key={pokemon.pokemon} className="py-1">
+          <PokemonRow
+            pokemon={pokemon.pokemon}
+            name={pokemon.name}
+            dexNumber={pokemon.dex_number}
+            imageUrl={pokemon.image_url}
+            types={pokemon.types}
+            extra={
+              <>
+                <span className="text-sm text-slate-700">{`+${String(gain)}`}</span>
+                {!verified && (
+                  <span
+                    title="Algún dato de este Pokémon está sin confirmar"
+                    className="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900"
+                  >
+                    Sin verificar
+                  </span>
+                )}
+              </>
+            }
+            action={
+              <FavoriteButton pokemon={pokemon.pokemon} name={pokemon.name} favorite={false} />
+            }
+          />
         </li>
       ))}
     </ul>

@@ -8,8 +8,7 @@ import { useCatalog, type CatalogFilters } from "../api/queries/pokemon";
 import ErrorMessage from "../components/ErrorMessage";
 import FavoriteButton from "../components/FavoriteButton";
 import FavoriteHint from "../components/FavoriteHint";
-import PokemonName from "../components/PokemonName";
-import { TypeBadges } from "../components/TypeBadge";
+import PokemonRow from "../components/PokemonRow";
 import { TYPE_IDS, typeStyle } from "../lib/types";
 
 const FIELD = "rounded border border-slate-300 bg-white px-2 py-1";
@@ -135,21 +134,21 @@ function Results({ query }: { query: ReturnType<typeof useCatalog> }) {
           className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white"
         >
           {pokemon.map((entry) => (
-            <li key={entry.pokemon} className="flex flex-wrap items-center gap-3 px-3 py-2">
-              <PokemonName
+            <li key={entry.pokemon} className="px-3 py-2">
+              <PokemonRow
                 pokemon={entry.pokemon}
                 name={entry.name}
                 dexNumber={entry.dex_number}
                 imageUrl={entry.image_url}
+                types={entry.types}
+                action={
+                  <FavoriteButton
+                    pokemon={entry.pokemon}
+                    name={entry.name}
+                    favorite={entry.favorite}
+                  />
+                }
               />
-              <TypeBadges types={entry.types} />
-              <span className="ml-auto">
-                <FavoriteButton
-                  pokemon={entry.pokemon}
-                  name={entry.name}
-                  favorite={entry.favorite}
-                />
-              </span>
             </li>
           ))}
         </ul>
