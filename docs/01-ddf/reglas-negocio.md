@@ -747,8 +747,12 @@ generación de equipos ([CA-79](cuestiones-abiertas.md#resueltas)).
     5. **Salvaje**: «Aparece salvaje en X: N %», donde N es su probabilidad de aparición en esa
        zona con ese método. Primero el lugar con mayor probabilidad; a igual probabilidad, por
        método: andar (hierba o cueva), surfear, caña vieja, caña buena, supercaña y, por último,
-       golpe roca o cabezazo.
-    6. **Errante**: «Pokémon errante».
+       golpe roca o cabezazo. Si la probabilidad cambia con la hora, cuenta la mayor y se indica
+       el momento: «Aparece salvaje en la Ruta 29 (noche): 50 %»
+       ([CA-81](cuestiones-abiertas.md#resueltas)).
+    6. **Errante**: «Pokémon errante». Si qué Pokémon vaga depende del inicial elegido, se indica:
+       «Pokémon errante si elegiste a Squirtle», como Raikou en Rojo Fuego
+       ([CA-80](cuestiones-abiertas.md#resueltas)).
 - **Sin tener en cuenta el avance**: el juego ya está superado, así que no importa en qué
   momento de la partida se puede llegar a cada lugar.
 - Los regalos que dependen del inicial elegido no van aquí, sino casi al final

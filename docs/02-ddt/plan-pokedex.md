@@ -58,7 +58,7 @@ Hechas el 2026-10-07 con el volcado CSV de PokeAPI del commit fijado (`bc92d3b`)
 | `game_pokedex` | Qué Pokédex usa cada juego (RN-22). | Curado |
 | `location`, `encounter` | Los lugares, con su nombre en español, y cada aparición: juego, lugar, Pokémon, método, probabilidad por zona y método, niveles y condiciones. | PokeAPI; los nombres que faltan, curados |
 | `game_transfer` | Qué juegos pueden enviar Pokémon a cuáles, y con qué límite de especies (RN-25). | Curado |
-| `special_obtention` | Pokémon de evento, solo de spin-offs, fósiles (Fósil y lugar donde se revive) y regalos que dependen del inicial. | Curado |
+| `special_obtention` | Pokémon de evento, solo de spin-offs, fósiles (Fósil y lugar donde se revive), y regalos y errantes que dependen del inicial. | Curado |
 
 Cada método de PokeAPI pasa a una de las clases de [RN-26](../01-ddf/reglas-negocio.md#rn-26):
 
@@ -125,17 +125,17 @@ Cada fase es un PR desde `main`, con sus tests y su documentación
 | 5 | `feat/pokedex-web` | Las pantallas, manual y CHANGELOG. | Vitest de cada pantalla y E2E. |
 | 6 | `chore/release-X.Y.0` | Versión MENOR y cierre de #94. | — |
 
-## Pendiente de decidir
+## Decisiones tomadas al planificar
 
-Casos que el DDF no cubre y que salieron al comprobar los datos. Se decidirán antes de la fase
-que los necesita:
+Casos que el DDF no cubría y que salieron al comprobar los datos:
 
-- **Errantes que dependen del inicial**: en Rojo Fuego y Verde Hoja, el perro legendario errante
-  depende del inicial elegido. ¿Cuenta como errante o como un regalo que depende del inicial,
-  casi al final ([RN-24](../01-ddf/reglas-negocio.md#rn-24))? (Fase 3.)
-- **Condiciones de aparición**: en la 2.ª generación la probabilidad cambia con la hora (mañana,
-  día y noche), y hay enjambres y otras condiciones. ¿Qué probabilidad cuenta para elegir el
-  lugar más sencillo? (Fase 3.)
+- **Errantes que dependen del inicial** (el perro legendario de Rojo Fuego y Verde Hoja): cuentan
+  como errantes e indican de qué inicial dependen
+  ([CA-80](../01-ddf/cuestiones-abiertas.md#resueltas)). El inicial de cada errante va en los
+  datos curados.
+- **Probabilidad que cambia con la hora** (2.ª generación): cuenta la mayor e indica el momento
+  ([CA-81](../01-ddf/cuestiones-abiertas.md#resueltas)). El resto de condiciones (enjambres,
+  radio…) se decidirán si aparecen en la fase 3.
 
 ## Riesgos
 
