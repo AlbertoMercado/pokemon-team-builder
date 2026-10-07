@@ -19,6 +19,7 @@ las reglas de negocio (**RN-XX**).
 | 0.11 | 2026-10-04 | CA-51: las puntuaciones se muestran como enteros redondeados que siguen sumando el total (RF-09). |
 | 0.12 | 2026-10-07 | Nueva regla de presencia RN-21: un inicial del juego obligatorio, y solo uno (CA-59 a CA-63). Si no hay un inicial favorito, la regla elige uno del juego (CA-65). Se retira la regla candidata «Excluir el inicial» (CA-64). |
 | 0.13 | 2026-10-07 | CA-66: con RN-21 activa, se confirman también los datos sin verificar de los iniciales del juego (RN-18, RF-15). |
+| 0.14 | 2026-10-07 | CA-67: solo se puede elegir como juego objetivo un juego completo, definido en RF-05. Un juego incompleto se carga y no bloquea la carga (modifica CA-46; RF-11, RN-17). |
 
 ## Propósito
 
@@ -159,7 +160,8 @@ Generación
 
 Juego objetivo
 :   Juego de la saga principal que se quiere completar (p. ej., Pokémon Rojo Fuego). Pertenece a
-    una generación. Ambos determinan los candidatos ([RN-03](reglas-negocio.md#rn-03)).
+    una generación. Ambos determinan los candidatos ([RN-03](reglas-negocio.md#rn-03)). Solo
+    se puede elegir un juego completo ([RF-05](requisitos-funcionales.md#rf-05)).
 
 Completar un juego
 :   Vencer al Campeón de la Liga Pokémon y entrar en el *Hall of Fame* del juego.

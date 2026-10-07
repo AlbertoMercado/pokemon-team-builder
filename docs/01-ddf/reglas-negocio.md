@@ -426,9 +426,10 @@ parámetros son fijos.
   La puntuación de cada rival es la media de los dos aspectos (0, 0,5 o 1). La de cada combate
   es la media de sus rivales, y la de la regla es la media de todos los combates, de modo que
   cada combate pesa lo mismo.
-- **Juegos sin combates clave**: no hay ninguno entre los juegos conocidos. Si apareciera, la
-  carga de ese juego no se hace hasta que una nueva versión de la aplicación decida cómo
-  puntuarlo ([CA-46](cuestiones-abiertas.md#resueltas)).
+- **Juegos sin combates clave**: no se pueden elegir como juego objetivo, porque no están
+  completos ([RF-05](requisitos-funcionales.md#rf-05),
+  [CA-67](cuestiones-abiertas.md#resueltas)). Así la regla siempre tiene combates contra los
+  que puntuar.
 - **Ejemplo**: en Pokémon Rojo Fuego, contra Brock (Geodude y Onix, Roca/Tierra), un miembro de
   tipo Agua cubre el ataque (×4). Uno de tipo Lucha cubre la defensa: resiste Roca y no es
   débil a Tierra.

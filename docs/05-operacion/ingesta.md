@@ -234,7 +234,6 @@ Los códigos de salida están en el [manual](../04-manual-usuario/cargar-datos.m
 | `unknown_evolution_trigger` | Un disparador de evolución que no está en [`evolution_methods.yaml`](../02-ddt/datos-curados.md#evolution_methodsyaml) ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)). | Su categoría para RN-15 y RN-20. |
 | `unknown_evolution_condition` | Una condición de evolución que no está en ese fichero. | Igual. |
 | `missing_level_moves` | Un paso exige conocer un movimiento y no se cargan los movimientos por nivel ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). | Activar la carga de `level_move`. |
-| `target_game_without_key_battles` | Un juego objetivo sin combates clave ([CA-46](../01-ddf/cuestiones-abiertas.md#resueltas)). | Completar su lista curada o, si no tiene, cómo puntúa RN-17. |
 | `wikidex_team_not_found` | La lista curada de combates no encuentra un equipo en WikiDex. | Corregir la página, la sección o el rótulo en `key_battles/*.yaml`. |
 
 ### Informe
