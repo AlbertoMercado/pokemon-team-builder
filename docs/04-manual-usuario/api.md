@@ -83,8 +83,8 @@ curl http://127.0.0.1:8000/api/pokemon/haunter                # ficha
 curl -o vulpix.png http://127.0.0.1:8000/api/pokemon/vulpix-alola/image
 ```
 
-  Las imágenes son de Nintendo, Creatures, GAME FREAK y The Pokémon Company; la carga de datos
-  las descarga del repositorio de PokeAPI a tu ordenador y la API las sirve desde ahí.
+  De quién son las imágenes:
+  [imágenes y portadas](index.md#imagenes-y-portadas-de-quien-son-y-como-se-usan).
 
 ## Favoritos
 
@@ -145,10 +145,8 @@ mismas dos. Puedes abrirla en el navegador o descargarla:
 curl -o rojo-fuego.png http://127.0.0.1:8000/api/games/firered/cover
 ```
 
-Las portadas son de Nintendo, Creatures, GAME FREAK y The Pokémon Company. WikiDex las declara de
-uso legítimo solo en sus artículos, así que son **solo para tu uso privado**: no las publiques ni
-las compartas. La carga de datos las descarga a tu ordenador y la API las sirve desde ahí; si no
-las quieres, carga los datos con `--no-covers` ([cargar datos](cargar-datos.md)).
+Las portadas son **solo para tu uso privado** y se pueden quitar con `--no-covers`
+([de quién son y cómo se usan](index.md#imagenes-y-portadas-de-quien-son-y-como-se-usan)).
 
 ## Revisar los datos de un juego
 

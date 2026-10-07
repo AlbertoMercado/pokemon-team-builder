@@ -57,10 +57,6 @@ desincronizándose y llevando a errores (#76).
 | Cómo se planificó cada parte (no vigente) | [Historial](../06-historial/index.md) | ADR |
 | Cómo se documenta | Esta página | `CLAUDE.md` |
 
-!!! note "En curso"
-    La documentación se está ajustando a este mapa por temas (#76). Hasta terminar, algunos temas
-    aún tienen copias en otras páginas.
-
 ## El README de un directorio
 
 Un índice breve, sin repetir lo que dice el código ni el diseño:

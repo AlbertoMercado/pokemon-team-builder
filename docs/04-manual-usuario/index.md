@@ -23,3 +23,16 @@ el equipo.
 
 Las sugerencias para completar un equipo incompleto pueden depender de datos que no has
 confirmado. En ese caso aparecen marcadas como «sin verificar».
+
+## Imágenes y portadas: de quién son y cómo se usan
+
+Las imágenes de los Pokémon y las portadas de los juegos son de Nintendo, Creatures, GAME FREAK y
+The Pokémon Company ([CA-56](../01-ddf/cuestiones-abiertas.md#resueltas)). La
+[carga de datos](cargar-datos.md) las descarga a tu ordenador y la aplicación las sirve desde
+ahí, sin volver a pedirlas fuera ni redistribuirlas.
+
+!!! warning "Portadas: solo para tu uso privado"
+    Las portadas salen de WikiDex, que las declara de uso legítimo solo en sus artículos
+    ([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)). No publiques ni compartas la
+    aplicación con ellas. Si no las quieres, carga los datos con `--no-covers`: la aplicación
+    muestra solo los nombres de los juegos.

@@ -77,9 +77,8 @@ La portada de cada juego es la carátula que muestra la ficha de su artículo en
 de su fichero está en [`data/curated/covers.yaml`](../02-ddt/datos-curados.md#coversyaml)
 ([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)):
 
-- **Solo uso privado**: WikiDex las declara de uso legítimo solo en sus artículos. La aplicación
-  las usa en privado, sin versionarlas ni redistribuirlas. Si la aplicación se publicara de forma
-  abierta, hay que cargar con `--no-covers`.
+- **Solo uso privado** ([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)): no se
+  versionan ni se redistribuyen, y `--no-covers` carga sin ellas.
 - **Descarga**: una petición a la API MediaWiki con todos los títulos (`prop=imageinfo`, que da la
   URL y el `sha1` de cada fichero) y una descarga por portada, como las páginas de los combates
   clave: al menos 1 s entre peticiones y el mismo `User-Agent`. La primera carga tarda unos 12
