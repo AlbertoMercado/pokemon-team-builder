@@ -6,14 +6,28 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+## [1.4.0] - 2026-10-07
+
+Solo se pueden elegir como juego objetivo los juegos completos, los que tienen todos los datos
+que necesitan las reglas. Hoy son Rojo Fuego y Verde Hoja.
+
+**Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`): es la carga la
+que decide qué juegos están completos y, hasta repetirla, **Nuevo juego** sigue ofreciendo
+Rubí, Zafiro y Esmeralda.
+
+### Añadido
+
+- **Ingesta**: el informe de la carga lista los juegos que no se pueden elegir como objetivo y
+  qué les falta: sus mecánicas, sus combates clave, sus iniciales o la disponibilidad de sus
+  Pokémon. Un juego incompleto no bloquea la carga (CA-67, #75, #91).
+
 ### Cambiado
 
-- **Juegos objetivo**: solo se pueden elegir los juegos completos, que tienen todos los datos
-  que necesitan las reglas (RF-05, CA-67). Hoy, Rojo Fuego y Verde Hoja: Rubí, Zafiro y
-  Esmeralda dejan de aparecer en **Nuevo juego** y responden `404` en la revisión y la
-  generación, aunque se siguen cargando y se pueden registrar en el *Hall of Fame*. El informe
-  de la carga dice qué le falta a cada uno (#75). Al actualizar hay que repetir la carga de
-  datos (`uv run python -m ingest`).
+- **Juegos objetivo**: solo se pueden elegir los juegos completos (RF-05, CA-67). Rubí, Zafiro
+  y Esmeralda, a los que les faltan sus mecánicas y sus combates clave, dejan de aparecer en
+  **Nuevo juego** y responden `404` en la revisión y la generación, aunque se siguen cargando y
+  se pueden registrar en el *Hall of Fame*. Un juego sin combates clave deja de ser un motivo
+  para bloquear la carga, como decía CA-46 (#75, #90, #91).
 
 ## [1.3.0] - 2026-10-07
 
@@ -190,7 +204,8 @@ Hoja**.
   acceso (RF-19, #52).
 - Restricciones de llegada del resto de juegos (CA-28, #8).
 
-[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.3.0...HEAD
+[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.0...v1.1.1
