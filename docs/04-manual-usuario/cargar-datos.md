@@ -22,13 +22,13 @@ Detalle técnico (qué hace cada paso, la caché, las fuentes y las comprobacion
 uv run python -m ingest
 ```
 
-La primera vez descarga los datos de PokeAPI, las páginas de WikiDex (WikiDex va a una petición
-por segundo) y las imágenes de los Pokémon (unos 2 minutos y medio). Las siguientes usan la caché y
-tardan un par de segundos.
+La primera vez descarga los datos de PokeAPI, las páginas y las portadas de WikiDex (a una
+petición por segundo) y las imágenes de los Pokémon: unos 3 minutos. Las siguientes usan la
+caché y tardan un par de segundos ([fuentes y caché](../05-operacion/ingesta.md#fuentes-y-cache)).
 
 | Opción | Para qué |
 |--------|----------|
-| `--offline` | Cargar sin red, solo con lo que ya está en la caché. Las imágenes que falten solo dan un aviso. |
+| `--offline` | Cargar sin red, solo con lo que ya está en la caché. Si falta un fichero de datos, la carga falla; las imágenes y portadas que falten solo dan un aviso. |
 | `--no-covers` | Cargar sin las portadas de los juegos. Hazlo si alguna vez publicas la aplicación de forma abierta: WikiDex solo permite usar sus carátulas en sus artículos ([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)). |
 | `--data-dir DIR` | Usar otro directorio de datos (por ejemplo, para probar sin tocar `data/`). |
 

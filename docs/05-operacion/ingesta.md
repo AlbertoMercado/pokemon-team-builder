@@ -4,40 +4,11 @@ Cómo se construye `reference.sqlite`, la base de datos de referencia con los Po
 juegos y los combates clave ([RF-11](../01-ddf/requisitos-funcionales.md#rf-11)). La ingesta
 es una tarea del administrador que se ejecuta de forma puntual, no al arrancar la aplicación.
 
-!!! note "Estado"
-    Implementadas las fases 2 a 5 del [plan de carga](../02-ddt/plan-carga-datos.md#fases):
-    el comando, el informe, la sustitución segura y las tres fuentes: **PokeAPI** (especies,
-    formas, tipos, eficacias, grupos huevo, evoluciones y juegos), los
-    **[datos curados](../02-ddt/datos-curados.md)** de Rojo Fuego y Verde Hoja y los equipos
-    de sus combates clave desde **WikiDex**, y las imágenes de los Pokémon
-    ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)). Rubí, Zafiro y Esmeralda se
-    completan en la fase 6.
+Cómo se usa (opciones, códigos de salida y qué hacer si falla): el
+[manual de la carga](../04-manual-usuario/cargar-datos.md). Esta página explica cómo funciona
+por dentro.
 
-## Uso
-
-```bash
-uv run python -m ingest                    # escribe data/reference.sqlite
-uv run python -m ingest --offline          # sin descargas: solo con la caché
-uv run python -m ingest --data-dir otra/   # escribe otra/reference.sqlite y usa otra/cache/
-uv run python -m ingest --no-covers        # sin las portadas de los juegos (ADR-0011)
-```
-
-| Opción | Por defecto | Qué hace |
-|--------|-------------|----------|
-| `--data-dir DIR` | `data` | Directorio donde se escriben `reference.sqlite` y la caché de descargas. Se crea si no existe. |
-| `--offline` | No | No descarga nada, ni de PokeAPI ni de WikiDex ni las imágenes. Si falta algún fichero de datos en la caché, la carga falla; si falta una imagen, solo es un aviso. |
-| `--no-covers` | No | Carga sin las portadas de los juegos: ni las descarga ni las asigna, y la web muestra solo los nombres. Obligatorio si la aplicación se publica de forma abierta ([portadas](#portadas-de-los-juegos)). |
-| `-h`, `--help` | | Muestra la ayuda. |
-
-| Código de salida | Significado |
-|------------------|-------------|
-| `0` | Carga completada: `reference.sqlite` se ha sustituido por la nueva. |
-| `1` | La carga ha fallado: se conserva la base de datos anterior y el informe explica el motivo. También si un fichero de `data/curated/` no es válido: en ese caso no se llega a cargar nada. |
-| `2` | Carga bloqueada: se conserva la base de datos anterior y se genera un informe para el arquitecto ([carga bloqueada](#carga-bloqueada)). Pendiente de implementar (fase 7). |
-
-Después de una carga correcta hay que reiniciar la API para que lea la base de datos nueva.
-Guía paso a paso para el administrador en el
-[manual de usuario](../04-manual-usuario/cargar-datos.md).
+## Fuentes y caché
 
 ### Primera ejecución y caché
 
@@ -245,9 +216,8 @@ ERROR: la carga ha fallado; se conserva la base de datos anterior.
 ## Carga bloqueada
 
 !!! note "Pendiente de implementar"
-    Diseño de la fase 7 del [plan de carga](../02-ddt/plan-carga-datos.md#fases)
-    ([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)). Hasta entonces, estos casos son errores
-    que cortan la carga.
+    Diseño de [ADR-0008](../03-adr/0008-cargas-bloqueadas.md), pendiente en #78. Hasta
+    entonces, estos casos son errores que cortan la carga.
 
 Una carga queda **bloqueada** cuando encuentra algo que la aplicación no sabe tratar y que no
 se puede resolver sin decidir cómo lo interpretan las reglas
@@ -255,11 +225,7 @@ se puede resolver sin decidir cómo lo interpretan las reglas
 sigue hasta el final para recoger **todos** los bloqueos, no sustituye `reference.sqlite` y
 termina con el código de salida **2**.
 
-| Código de salida | Significado | Qué hacer |
-|------------------|-------------|-----------|
-| 0 | Carga completada. | Nada; si es la primera carga de una versión nueva, registrar el informe. |
-| 1 | Error: red, ficheros, validación de filas, integridad o comprobaciones. | Leer el error, corregir y repetir. |
-| 2 | Carga bloqueada: hace falta que el arquitecto revise el modelo. | Seguir el [protocolo](#protocolo-de-registro). |
+Los códigos de salida están en el [manual](../04-manual-usuario/cargar-datos.md#hacer-una-carga).
 
 ### Bloqueos
 

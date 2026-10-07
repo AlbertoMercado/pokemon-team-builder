@@ -24,50 +24,70 @@ con ella.
 ## Publicar una versión
 
 La publicación se reparte entre Claude Code y el usuario. Basta con pedir a Claude que publique
-una versión: la skill del proyecto
-[`publicar-version`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/.claude/skills/publicar-version/SKILL.md)
-le dice qué hacer en cada fase.
+una versión: la skill del proyecto `publicar-version` lo pone a seguir este protocolo, que es su
+única fuente.
 
 ```mermaid
 flowchart LR
     A["1 · Preparar<br/>(Claude)"] --> B["2 · Publicar<br/>(usuario)"] --> C["3 · Comprobar<br/>(Claude)"]
 ```
 
+Si el usuario dice que ya ha ejecutado los comandos de publicación, se pasa directamente a la
+fase 3.
+
 ### 1. Preparar (Claude)
 
 Todo lo que no publica nada fuera de la rama:
 
-1. Parte de `main` al día y sin cambios, y localiza la última etiqueta y los cambios desde
-   entonces. Si no hay cambios, no hay versión.
-2. Decide el número con la [numeración](#numeracion). Si el usuario no lo ha dicho, Claude lo
-   propone, explica por qué y espera su confirmación.
-3. Crea la rama `chore/release-X.Y.Z` y sube la versión:
+1. **Punto de partida**: `git switch main && git pull` y `git fetch --tags --prune`. El árbol
+   tiene que estar limpio; si no, Claude para y pregunta. La última versión es
+   `git describe --tags --abbrev=0` (y la de `pyproject.toml`), y los cambios desde entonces,
+   `git log --oneline --first-parent <última>..main` y **Sin publicar** del `CHANGELOG.md`. Si no
+   hay cambios, no hay versión.
+2. **Número**: el que diga el usuario. Si no lo dice, Claude lo deduce con la
+   [numeración](#numeracion), explica por qué y espera su confirmación.
+3. **Rama `chore/release-X.Y.Z`** y la versión en todos sus sitios:
 
     ```bash
     # pyproject.toml: version = "X.Y.Z"
     uv lock
-    cd web && npm version X.Y.Z --no-git-tag-version
+    cd web && npm version X.Y.Z --no-git-tag-version   # también package-lock.json
     ```
 
-4. En `CHANGELOG.md`, pasa lo de **Sin publicar** a una sección `[X.Y.Z] - AAAA-MM-DD`,
-   complétala con los PR fusionados desde la última versión y actualiza los enlaces del final.
-5. Actualiza el ejemplo de `GET /api/meta` del [manual de la API](../04-manual-usuario/api.md)
-   y cualquier otra aparición de la versión anterior.
-6. Pasa las comprobaciones locales (`pytest`, `mypy`, `lint-imports`, `mkdocs build --strict`
-   y `pre-commit`).
-7. Hace el commit `chore: publicar la versión X.Y.Z`, abre el PR y espera a que pase la CI.
+4. **`CHANGELOG.md`**: pasa lo de **Sin publicar** a `## [X.Y.Z] - AAAA-MM-DD` (fecha de hoy) y
+   deja **Sin publicar** vacía. Completa lo que falte con los PR fusionados desde la última
+   etiqueta, agrupado en *Añadido*, *Cambiado*, *Corregido*, *Eliminado* y *Pendiente*, citando
+   `#PR`, `RF-XX` y `RN-XX`. Si hay que repetir la carga de datos, dilo al principio de la sección.
+   En una versión MAYOR, explica qué se rompe y cómo actualizar. Actualiza los enlaces del final
+   (`[Sin publicar]` compara desde `vX.Y.Z`; añade `[X.Y.Z]`). La sintaxis de MkDocs
+   (`!!! note`) no vale: el CHANGELOG son también las notas de la *release* de GitHub.
+5. **Otras apariciones de la versión anterior**: el ejemplo de `GET /api/meta` del
+   [manual de la API](../04-manual-usuario/api.md#comprobar-con-que-datos-trabaja) y lo que
+   encuentre
+   `grep -rn "<anterior>" --exclude-dir={node_modules,.venv,.git,site,data} .`
+6. **Comprobaciones locales**: `uv run pytest`, `uv run mypy`, `uv run lint-imports`,
+   `uv run mkdocs build --strict` y `uv run pre-commit run --all-files`; si cambia algo de la web,
+   también `npm run typecheck` y `npm run test` en `web/`. Si algo falla, se arregla antes de
+   seguir.
+7. **Commit y PR**: `chore: publicar la versión X.Y.Z`; en la descripción, qué incluye y qué
+   falta después de fusionar. Claude espera a la CI (`gh pr checks <n> --watch`): los cinco
+   jobs tienen que pasar.
+8. **Notas de la *release***: comprueba que el `awk` de la fase 2 extrae justo la sección de la
+   versión.
 
 ### 2. Publicar (usuario)
 
 Fusionar en `main`, etiquetar y crear la *release* son acciones visibles fuera del ordenador,
-así que las ejecuta el usuario. Claude le da los comandos con el PR y la versión ya
-sustituidos; con el prefijo `!` se ejecutan en la propia sesión:
+así que las ejecuta el usuario; Claude **no** las ejecuta. Le da estos comandos con el PR y la
+versión ya sustituidos y con el prefijo `!`, que los ejecuta en la propia sesión, y le pide que
+avise al terminar:
 
 ```bash
-gh pr merge <n> --merge --delete-branch && git switch main && git pull \
-  && git tag -a vX.Y.Z -m "Versión X.Y.Z" && git push origin vX.Y.Z
-awk '/^## \[X.Y.Z\]/{f=1;next} /^## \[|^\[Sin publicar\]:/{f=0} f' CHANGELOG.md > /tmp/notas-X.Y.Z.md \
-  && gh release create vX.Y.Z --title "vX.Y.Z" --notes-file /tmp/notas-X.Y.Z.md --latest
+! gh pr merge <n> --merge --delete-branch && git switch main && git pull && git tag -a vX.Y.Z -m "Versión X.Y.Z" && git push origin vX.Y.Z
+```
+
+```bash
+! awk '/^## \[X.Y.Z\]/{f=1;next} /^## \[|^\[Sin publicar\]:/{f=0} f' CHANGELOG.md > /tmp/notas-X.Y.Z.md && gh release create vX.Y.Z --title "vX.Y.Z" --notes-file /tmp/notas-X.Y.Z.md --latest
 ```
 
 El `awk` copia a las notas solo la sección de la versión: se detiene en la sección siguiente o
@@ -75,18 +95,27 @@ en los enlaces del final.
 
 ### 3. Comprobar (Claude)
 
-Cuando el usuario avisa de que ha ejecutado los comandos, Claude comprueba y resume en una
-tabla que:
+Cuando el usuario avisa de que ha ejecutado los comandos:
 
-- El PR está fusionado, la rama borrada y `main` local igual que `origin/main`.
-- La etiqueta `vX.Y.Z` es anotada, apunta al último commit de `main`, está en el remoto y su
-  `pyproject.toml` tiene la versión `X.Y.Z`.
-- La *release* está publicada (ni borrador ni prerelease), es la *Latest* y sus notas son la
-  sección `X.Y.Z` del `CHANGELOG.md`.
-- La CI de `main` después de fusionar termina en verde.
+```bash
+git fetch --tags --prune
+git status -sb                                   # main igual que origin/main
+gh pr view <n> --json state,mergeCommit          # MERGED
+git cat-file -t vX.Y.Z                           # tag (anotada)
+git rev-parse vX.Y.Z^{commit} origin/main        # el mismo commit
+git ls-remote --tags origin vX.Y.Z               # está en el remoto
+git show vX.Y.Z:pyproject.toml | grep '^version' # X.Y.Z
+gh release view vX.Y.Z --json tagName,isDraft,isPrerelease,url,body
+gh release list --limit 3                        # vX.Y.Z es Latest
+git branch -a | grep release                     # la rama ya no existe
+gh run list --branch main --limit 1              # CI del merge; esperar con gh run watch
+```
 
-Si algo falla, explica cómo corregirlo. Por último, recuerda comprobar `GET /api/meta` en la
-API.
+Las notas de la *release* tienen que ser la sección `X.Y.Z` del `CHANGELOG.md` (ni vacías ni las
+de otra versión) y la CI de `main` tiene que terminar en verde. Claude lo resume en una tabla
+(comprobación → resultado). Si algo está mal, explica cómo corregirlo y, si hace falta un comando
+de publicación, se lo da al usuario como en la fase 2. Por último, le recuerda comprobar
+`GET /api/meta` en su API y que lo nuevo se anota en **Sin publicar**.
 
 ### Entre versiones
 
