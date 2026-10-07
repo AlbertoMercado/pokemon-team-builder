@@ -38,7 +38,7 @@ Al terminar, la carga muestra un informe y sale con un código que dice cómo ha
 |--------|-----------|-----------|
 | `0` | **Completada**. Los datos nuevos ya están en `data/reference.sqlite`. | Reiniciar la aplicación para que los use. |
 | `1` | **Error** (red, un fichero curado no válido, una comprobación fallida…). Se conservan los datos anteriores. | Leer el mensaje, corregir y repetir. Ver [errores habituales](#errores-habituales). |
-| `2` | **Bloqueada**: hay algo que la aplicación no sabe tratar. Se conservan los datos anteriores. *(Disponible con la fase 7 de la ingesta; hasta entonces, estos casos salen como código 1.)* | Registrar el informe y avisar al arquitecto. Ver [carga bloqueada](#si-la-carga-queda-bloqueada). |
+| `2` | **Bloqueada**: hay algo que la aplicación no sabe tratar. Se conservan los datos anteriores. *(Pendiente, #78: hasta entonces, estos casos salen como código 1.)* | Registrar el informe y avisar al arquitecto. Ver [carga bloqueada](#si-la-carga-queda-bloqueada). |
 
 Para ver el código después de ejecutarla: `echo $?`.
 
@@ -61,22 +61,15 @@ No hace falta repetir la carga si no ha cambiado nada: daría el mismo resultado
 
 ## Si la carga queda bloqueada
 
-Una carga bloqueada no es un fallo tuyo ni de la carga: es una novedad en las fuentes (un
-método de evolución nuevo, un juego sin combates clave…) que hay que decidir cómo tratar en
-una nueva versión de la aplicación ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)).
+!!! note "Pendiente de implementar"
+    Las cargas bloqueadas ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)) están diseñadas
+    pero no implementadas (#78). Hasta entonces, si la carga encuentra algo que la aplicación
+    no sabe tratar (un método de evolución nuevo, por ejemplo), termina con un **error** y se
+    trata como los [errores habituales](#errores-habituales): la aplicación sigue funcionando con
+    los datos anteriores.
 
-1. **No hagas nada con los datos**: la aplicación sigue funcionando con los anteriores.
-2. **Busca el informe** en `data/reports/`: dos ficheros con la fecha y `bloqueada` en el
-   nombre, uno `.md` para leer y otro `.json`. El Markdown empieza con un resumen de los
-   bloqueos.
-3. **Regístralo en git** para avisar al arquitecto, siguiendo el
-   [protocolo de registro](../05-operacion/ingesta.md#protocolo-de-registro): rama
-   `chore/informe-carga-AAAA-MM-DD`, copia del informe a
-   `docs/05-operacion/informes-carga/`, una fila con estado «abierta» en
-   [Informes de carga](../05-operacion/informes-carga/index.md) y un PR. La carga nunca
-   sube nada a git por su cuenta.
-4. **Espera a la nueva versión**. Cuando el arquitecto la publique en `main`, actualiza tu
-   copia (`git pull`) y repite la carga.
+Cuando esté implementada, el procedimiento será el del
+[protocolo de registro](../05-operacion/ingesta.md#protocolo-de-registro).
 
 ## Errores habituales
 

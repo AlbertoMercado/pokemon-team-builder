@@ -61,6 +61,7 @@ nav:
       - Arquitectura: 02-ddt/arquitectura.md
       - Motor de reglas: 02-ddt/motor.md
       - Estructura del código: 02-ddt/estructura-codigo.md
+      - Cómo se documenta: 02-ddt/documentacion.md
       - Modelo de datos: 02-ddt/modelo-datos.md
       - API: 02-ddt/api.md
       - Algoritmo de generación: 02-ddt/algoritmo-generacion.md
@@ -93,6 +94,7 @@ nav:
       - Usar la web: 04-manual-usuario/web.md
   - Operación:
       - 05-operacion/index.md
+      - Comandos y CI: 05-operacion/comandos.md
       - Entorno de desarrollo en macOS: 05-operacion/entorno-desarrollo-macos.md
       - Ingesta de datos: 05-operacion/ingesta.md
       - Arrancar la API: 05-operacion/api.md

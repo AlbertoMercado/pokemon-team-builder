@@ -93,25 +93,11 @@ dependencias del código (SQLModel, pydantic…) sin mantener una segunda lista 
 ## Añadir un paquete o una dependencia
 
 - **Nuevo paquete de Python de primer nivel**: añadirlo a `root_packages` y a los contratos de
-  `[tool.importlinter]`, a `files` de `[tool.mypy]`, a esta página y a la estructura de
-  `CLAUDE.md`, con su `README.md` y su *docstring*. Si cambia la arquitectura, con un ADR.
+  `[tool.importlinter]`, a `files` de `[tool.mypy]`, a esta página, con su `README.md` y su *docstring*. Si cambia la arquitectura, con un ADR.
 - **Nueva dependencia permitida entre paquetes**: es un cambio de arquitectura. Se registra en
   un ADR y se actualizan los contratos, el diagrama de esta página y la
   [arquitectura](arquitectura.md#reglas-de-dependencia).
 
 ## Documentación del código
 
-Todo código o cambio de base de datos se documenta en el mismo PR que lo introduce:
-
-- **Qué es, por qué existe y qué hace** cada paquete o módulo: *docstring* de módulo y, si es
-  un paquete o un directorio nuevo, su fila en esta página y su `README.md`.
-- **Base de datos**: cada tabla o columna nueva o modificada, en el
-  [modelo de datos](modelo-datos.md); cada migración de `user.sqlite`, con su motivo.
-- **Diseño técnico**: si el cambio afecta a la arquitectura, el algoritmo, la API o los datos,
-  se actualiza la página del DDT correspondiente, o se crea una nueva y se enlaza desde el
-  [índice del DDT](index.md).
-- **Operación**: los comandos nuevos (ingesta, arranque…), en
-  [Operación](../05-operacion/index.md) y en la tabla de comandos de `CLAUDE.md`.
-- **Manual de usuario**: cómo se usa cada interfaz (la CLI, la API y la web), orientado a
-  tareas, en el [manual de usuario](../04-manual-usuario/index.md). Operación explica cómo
-  funciona por dentro; el manual, cómo usarla.
+Dónde se documenta cada cosa y qué se actualiza en cada PR: [cómo se documenta](documentacion.md).

@@ -2,13 +2,13 @@
 
 Guía de uso de la aplicación, por cada forma de usarla. Cada interfaz (la CLI de carga, la API y
 la web) se documenta aquí en el mismo PR que la introduce o la cambia
-([documentación del código](../02-ddt/estructura-codigo.md#documentacion-del-codigo)).
+([cómo se documenta](../02-ddt/documentacion.md)).
 
-| Interfaz | Quién la usa | Guía | Estado |
-|----------|--------------|------|--------|
-| CLI de carga de datos | Administrador | [Cargar y actualizar los datos](cargar-datos.md) | Disponible |
-| API | Integraciones y la propia web | [Usar la API](api.md) | Disponible |
-| Web | Usuario | [Usar la web](web.md) | Disponible |
+| Interfaz | Quién la usa | Guía |
+|----------|--------------|------|
+| CLI de carga de datos | Administrador | [Cargar y actualizar los datos](cargar-datos.md) |
+| API | Integraciones y la propia web | [Usar la API](api.md) |
+| Web | Usuario | [Usar la web](web.md) |
 
 ## Responsabilidad sobre los datos confirmados
 
