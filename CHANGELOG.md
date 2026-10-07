@@ -6,6 +6,12 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+### Añadido
+
+- **Arranque**: `scripts/start.sh` prepara y arranca la aplicación en un solo comando: copia
+  `user.sqlite` en `data/backups/`, instala las dependencias, carga los datos, compila la web y
+  arranca la API, que la sirve. Acepta las opciones de la carga, como `--offline`.
+
 ## [1.4.0] - 2026-10-07
 
 Solo se pueden elegir como juego objetivo los juegos completos, los que tienen todos los datos

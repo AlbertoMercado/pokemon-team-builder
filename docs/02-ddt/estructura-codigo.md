@@ -16,6 +16,7 @@ cabecera ([cómo se documenta](documentacion.md#el-readme-de-un-directorio)).
 | `api/` | API HTTP con FastAPI ([API](api.md)). | [`api/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/api/README.md) |
 | `web/` | Frontend React ([web](../05-operacion/web.md)). | [`web/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/web/README.md) |
 | `data/` | Datos curados (en git) y generados (fuera de git) ([datos curados](datos-curados.md)). | [`data/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/data/README.md) |
+| `scripts/` | Scripts de terminal para usar la aplicación en el propio ordenador, como el que la prepara y la arranca. | [`scripts/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/scripts/README.md) |
 | `tests/` | Tests de Python ([estrategia de pruebas](arquitectura.md#estrategia-de-pruebas)). | [`tests/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/tests/README.md) |
 | `docs/` | Documentación MkDocs ([cómo se documenta](documentacion.md)); `docs/hooks/`, los *hooks* que la generan en parte. | [Inicio](../index.md) |
 | `.claude/` | Skills de Claude Code del proyecto: [publicar una versión](../05-operacion/versiones.md#publicar-una-version). | — |
