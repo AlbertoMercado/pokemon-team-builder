@@ -6,33 +6,50 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+## [1.2.0] - 2026-10-07
+
+Portadas de los juegos (RF-18): cada juego se ve con su portada junto al nombre, y cada combate
+clave enlaza a la página de WikiDex de la que sale su equipo. Corrige además la altura de las
+filas de Pokémon en el móvil.
+
+**Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`): la tabla `game`
+tiene columnas nuevas y, hasta repetirla, la API responde `503` pidiéndolo. En el servidor, copia
+también las portadas
+([puesta en producción](docs/05-operacion/puesta-en-produccion.md#4-codigo-web-y-datos)).
+
+**Las portadas son solo para uso privado**: WikiDex las declara de uso legítimo solo en sus
+artículos (ADR-0011). Si alguna vez publicas la aplicación de forma abierta, carga los datos con
+`--no-covers`.
+
 ### Añadido
 
 - **Ingesta**: descarga la portada de cada juego cargado de WikiDex a la caché local, con
-  límite de peticiones y sin versionarlas en git. Cada portada se indica en
-  `data/curated/covers.yaml`. WikiDex las declara de uso legítimo solo en sus artículos, así
-  que la aplicación las usa en privado; `--no-covers` carga sin ellas (RF-18, ADR-0011, #49).
+  límite de peticiones, comprobación de su `sha1` y sin versionarlas en git. Cada portada se
+  indica en `data/curated/covers.yaml`. `--no-covers` carga sin ellas (RF-18, ADR-0011, #69,
+  #70).
 - **API**: `GET /api/games/{game}/cover` sirve la portada de cada juego cargado. Los juegos y el
-  Hall of Fame la indican en `cover_url`, con la página de WikiDex de la que sale en
+  *Hall of Fame* la indican en `cover_url`, con la página de WikiDex de la que sale en
   `cover_source_url`. En la revisión de datos, cada combate clave enlaza en `source_url` a la
-  versión de la página de WikiDex de la que sale su equipo (RF-18, ADR-0004, ADR-0011, #49).
+  versión de la página de WikiDex de la que sale su equipo (RF-18, ADR-0004, ADR-0011, #71).
 - **Web**: cada juego se muestra con su portada junto al nombre: al elegir el juego, en la
-  revisión de datos y el resultado, en el último juego completado del Inicio y en el Hall of
-  Fame. El pie añade su titularidad y un enlace a la página de cada portada en WikiDex. En la
-  revisión, cada combate clave enlaza a la página de WikiDex de la que sale su equipo
-  (RF-18, ADR-0004, ADR-0011, #49).
-
-### Cambiado
-
-- **Hay que repetir la carga de datos** al actualizar: la tabla `game` guarda ahora la portada
-  de cada juego.
+  revisión de datos y el resultado, en el último juego completado del Inicio y en el *Hall of
+  Fame*. Sin portada se muestra igual. El pie añade su titularidad y un enlace a la página de
+  cada portada en WikiDex. En la revisión, cada combate clave con fuente conocida muestra
+  «Fuente: WikiDex» (RF-18, CA-56, ADR-0004, ADR-0011, #72).
 
 ### Corregido
 
 - **Web**: en el móvil, todas las filas del catálogo, los favoritos, las sugerencias del
   resultado y la línea evolutiva miden lo mismo, con el número y el nombre arriba, los tipos
   debajo y la estrella siempre a la derecha. Antes, con un nombre largo o dos tipos, la estrella
-  bajaba sola a otra línea y la fila salía más alta (RF-01, RF-04, #68).
+  bajaba sola a otra línea y la fila salía más alta (RF-01, RF-04, #68, #73).
+
+### Pendiente
+
+- Mostrar la fuente de cada combate clave fuera de la revisión: con los datos actuales los
+  combates se cargan automáticos y la revisión no los muestra (ADR-0004).
+- Aprobar la puesta en producción (ADR-0009, #51), proteger el acceso (RF-19, #52) y las
+  restricciones de llegada del resto de juegos (CA-28, #8).
 
 ## [1.1.1] - 2026-10-06
 
@@ -130,7 +147,8 @@ Hoja**.
   acceso (RF-19, #52).
 - Restricciones de llegada del resto de juegos (CA-28, #8).
 
-[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.1...HEAD
+[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/AlbertoMercado/pokemon-team-builder/releases/tag/v1.0.0

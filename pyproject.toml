@@ -1,6 +1,6 @@
 [project]
 name = "pokemon-team-builder"
-version = "1.1.1"
+version = "1.2.0"
 description = "Generador de equipos Pokémon a partir de favoritos y reglas configurables"
 readme = "README.md"
 license = "MIT"
