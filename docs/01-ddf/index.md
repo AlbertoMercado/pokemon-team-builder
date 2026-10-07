@@ -20,6 +20,7 @@ las reglas de negocio (**RN-XX**).
 | 0.12 | 2026-10-07 | Nueva regla de presencia RN-21: un inicial del juego obligatorio, y solo uno (CA-59 a CA-63). Si no hay un inicial favorito, la regla elige uno del juego (CA-65). Se retira la regla candidata «Excluir el inicial» (CA-64). |
 | 0.13 | 2026-10-07 | CA-66: con RN-21 activa, se confirman también los datos sin verificar de los iniciales del juego (RN-18, RF-15). |
 | 0.14 | 2026-10-07 | CA-67: solo se puede elegir como juego objetivo un juego completo, definido en RF-05. Un juego incompleto se carga y no bloquea la carga (modifica CA-46; RF-11, RN-17). |
+| 0.15 | 2026-10-07 | Nueva función: la Pokédex de los juegos superados (RF-20 a RF-24, RN-22 a RN-26, CA-68 a CA-79). Cada juego se registra una sola vez en el *Hall of Fame* y deja de ser juego objetivo (RF-05, RF-12, RF-13). |
 
 ## Propósito
 
@@ -64,6 +65,9 @@ Consecuencias:
 - Consultar el catálogo de Pokémon y la ficha básica de cada uno.
 - Cargar y actualizar los datos de los Pokémon desde fuentes externas.
 - Registrar los equipos con los que se ha completado un juego (*Hall of Fame*).
+- Completar la Pokédex de los juegos superados: el progreso de cada una, el siguiente Pokémon
+  que hay que registrar y la forma más sencilla de obtenerlo
+  ([RF-20](requisitos-funcionales.md#rf-20) a [RF-24](requisitos-funcionales.md#rf-24)).
 - Como mejora deseable, mostrar las imágenes de los Pokémon y las portadas de los juegos
   ([RF-17](requisitos-funcionales.md#rf-17), [RF-18](requisitos-funcionales.md#rf-18)).
 - Como mejora deseable, proteger el acceso a la aplicación para que solo la use su usuario
@@ -85,7 +89,7 @@ Consecuencias:
 
 | Actor | Descripción |
 |-------|-------------|
-| Usuario | Persona que usa la aplicación: gestiona favoritos y reglas, genera equipos y registra su *Hall of Fame*. |
+| Usuario | Persona que usa la aplicación: gestiona favoritos y reglas, genera equipos, registra su *Hall of Fame* y completa la Pokédex de sus juegos. |
 | Administrador | El mismo usuario cuando carga o actualiza los datos. Se separa porque es una tarea técnica y poco frecuente. |
 
 ## Visión general
@@ -98,6 +102,7 @@ flowchart LR
         REG[Juego objetivo<br/>y reglas]
         GEN[Generación<br/>de equipo]
         HOF[Hall of Fame<br/>y recorrido]
+        POK[Pokédex de los<br/>juegos superados]
     end
     subgraph should ["Apoyo (Should)"]
         CAT[Catálogo y ficha<br/>de Pokémon]
@@ -112,6 +117,7 @@ flowchart LR
     PER -.-> REG
     GEN -- equipo usado --> HOF
     HOF -- Pokémon ya usados --> GEN
+    HOF -- juegos superados --> POK
 ```
 
 ## Glosario
@@ -165,6 +171,24 @@ Juego objetivo
 
 Completar un juego
 :   Vencer al Campeón de la Liga Pokémon y entrar en el *Hall of Fame* del juego.
+
+Juego superado
+:   Juego registrado en el *Hall of Fame* de la aplicación. Cada juego se registra una sola vez
+    ([CA-68](cuestiones-abiertas.md#resueltas)) y tiene su Pokédex
+    ([RF-20](requisitos-funcionales.md#rf-20)).
+
+Pokédex de un juego
+:   Los Pokémon que hay que registrar para completarla: la nacional si el juego la tiene
+    ([RN-22](reglas-negocio.md#rn-22)). Un Pokémon está **registrado** si se ha capturado u
+    obtenido, no solo visto.
+
+Pokémon objetivo
+:   El primero de la Pokédex de un juego que falta por registrar
+    ([RN-23](reglas-negocio.md#rn-23)).
+
+Imposible de obtener
+:   Pokémon de una Pokédex que no se puede conseguir en ese juego: lo marca el usuario o, si
+    solo se obtiene desde spin-offs, la aplicación ([RN-25](reglas-negocio.md#rn-25)).
 
 Favoritos
 :   Lista única de Pokémon que el usuario considera elegibles para formar el equipo, común a

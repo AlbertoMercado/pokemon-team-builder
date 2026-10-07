@@ -36,6 +36,14 @@ juego y se transfiere al juego objetivo en su etapa inicial.
 | [RN-19](#rn-19) | A igual puntuación, se prefieren los Pokémon con dos tipos | Mecanismo | No | Vigente |
 | [RN-20](#rn-20) | Penalizar las evoluciones aleatorias | Blanda | Activable y peso | Vigente |
 | [RN-21](#rn-21) | Un inicial del juego obligatorio, y solo uno | Dura (presencia) | Activable | Vigente |
+| [RN-22](#rn-22) | La Pokédex de cada juego y su progreso | Pokédex | No | Vigente |
+| [RN-23](#rn-23) | El Pokémon objetivo es el primero sin registrar | Pokédex | No | Vigente |
+| [RN-24](#rn-24) | Formas de obtener un Pokémon, de la más sencilla a la menos | Pokédex | No | Vigente |
+| [RN-25](#rn-25) | Transferencias entre juegos | Pokédex | No | Vigente |
+| [RN-26](#rn-26) | Obtenerlo en el juego: el lugar más sencillo | Pokédex | No | Vigente |
+
+Las reglas de tipo **Pokédex** son de la [Pokédex](#reglas-de-la-pokedex), una función aparte
+de la generación de equipos: no se configuran ni intervienen al generar.
 
 Estados posibles:
 
@@ -636,6 +644,115 @@ parámetros son fijos.
       agrupados ([RN-04](#rn-04)).
     - Azumarill cuenta como Pokémon de un solo tipo (Agua) hasta la 5.ª generación y de dos
       tipos (Agua/Hada) desde la 6.ª ([RN-10](#rn-10)).
+
+## Reglas de la Pokédex
+
+Las usa la [Pokédex](requisitos-funcionales.md#pokedex) para ayudar a completar la de un juego
+superado ([RF-20](requisitos-funcionales.md#rf-20) a
+[RF-24](requisitos-funcionales.md#rf-24)). No son configurables y no intervienen en la
+generación de equipos ([CA-79](cuestiones-abiertas.md#resueltas)).
+
+### RN-22 · La Pokédex de cada juego y su progreso { #rn-22 }
+
+- **Tipo**: Pokédex
+- **Qué Pokédex** ([CA-70](cuestiones-abiertas.md#resueltas)):
+    - Si el juego tiene Pokédex nacional, la nacional: en Rubí, Zafiro, Esmeralda, Rojo Fuego
+      y Verde Hoja, los 386.
+    - En la 1.ª generación, la de Kanto (151). En la 2.ª, la de Johto, que tiene los 251.
+    - En los juegos con Pokédex reducida, como los de Switch, la unión de las Pokédex del juego
+      base y de sus contenidos descargables. Se aplicará cuando se carguen esas generaciones.
+- **Registrado**: capturado u obtenido. Un Pokémon solo visto no cuenta
+  ([CA-69](cuestiones-abiertas.md#resueltas)).
+- **Progreso**: el porcentaje de Pokémon registrados sobre el total de la Pokédex. Los
+  imposibles de obtener cuentan en el total y no como registrados, y se señalan aparte
+  ([CA-71](cuestiones-abiertas.md#resueltas)). Se redondea hacia abajo, para que el 100 % solo
+  aparezca con la Pokédex completa.
+- **Estados**: **no iniciada** (todavía no se ha marcado la lista inicial,
+  [RF-21](requisitos-funcionales.md#rf-21)), **en curso** y **completada** (todos registrados).
+- **Ejemplo**: en Rojo Fuego, con 300 registrados y 3 imposibles, el progreso es del 77 %
+  (300 de 386) y se indica «3 imposibles».
+
+### RN-23 · El Pokémon objetivo es el primero sin registrar { #rn-23 }
+
+- **Tipo**: Pokédex
+- **Descripción**: el Pokémon objetivo es el primero, en el orden de la Pokédex del juego
+  ([RN-22](#rn-22)), que no está registrado ni es imposible de obtener, marcado por el usuario o
+  de forma automática ([RN-25](#rn-25)).
+- **Saltar**: «saltar de momento» pasa al siguiente sin guardar nada. Al volver a entrar en la
+  Pokédex de ese juego, el objetivo vuelve a ser el primero sin registrar
+  ([CA-77](cuestiones-abiertas.md#resueltas)).
+- **Ejemplo**: con Bulbasaur e Ivysaur registrados, el objetivo es Venusaur. Si el usuario lo
+  salta, pasa a Charmander; al volver a entrar, vuelve a ser Venusaur.
+
+### RN-24 · Formas de obtener un Pokémon, de la más sencilla a la menos { #rn-24 }
+
+- **Tipo**: Pokédex
+- **Primera fase de su línea evolutiva**, por este orden
+  ([CA-74](cuestiones-abiertas.md#resueltas)):
+    1. **Criarlo desde una fase posterior ya registrada** en esta Pokédex: el usuario ya tiene
+       un Pokémon de su línea.
+    2. **Transferirlo desde un juego superado** en cuya Pokédex está registrado
+       ([RN-25](#rn-25)).
+    3. **Obtenerlo en el juego**: regalo, intercambio con un PNJ, fósil, estático, salvaje o
+       errante ([RN-26](#rn-26)).
+    4. **Criarlo desde una fase posterior que se obtiene en el juego** (forma 3).
+    5. **Transferirlo desde un juego compatible** en el que se obtiene, aunque no esté
+       superado ([RN-25](#rn-25)). Así se cubren los exclusivos de cada versión.
+    6. **Regalo que depende del inicial elegido**: «Regalo en X si elegiste a Y». Cuenta casi
+       como un evento, porque depende de una elección hecha al empezar la partida.
+    7. **Evento**: «Pokémon obtenido por evento».
+- **Fase posterior**: lo más sencillo es **evolucionar la fase anterior**, indicando el método
+  (subir al nivel N, piedra, intercambio, intercambio con un objeto, amistad, girar la consola…).
+  Las demás formas siguen el orden de la primera fase.
+- **Criar** solo es posible en los juegos con crianza, desde la 2.ª generación, y si la línea
+  se puede criar (como en [RN-11](#rn-11)). En la 1.ª generación no hay crianza.
+- **Enlaces**: si la forma es criarlo o evolucionarlo desde otro Pokémon que no está
+  registrado, la ficha enlaza a la de ese Pokémon ([CA-76](cuestiones-abiertas.md#resueltas)).
+- **Sin ninguna forma**: si no se conoce ninguna, la ficha lo dice y el usuario puede marcarlo
+  como imposible.
+- **Ejemplos** en Rojo Fuego:
+    - Con Pikachu registrado, Pichu: criar desde Pikachu (forma 1).
+    - Venusaur: evolucionar Ivysaur al nivel 32.
+    - Eevee: regalo en Ciudad Azulona (forma 3).
+    - En Verde Hoja, con Rojo Fuego superado y Ekans registrado en él: transferir desde Rojo
+      Fuego (forma 2). Sin ese registro, la forma 5: transferir desde Rojo Fuego, aunque no se
+      haya superado.
+    - Mew: evento.
+
+### RN-25 · Transferencias entre juegos { #rn-25 }
+
+- **Tipo**: Pokédex
+- **Juegos compatibles**: los que pueden enviar Pokémon a otro, según los datos curados
+  ([CA-78](cuestiones-abiertas.md#resueltas)). En las generaciones cargadas:
+    - La 1.ª y la 2.ª generación entre sí, con la Cápsula del Tiempo, solo con los Pokémon que
+      existen en la 1.ª.
+    - Los juegos de la 3.ª generación entre sí: Rubí, Zafiro, Esmeralda, Rojo Fuego y Verde
+      Hoja.
+    - De la 1.ª o la 2.ª a la 3.ª no se puede.
+- **Juego superado**: si el Pokémon está registrado en la Pokédex de un juego superado y
+  compatible, se da por disponible allí, aunque el usuario pueda haberlo soltado o
+  intercambiado. Si no lo tiene, elige otra forma ([CA-75](cuestiones-abiertas.md#resueltas)).
+- **Spin-offs** (Colosseum, XD, Pokémon Ranger…): no cuentan
+  ([CA-73](cuestiones-abiertas.md#resueltas)). Si un Pokémon solo se puede obtener desde ellos,
+  es **imposible de obtener de forma automática**; si es una de varias formas, esa se omite.
+
+### RN-26 · Obtenerlo en el juego: el lugar más sencillo { #rn-26 }
+
+- **Tipo**: Pokédex
+- **Formas y cómo se muestran** ([CA-75](cuestiones-abiertas.md#resueltas)), en este orden:
+    1. **Regalo**: «Regalo en X», como el Eevee de Ciudad Azulona.
+    2. **Intercambio con un PNJ**: «Intercambiar con un PNJ en X».
+    3. **Fósil**: «Revivir el Fósil X en Y», como el Fósil Hélix en Isla Canela.
+    4. **Estático**, como los legendarios o Snorlax: «Aparece salvaje en X: 100 %».
+    5. **Salvaje**: «Aparece salvaje en X: N %», donde N es su probabilidad de aparición en esa
+       zona con ese método. Primero el lugar con mayor probabilidad; a igual probabilidad, por
+       método: andar (hierba o cueva), surfear, caña vieja, caña buena, supercaña y, por último,
+       golpe roca o cabezazo.
+    6. **Errante**: «Pokémon errante».
+- **Sin tener en cuenta el avance**: el juego ya está superado, así que no importa en qué
+  momento de la partida se puede llegar a cada lugar.
+- Los regalos que dependen del inicial elegido no van aquí, sino casi al final
+  ([RN-24](#rn-24)).
 
 ## Reglas candidatas
 
