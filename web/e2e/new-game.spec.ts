@@ -79,7 +79,8 @@ test("a new game from the favourites to the Hall of Fame", async ({ page, reques
   // RN-16: the result is generated again without the lines just used.
   const used = page.getByRole("region", { name: "Favoritos descartados" });
   await expect(used.getByRole("heading", { name: "Ya usados en tu recorrido" })).toBeVisible();
-  await expect(used.getByText(/^Rhydon queda excluido/)).toBeVisible();
+  // The starter used is excluded too: RN-21 chooses among the others (CA-62).
+  await expect(used.getByText(/^Venusaur queda excluido/)).toBeVisible();
   // The line of Dragonite is never excluded: it is still in the team (RN-16, RN-13).
   await expect(used.getByText(/^Dragonite/)).toHaveCount(0);
   await expect(page.getByRole("list", { name: "Posiciones" }).first()).toContainText("Dragonite");

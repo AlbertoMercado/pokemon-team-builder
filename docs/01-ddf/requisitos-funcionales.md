@@ -139,7 +139,8 @@ Hay dos excepciones:
     - Solo se muestran los datos inferidos o pendientes que intervienen en la generación: los
       del juego objetivo (p. ej., si tiene ciclo de día y noche, o sus combates clave) y los de
       los favoritos que no se han descartado ya con datos automáticos (p. ej., si pueden llegar
-      al juego antes de completarlo).
+      al juego antes de completarlo). Con [RN-21](reglas-negocio.md#rn-21) activa, también los
+      de los iniciales del juego ([CA-66](cuestiones-abiertas.md#resueltas)).
     - Los datos inferidos aparecen con la propuesta ya rellenada. El usuario la acepta o la
       corrige, y rellena los pendientes.
     - Las confirmaciones se guardan por juego y no se vuelven a pedir, salvo que una nueva carga

@@ -31,9 +31,13 @@ def _generate(
 
 @pytest.mark.rn("RN-08")
 def test_four_candidates_in_firered_and_two_free_slots() -> None:
-    """The DDF example: the team of the 4 and a list of FireRed Pokémon for the 2 slots."""
+    """The DDF example: the team of the 4 and a list of FireRed Pokémon for the 2 slots.
+
+    Without RN-21, which would add a starter to the team.
+    """
     favorites = ("arcanine", "gengar", "vaporeon", "dragonite")
-    result = generate(firered_context(favorites))
+    settings = RuleSettings.defaults().with_changes(enabled={"RN-21": False})
+    result = generate(firered_context(favorites, settings))
 
     assert result.incomplete_reason is IncompleteReason.NOT_ENOUGH_CANDIDATES
     [team] = result.teams
@@ -48,6 +52,42 @@ def test_four_candidates_in_firered_and_two_free_slots() -> None:
     # Every suggestion fits with the team under RN-12.
     team_types = {t for member in team.members for t in member.types}
     assert all(team_types.isdisjoint(all_pokemon()[s][0].types) for s in suggested)
+
+
+@pytest.mark.rn("RN-21")
+@pytest.mark.rn("RN-08")
+def test_a_chosen_starter_comes_before_a_favourite_that_does_not_fit() -> None:
+    """CA-65 and CA-19: no starter is a favourite, and each one clashes with a favourite
+    (Charizard with Arcanine, Blastoise with Vaporeon, Venusaur with Gengar). The presence
+    rule comes before the size of the team: the team includes Venusaur, which scores best,
+    and leaves Gengar out."""
+    favorites = ("arcanine", "gengar", "vaporeon", "dragonite")
+    result = generate(firered_context(favorites))
+
+    starter = result.presence[-1]
+    assert (starter.rule_id, starter.status) == ("RN-21", PresenceStatus.CHOSEN)
+    assert result.incomplete_reason is IncompleteReason.NOT_ENOUGH_CANDIDATES
+    [team] = result.teams
+    assert team.slugs == ("venusaur", "arcanine", "vaporeon", "dragonite")
+    [slots] = team.open_slots
+    assert (slots.count, slots.rule_id) == (2, None)
+    assert not {"charizard", "blastoise"} & {s.pokemon.slug for s in slots.suggestions}
+
+
+@pytest.mark.rn("RN-21")
+@pytest.mark.rn("RN-13")
+def test_a_favourite_starter_that_clashes_with_dragonite_gives_way() -> None:
+    """CA-61: Charizard, the only favourite starter, shares Flying with Dragonite (RN-12).
+    RN-13 comes first, so RN-21 chooses between the other starters of the game."""
+    result = generate(firered_context(("dragonite", "charizard", "golem", "exeggutor")))
+
+    starter = result.presence[-1]
+    assert (starter.rule_id, starter.level, starter.status) == ("RN-21", 2, PresenceStatus.CHOSEN)
+    assert starter.options == ("venusaur", "blastoise")
+    assert "charizard" in starter.detail
+    assert "RN-13, que tiene prioridad" in starter.detail
+    [team] = result.teams
+    assert team.slugs == ("blastoise", "golem", "exeggutor", "dragonite")
 
 
 @pytest.mark.rn("RN-08")
@@ -131,7 +171,7 @@ def test_when_dragon_and_eevee_cannot_go_together_the_dragon_comes_first() -> No
         [zekrom, JOLTEON], pool=[pool_entry(VAPOREON), pool_entry(FLAREON)], settings=settings
     )
 
-    dragon, eevee = result.presence
+    dragon, eevee, _ = result.presence  # the game has no starters: RN-21 is unmet
     assert (dragon.status, dragon.options) == (PresenceStatus.CANDIDATES, ("zekrom",))
     assert (eevee.level, eevee.status, eevee.options) == (
         2,

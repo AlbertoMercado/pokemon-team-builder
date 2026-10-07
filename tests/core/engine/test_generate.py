@@ -147,7 +147,7 @@ def test_dragonite_comes_before_a_team_of_six() -> None:
 @pytest.mark.rn("RN-13")
 def test_unmet_dragon_rule_does_not_block_the_team() -> None:
     """Level 4: no primary Dragon type in the game; the team is generated without it."""
-    settings = RuleSettings.defaults().with_changes(enabled={"RN-14": False})
+    settings = RuleSettings.defaults().with_changes(enabled={"RN-14": False, "RN-21": False})
     result = _generate(FILLERS[:6], settings=settings)
     assert result.status is GenerationStatus.COMPLETE
     [presence] = result.presence

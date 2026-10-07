@@ -52,8 +52,8 @@ identificador. Así salen solos los motivos de descarte
 | Clase de regla | Interfaz | Reglas |
 |----------------|----------|--------|
 | Filtro por candidato | `exclusion(candidate, ctx) -> Discard \| None` | RN-03, RN-11, RN-16 |
-| Restricción entre pares | `conflicts(a, b, ctx) -> bool` | RN-07, RN-12, RN-14 (máximo una) |
-| Presencia | `tiers(ctx) -> list[Tier]`, niveles por prioridad | RN-13, RN-14 (al menos una) |
+| Restricción entre pares | `conflicts(a, b, ctx) -> bool` | RN-07, RN-12, RN-14, RN-21 (máximo uno) |
+| Presencia | `tiers(ctx) -> list[Tier]`, niveles por prioridad | RN-13, RN-14, RN-21 (al menos uno) |
 | Blanda | `score(team, ctx) -> Fraction` entre 0 y 1 | RN-06, RN-15, RN-17, RN-20 |
 | Desempate | `tie_break_key(team, ctx) -> int` | RN-19 |
 

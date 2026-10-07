@@ -10,8 +10,8 @@ Las reglas del catálogo se agrupan en tres tipos de restricción, cada uno con 
 | Tipo de restricción | Reglas | Técnica |
 |---------------------|--------|---------|
 | Sobre cada candidato | RN-03, RN-11, RN-16 | Filtro lineal previo. Cada descarte guarda su motivo (RF-10). Las exclusiones de RN-16 se calculan antes, a partir del recorrido, con las excepciones de Dragonite y Eevee. |
-| Entre pares de miembros | RN-07, RN-12, RN-14 (máximo una) | **Grafo de incompatibilidades**: hay una arista entre dos candidatos si comparten tipo, línea evolutiva o ambos son evoluciones de Eevee. Un equipo válido es un conjunto de candidatos sin aristas entre ellos (conjunto independiente). |
-| De presencia | RN-13, RN-14 (al menos una) | Niveles de prioridad: se fija primero el miembro obligatorio y se completa el resto del equipo. |
+| Entre pares de miembros | RN-07, RN-12, RN-14, RN-21 (máximo uno) | **Grafo de incompatibilidades**: hay una arista entre dos candidatos si comparten tipo, línea evolutiva o ambos son evoluciones de Eevee. Un equipo válido es un conjunto de candidatos sin aristas entre ellos (conjunto independiente). |
+| De presencia | RN-13, RN-14, RN-21 (al menos uno) | Niveles de prioridad: se fija primero el miembro obligatorio y se completa el resto del equipo. |
 
 La puntuación (RN-04) no es aditiva por miembro. La cobertura de RN-17 depende de la
 combinación, así que se evalúa sobre el equipo completo. Sí se puede precalcular por candidato:
@@ -28,7 +28,7 @@ combinación, así que se evalúa sobre el equipo completo. Sí se puede precalc
 ```mermaid
 flowchart TD
     A[Favoritos] --> B[Filtros por candidato<br/>RN-03 · RN-11 · RN-16]
-    B --> C[Grafo de incompatibilidades<br/>RN-07 · RN-12 · RN-14]
+    B --> C[Grafo de incompatibilidades<br/>RN-07 · RN-12 · RN-14 · RN-21]
     C --> D{¿Reglas de presencia<br/>activas?}
     D -- sí --> E[Fijar el miembro obligatorio<br/>según el primer nivel posible]
     D -- no --> F
@@ -49,12 +49,19 @@ flowchart TD
     - RN-13: Dragonite si es candidato válido. Si no, se ramifica sobre cada candidato de tipo
       primario Dragón.
     - RN-14: se ramifica sobre cada evolución de Eevee candidata.
-    - Si un nivel no tiene candidatos, se reserva un hueco para sugerencias (RN-08).
+    - RN-21: se ramifica sobre cada inicial del juego candidato. Si no hay ninguno, sobre cada
+      inicial del juego que pasa los filtros, aunque no sea favorito
+      ([CA-65](../01-ddf/cuestiones-abiertas.md#resueltas)).
+    - Si un nivel no tiene candidatos, se reserva un hueco para sugerencias (RN-08), salvo en
+      RN-21.
     - Implementación: en lugar de ramificar, la búsqueda exige que el equipo contenga al menos
       uno de cada conjunto de presencia y poda en cuanto ya no puede. Es equivalente y no
       repite equipos cuando RN-12 está desactivada ([motor](motor.md#busqueda-coreenginesearchpy)).
-    - Si ningún equipo puede cumplir RN-13 y RN-14 a la vez, RN-13 tiene prioridad y RN-14 pasa
-      a reservar un hueco ([CA-48](../01-ddf/cuestiones-abiertas.md#resueltas)).
+    - Las reglas se fijan en el orden RN-13, RN-14 y RN-21. Si una no cabe en ningún equipo con
+      las anteriores, pasa a su nivel siguiente: RN-14 reserva un hueco y RN-21 elige un
+      inicial que no es favorito o, si tampoco cabe, no se cumple
+      ([CA-48](../01-ddf/cuestiones-abiertas.md#resueltas),
+      [CA-61](../01-ddf/cuestiones-abiertas.md#resueltas)).
 4. **Buscar con retroceso** (*backtracking*) todos los conjuntos independientes de tamaño
    `k = 6 − huecos reservados` que contienen los miembros fijados. Los candidatos se recorren
    en un orden canónico (número de la Pokédex nacional y forma) para que el resultado sea
@@ -75,7 +82,7 @@ Sin restricciones entre miembros, con `N` candidatos hay `C(N, 6)` equipos: unos
 
 Con [RN-12](../01-ddf/reglas-negocio.md#rn-12) activa, el espacio se reduce mucho. Cada
 miembro ocupa uno o dos de los 17 o 18 tipos del juego, y la búsqueda con retroceso poda en
-cuanto dos miembros comparten tipo. Los miembros fijados por RN-13 y RN-14 reducen aún más el
+cuanto dos miembros comparten tipo. Los miembros fijados por RN-13, RN-14 y RN-21 reducen aún más el
 problema.
 
 Medición con candidatos sintéticos (17 tipos, un 15 % de líneas compartidas, Dragonite fijado,
@@ -125,7 +132,8 @@ suelen ser intercambiables, así que los equipos que siguen empatados se muestra
 4. Como cada equipo del grupo ya es válido, no hace falta comprobar de nuevo las reglas de
    presencia: una evolución de Eevee nunca queda agrupada con un Pokémon que no lo sea, porque
    el equipo resultante no cumpliría [RN-14](../01-ddf/reglas-negocio.md#rn-14) y no estaría
-   entre los empatados.
+   entre los empatados. Lo mismo pasa con los iniciales y
+   [RN-21](../01-ddf/reglas-negocio.md#rn-21).
 
 ## Pureza del motor
 

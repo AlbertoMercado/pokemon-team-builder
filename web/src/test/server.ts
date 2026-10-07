@@ -817,6 +817,31 @@ export function withoutApi(): void {
   server.use(http.all("/api/*", () => HttpResponse.error()));
 }
 
+/** Rojo Fuego without favourite starters: RN-21 puts Charizard in the team (CA-65). */
+export function withChosenStarter(): void {
+  const charizard = generated("charizard", "Charizard", 6, ["fire", "flying"]);
+  const generation: Generation = {
+    ...incompleteGeneration,
+    groups: incompleteGeneration.groups.map((group) => ({
+      positions: [[charizard], ...group.positions],
+      teams: group.teams.map((team) => ({ ...team, members: ["charizard", ...team.members] })),
+    })),
+    presence: [
+      ...incompleteGeneration.presence,
+      {
+        rule_id: "RN-21",
+        level: 2,
+        status: "chosen",
+        options: ["venusaur", "charizard", "blastoise"],
+        detail:
+          "Ningún inicial favorito es un candidato válido: el equipo incluye uno de los " +
+          "iniciales del juego, aunque no sea favorito",
+      },
+    ],
+  };
+  server.use(http.post("/api/games/firered/generations", () => HttpResponse.json(generation)));
+}
+
 /** No game has a cover, as after a load with `--no-covers` (ADR-0011). */
 export function withoutCovers(): void {
   const bare = (list: Game[]) =>

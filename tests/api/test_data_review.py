@@ -13,6 +13,9 @@ from tests.api.scenario import Load, write_firered
 REVIEW = "/api/games/firered/review"
 RAICHU_ARRIVAL = "pokemon:firered:raichu:arrival"
 MECHANICS = ["mechanic:firered:contests", "mechanic:firered:day_night_cycle"]
+# With RN-21, the arrival of the starters is asked even if they are not favourites (CA-66).
+STARTERS = ["venusaur", "charizard", "blastoise"]
+STARTER_ARRIVALS = [f"pokemon:firered:{slug}:arrival" for slug in STARTERS]
 
 
 @pytest.fixture
@@ -38,12 +41,16 @@ def _favorites(client: TestClient, *pokemon: str) -> None:
 
 
 @pytest.mark.rn("RN-18")
-def test_without_favourites_only_the_game_mechanics_are_asked(client: TestClient) -> None:
-    """The key battles of a real load are automatic: they are not reviewed."""
+@pytest.mark.rn("RN-21")
+def test_without_favourites_the_game_mechanics_and_the_starters_are_asked(
+    client: TestClient,
+) -> None:
+    """The key battles of a real load are automatic: they are not reviewed. The starters are,
+    because RN-21 can choose one that is not a favourite (CA-66)."""
     body = _review(client)
     assert body["game"] == "firered"
-    assert body["pending"] == 2
-    assert [fact["fact_key"] for fact in body["facts"]] == MECHANICS
+    assert body["pending"] == 5
+    assert [fact["fact_key"] for fact in body["facts"]] == MECHANICS + STARTER_ARRIVALS
     contests = body["facts"][0]
     assert contests == {
         "fact_key": "mechanic:firered:contests",
@@ -73,7 +80,14 @@ def test_raichu_arrival_is_proposed_and_confirmed(client: TestClient) -> None:
     body = response.json()
     assert (body["status"], body["value"], body["outdated"]) == ("confirmed", False, False)
     assert body["confirmed_at"] is not None
-    assert _review(client)["pending"] == 2  # the mechanics
+    assert _review(client)["pending"] == 5  # the mechanics and the starters
+
+
+@pytest.mark.rn("RN-18")
+@pytest.mark.rn("RN-21")
+def test_without_rn21_the_starters_are_not_asked(client: TestClient) -> None:
+    client.patch("/api/rules/RN-21", json={"enabled": False})
+    assert [fact["fact_key"] for fact in _review(client)["facts"]] == MECHANICS
 
 
 @pytest.mark.rn("RN-18")
@@ -89,14 +103,21 @@ def test_a_value_can_be_corrected(client: TestClient) -> None:
 def test_favourites_discarded_with_known_data_are_not_asked(client: TestClient) -> None:
     """Zapdos cannot be bred, so whether it can arrive does not matter."""
     _favorites(client, "zapdos", "gengar")
-    assert [fact["subject"] for fact in _review(client)["facts"]][2:] == ["gengar"]
+    assert [fact["subject"] for fact in _review(client)["facts"]][2:] == [*STARTERS, "gengar"]
 
 
 @pytest.mark.rn("RN-18")
 def test_facts_follow_the_order_of_the_game_and_the_pokedex(client: TestClient) -> None:
     _favorites(client, "raichu", "gengar", "dragonite", "charizard")
     subjects = [fact["subject"] for fact in _review(client)["facts"]]
-    assert subjects == ["contests", "day_night_cycle", "charizard", "raichu", "gengar", "dragonite"]
+    assert subjects == [
+        "contests",
+        "day_night_cycle",
+        *STARTERS,  # Charizard once, although it is a favourite and a starter
+        "raichu",
+        "gengar",
+        "dragonite",
+    ]
 
 
 @pytest.mark.rn("RN-18")
@@ -152,6 +173,7 @@ def test_accepting_the_proposals_leaves_the_pending_values(
         "firered-misty": ("pending", None),
         "raichu": ("confirmed", True),  # the user's correction is kept
         "gengar": ("confirmed", True),
+        **dict.fromkeys(STARTERS, ("confirmed", True)),
     }
 
 

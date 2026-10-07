@@ -6,7 +6,7 @@ engine have no problems is in ``tests/core/test_engine_properties.py``.
 
 import pytest
 
-from core.domain import GameContext, HallOfFameEntry, PokemonData
+from core.domain import GameContext, GameInfo, HallOfFameEntry, PokemonData
 from core.rules.catalog import RuleSettings
 from core.rules.check import TeamProblem, UnknownMemberError, check_team
 from tests.core.builders import candidate, completed, context, pokemon, pool_entry
@@ -24,6 +24,11 @@ LAPRAS = pokemon("lapras", ("water", "ice"), dex_number=131)
 MAGNETON = pokemon("magneton", ("electric", "steel"), line=("magnemite",), dex_number=82)
 ZAPDOS = pokemon("zapdos", ("electric", "flying"), egg_groups=("no-eggs",), dex_number=145)
 DRATINI = pokemon("dratini", ("dragon",), dex_number=147)
+VENUSAUR = pokemon("venusaur", ("grass", "poison"), line=("bulbasaur", "ivysaur"), dex_number=3)
+CHARIZARD = pokemon("charizard", ("fire", "flying"), line=("charmander",), dex_number=6)
+WARTORTLE = pokemon("wartortle", ("water",), line=("squirtle",), dex_number=8)
+BLASTOISE = pokemon("blastoise", ("water",), line=("squirtle", "wartortle"), dex_number=9)
+FIRERED = GameInfo("firered", 3, starters=frozenset({"venusaur", "charizard", "blastoise"}))
 
 
 def _context(
@@ -32,6 +37,7 @@ def _context(
     unverified: tuple[str, ...] = (),
     disabled: tuple[str, ...] = (),
     journey: tuple[HallOfFameEntry, ...] = (),
+    game: GameInfo | None = None,
 ) -> GameContext:
     settings = RuleSettings.defaults().with_changes(enabled=dict.fromkeys(disabled, False))
     entries = [pool_entry(p, verified=p.slug not in unverified) for p in pool]
@@ -40,6 +46,7 @@ def _context(
         pool=entries,
         settings=settings,
         journey=journey,
+        game=game,
     )
 
 
@@ -174,3 +181,24 @@ def test_a_pokemon_outside_the_game_is_an_error() -> None:
     with pytest.raises(UnknownMemberError, match="mew") as error:
         check_team(_context(GENGAR), ["gengar", "mew"])
     assert error.value.members == ("mew",)
+
+
+@pytest.mark.rn("RN-21")
+def test_rn21_members_of_two_starter_lines_are_a_problem() -> None:
+    """CA-60: Charizard and Wartortle do not go together, although only Charizard is a
+    starter."""
+    ctx = _context(CHARIZARD, WARTORTLE, pool=(BLASTOISE,), game=FIRERED, disabled=("RN-14",))
+    check = check_team(ctx, ["charizard", "wartortle"])
+    [problem] = check.problems
+    assert (problem.rule_id, problem.members) == ("RN-21", ("charizard", "wartortle"))
+    assert problem.detail == "Charizard y Wartortle son de las líneas de los iniciales del juego"
+
+
+@pytest.mark.rn("RN-21")
+def test_rn21_a_starter_that_is_not_a_favourite_meets_it() -> None:
+    """CA-65: with no favourite starter, Venusaur from the pool meets the rule."""
+    ctx = _context(GENGAR, pool=(VENUSAUR, BLASTOISE), game=FIRERED, disabled=("RN-14",))
+    [problem] = check_team(ctx, ["gengar"]).problems
+    assert problem.rule_id == "RN-21"
+    assert "Venusaur o Blastoise" in problem.detail
+    assert check_team(ctx, ["blastoise", "gengar"]).valid

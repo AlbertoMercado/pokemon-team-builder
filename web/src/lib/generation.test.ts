@@ -1,5 +1,5 @@
-import type { Discard } from "../api/types";
-import { alternatives, discardSummary, discardsByReason } from "./generation";
+import type { Discard, Presence } from "../api/types";
+import { alternatives, chosenBy, discardSummary, discardsByReason } from "./generation";
 
 const discard = (pokemon: string, reason: Discard["reason"]): Discard => ({
   pokemon,
@@ -50,5 +50,27 @@ describe("alternatives", () => {
     expect(alternatives(["Magneton"])).toBe("Magneton");
     expect(alternatives(["Cloyster", "Lapras"])).toBe("Cloyster o Lapras");
     expect(alternatives(["Vaporeon", "Jolteon", "Flareon"])).toBe("Vaporeon, Jolteon o Flareon");
+  });
+});
+
+describe("chosenBy", () => {
+  const presence = (rule_id: string, status: Presence["status"], options: string[]): Presence => ({
+    rule_id,
+    level: 1,
+    status,
+    options,
+    detail: "",
+  });
+
+  it("gives the Pokémon that a rule chooses although they are not favourites (CA-65)", () => {
+    const chosen = chosenBy([
+      presence("RN-13", "candidates", ["dragonite"]),
+      presence("RN-14", "reserved", ["vaporeon"]),
+      presence("RN-21", "chosen", ["venusaur", "blastoise"]),
+    ]);
+    expect([...chosen]).toEqual([
+      ["venusaur", "RN-21"],
+      ["blastoise", "RN-21"],
+    ]);
   });
 });

@@ -80,9 +80,20 @@ export function discardSummary(discards: readonly Discard[], favorites: number):
 
 export const PRESENCE_STATUS: Readonly<Record<Presence["status"], string>> = {
   candidates: "Se cumple con tus favoritos",
+  chosen: "Se cumple con un Pokémon del juego que no es favorito",
   reserved: "Se reserva un hueco",
   unmet: "No se puede cumplir en este juego",
 };
+
+/** The Pokémon that a presence rule puts in the team although they are not favourites
+ * (RN-21, CA-65), each with that rule. */
+export function chosenBy(presence: readonly Presence[]): ReadonlyMap<string, string> {
+  return new Map(
+    presence
+      .filter((rule) => rule.status === "chosen")
+      .flatMap((rule) => rule.options.map((pokemon) => [pokemon, rule.rule_id] as const)),
+  );
+}
 
 /** «Cloyster o Lapras», «Magneton»: the names that can take a position. */
 export function alternatives(names: readonly string[]): string {

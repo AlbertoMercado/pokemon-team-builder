@@ -1,4 +1,4 @@
-"""The target game and its key battles (RN-15, RN-17)."""
+"""The target game, its starters and its key battles (RN-15, RN-17, RN-21)."""
 
 from dataclasses import dataclass
 
@@ -12,13 +12,15 @@ class GameInfo:
     """Target game: identifier, generation and the mechanics it has (already confirmed).
 
     ``name`` is its Spanish name, for the explanations of the rules; without it, they use the
-    identifier.
+    identifier. ``starters`` are its starters, as the form of their final evolution in the
+    game (RN-21, CA-59).
     """
 
     slug: str
     generation: int
     mechanics: frozenset[str] = frozenset()
     name: str | None = None
+    starters: frozenset[str] = frozenset()
 
     def has(self, mechanic: str) -> bool:
         return mechanic in self.mechanics

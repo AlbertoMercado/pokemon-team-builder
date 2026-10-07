@@ -16,16 +16,20 @@ from core.rules.catalog import RuleSettings
 from core.rules.team import PresenceStatus
 from tests.core.scenario import FAVORITES, firered_context
 
+STARTERS = {"venusaur", "charizard", "blastoise"}
+
 EXPECTED_TEAMS = [
-    ("tentacruel", "magneton", "exeggutor", "rhydon", "flareon", "dragonite"),
-    ("magneton", "cloyster", "exeggutor", "rhydon", "flareon", "dragonite"),
-    ("magneton", "exeggutor", "rhydon", "lapras", "flareon", "dragonite"),
+    ("venusaur", "dugtrio", "magneton", "cloyster", "flareon", "dragonite"),
+    ("venusaur", "dugtrio", "magneton", "starmie", "flareon", "dragonite"),
+    ("venusaur", "dugtrio", "magneton", "lapras", "flareon", "dragonite"),
+    ("blastoise", "magneton", "exeggutor", "rhydon", "flareon", "dragonite"),
 ]
 
 
 @pytest.mark.rn("RN-04")
 @pytest.mark.rn("RN-13")
 @pytest.mark.rn("RN-14")
+@pytest.mark.rn("RN-21")
 def test_firered_with_the_default_rules() -> None:
     result = generate(firered_context())
 
@@ -34,7 +38,7 @@ def test_firered_with_the_default_rules() -> None:
     # 1 (RN-06) + 3 (RN-15) + 10 · 23/24 (RN-17) + 5 (RN-20). RN-17 misses only the attack
     # on the Psychic rivals (Kadabra, Mr. Mime and Alakazam).
     assert {team.score.total for team in result.teams} == {Fraction(223, 12)}
-    assert {team.score.dual_types for team in result.teams} == {5}
+    assert {team.score.dual_types for team in result.teams} == {4}
 
 
 @pytest.mark.rn("RN-11")
@@ -49,18 +53,41 @@ def test_legendaries_are_discarded_because_they_cannot_be_bred() -> None:
 
 @pytest.mark.rn("RN-13")
 @pytest.mark.rn("RN-14")
+@pytest.mark.rn("RN-21")
 def test_presence_rules_in_firered() -> None:
-    """Dragonite is a valid candidate (level 1), and so are three Eevee evolutions."""
+    """Dragonite is a valid candidate (level 1), and so are three Eevee evolutions and the
+    three starters. Charizard is in no team: it shares Fire with Flareon and Flying with
+    Dragonite (RN-12)."""
     result = generate(firered_context())
-    dragon, eevee = result.presence
+    dragon, eevee, starter = result.presence
     assert (dragon.level, dragon.status, dragon.options) == (
         1,
         PresenceStatus.CANDIDATES,
         ("dragonite",),
     )
     assert eevee.options == ("vaporeon", "jolteon", "flareon")
+    assert (starter.level, starter.status, starter.options) == (
+        1,
+        PresenceStatus.CANDIDATES,
+        ("venusaur", "charizard", "blastoise"),
+    )
     for team in result.teams:
         assert len(set(team.slugs) & EEVEE_EVOLUTIONS) == 1
+        assert len(set(team.slugs) & STARTERS) == 1
+
+
+@pytest.mark.rn("RN-21")
+def test_without_favourite_starters_the_rule_chooses_one_of_the_game() -> None:
+    """CA-65: with no starter among the favourites, the team includes one that is not."""
+    favorites = [f for f in FAVORITES if f not in STARTERS]
+    result = generate(firered_context(favorites))
+    starter = result.presence[-1]
+    assert (starter.rule_id, starter.level, starter.status) == ("RN-21", 2, PresenceStatus.CHOSEN)
+    assert starter.options == ("venusaur", "charizard", "blastoise")
+    assert result.status is GenerationStatus.COMPLETE
+    for team in result.teams:
+        assert len(set(team.slugs) & STARTERS) == 1
+        assert len(set(team.slugs) - set(favorites)) == 1
 
 
 @pytest.mark.rn("RN-12")
@@ -95,13 +122,14 @@ def test_tied_teams_are_grouped() -> None:
         for group in result.groups
     ]
     assert positions == [
-        [("tentacruel",), ("magneton",), ("exeggutor",), ("rhydon",), ("flareon",), ("dragonite",)],
         [
+            ("venusaur",),
+            ("dugtrio",),
             ("magneton",),
             ("cloyster", "lapras"),
-            ("exeggutor",),
-            ("rhydon",),
             ("flareon",),
             ("dragonite",),
         ],
+        [("venusaur",), ("dugtrio",), ("magneton",), ("starmie",), ("flareon",), ("dragonite",)],
+        [("blastoise",), ("magneton",), ("exeggutor",), ("rhydon",), ("flareon",), ("dragonite",)],
     ]

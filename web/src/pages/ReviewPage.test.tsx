@@ -21,7 +21,7 @@ describe("Revisión de datos", () => {
     expect(screen.getByRole("note")).toHaveTextContent("Los datos que confirmas se usan tal cual");
     expect(
       screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent),
-    ).toEqual(["Mecánicas del juego", "Combates clave", "Favoritos"]);
+    ).toEqual(["Mecánicas del juego", "Combates clave", "Favoritos e iniciales del juego"]);
     expect(within(card("Concursos")).getByText("¿Rojo Fuego tiene esta mecánica?")).toBeVisible();
     expect(screen.queryByRole("link", { name: "Generar el equipo" })).not.toBeInTheDocument();
   });

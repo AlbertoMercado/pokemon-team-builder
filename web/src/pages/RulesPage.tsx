@@ -20,7 +20,7 @@ const GROUPS: { kind: Rule["kind"]; title: string; text: string }[] = [
   {
     kind: "presence",
     title: "Reglas de presencia",
-    text: "Obligan a incluir un tipo de miembro en el equipo; si ningún favorito la cumple, se reserva un hueco con sugerencias.",
+    text: "Obligan a incluir un tipo de miembro en el equipo; si ningún favorito la cumple, se reserva un hueco con sugerencias, salvo la del inicial, que elige ella misma uno de los iniciales del juego.",
   },
   {
     kind: "soft",

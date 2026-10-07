@@ -3,7 +3,15 @@
 import pytest
 
 from core.domain import GameInfo, PokemonData
-from core.review import Fact, FactKind, FavoriteFacts, Origin, involved_facts, pending_facts
+from core.review import (
+    Fact,
+    FactKind,
+    FavoriteFacts,
+    Origin,
+    involved_facts,
+    pending_facts,
+    with_starters,
+)
 from core.rules.catalog import RuleSettings
 from tests.core.builders import completed, pokemon
 
@@ -174,3 +182,31 @@ def test_a_known_false_value_that_discards_a_favourite_takes_part() -> None:
 @pytest.mark.rn("RN-11")
 def test_nothing_takes_part_of_a_favourite_discarded_by_other_rules() -> None:
     assert involved_facts(FIRERED, (), [_favorite(ZAPDOS)], DEFAULTS) == ()
+
+
+VENUSAUR = pokemon("venusaur", ("grass", "poison"), line=("bulbasaur", "ivysaur"), dex_number=3)
+CHARIZARD = pokemon("charizard", ("fire", "flying"), line=("charmander",), dex_number=6)
+
+
+@pytest.mark.rn("RN-21")
+@pytest.mark.rn("RN-18")
+def test_the_starters_that_are_not_favourites_are_reviewed_too() -> None:
+    """CA-66: RN-21 can choose a starter that is not a favourite, so its data takes part."""
+    favourites = [_favorite(CHARIZARD), _favorite(RAICHU)]
+    starters = [_favorite(VENUSAUR), _favorite(CHARIZARD)]
+
+    reviewed = with_starters(favourites, starters, DEFAULTS)
+
+    assert [f.pokemon.slug for f in reviewed] == ["charizard", "raichu", "venusaur"]
+    assert _keys(*reviewed) == [
+        "pokemon:firered:venusaur:arrival",
+        "pokemon:firered:charizard:arrival",
+        "pokemon:firered:raichu:arrival",
+    ]
+
+
+@pytest.mark.rn("RN-21")
+def test_without_rn21_only_the_favourites_are_reviewed() -> None:
+    settings = DEFAULTS.with_changes(enabled={"RN-21": False})
+    favourites = [_favorite(RAICHU)]
+    assert with_starters(favourites, [_favorite(VENUSAUR)], settings) == favourites

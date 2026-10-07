@@ -206,6 +206,9 @@ Qué mirar en la respuesta:
   `incomplete_reason` dice por qué: una regla de presencia necesita un Pokémon que no tienes
   en favoritos (`reserved_slot`), tienes menos de 6 favoritos válidos
   (`not_enough_candidates`) o no hay 6 que cumplan juntos las reglas (`no_valid_team`).
+- **`presence`**: cómo se aplica cada regla de presencia. Con `status` `chosen`, RN-21 ha
+  puesto en el equipo un inicial del juego que no está en tus favoritos: es el miembro que
+  aparece en sus `options`.
 - **`groups`**: los equipos recomendados. Si varios empatan, aparecen todos; los que solo se
   diferencian en Pokémon con los mismos tipos se agrupan, y `positions` dice qué Pokémon
   puede ocupar cada puesto (por ejemplo, Cloyster o Lapras).
@@ -238,8 +241,8 @@ curl -X POST http://127.0.0.1:8000/api/games/firered/team-checks \
 
 - **`valid`**: si cumple las reglas activas.
 - **`problems`**: cada regla que no cumple, con los miembros afectados y la explicación. Por
-  ejemplo, dos sugerencias para huecos libres que comparten tipo (RN-12), o un equipo sin la
-  evolución de Eevee que pide RN-14.
+  ejemplo, dos sugerencias para huecos libres que comparten tipo (RN-12), un equipo sin la
+  evolución de Eevee que pide RN-14 o con dos Pokémon de las líneas de los iniciales (RN-21).
 - **`unverified`**: los miembros con datos que no has confirmado. No es un problema.
 
 No se guarda nada. Como al generar, responde `409` si queda algún dato por confirmar, y `422`

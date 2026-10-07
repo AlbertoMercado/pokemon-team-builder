@@ -1,10 +1,10 @@
 """Rules about the whole team: constraints between members and presence rules.
 
-- **Between members** (RN-07, RN-12, RN-14 "at most one"): two candidates conflict if they
-  cannot be in the same team. Together they form the incompatibility graph of the search
-  (docs/02-ddt/algoritmo-generacion.md).
-- **Presence** (RN-13, RN-14 "at least one"): which Pokémon the team must include, resolved
-  to the first level of the DDF that can be met.
+- **Between members** (RN-07, RN-12, RN-14 and RN-21 "at most one"): two candidates conflict
+  if they cannot be in the same team. Together they form the incompatibility graph of the
+  search (docs/02-ddt/algoritmo-generacion.md).
+- **Presence** (RN-13, RN-14 and RN-21 "at least one"): which Pokémon the team must include,
+  resolved to the first level of the DDF that can be met.
 """
 
 from collections.abc import Sequence
@@ -12,9 +12,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Protocol
 
-from core.domain import PokemonData
+from core.domain import GameContext, GameInfo, PokemonData
 from core.domain.lines import DRAGONITE, EEVEE_EVOLUTIONS
-from core.rules.catalog import RuleSettings
 
 DRAGON = "dragon"
 
@@ -61,15 +60,38 @@ class SingleEeveeEvolutionConstraint:
         return a.slug in EEVEE_EVOLUTIONS and b.slug in EEVEE_EVOLUTIONS
 
 
-PAIR_CONSTRAINTS: tuple[PairConstraint, ...] = (
-    SameLineConstraint(),
-    SharedTypeConstraint(),
-    SingleEeveeEvolutionConstraint(),
-)
+class SingleStarterConstraint:
+    """RN-21, "only one": two members of the lines of the game's starters never go together.
+
+    Not only two starters: Charizard and Wartortle do not go together either, so that no other
+    starter is spent for the other games of the generation (CA-60). ``chains`` are the
+    evolution chains of the starters.
+    """
+
+    rule_id = "RN-21"
+
+    def __init__(self, chains: frozenset[int]) -> None:
+        self._chains = chains
+
+    def conflicts(self, a: PokemonData, b: PokemonData) -> bool:
+        return a.evolution_chain in self._chains and b.evolution_chain in self._chains
 
 
-def active_pair_constraints(settings: RuleSettings) -> tuple[PairConstraint, ...]:
-    return tuple(c for c in PAIR_CONSTRAINTS if settings.is_enabled(c.rule_id))
+def starter_chains(ctx: GameContext) -> frozenset[int]:
+    """The evolution chains of the game's starters among the favourites and the pool."""
+    known = [c.pokemon for c in ctx.favorites] + [e.pokemon for e in ctx.pool]
+    return frozenset(p.evolution_chain for p in known if p.slug in ctx.game.starters)
+
+
+def active_pair_constraints(ctx: GameContext) -> tuple[PairConstraint, ...]:
+    """The constraints between members of the active rules, in catalogue order."""
+    constraints: tuple[PairConstraint, ...] = (
+        SameLineConstraint(),
+        SharedTypeConstraint(),
+        SingleEeveeEvolutionConstraint(),
+        SingleStarterConstraint(starter_chains(ctx)),
+    )
+    return tuple(c for c in constraints if ctx.settings.is_enabled(c.rule_id))
 
 
 def conflict(a: PokemonData, b: PokemonData, constraints: Sequence[PairConstraint]) -> str | None:
@@ -82,6 +104,9 @@ def conflict(a: PokemonData, b: PokemonData, constraints: Sequence[PairConstrain
 
 class PresenceStatus(StrEnum):
     CANDIDATES = "candidates"  # the team must include one of ``options``, all valid candidates
+    # No valid candidate: the team must include one of ``options``, Pokémon of the game that
+    # are not favourites and that the rule chooses itself (RN-21, CA-65).
+    CHOSEN = "chosen"
     RESERVED = "reserved"  # no valid candidate: a slot is reserved for ``options`` (RN-08)
     UNMET = "unmet"  # nothing in the game meets it: the team is generated without it
 
@@ -91,8 +116,8 @@ class PresenceRequirement:
     """The level of a presence rule that applies, and the Pokémon that meet it.
 
     ``level`` is the level of the rule in the DDF. ``options`` are valid candidates for
-    ``CANDIDATES`` and Pokémon of the game that pass the candidate filters (CA-40) for
-    ``RESERVED``, both in canonical order.
+    ``CANDIDATES`` and Pokémon of the game that are not favourites and pass the candidate
+    filters (CA-40) for ``CHOSEN`` and ``RESERVED``, all in canonical order.
     """
 
     rule_id: str
@@ -100,6 +125,11 @@ class PresenceRequirement:
     status: PresenceStatus
     options: tuple[str, ...]
     detail: str
+
+    @property
+    def requires_member(self) -> bool:
+        """Whether the search has to put one of ``options`` in the team."""
+        return self.status in {PresenceStatus.CANDIDATES, PresenceStatus.CHOSEN}
 
 
 class PresenceRule(Protocol):
@@ -198,4 +228,48 @@ class EeveePresence:
         )
 
 
-PRESENCE_RULES: tuple[PresenceRule, ...] = (DragonPresence(), EeveePresence())
+class StarterPresence:
+    """RN-21, "at least one": a starter of the game, a favourite or not (CA-65).
+
+    ``starters`` are the game's, as the form of their final evolution (CA-59).
+    """
+
+    rule_id = "RN-21"
+
+    def __init__(self, starters: frozenset[str]) -> None:
+        self._starters = starters
+
+    def requirement(
+        self, valid: Sequence[PokemonData], suggestible: Sequence[PokemonData]
+    ) -> PresenceRequirement:
+        favorites = [p for p in valid if p.slug in self._starters]
+        if favorites:
+            return PresenceRequirement(
+                self.rule_id,
+                1,
+                PresenceStatus.CANDIDATES,
+                _slugs(favorites),
+                "El equipo incluye un inicial de tus favoritos",
+            )
+        others = [p for p in suggestible if p.slug in self._starters]
+        if others:
+            return PresenceRequirement(
+                self.rule_id,
+                2,
+                PresenceStatus.CHOSEN,
+                _slugs(others),
+                "Ningún inicial favorito es un candidato válido: el equipo incluye uno de los "
+                "iniciales del juego, aunque no sea favorito",
+            )
+        return PresenceRequirement(
+            self.rule_id,
+            3,
+            PresenceStatus.UNMET,
+            (),
+            "Ningún inicial del juego puede formar parte del equipo: se genera sin esta regla",
+        )
+
+
+def presence_rules(game: GameInfo) -> tuple[PresenceRule, ...]:
+    """Every presence rule, in catalogue order, which is also their priority (CA-48, CA-61)."""
+    return (DragonPresence(), EeveePresence(), StarterPresence(game.starters))

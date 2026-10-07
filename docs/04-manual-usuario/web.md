@@ -160,7 +160,7 @@ las explica en detalle.
 | Clase | Qué hacen | Qué puedes cambiar |
 |-------|-----------|--------------------|
 | **Reglas duras** | Filtros: un Pokémon o un equipo que no las cumple se descarta. | Las configurables tienen un interruptor **Activa**; las estructurales (como RN-01, «El equipo tiene 6 Pokémon») están siempre activas. |
-| **Reglas de presencia** | Obligan a incluir un tipo de miembro: Dragonite o un Dragón (RN-13) y una evolución de Eevee (RN-14). | El interruptor **Activa**. |
+| **Reglas de presencia** | Obligan a incluir un tipo de miembro: Dragonite o un Dragón (RN-13), una evolución de Eevee (RN-14) y un inicial del juego (RN-21). Si ningún favorito cumple RN-13 o RN-14, se reserva un hueco con sugerencias; si ningún inicial es favorito, RN-21 elige uno del juego. | El interruptor **Activa**. |
 | **Reglas blandas** | Puntúan el equipo; la puntuación de cada una se multiplica por su **peso**. | El interruptor y el **Peso**, de 0 a 10. Junto al peso se ve su valor por defecto. |
 | **Mecanismos** | Cómo funciona el generador. | Nada: son informativos. |
 
@@ -188,7 +188,7 @@ en tres grupos:
 |-------|-----------------|-----------|
 | **Mecánicas del juego** | Si el juego tiene una mecánica, como el ciclo de día y noche. | Sí o No. |
 | **Combates clave** | El equipo de un líder o rival, en orden. | La lista de sus Pokémon. |
-| **Favoritos** | Si un favorito se puede tener en el juego o si puede llegar a él y evolucionar hasta esa forma antes de completarlo. | Sí o No. |
+| **Favoritos e iniciales del juego** | Si un favorito se puede tener en el juego o si puede llegar a él y evolucionar hasta esa forma antes de completarlo. Con RN-21 activa, lo mismo de los iniciales del juego, aunque no sean favoritos, porque la regla puede elegir uno. | Sí o No. |
 
 Cada dato muestra la **propuesta** de la carga, si la hay, y su estado:
 
@@ -234,11 +234,11 @@ porque acabas de añadir un favorito), te lleva a la revisión.
 | Apartado | Qué muestra |
 |----------|-------------|
 | **Estado** | Si el equipo está **completo** (6 favoritos) o **incompleto** y por qué, y su **puntuación**. Si varios equipos empatan en cabeza, cuántos son. |
-| **Equipo recomendado** u **Opción N** | Sus posiciones, con el número, el nombre y los tipos en el juego. Una posición como «Cloyster o Lapras» significa que cualquiera de los dos da la misma puntuación: es un grupo de equipos y eliges uno de cada posición. |
+| **Equipo recomendado** u **Opción N** | Sus posiciones, con el número, el nombre y los tipos en el juego. Una posición como «Cloyster o Lapras» significa que cualquiera de los dos da la misma puntuación: es un grupo de equipos y eliges uno de cada posición. Si el inicial no está en tus favoritos, su posición dice «No es favorito: lo elige RN-21». |
 | **Puntuación por regla** | Cada regla blanda activa con su peso, cuánto la cumple el equipo (en %), lo que aporta al total y qué miembros cuentan en contra. Las aportaciones suman el total ([RF-09](../01-ddf/requisitos-funcionales.md#rf-09)). |
 | **Huecos** | Si el equipo es incompleto: los huecos reservados por una regla de presencia y los libres, cada uno con sus **sugerencias**, de mejor a peor, con lo que aportarían (`+3`). Se ven las 5 primeras; **Ver N sugerencias más** muestra el resto. |
 | **Favoritos descartados** | Cuántos favoritos se han descartado y por qué, agrupados por motivo. Si lo decidió un dato que confirmaste, enlaza a la revisión. |
-| **Reglas de presencia** | Cómo se aplica cada una (RN-13, RN-14): si se cumple con tus favoritos, si se le reserva un hueco o si no se puede cumplir en el juego, y qué Pokémon la cumplen. |
+| **Reglas de presencia** | Cómo se aplica cada una (RN-13, RN-14, RN-21): si se cumple con tus favoritos o con un Pokémon del juego que no es favorito, si se le reserva un hueco o si no se puede cumplir en el juego, y qué Pokémon la cumplen. |
 | **Datos que confirmaste** | Los datos confirmados que se han usado, con un enlace para cambiarlos. |
 
 Las sugerencias no son favoritos. Las marcadas **Sin verificar** dependen de datos que no has

@@ -41,27 +41,32 @@ def _check(client: TestClient, *members: str) -> dict[str, Any]:
 
 def test_a_generated_team_is_valid(client: TestClient) -> None:
     body = _ready(client, *FAVORITES)
-    team = body["groups"][1]["teams"][1]["members"]  # the group of «Cloyster o Lapras»
+    team = body["groups"][0]["teams"][1]["members"]  # the group of «Cloyster o Lapras»
     assert _check(client, *team) == {"valid": True, "problems": [], "unverified": []}
 
 
 @pytest.mark.rn("RN-12")
 def test_two_suggestions_that_clash_are_reported(client: TestClient) -> None:
-    """With several free slots, each suggestion fits the team, but not necessarily the rest."""
+    """With several free slots, each suggestion fits the team, but not necessarily the rest.
+
+    RN-21 adds Blastoise, the only starter that fits with Gengar and Flareon (CA-65).
+    """
     body = _ready(client, "gengar", "dragonite", "flareon")
     team = body["groups"][0]["teams"][0]
+    assert "blastoise" in team["members"]
     [free] = [slot for slot in team["open_slots"] if slot["rule_id"] is None]
     suggestions = [s["pokemon"] for s in free["suggestions"]]
-    water = [s["pokemon"] for s in suggestions if "water" in s["types"]][:2]
-    assert len(water) == 2  # two suggestions of the same type
+    grass = ["exeggutor", "tangela"]  # two suggestions of the same type, of different lines
+    assert set(grass) <= {s["pokemon"] for s in suggestions}
 
-    check = _check(client, *team["members"], *water)
+    check = _check(client, *team["members"], *grass)
 
     assert check["valid"] is False
-    assert [(p["rule_id"], p["members"]) for p in check["problems"]] == [("RN-12", water)]
+    assert [(p["rule_id"], p["members"]) for p in check["problems"]] == [("RN-12", grass)]
     assert check["problems"][0]["detail"].endswith("comparten tipo")
-    # The suggestions of the pool have unconfirmed data in the scenario (CA-31).
-    assert check["unverified"] == water
+    # The suggestions of the pool have unconfirmed data in the scenario (CA-31); Blastoise's
+    # were confirmed with the starters (CA-66).
+    assert check["unverified"] == grass
 
 
 @pytest.mark.rn("RN-13")

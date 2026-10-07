@@ -8,7 +8,12 @@
  "game": {
   "slug": "firered",
   "generation": 3,
-  "mechanics": []
+  "mechanics": [],
+  "starters": [
+   "blastoise",
+   "charizard",
+   "venusaur"
+  ]
  },
  "types": [
   "normal",

@@ -7,7 +7,10 @@ generation (RF-15, CA-30):
 - the target game's data: its mechanics and, if RN-17 is active, its key battles (they are
   used nowhere else);
 - the data of each favourite that is not already discarded with known data, such as whether
-  it can arrive at the game before completing it (RN-03).
+  it can arrive at the game before completing it (RN-03);
+- if RN-21 is active, the same data of the game's starters that are not favourites, because
+  the rule can choose one as a member of the team (CA-65, CA-66): ``with_starters`` adds
+  them to the favourites.
 
 Known data is automatic or already confirmed. A favourite is already discarded if a candidate
 filter excludes it with known data alone: it appeared in a later generation, its existence or
@@ -115,6 +118,17 @@ def _favorite_facts(
     ):
         return ()
     return (favorite.exists, favorite.arrival)
+
+
+def with_starters(
+    favorites: Sequence[FavoriteFacts], starters: Sequence[FavoriteFacts], settings: RuleSettings
+) -> list[FavoriteFacts]:
+    """The favourites and, if RN-21 is active, the game's ``starters`` that are not
+    favourites: the rule can choose one as a member of the team (CA-65, CA-66)."""
+    if not settings.is_enabled("RN-21"):
+        return list(favorites)
+    chosen = {favorite.pokemon.slug for favorite in favorites}
+    return [*favorites, *(s for s in starters if s.pokemon.slug not in chosen)]
 
 
 def involved_facts(

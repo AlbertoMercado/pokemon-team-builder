@@ -1089,7 +1089,7 @@ export interface components {
         PresenceOut: {
             /**
              * Rule Id
-             * @description Regla de presencia, `RN-13` o `RN-14`.
+             * @description Regla de presencia: `RN-13`, `RN-14` o `RN-21`.
              */
             rule_id: string;
             /**
@@ -1097,7 +1097,7 @@ export interface components {
              * @description Nivel de la regla en el DDF que se aplica.
              */
             level: number;
-            /** @description `candidates` (el equipo incluye una de `options`), `reserved` (se reserva un hueco para una de `options`, que no son favoritos) o `unmet` (no se puede cumplir). */
+            /** @description `candidates` (el equipo incluye una de `options`, que son favoritos), `chosen` (el equipo incluye una de `options`, que no son favoritos: solo RN-21), `reserved` (se reserva un hueco para una de `options`, que no son favoritos) o `unmet` (no se puede cumplir). */
             status: components["schemas"]["PresenceStatus"];
             /**
              * Options
@@ -1114,7 +1114,7 @@ export interface components {
          * PresenceStatus
          * @enum {string}
          */
-        PresenceStatus: "candidates" | "reserved" | "unmet";
+        PresenceStatus: "candidates" | "chosen" | "reserved" | "unmet";
         /** ReviewFactOut */
         ReviewFactOut: {
             /**
