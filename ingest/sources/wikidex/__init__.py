@@ -3,7 +3,7 @@
 For each curated battle, reads its trainer page (cached, rate limited), finds the team in
 the games' section, translates the Spanish names to loaded forms, leaves out the rival's
 starter (CA-26) and, if the team has variants, keeps the Pokémon common to all of them
-(CA-38). See docs/02-ddt/plan-carga-datos.md and docs/02-ddt/datos-curados.md.
+(CA-38). See docs/02-ddt/carga-datos.md and docs/02-ddt/datos-curados.md.
 """
 
 from collections.abc import Callable, Iterable, Iterator

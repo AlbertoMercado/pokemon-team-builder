@@ -24,19 +24,12 @@ arquitectura se registran como [ADR](../03-adr/index.md).
   fuente salen, su origen y las restricciones de llegada por juego.
 - [Datos curados](datos-curados.md): los ficheros YAML de `data/curated/`, su esquema y cómo se
   cargan.
-- [Plan de implementación de la web](plan-web.md): alcance, principios, pantallas y rutas,
-  estructura de `web/`, fases, pruebas y CI.
-- [Plan de las imágenes de los Pokémon](plan-imagenes.md): obtenerlas en la ingesta,
-  servirlas desde la API y mostrarlas en la web (RF-17), con sus comprobaciones previas, fases y
-  riesgos.
-- [Plan de las portadas de los juegos](plan-portadas.md): obtenerlas de WikiDex en la ingesta,
-  servirlas desde la API y mostrarlas en la web (RF-18), con la fuente de cada combate clave.
-- [Plan de implementación de la API](plan-api.md): alcance, `user.sqlite`, construcción del
-  contexto, datos revisables, fases y estrategia de pruebas.
-- [Plan de implementación del motor](plan-motor.md): alcance, interfaz, módulos, cómo se
-  interpreta cada regla, pruebas, fases y trazabilidad de las reglas de `core/`.
-- [Plan de la primera carga de datos](plan-carga-datos.md): alcance (generaciones 1 a 3),
-  revisión del volcado de PokeAPI, datos curados, WikiDex y fases de implementación.
+- [Diseño de la carga de datos](carga-datos.md): qué se carga y cómo se interpretan PokeAPI y
+  WikiDex, y las comprobaciones de la carga.
+- [Diseño de la web](web.md): pantallas, rutas, endpoints que usan y cómo se muestran los
+  errores.
+
+Los planes de implementación ya ejecutados están en el [historial](../06-historial/index.md).
 
 ## Decisiones
 

@@ -2,7 +2,7 @@
 
 Reads the CSV dump of the PokeAPI repository pinned to the commit in
 ``data/curated/pokeapi.yaml`` (ADR-0004), and uses the curated data for incense babies and
-arrival proposals. See docs/02-ddt/plan-carga-datos.md.
+arrival proposals. See docs/02-ddt/carga-datos.md.
 """
 
 from collections.abc import Iterable

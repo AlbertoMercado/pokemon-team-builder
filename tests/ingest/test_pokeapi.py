@@ -1,7 +1,7 @@
 """PokeAPI source of the ingest, on a real extract of the pinned CSV dump (no network).
 
-The rules checked here are described in docs/02-ddt/plan-carga-datos.md, section
-"Revisión del volcado de PokeAPI".
+The rules checked here are described in docs/02-ddt/carga-datos.md, section
+"Cómo se interpreta el volcado de PokeAPI".
 """
 
 import shutil

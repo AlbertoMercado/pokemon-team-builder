@@ -1,8 +1,8 @@
 # Web: un solo proceso, desarrollo y pruebas
 
 Cómo se sirve la web con la API en un solo proceso, cómo se arranca en desarrollo, cómo se
-regenera su cliente de la API y cómo se prueba. Qué pantallas tiene y cómo se construye, en el
-[plan de la web](../02-ddt/plan-web.md); cómo se usa, en el
+regenera su cliente de la API y cómo se prueba. Qué pantallas tiene y sus rutas, en el
+[diseño de la web](../02-ddt/web.md); cómo se usa, en el
 [manual de usuario](../04-manual-usuario/web.md).
 
 ## Requisitos

@@ -11,7 +11,7 @@ necesita para generar equipos en Pokémon Rojo Fuego:
 - los 13 combates clave, con los tipos de cada Pokémon rival.
 
 **Por qué existe**: los tests del motor no usan la base de datos
-([plan del motor](../../../docs/02-ddt/plan-motor.md#estrategia-de-pruebas)). Con datos reales,
+([convenciones de los tests](../../README.md#convenciones)). Con datos reales,
 `tests/core/test_scenario_firered.py` comprueba que el resultado es razonable y que la
 generación tarda menos de un segundo. `tests/core/scenario.py` lo convierte en un
 `GameContext`.

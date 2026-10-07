@@ -1,13 +1,13 @@
-# Plan de la primera carga de datos
+# Diseño de la carga de datos
 
-Plan para construir la primera versión de `reference.sqlite`, con el alcance decidido en
-[CA-11](../01-ddf/cuestiones-abiertas.md#resueltas). Parte de los
-[datos requeridos por las reglas](datos-requeridos.md), del [modelo de datos](modelo-datos.md)
-y de una revisión del volcado CSV de PokeAPI hecha el 2026-10-04.
+Qué carga la ingesta y cómo interpreta sus fuentes para construir `reference.sqlite`. Cómo
+funciona paso a paso, la caché y el informe: [ingesta de datos](../05-operacion/ingesta.md);
+cómo se usa: el [manual](../04-manual-usuario/cargar-datos.md); el esquema de los datos curados:
+[datos curados](datos-curados.md).
 
 ## Alcance
 
-| Elemento | Primera carga | Cantidad |
+| Elemento | Qué se carga | Cantidad |
 |----------|---------------|----------|
 | Especies | 1.ª a 3.ª generación: de #0001 Bulbasaur a #0386 Deoxys | 386 (151 + 100 + 135) |
 | Formas (`pokemon`) | Solo la forma por defecto de cada especie | 386 |
@@ -28,18 +28,19 @@ Decisiones de alcance:
   Fame* y el recorrido puedan registrarlos ([RN-16](../01-ddf/reglas-negocio.md#rn-16)), con
   sus tipos y su tabla de eficacias ([RF-12](../01-ddf/requisitos-funcionales.md#rf-12)). No se
   cargan sus combates clave.
-- **Primero Rojo Fuego y Verde Hoja**. Sus restricciones de llegada ya están investigadas
-  ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Rubí, Zafiro y Esmeralda se completan
-  después.
+- **Juegos objetivo con datos completos**: hoy, Rojo Fuego y Verde Hoja, cuyas restricciones de
+  llegada están investigadas ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Completar
+  Rubí, Zafiro y Esmeralda está pendiente (#75, #8).
 - **Sin movimientos por nivel**. Ninguna evolución de las especies 1 a 386 exige conocer un
   movimiento (eso empieza en la 4.ª generación: Tangrowth, Mamoswine…). La tabla `level_move`
   y el fichero `pokemon_moves.csv` (10,7 MB) se dejan para cuando haga falta.
 - **Pokémon Showdown sigue aplazado** ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)).
 
-## Revisión del volcado de PokeAPI
+## Cómo se interpreta el volcado de PokeAPI
 
-Revisión del último commit de `PokeAPI/pokeapi` (`bc92d3b`, 2026-09-30), que se propone como
-commit fijado para la primera carga ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)).
+El volcado CSV de `PokeAPI/pokeapi` se carga del commit fijado en `data/curated/pokeapi.yaml`
+([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)); estas reglas se comprobaron con el commit
+`bc92d3b` (2026-09-30).
 
 ### Ficheros que se usan
 
@@ -137,19 +138,6 @@ En PokeAPI, las evoluciones aleatorias se reconocen por `percentage_chance` o
     - Rubí, Zafiro y Esmeralda: dato **pendiente** hasta investigarlo (issue #8). El usuario
       lo confirmará antes de generar ([RN-18](../01-ddf/reglas-negocio.md#rn-18)).
 
-## Datos curados
-
-Ficheros YAML en `data/curated/` ([ADR-0005](../03-adr/0005-datos-curados-yaml.md)). Sus
-esquemas, su significado y cómo se cargan están en [Datos curados](datos-curados.md).
-
-| Fichero | Contenido | Origen de los datos |
-|---------|-----------|---------------------|
-| `pokeapi.yaml` | Commit fijado del volcado de PokeAPI. | — |
-| `games.yaml` | Mecánicas de cada juego objetivo: ciclo de día y noche (Rubí, Zafiro y Esmeralda tienen reloj; Rojo Fuego y Verde Hoja, no) y concursos (solo Rubí, Zafiro y Esmeralda). | Inferido |
-| `breeding.yaml` | Bebés que solo nacen con incienso (Azurill, Wynaut). Se cargan en `species.requires_incense`; `core/breeding.py` toma entonces la etapa siguiente (Marill, Wobbuffet) como etapa de entrada ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)). | Automático |
-| `arrival.yaml` | Regla de llegada de cada juego objetivo (Pokédex regional de referencia, evoluciones bloqueadas antes de la Pokédex Nacional). | Inferido o pendiente |
-| `key_battles/<grupo-de-versiones>.yaml` | Combates clave de los juegos del grupo: categoría, entrenador, orden y página de WikiDex. Los equipos se descargan de WikiDex. | Lista curada; equipos automáticos o inferidos |
-
 ## WikiDex
 
 - Una petición por página de entrenador (`action=parse&prop=wikitext`): 13 para Rojo Fuego y
@@ -166,40 +154,12 @@ esquemas, su significado y cómo se cargan están en [Datos curados](datos-curad
 - Licencia CC BY-NC-SA: cada combate guarda la página y la revisión de WikiDex de su equipo,
   para la atribución ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)).
 
-## Fases
-
-Cada fase es un PR que incluye su documentación
-([documentación del código](estructura-codigo.md#documentacion-del-codigo)).
-
-```mermaid
-flowchart LR
-    F1["1 · Modelos de<br/>reference.sqlite"] --> F2["2 · Esqueleto<br/>de la ingesta"]
-    F2 --> F3["3 · PokeAPI"]
-    F2 --> F4["4 · Datos curados<br/>Rojo Fuego y Verde Hoja"]
-    F4 --> F5["5 · WikiDex<br/>Rojo Fuego y Verde Hoja"]
-    F3 & F5 --> F6["6 · Rubí, Zafiro<br/>y Esmeralda"]
-    F3 & F4 --> F7["7 · Catálogo de<br/>métodos de evolución"]
-```
-
-| Fase | Rama | Contenido | Documentación |
-|------|------|-----------|---------------|
-| 1 ✅ | `feat/db-reference` | Modelos SQLModel de las tablas de `reference.sqlite` que usa la primera carga (sin `level_move`). | [Modelo de datos](modelo-datos.md#implementacion-de-referencesqlite): tablas, columnas y decisiones de implementación. |
-| 2 ✅ | `feat/ingest-esqueleto` | CLI `uv run python -m ingest`, informe de la carga, tabla `ingest_run` y sustitución atómica del fichero. | Nueva página de Operación: «Ingesta de datos» (uso, opciones, informe y errores). Tabla de comandos de `CLAUDE.md`. |
-| 3 ✅ | `feat/ingest-pokeapi` | Descarga de los CSV del commit fijado a `data/cache/pokeapi/<commit>/`, validación de cada fila con pydantic, transformaciones y carga. Tests con extractos reales de los CSV. | Detalle de cada transformación en esta página o en una de la ingesta. |
-| 4 ✅ | `feat/ingest-curados` | Esquemas pydantic de los YAML y datos de Rojo Fuego y Verde Hoja: juego, mecánicas, llegada y lista de combates clave. | Esquema de cada fichero YAML. |
-| 5 ✅ | `feat/ingest-wikidex` | Adaptador de WikiDex con caché y límite de peticiones, y equipos de los combates clave de Rojo Fuego y Verde Hoja. Tests con wikitexto real guardado. | Cómo se procesan las plantillas y qué se marca como inferido. |
-| 6 | `feat/ingest-hoenn` | Datos curados y combates clave de Rubí, Zafiro y Esmeralda, después de investigar su llegada (issue #8). | Restricciones de llegada en [datos requeridos](datos-requeridos.md#restricciones-de-llegada-por-juego). |
-| 7 | `feat/catalogo-evoluciones` | [`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml) con los 18 disparadores y todas las condiciones de PokeAPI, tabla `evolution_method` y `core/evolution.py` leyendo la clasificación del contexto, con el sexo como no tedioso (CA-43). Bloqueos de la carga ([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)): se recogen todos (método sin catalogar, CA-42; evolución por movimiento sin los movimientos por nivel, CA-45; juego objetivo sin combates clave, CA-46; equipo no encontrado en WikiDex), no se sustituye la base de datos, se genera el informe en JSON y Markdown en `data/reports/` y la CLI termina con el código 2 (RF-16). | Datos curados, modelo de datos, motor e ingesta (bloqueos, informe y protocolo). |
-
-Las fases 1 a 3 no dependen de `core/`, así que se pueden hacer en paralelo con el motor.
-
 ## Comprobaciones de la carga
 
 Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
 (`ingest/checks.py`). Si alguna falla, la carga se rechaza y se conserva la anterior
 ([ingesta](../05-operacion/ingesta.md#que-hace)).
 
-Implementadas (fase 3):
 
 - **Cantidades**: 3 generaciones, 7 grupos de versiones, 11 juegos, 17 tipos, 386 especies,
   386 formas y 5 × 386 filas de disponibilidad. Tablas de eficacias completas: 15 × 15 pares
@@ -214,7 +174,6 @@ Implementadas (fase 3):
   por muda; Feebas → Milotic es por belleza en Rubí y Zafiro.
 - **Crianza**: Mewtwo es legendario y Ditto está en el grupo huevo `ditto`.
 
-Implementadas (fase 4):
 
 - **Datos curados**: 4 mecánicas (2 por juego) y 13 combates clave en cada uno de Rojo Fuego y
   Verde Hoja, de Brock a Azul (eran 15 hasta que CA-39 quitó los dos de Giovanni como jefe
@@ -224,49 +183,11 @@ Implementadas (fase 4):
   Casos conocidos en Rojo Fuego: llegan Bulbasaur, Vaporeon, Golbat y Chansey, y no llegan
   Pikachu, Raichu, Clefairy, Crobat, Espeon ni Blissey.
 
-Previstas (fase 7). No son errores sino **bloqueos**: se recogen todos, la carga no sustituye
-la base de datos y genera un informe para el arquitecto
-([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)):
-
-- **Métodos de evolución sin catalogar**: cada disparador y cada condición de los pasos
-  cargados está en `evolution_methods.yaml` o lo ha catalogado el usuario
-  ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)).
-- **Movimientos por nivel**: si algún paso exige conocer un movimiento, tienen que estar
-  cargados los movimientos que se aprenden por nivel
-  ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)).
-- **Combates clave**: cada juego objetivo tiene al menos uno
-  ([CA-46](../01-ddf/cuestiones-abiertas.md#resueltas)).
-- **Equipos de WikiDex**: cada combate clave tiene su equipo en la página y la sección que
-  indica la lista curada. Hoy es un error que corta la carga; pasa a ser un bloqueo.
-
-Implementadas (fase 5):
-
 - **Equipos de los combates clave**: cada combate de Rojo Fuego y Verde Hoja tiene Pokémon
   (las claves foráneas garantizan que son formas cargadas) y es automático. Giovanni solo
   aparece como líder de gimnasio (CA-39). El equipo de Brock en Rojo Fuego es Geodude y Onix,
   y el del Campeón, Pidgeot, Alakazam y Rhydon (CA-26 y CA-38).
 
-### Resultado de la carga real
-
-Carga del 2026-10-04 con los equipos de WikiDex de la fase 5: las 9 comprobaciones
-superadas, 26 combates clave (13 por juego, todos automáticos) y 100 Pokémon rivales, leídos de
-13 páginas de WikiDex ([equipos](datos-curados.md#key_battlesyaml)).
-
-Carga con el commit `bc92d3b` y los datos curados de la fase 4: las 9
-comprobaciones superadas. Pueden llegar a Rojo Fuego y Verde Hoja 140 Pokémon
-([detalle](datos-curados.md#arrivalyaml)).
-
-Carga de la fase 3 (solo PokeAPI): todas las comprobaciones superadas, en menos de
-un segundo con la caché llena. 386 especies y formas, 11 juegos, 17 tipos, 803 eficacias
-(225 + 289 + 289), 504 grupos huevo, 1131 tipos por forma y generación, 940 pasos de
-evolución (72 en cada grupo de la 1.ª generación, 122 en la 2.ª y 184 en la 3.ª: uno por
-especie que evoluciona) y 1930 filas de disponibilidad. Informe completo en
-[Ingesta de datos](../05-operacion/ingesta.md#informe).
-
-## Riesgos
-
-| Riesgo | Mitigación |
-|--------|------------|
-| El esquema de los CSV cambia al actualizar el commit fijado. | Validación con pydantic de cada fila; el commit solo cambia mediante PR. |
-| Las plantillas de WikiDex no son uniformes entre páginas. | La lista curada dice la sección y el rótulo de cada equipo, y lo que no se encuentre hace fallar la carga con un mensaje que dice qué falta. |
-| Las restricciones de llegada de Rubí, Zafiro y Esmeralda no están investigadas. | Se cargan como pendientes y no bloquean Rojo Fuego ni Verde Hoja. |
+Los casos que la aplicación no sabe tratar (métodos de evolución sin catalogar, movimientos por
+nivel, equipos que no están en WikiDex) serán **bloqueos** de la carga, no errores
+([ADR-0008](../03-adr/0008-cargas-bloqueadas.md), pendiente en #78).

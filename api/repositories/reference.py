@@ -1,5 +1,5 @@
 """Reads of reference.sqlite: forms, their current types, the target games and what a game's
-context needs (docs/02-ddt/plan-api.md, "Construcción del GameContext")."""
+context needs (docs/02-ddt/modelo-datos.md, "Contexto del motor")."""
 
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass

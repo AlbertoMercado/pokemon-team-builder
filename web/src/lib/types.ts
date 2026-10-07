@@ -1,6 +1,6 @@
 /**
  * Names in Spanish and colours of the 18 types. The API sends types as identifiers (`fire`);
- * they are fixed, so the web keeps them (docs/02-ddt/plan-web.md).
+ * they are fixed, so the web keeps them (docs/02-ddt/web.md).
  */
 
 export interface TypeStyle {

@@ -39,8 +39,7 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Rojo Fuego, Verde Hoja |
 | [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). **Pendiente de implementar.** | `evolution_method` | — |
 
-Rubí, Zafiro y Esmeralda se completan en la fase 6 del
-[plan de carga](plan-carga-datos.md#fases). Mientras tanto, sus datos quedan pendientes.
+Los datos de Rubí, Zafiro y Esmeralda están pendientes (#75, #8).
 
 ### `pokeapi.yaml`
 
@@ -233,8 +232,8 @@ esos no cuentan ([CA-38](../01-ddf/cuestiones-abiertas.md#resueltas)).
 ### `evolution_methods.yaml`
 
 !!! note "Pendiente de implementar"
-    Diseño de la fase 7 del [plan de carga](plan-carga-datos.md#fases). Hasta entonces, la
-    clasificación está en el código de `core/evolution.py` ([motor](motor.md#evoluciones-coreevolutionpy)).
+    Pendiente en #78. Hasta entonces, la clasificación está en el código de
+    `core/evolution.py` ([motor](motor.md#evoluciones-coreevolutionpy)).
 
 **Qué es**: la categoría de cada disparador (`trigger`) y de cada condición de evolución de
 PokeAPI: no tedioso, tedioso con su motivo, o aleatorio

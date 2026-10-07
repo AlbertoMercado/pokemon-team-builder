@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 // In development the API runs apart (uvicorn on port 8000): Vite forwards /api to it, so the
-// web and the API share the origin and need no CORS (docs/02-ddt/plan-web.md).
+// web and the API share the origin and need no CORS (docs/05-operacion/web.md).
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {

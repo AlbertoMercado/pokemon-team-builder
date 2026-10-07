@@ -1,8 +1,8 @@
 """Checks of the first load (CA-11): expected counts and known cases.
 
 They run on the freshly built database, before it replaces the previous one. A failed check
-means the data is not what the data load plan expects (for example, because the PokeAPI
-schema changed), so the load is rejected. See docs/02-ddt/plan-carga-datos.md, section
+means the data is not what the load design expects (for example, because the PokeAPI
+schema changed), so the load is rejected. See docs/02-ddt/carga-datos.md, section
 "Comprobaciones de la carga".
 """
 

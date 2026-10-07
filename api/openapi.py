@@ -4,7 +4,7 @@
 
 Writes the contract as JSON to ``FILE`` (creating its directory) or to the standard output.
 The web generates its typed client from it with ``npm run api:generate`` (ADR-0007,
-docs/02-ddt/plan-web.md). Building the contract does not open any database.
+docs/05-operacion/web.md). Building the contract does not open any database.
 """
 
 import json

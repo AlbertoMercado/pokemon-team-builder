@@ -4,11 +4,6 @@ Cómo se arranca la API, dónde guarda sus datos y cómo evoluciona `user.sqlite
 endpoint está en la [API](../02-ddt/api.md); cómo se usa, en el
 [manual de usuario](../04-manual-usuario/api.md).
 
-!!! note "Estado"
-    Completa: todas las fases del [plan de la API](../02-ddt/plan-api.md#fases) y, desde la
-    fase 8 del [plan de la web](../02-ddt/plan-web.md#fases), sirve también la web compilada
-    en un solo proceso ([detalle](web.md#un-solo-proceso)).
-
 ## Arrancar
 
 ```bash
@@ -39,7 +34,7 @@ PTB_DATA_DIR=/ruta/a/otros-datos uv run uvicorn api.main:app
 - **Después de volver a cargar los datos**, hay que reiniciar la API: las conexiones abiertas
   siguen leyendo el fichero anterior ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md))
   y los datos de referencia de cada juego se guardan en memoria la primera vez que se usan
-  ([plan de la API](../02-ddt/plan-api.md#construccion-del-gamecontext)).
+  ([contexto del motor](../02-ddt/modelo-datos.md#contexto-del-motor-gamecontext)).
   `GET /api/meta` dice con qué carga está trabajando.
 
 ## Base de datos del usuario (`user.sqlite`)

@@ -23,7 +23,3 @@ el equipo.
 
 Las sugerencias para completar un equipo incompleto pueden depender de datos que no has
 confirmado. En ese caso aparecen marcadas como «sin verificar».
-
-!!! note "Pendiente"
-    La guía de la web se completa a medida que se añaden sus pantallas
-    ([plan de la web](../02-ddt/plan-web.md#fases)).

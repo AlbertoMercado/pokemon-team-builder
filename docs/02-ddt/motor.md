@@ -1,16 +1,8 @@
 # Motor de reglas (`core/`)
 
-Qué hay implementado en `core/`, el dominio puro que aplica las reglas de negocio y genera los
-equipos, y cómo se usa. El plan completo, con las fases y la interpretación de cada regla,
-está en el [plan de implementación del motor](plan-motor.md).
-
-!!! note "Estado"
-    Motor completo (fases 1 a 6): modelos del dominio, tabla de tipos, catálogo de reglas con
-    la configuración del usuario, filtros por candidato, dificultad de las evoluciones, reglas
-    blandas y puntuación, reglas de equipo, `generate()` con el equipo incompleto, sus
-    sugerencias y la agrupación de empates, y la revisión de los datos sin verificar (RN-18).
-    La API construye el `GameContext` desde las bases de datos (fase 3 del
-    [plan de la API](plan-api.md#fases)).
+Cómo está hecho `core/`, el dominio puro que aplica las reglas de negocio y genera los
+equipos, y cómo se usa. Cómo se planificó, con la interpretación de cada regla, está en el
+[historial](../06-historial/plan-motor.md).
 
 ## Restricciones
 

@@ -23,3 +23,4 @@ flowchart LR
 - [Decisiones de arquitectura (ADR)](03-adr/index.md)
 - [Manual de usuario](04-manual-usuario/index.md)
 - [Operación](05-operacion/index.md)
+- [Historial](06-historial/index.md): planes ya ejecutados, que no se mantienen

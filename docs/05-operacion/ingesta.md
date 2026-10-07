@@ -116,11 +116,11 @@ flowchart TD
 1. **Lectura**: cada fuente lee sus datos. La de PokeAPI descarga los CSV que falten en la
    caché y valida cada fila con pydantic: si falta una columna, un valor no tiene el tipo
    esperado o aparece una condición de evolución desconocida, la carga falla
-   ([validación](../02-ddt/plan-carga-datos.md#ficheros-que-se-usan)).
+   ([validación](../02-ddt/carga-datos.md#ficheros-que-se-usan)).
 2. **Transformación**: aplica el alcance de la carga (`ingest/scope.py`,
    [CA-11](../01-ddf/cuestiones-abiertas.md#resueltas)) y resuelve los datos de cada
    generación (tipos, eficacias, evoluciones). Las reglas están en el
-   [plan de carga](../02-ddt/plan-carga-datos.md#revision-del-volcado-de-pokeapi).
+   [plan de carga](../02-ddt/carga-datos.md#como-se-interpreta-el-volcado-de-pokeapi).
 3. **Fichero temporal**: crea `reference.sqlite.tmp` junto al destino, con todas las tablas
    del [modelo de datos](../02-ddt/modelo-datos.md). Si quedaba un temporal de una ejecución
    interrumpida, lo borra antes.
@@ -134,7 +134,7 @@ flowchart TD
    Después, cada forma recibe la ruta de su [imagen](#imagenes-de-los-pokemon), de la caché o
    descargándola. Las que no tienen imagen son avisos, no errores.
 6. **Comprobaciones de la carga** (`ingest/checks.py`): cantidades esperadas y casos
-   conocidos de la primera carga ([detalle](../02-ddt/plan-carga-datos.md#comprobaciones-de-la-carga)).
+   conocidos de la primera carga ([detalle](../02-ddt/carga-datos.md#comprobaciones-de-la-carga)).
    Si alguna falla, la carga se rechaza.
 7. **Datos del usuario** (`ingest/user_keys.py`): si existe `user.sqlite` en el directorio de
    datos, comprueba que lo que usa sigue existiendo en la nueva base de datos

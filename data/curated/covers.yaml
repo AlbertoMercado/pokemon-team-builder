@@ -2,7 +2,7 @@
 # Esquema y significado: docs/02-ddt/datos-curados.md.
 #
 # Es la carátula que muestra la ficha del artículo de cada juego en WikiDex, revisada el
-# 2026-10-06 (docs/02-ddt/plan-portadas.md). WikiDex las declara de uso legítimo solo en sus
+# 2026-10-06 (docs/06-historial/plan-portadas.md). WikiDex las declara de uso legítimo solo en sus
 # artículos: la aplicación las usa en privado y se pueden quitar con --no-covers.
 # Un juego sin entrada se carga sin portada.
 covers:

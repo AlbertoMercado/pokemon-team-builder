@@ -1,9 +1,14 @@
 # Plan de implementación de la API (`api/`)
 
+!!! warning "Histórico: no se mantiene"
+    Este plan ya se ejecutó y se conserva como historial de cómo y por qué se hizo. No se
+    actualiza: lo vigente sobre la API está en [su documentación](../02-ddt/api.md) y lo pendiente, en las
+    [issues](https://github.com/AlbertoMercado/pokemon-team-builder/issues).
+
 Plan para implementar `api/`, la capa de aplicación HTTP: `user.sqlite`, la construcción del
-`GameContext` a partir de las dos bases de datos y los endpoints de la [API](api.md). Parte de
-la [arquitectura](arquitectura.md#api-capa-de-aplicacion), del
-[modelo de datos](modelo-datos.md), del [motor](motor.md), ya completo, y de los requisitos
+`GameContext` a partir de las dos bases de datos y los endpoints de la [API](../02-ddt/api.md). Parte de
+la [arquitectura](../02-ddt/arquitectura.md#api-capa-de-aplicacion), del
+[modelo de datos](../02-ddt/modelo-datos.md), del [motor](../02-ddt/motor.md), ya completo, y de los requisitos
 del [DDF](../01-ddf/requisitos-funcionales.md).
 
 ## Alcance
@@ -29,7 +34,7 @@ la carga.
 
 ## Principios
 
-- **Tres capas** ([arquitectura](arquitectura.md#api-capa-de-aplicacion)): `routers/` (HTTP,
+- **Tres capas** ([arquitectura](../02-ddt/arquitectura.md#api-capa-de-aplicacion)): `routers/` (HTTP,
   validación y códigos de estado), `services/` (casos de uso: construir el contexto, llamar a
   `core/` y traducir el resultado) y `repositories/` (acceso a `db/`). Los routers no tocan la
   base de datos y los repositorios no conocen `core/`.
@@ -39,8 +44,8 @@ la carga.
   un cálculo que no se guarda.
 - **Esquemas explícitos**: cada endpoint declara sus modelos pydantic de entrada y salida, para
   que el OpenAPI sea completo y el cliente de la web se genere sin ajustes.
-- **Documentado en el mismo PR**: cada fase actualiza la [API](api.md), el
-  [modelo de datos](modelo-datos.md), Operación, el **manual de usuario** (guía de la API) y la
+- **Documentado en el mismo PR**: cada fase actualiza la [API](../02-ddt/api.md), el
+  [modelo de datos](../02-ddt/modelo-datos.md), Operación, el **manual de usuario** (guía de la API) y la
   tabla de comandos de `CLAUDE.md`.
 
 ## Decisiones tomadas al planificar
@@ -76,7 +81,7 @@ la carga.
 
 ### `user.sqlite`
 
-Las tablas del [modelo de datos](modelo-datos.md#base-de-datos-del-usuario-usersqlite), en
+Las tablas del [modelo de datos](../02-ddt/modelo-datos.md#base-de-datos-del-usuario-usersqlite), en
 `db/user/` con SQLModel, y sus migraciones con Alembic en `db/user/migrations/`. Ajustes que se
 fijan en la fase 1:
 
@@ -125,7 +130,7 @@ usa la propuesta; si es pendiente, se trata como posible y va marcado.
    enteros (mayor resto), huecos con sus sugerencias, descartes con su motivo, reglas de
    presencia y datos confirmados usados.
 
-El esquema de la respuesta está en la [API](api.md#generacion).
+El esquema de la respuesta está en la [API](../02-ddt/api.md#generacion).
 
 ### Decisiones tomadas al implementar la fase 3
 

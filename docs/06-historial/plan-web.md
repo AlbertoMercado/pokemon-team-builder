@@ -1,8 +1,13 @@
 # Plan de implementación de la web (`web/`)
 
+!!! warning "Histórico: no se mantiene"
+    Este plan ya se ejecutó y se conserva como historial de cómo y por qué se hizo. No se
+    actualiza: lo vigente sobre la web está en [su documentación](../02-ddt/web.md) y lo pendiente, en las
+    [issues](https://github.com/AlbertoMercado/pokemon-team-builder/issues).
+
 Plan para implementar `web/`, la interfaz de la aplicación: una aplicación de una sola página
 con React, Vite, TypeScript y Tailwind ([ADR-0001](../03-adr/0001-stack-tecnologico.md)) sobre
-la [API](api.md), ya completa. Parte de la [arquitectura](arquitectura.md#web-interfaz) y de
+la [API](../02-ddt/api.md), ya completa. Parte de la [arquitectura](../02-ddt/arquitectura.md#web-interfaz) y de
 los requisitos del [DDF](../01-ddf/requisitos-funcionales.md).
 
 ## Alcance
@@ -20,8 +25,8 @@ los requisitos del [DDF](../01-ddf/requisitos-funcionales.md).
 | Resultado: equipos, explicación, descartes y sugerencias | RF-08, RF-09, RF-10 |
 | Selector del equipo: elegir uno de los generados, comprobarlo y registrarlo, o descartarlos. Incluye la comprobación en `core/` y en la API | RF-10, RF-12, CA-53 |
 | *Hall of Fame* | RF-12, RF-13 |
-| La API sirve la web compilada: un solo proceso | [Despliegue](arquitectura.md#despliegue) |
-| Pruebas de extremo a extremo del flujo de nuevo juego | [Estrategia de pruebas](arquitectura.md#estrategia-de-pruebas) |
+| La API sirve la web compilada: un solo proceso | [Despliegue](../02-ddt/arquitectura.md#despliegue) |
+| Pruebas de extremo a extremo del flujo de nuevo juego | [Estrategia de pruebas](../02-ddt/arquitectura.md#estrategia-de-pruebas) |
 
 **Fuera**: lanzar la carga de datos desde la web
 ([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)), reglas definidas por el usuario (RF-14,
@@ -65,7 +70,7 @@ Pokémon y las portadas de los juegos quedan como mejora posterior
 - **Nombres y colores de los tipos en la web**: un diccionario de los 18 tipos con su nombre
   en español y su color. Son fijos y la API los envía como identificadores (`fire`).
 - **Métodos de evolución en texto**: la ficha recibe el disparador y las condiciones de
-  PokeAPI ([API](api.md#catalogo)). La web los convierte en texto («Nivel 25», «Intercambio
+  PokeAPI ([API](../02-ddt/api.md#catalogo)). La web los convierte en texto («Nivel 25», «Intercambio
   llevando Revestimiento metálico», «Amistad alta, de día») con un diccionario de disparadores,
   condiciones y objetos de evolución de las generaciones cargadas. Lo que no conoce se muestra
   con su identificador de PokeAPI, nunca se oculta. Si se cargan más generaciones y el
@@ -109,8 +114,8 @@ resolvieron al planificar:
 
 La web no sabe qué equipos cumplen las reglas, así que el selector pide a la API que compruebe
 el equipo elegido. Es un endpoint con su función en `core/`, añadidos en la fase 6
-([motor](motor.md#comprobacion-de-un-equipo-elegido-corerulescheckpy),
-[API](api.md#generacion)):
+([motor](../02-ddt/motor.md#comprobacion-de-un-equipo-elegido-corerulescheckpy),
+[API](../02-ddt/api.md#generacion)):
 
 - **`core.rules.check.check_team(ctx, miembros)`**: devuelve los problemas del equipo con las
   reglas activas, cada uno con su regla, los miembros afectados y una explicación en español.

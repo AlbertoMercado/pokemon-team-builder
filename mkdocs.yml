@@ -29,6 +29,11 @@ theme:
     - search.highlight
     - content.code.copy
 
+# A link to a missing page or section fails the build (--strict in the CI).
+validation:
+  anchors: warn
+  unrecognized_links: warn
+
 hooks:
   - docs/hooks/api_reference.py
 
@@ -75,12 +80,8 @@ nav:
       - Algoritmo de generación: 02-ddt/algoritmo-generacion.md
       - Datos requeridos: 02-ddt/datos-requeridos.md
       - Datos curados: 02-ddt/datos-curados.md
-      - Plan de la primera carga: 02-ddt/plan-carga-datos.md
-      - Plan del motor: 02-ddt/plan-motor.md
-      - Plan de la API: 02-ddt/plan-api.md
-      - Plan de la web: 02-ddt/plan-web.md
-      - Plan de las imágenes: 02-ddt/plan-imagenes.md
-      - Plan de las portadas: 02-ddt/plan-portadas.md
+      - Diseño de la carga: 02-ddt/carga-datos.md
+      - Diseño de la web: 02-ddt/web.md
   - Decisiones (ADR):
       - 03-adr/index.md
       - Plantilla: 03-adr/0000-plantilla.md
@@ -112,3 +113,11 @@ nav:
       - Versiones: 05-operacion/versiones.md
       - Dependencias: 05-operacion/dependencias.md
       - Informes de carga: 05-operacion/informes-carga/index.md
+  - Historial:
+      - 06-historial/index.md
+      - Plan de la primera carga: 06-historial/plan-carga-datos.md
+      - Plan del motor: 06-historial/plan-motor.md
+      - Plan de la API: 06-historial/plan-api.md
+      - Plan de la web: 06-historial/plan-web.md
+      - Plan de las imágenes: 06-historial/plan-imagenes.md
+      - Plan de las portadas: 06-historial/plan-portadas.md
