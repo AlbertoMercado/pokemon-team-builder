@@ -6,18 +6,39 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+## [1.3.0] - 2026-10-07
+
+Nueva regla de presencia RN-21: el equipo lleva un inicial del juego, y solo uno. Si ninguno de
+tus favoritos es inicial, la regla elige uno de los del juego.
+
+**Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`): la base de
+referencia tiene una tabla nueva con los iniciales de cada juego y, hasta repetirla, la API
+responde `503` pidiéndolo.
+
 ### Añadido
 
+- **Reglas**: regla de presencia RN-21, activa por defecto: el equipo incluye un inicial del
+  juego en su evolución final (en Rojo Fuego y Verde Hoja, Venusaur, Charizard o Blastoise), y
+  ningún otro miembro de las líneas de los iniciales. Si ningún inicial es favorito, la regla
+  elige uno del juego, que el resultado marca como «No es favorito», y antes de generar se
+  piden también los datos sin verificar de los iniciales (CA-59 a CA-66, #85, #86, #88).
+- **Datos**: la carga guarda los iniciales de los cinco juegos objetivo, a partir del nuevo
+  fichero curado `data/curated/starters.yaml`, y comprueba que cada uno es una evolución final
+  en su juego (#85, #87).
+- **API**: nuevo estado de presencia `chosen`, cuando una regla pone en el equipo un Pokémon
+  que no es favorito (RN-21, #88).
 - **Documentación**: [referencia de la API](docs/02-ddt/api-referencia.md) generada del contrato
   OpenAPI al construir la documentación, con todos los endpoints, parámetros y campos descritos;
   un test exige que no falte ninguna descripción (ADR-0012, #76).
-- **Reglas**: nueva regla de presencia RN-21, activa por defecto: el equipo incluye un inicial
-  del juego en su evolución final, y solo uno. Si ningún inicial es favorito, la regla elige
-  uno del juego, que el resultado marca como «No es favorito», y antes de generar se piden
-  también los datos sin verificar de los iniciales (#85).
-- **Datos**: la carga guarda los iniciales de cada juego objetivo (#85). Al actualizar hay que
-  repetir la carga de datos (`uv run python -m ingest`): hasta entonces, la API responde `503`
-  pidiéndolo.
+
+### Cambiado
+
+- **Motor**: las reglas de presencia se cumplen por orden (RN-13, RN-14 y RN-21) y, si chocan,
+  solo cede la que no cabe con las anteriores (CA-61, #88).
+- **Resultados**: con RN-21 activa, los equipos recomendados cambian. Con los favoritos del
+  escenario de Rojo Fuego, cada equipo lleva a Venusaur o a Blastoise (#88).
+- **Web**: en la revisión de datos, el grupo «Favoritos» pasa a ser «Favoritos e iniciales del
+  juego» (#88).
 
 ## [1.2.0] - 2026-10-07
 
@@ -160,7 +181,8 @@ Hoja**.
   acceso (RF-19, #52).
 - Restricciones de llegada del resto de juegos (CA-28, #8).
 
-[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.2.0...HEAD
+[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.0.0...v1.1.0
