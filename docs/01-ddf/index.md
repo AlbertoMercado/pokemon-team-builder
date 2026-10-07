@@ -20,7 +20,7 @@ las reglas de negocio (**RN-XX**).
 | 0.12 | 2026-10-07 | Nueva regla de presencia RN-21: un inicial del juego obligatorio, y solo uno (CA-59 a CA-63). Si no hay un inicial favorito, la regla elige uno del juego (CA-65). Se retira la regla candidata «Excluir el inicial» (CA-64). |
 | 0.13 | 2026-10-07 | CA-66: con RN-21 activa, se confirman también los datos sin verificar de los iniciales del juego (RN-18, RF-15). |
 | 0.14 | 2026-10-07 | CA-67: solo se puede elegir como juego objetivo un juego completo, definido en RF-05. Un juego incompleto se carga y no bloquea la carga (modifica CA-46; RF-11, RN-17). |
-| 0.15 | 2026-10-07 | Nueva función: la Pokédex de los juegos superados (RF-20 a RF-24, RN-22 a RN-26, CA-68 a CA-79). Cada juego se registra una sola vez en el *Hall of Fame* y deja de ser juego objetivo (RF-05, RF-12, RF-13). |
+| 0.15 | 2026-10-07 | Nueva función: la Pokédex de los juegos superados (RF-20 a RF-24, RN-22 a RN-26, CA-68 a CA-81). Cada juego se registra una sola vez en el *Hall of Fame* y deja de ser juego objetivo (RF-05, RF-12, RF-13). |
 
 ## Propósito
 

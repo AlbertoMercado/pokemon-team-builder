@@ -82,6 +82,7 @@ nav:
       - Datos curados: 02-ddt/datos-curados.md
       - Diseño de la carga: 02-ddt/carga-datos.md
       - Diseño de la web: 02-ddt/web.md
+      - Plan de la Pokédex: 02-ddt/plan-pokedex.md
   - Decisiones (ADR):
       - 03-adr/index.md
       - Plantilla: 03-adr/0000-plantilla.md
@@ -97,6 +98,7 @@ nav:
       - "0010 · Imágenes de los Pokémon": 03-adr/0010-imagenes-pokemon-cache-local.md
       - "0011 · Portadas de WikiDex de uso privado": 03-adr/0011-portadas-wikidex-uso-privado.md
       - "0012 · Referencia de la API desde OpenAPI": 03-adr/0012-referencia-api-desde-openapi.md
+      - "0013 · Obtención: PokeAPI y datos curados": 03-adr/0013-obtencion-pokeapi-y-curados.md
   - Manual de usuario:
       - 04-manual-usuario/index.md
       - Cargar y actualizar los datos: 04-manual-usuario/cargar-datos.md
