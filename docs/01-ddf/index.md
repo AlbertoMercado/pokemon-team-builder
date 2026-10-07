@@ -17,7 +17,7 @@ las reglas de negocio (**RN-XX**).
 | 0.9 | 2026-10-04 | CA-47: la carga sigue siendo una tarea manual del administrador. Si queda bloqueada, genera un informe para el arquitecto, que la resuelve con una nueva versión (RF-11; RF-16 pasa a ser «Informar de las cargas bloqueadas»). |
 | 0.10 | 2026-10-04 | CA-48: si RN-13 y RN-14 no caben juntas, RN-13 tiene prioridad y RN-14 reserva un hueco. CA-49: solo se agrupan los empates si todas sus combinaciones son válidas. CA-50: se dan todas las sugerencias, ordenadas (RN-04, RN-08). |
 | 0.11 | 2026-10-04 | CA-51: las puntuaciones se muestran como enteros redondeados que siguen sumando el total (RF-09). |
-| 0.12 | 2026-10-07 | Nueva regla de presencia RN-21: un inicial del juego obligatorio, y solo uno (CA-59 a CA-63). Se retira la regla candidata «Excluir el inicial» (CA-64). |
+| 0.12 | 2026-10-07 | Nueva regla de presencia RN-21: un inicial del juego obligatorio, y solo uno (CA-59 a CA-63). Si no hay un inicial favorito, la regla elige uno del juego (CA-65). Se retira la regla candidata «Excluir el inicial» (CA-64). |
 
 ## Propósito
 

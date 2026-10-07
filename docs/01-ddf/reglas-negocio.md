@@ -107,8 +107,12 @@ Siempre están activas.
 - **Tipo**: dura
 - **Descripción**: todos los miembros del equipo pertenecen a la lista de favoritos del usuario.
   Solo hay una lista de favoritos, común a todos los juegos.
-- **Excepción**: cuando el equipo no se puede completar, [RN-08](#rn-08) sugiere Pokémon que no
-  son favoritos. Se muestran como sugerencias, no como miembros del equipo.
+- **Excepciones**:
+    - Cuando el equipo no se puede completar, [RN-08](#rn-08) sugiere Pokémon que no son
+      favoritos. Se muestran como sugerencias, no como miembros del equipo.
+    - Si ningún inicial del juego es un favorito que pueda formar parte del equipo,
+      [RN-21](#rn-21) elige como miembro un inicial que no es favorito
+      ([CA-65](cuestiones-abiertas.md#resueltas)).
 
 ### RN-03 · Solo se eligen Pokémon de la generación y del juego objetivo { #rn-03 }
 
@@ -470,25 +474,38 @@ parámetros son fijos.
   miembro de las líneas de los iniciales del juego, para no gastar los demás iniciales de cara
   a los otros juegos de la misma generación ([RN-16](#rn-16)). Por ejemplo, Charizard y
   Wartortle no pueden estar juntos.
-- **Niveles**: como en [RN-14](#rn-14):
-    1. Hay algún inicial entre los candidatos válidos: uno de ellos forma parte del equipo.
-       Cuál se decide por puntuación ([RN-04](#rn-04)).
-    2. Si no, alguno se puede sugerir: se reserva un hueco y se sugieren ([RN-08](#rn-08)).
+- **No hace falta que sea favorito** ([CA-65](cuestiones-abiertas.md#resueltas)): a
+  diferencia de [RN-13](#rn-13) y [RN-14](#rn-14), si ningún inicial favorito puede formar
+  parte del equipo, la regla no reserva un hueco con sugerencias, sino que elige ella misma
+  uno de los iniciales del juego como miembro del equipo. Es una excepción a
+  [RN-02](#rn-02). Ese inicial pasa los mismos filtros que los favoritos
+  ([RN-03](#rn-03), [RN-11](#rn-11), [RN-16](#rn-16)), y el resultado indica que no es
+  favorito.
+- **Niveles**:
+    1. Hay algún inicial entre los candidatos válidos (favoritos): uno de ellos forma parte
+       del equipo. Cuál se decide por puntuación ([RN-04](#rn-04)).
+    2. Si no, alguno de los demás iniciales del juego pasa los filtros por candidato: uno de
+       ellos forma parte del equipo, aunque no sea favorito. Cuál se decide también por
+       puntuación.
     3. Si tampoco, la regla no se puede cumplir y se explica el motivo.
 - **Prioridad**: igual que en [RN-13](#rn-13), tiene prioridad sobre el tamaño del equipo.
 - **Junto con [RN-13](#rn-13) y [RN-14](#rn-14)** ([CA-61](cuestiones-abiertas.md#resueltas)):
-  si ningún inicial candidato cabe en un equipo con los candidatos que cumplen RN-13 y RN-14,
-  ellas tienen prioridad. Esos iniciales se descartan y la regla pasa al nivel 2: se reserva un
-  hueco para los demás iniciales del juego que encajan.
+  si ningún inicial favorito cabe en un equipo con los candidatos que cumplen RN-13 y RN-14,
+  ellas tienen prioridad. Esos iniciales se descartan y la regla pasa al nivel 2: elige entre
+  los demás iniciales del juego que encajan.
 - **Recorrido** ([CA-62](cuestiones-abiertas.md#resueltas)): el inicial usado queda excluido
-  como cualquier otro Pokémon ([RN-16](#rn-16)), así que la regla elige entre los demás.
+  como cualquier otro Pokémon ([RN-16](#rn-16)), así que la regla elige entre los demás, sean
+  favoritos o no.
 - **Ejemplos**:
     - En Rojo Fuego, con Venusaur, Charizard y Blastoise en favoritos, el equipo incluye uno
       solo: el que dé mayor puntuación al equipo.
+    - En Rojo Fuego, sin ningún inicial en favoritos, el equipo incluye a Venusaur, Charizard
+      o Blastoise: el que dé mayor puntuación al equipo.
     - Si en Rojo Fuego se usó Venusaur, en Verde Hoja se elige entre Charizard y Blastoise.
     - En Rojo Fuego, con Dragonite (Dragón/Volador) y Charizard (Fuego/Volador) como únicos
       candidatos de RN-13 y RN-21, que comparten tipo ([RN-12](#rn-12)), RN-13 tiene
-      prioridad: se descarta Charizard y se sugieren Venusaur o Blastoise.
+      prioridad: se descarta Charizard y el equipo incluye a Venusaur o a Blastoise, aunque no
+      sean favoritos.
     - Lo mismo con Flareon y Charizard, que comparten el tipo Fuego: RN-14 tiene prioridad.
 
 ## Mecanismos
