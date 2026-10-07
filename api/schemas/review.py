@@ -60,7 +60,7 @@ class ReviewFactOut(BaseModel):
 
 
 class ReviewOut(BaseModel):
-    game: str
+    game: str = Field(description="Identificador del juego.")
     pending: int = Field(description="Datos que faltan por confirmar; con 0 se puede generar.")
     facts: list[ReviewFactOut] = Field(
         description="Los datos inferidos o pendientes que intervienen en la generación: primero "

@@ -17,7 +17,7 @@ cabecera ([cómo se documenta](documentacion.md#el-readme-de-un-directorio)).
 | `web/` | Frontend React ([web](../05-operacion/web.md)). | [`web/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/web/README.md) |
 | `data/` | Datos curados (en git) y generados (fuera de git) ([datos curados](datos-curados.md)). | [`data/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/data/README.md) |
 | `tests/` | Tests de Python ([estrategia de pruebas](arquitectura.md#estrategia-de-pruebas)). | [`tests/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/tests/README.md) |
-| `docs/` | Documentación MkDocs ([cómo se documenta](documentacion.md)). | [Inicio](../index.md) |
+| `docs/` | Documentación MkDocs ([cómo se documenta](documentacion.md)); `docs/hooks/`, los *hooks* que la generan en parte. | [Inicio](../index.md) |
 | `.claude/` | Skills de Claude Code del proyecto: [publicar una versión](../05-operacion/versiones.md#publicar-una-version). | — |
 
 ## Reglas de dependencia

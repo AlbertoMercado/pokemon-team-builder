@@ -6,6 +6,12 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+### Añadido
+
+- **Documentación**: [referencia de la API](docs/02-ddt/api-referencia.md) generada del contrato
+  OpenAPI al construir la documentación, con todos los endpoints, parámetros y campos descritos;
+  un test exige que no falte ninguna descripción (ADR-0012, #76).
+
 ## [1.2.0] - 2026-10-07
 
 Portadas de los juegos (RF-18): cada juego se ve con su portada junto al nombre, y cada combate

@@ -38,8 +38,8 @@ class EvolutionMethodOut(BaseModel):
 
 
 class EvolutionOut(BaseModel):
-    from_pokemon: str
-    to_pokemon: str
+    from_pokemon: str = Field(description="Forma que evoluciona.")
+    to_pokemon: str = Field(description="Forma a la que evoluciona.")
     version_group: str = Field(
         description="Grupo de versiones más reciente con datos de esta evolución."
     )
@@ -54,9 +54,9 @@ class PokemonDetailOut(CatalogPokemonOut):
         "(`/api/pokemon/{pokemon}/artwork`); nula si la forma no tiene."
     )
     generation: int = Field(description="Generación en que apareció la especie.")
-    species: str
-    is_legendary: bool
-    is_mythical: bool
+    species: str = Field(description="Especie de la forma: la misma para sus formas regionales.")
+    is_legendary: bool = Field(description="Si la especie es legendaria.")
+    is_mythical: bool = Field(description="Si la especie es singular.")
     line: list[LineMemberOut] = Field(
         description="La línea evolutiva completa, con todas sus formas, por etapa y número."
     )

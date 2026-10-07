@@ -16,3 +16,4 @@ Cada decisión de arquitectura relevante se registra como un ADR numerado a part
 | [0009](0009-despliegue-vm-gratuita-tailscale.md) | Despliegue en una máquina virtual gratuita con acceso privado por Tailscale | Propuesto |
 | [0010](0010-imagenes-pokemon-cache-local.md) | Imágenes de los Pokémon: sprites de PokeAPI en la caché local, servidos por la API | Aceptado |
 | [0011](0011-portadas-wikidex-uso-privado.md) | Portadas de los juegos: carátulas de WikiDex, solo para uso privado | Aceptado |
+| [0012](0012-referencia-api-desde-openapi.md) | Referencia de la API generada desde OpenAPI con un hook de MkDocs | Aceptado |

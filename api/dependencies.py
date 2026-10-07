@@ -1,10 +1,12 @@
-"""Dependencies shared by the routers: the database sessions, the data directory and the
-cache of game data."""
+"""Dependencies shared by the routers: the database sessions, the data directory, the cache of
+game data and the path parameters used by several routers, with their description for the
+OpenAPI contract (the reference of the API, ADR-0012)."""
 
 from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, Request
+from fastapi import Path as PathParam
 from sqlmodel import Session
 
 from api.database import databases, reference_session, user_session
@@ -12,6 +14,10 @@ from api.services.context import GameReference, GameReferences
 
 UserDb = Annotated[Session, Depends(user_session)]
 ReferenceDb = Annotated[Session, Depends(reference_session)]
+PokemonSlug = Annotated[
+    str, PathParam(description="Identificador de la forma, p. ej. `vulpix-alola` (RN-05).")
+]
+GameSlug = Annotated[str, PathParam(description="Identificador del juego, p. ej. `firered`.")]
 
 
 def data_dir(request: Request) -> Path:
@@ -29,7 +35,7 @@ def game_references(request: Request) -> GameReferences:
 
 
 def target_game(
-    game: str,
+    game: GameSlug,
     reference: ReferenceDb,
     references: Annotated[GameReferences, Depends(game_references)],
 ) -> GameReference:
