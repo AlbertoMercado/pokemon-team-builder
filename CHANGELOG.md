@@ -6,6 +6,15 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+### Cambiado
+
+- **Hall of Fame**: cada juego se registra una sola vez. Un juego registrado deja de aparecer en
+  **Nuevo juego** y en el formulario del *Hall of Fame*, y la API responde `409` si se intenta
+  revisar, generar o registrar otra vez. Tras registrar un equipo desde el resultado, ya no se
+  vuelve a generar. Para volver a jugar un juego, se elimina antes su registro (CA-68, #94).
+  Al actualizar, si algún juego estuviera registrado más de una vez, la aplicación no arranca y
+  dice cuál: elimina con la versión anterior los registros que sobren.
+
 ### Añadido
 
 - **Arranque**: `scripts/start.sh` prepara y arranca la aplicación en un solo comando: copia

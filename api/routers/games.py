@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from sqlmodel import Session
 
 from api.database import reference_session
-from api.dependencies import DataDir, GameSlug, ReferenceDb
+from api.dependencies import DataDir, GameSlug, ReferenceDb, UserDb
 from api.schemas.games import GameOut
 from api.services import games as service
 from api.services import images
@@ -19,6 +19,7 @@ router = APIRouter(prefix="/games", tags=["Juegos"])
 @router.get("", summary="Juegos objetivo")
 def list_games(
     reference: Annotated[Session, Depends(reference_session)],
+    user: UserDb,
     every: Annotated[
         bool,
         Query(
@@ -29,10 +30,11 @@ def list_games(
     ] = False,
 ) -> list[GameOut]:
     """Los juegos que se pueden elegir como objetivo, en orden de lanzamiento: los juegos
-    completos, que permiten la crianza y tienen todos los datos que necesitan las reglas
-    (RF-05). Con `all=true`, todos los juegos cargados; `target` dice cuáles pueden ser juego
-    objetivo."""
-    return service.list_games(reference, every=every)
+    completos, que permiten la crianza y tienen todos los datos que necesitan las reglas, y que
+    no están ya registrados en el *Hall of Fame* (RF-05, CA-68). Con `all=true`, todos los
+    juegos cargados; `target` dice cuáles pueden ser juego objetivo y `completed`, cuáles ya
+    están registrados."""
+    return service.list_games(reference, user, every=every)
 
 
 @router.get(

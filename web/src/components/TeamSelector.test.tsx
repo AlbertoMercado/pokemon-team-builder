@@ -1,7 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { renderApp } from "../test/render";
+import { currentLocation, renderApp } from "../test/render";
 import { addFavorite, confirmAll, generationCalls, requests } from "../test/server";
 
 const RESULT = "/juego/firered/resultado";
@@ -46,10 +46,16 @@ describe("Selector del equipo (RF-12, CA-53)", () => {
         members,
       },
     ]);
-    // Recorded: the journey changes the next generation (RN-16), so it is generated again.
+    // Recorded: the game is completed (CA-68). Asking again answers 409, which does not lead
+    // to the review, and the teams are no longer shown.
     await vi.waitFor(() => {
       expect(generationCalls.count).toBe(2);
     });
+    expect(done).toHaveTextContent("Rojo Fuego queda completado: ya no aparece en Nuevo juego");
+    await vi.waitFor(() => {
+      expect(screen.queryByRole("region", { name: "Equipo recomendado" })).not.toBeInTheDocument();
+    });
+    expect(currentLocation()).toBe(RESULT);
     expect(screen.queryByRole("region", { name: "Elegir el equipo" })).not.toBeInTheDocument();
   });
 

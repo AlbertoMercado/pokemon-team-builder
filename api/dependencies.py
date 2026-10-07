@@ -10,6 +10,9 @@ from fastapi import Path as PathParam
 from sqlmodel import Session
 
 from api.database import databases, reference_session, user_session
+from api.errors import ConflictError
+from api.repositories import reference as reference_repo
+from api.repositories import user as user_repo
 from api.services.context import GameReference, GameReferences
 
 UserDb = Annotated[Session, Depends(user_session)]
@@ -34,12 +37,26 @@ def game_references(request: Request) -> GameReferences:
     return found
 
 
+COMPLETED_GAME_MESSAGE = (
+    "{name} ya está registrado en el Hall of Fame: cada juego se completa una sola vez. Para "
+    "volver a jugarlo, elimina antes su registro"
+)
+
+
 def target_game(
     game: GameSlug,
     reference: ReferenceDb,
+    user: UserDb,
     references: Annotated[GameReferences, Depends(game_references)],
 ) -> GameReference:
-    """The reference data of the path's ``{game}``: ``404`` if it is not a target game."""
+    """The reference data of the path's ``{game}``: ``404`` if it is not a target game and
+    ``409`` if it is already recorded in the Hall of Fame (CA-68)."""
+    target = reference_repo.target_game(reference, game)
+    entry = user_repo.completed_games(user).get(game)
+    if target is not None and entry is not None:
+        raise ConflictError(
+            COMPLETED_GAME_MESSAGE.format(name=target.name_es), {"hall_of_fame_entry": entry}
+        )
     return references.get(reference, game)
 
 

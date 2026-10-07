@@ -31,8 +31,8 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
   it("shows the journey with the team and the last completed game", async () => {
     renderApp("/hall-of-fame");
 
-    expect(await journey()).toEqual(["Rojo Fuego, 20 de septiembre de 2026"]);
-    const entry = within(screen.getByRole("listitem", { name: /Rojo Fuego/ }));
+    expect(await journey()).toEqual(["Verde Hoja, 20 de septiembre de 2026"]);
+    const entry = within(screen.getByRole("listitem", { name: /Verde Hoja/ }));
     expect(entry.getByText("Último juego completado")).toBeVisible();
     const team = entry.getByRole("list", { name: "Equipo" });
     expect(within(team).getByText("Lapras")).toBeVisible();
@@ -43,7 +43,7 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
     renderApp("/hall-of-fame");
     await journey();
 
-    const team = within(screen.getByRole("listitem", { name: /Rojo Fuego/ })).getByRole("list", {
+    const team = within(screen.getByRole("listitem", { name: /Verde Hoja/ })).getByRole("list", {
       name: "Equipo",
     });
     const images = Array.from(team.querySelectorAll("img")).map((image) =>
@@ -63,7 +63,7 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
     await vi.waitFor(async () => {
       expect(await journey()).toEqual([
         "Rojo, 15 de enero de 2026",
-        "Rojo Fuego, 20 de septiembre de 2026",
+        "Verde Hoja, 20 de septiembre de 2026",
       ]);
     });
     const red = within(screen.getByRole("listitem", { name: /^Rojo, / }));
@@ -71,11 +71,24 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
     expect(red.queryByText("Último juego completado")).toBeNull();
   });
 
+  it("does not offer a game already recorded: each game is recorded once (CA-68)", async () => {
+    renderApp("/hall-of-fame");
+    await journey();
+
+    await userEvent.click(screen.getByRole("button", { name: "Registrar un equipo" }));
+    const form = within(screen.getByRole("form", { name: "Registrar un equipo" }));
+    const options = within(form.getByRole("combobox", { name: "Juego" }))
+      .getAllByRole("option")
+      .map((option) => option.textContent);
+    expect(options).toContain("Rojo Fuego");
+    expect(options).not.toContain("Verde Hoja");
+  });
+
   it("asks for 1 to 6 Pokémon before saving", async () => {
     renderApp("/hall-of-fame");
     await journey();
 
-    const form = await record("Verde Hoja", "2026-10-01");
+    const form = await record("Rojo Fuego", "2026-10-01");
     const save = form.getByRole("button", { name: "Guardar" });
     expect(save).toBeDisabled();
     expect(form.getByText("Añade de 1 a 6 Pokémon.")).toBeVisible();
@@ -95,16 +108,16 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
   it("correcting the date reorders the journey and moves the last game", async () => {
     renderApp("/hall-of-fame");
     await journey();
-    const form = await record("Verde Hoja", "2026-10-01", "Gengar");
+    const form = await record("Rojo Fuego", "2026-10-01", "Gengar");
     await userEvent.click(form.getByRole("button", { name: "Guardar" }));
     await vi.waitFor(async () => {
       expect(await journey()).toHaveLength(2);
     });
-    const leafgreen = within(screen.getByRole("listitem", { name: /Verde Hoja/ }));
-    expect(leafgreen.getByText("Último juego completado")).toBeVisible();
+    const firered = within(screen.getByRole("listitem", { name: /Rojo Fuego/ }));
+    expect(firered.getByText("Último juego completado")).toBeVisible();
 
-    await userEvent.click(leafgreen.getByRole("button", { name: "Corregir" }));
-    const edit = within(screen.getByRole("form", { name: /Corregir: Verde Hoja/ }));
+    await userEvent.click(firered.getByRole("button", { name: "Corregir" }));
+    const edit = within(screen.getByRole("form", { name: /Corregir: Rojo Fuego/ }));
     const date = edit.getByLabelText("Fecha");
     await userEvent.clear(date);
     await userEvent.type(date, "2026-03-01");
@@ -112,12 +125,12 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
 
     await vi.waitFor(async () => {
       expect(await journey()).toEqual([
-        "Verde Hoja, 1 de marzo de 2026",
-        "Rojo Fuego, 20 de septiembre de 2026",
+        "Rojo Fuego, 1 de marzo de 2026",
+        "Verde Hoja, 20 de septiembre de 2026",
       ]);
     });
     expect(
-      within(screen.getByRole("listitem", { name: /Rojo Fuego/ })).getByText(
+      within(screen.getByRole("listitem", { name: /Verde Hoja/ })).getByText(
         "Último juego completado",
       ),
     ).toBeVisible();
@@ -125,12 +138,12 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
 
   it("removes an entry only after confirming", async () => {
     renderApp("/hall-of-fame");
-    const entry = within(await screen.findByRole("listitem", { name: /Rojo Fuego/ }));
+    const entry = within(await screen.findByRole("listitem", { name: /Verde Hoja/ }));
 
     await userEvent.click(entry.getByRole("button", { name: "Eliminar" }));
     const confirm = within(entry.getByRole("alertdialog", { name: "Confirmar la eliminación" }));
     await userEvent.click(confirm.getByRole("button", { name: "Cancelar" }));
-    expect(screen.getByRole("listitem", { name: /Rojo Fuego/ })).toBeVisible();
+    expect(screen.getByRole("listitem", { name: /Verde Hoja/ })).toBeVisible();
 
     await userEvent.click(entry.getByRole("button", { name: "Eliminar" }));
     await userEvent.click(entry.getByRole("button", { name: "Sí, eliminar" }));
@@ -143,9 +156,9 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
     renderApp("/hall-of-fame");
     await journey();
 
-    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Juego" }), "Verde Hoja");
+    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Juego" }), "Rojo Fuego");
 
-    expect(currentLocation()).toBe("/hall-of-fame?game=leafgreen");
+    expect(currentLocation()).toBe("/hall-of-fame?game=firered");
     expect(await screen.findByText("No hay ningún registro de este juego.")).toBeVisible();
   });
 
@@ -189,7 +202,7 @@ describe("Portadas en el Hall of Fame (RF-18)", () => {
     await screen.findByRole("listitem", { name: /^Rojo, / });
 
     expect(entryCover(/^Rojo,/)).toBe("/api/games/red/cover");
-    expect(entryCover(/Rojo Fuego/)).toBe("/api/games/firered/cover");
+    expect(entryCover(/Verde Hoja/)).toBe("/api/games/leafgreen/cover");
   });
 
   it("shows only the name of the game without cover", async () => {
@@ -197,7 +210,7 @@ describe("Portadas en el Hall of Fame (RF-18)", () => {
     renderApp("/hall-of-fame");
     await journey();
 
-    expect(entryCover(/Rojo Fuego/)).toBeNull();
-    expect(screen.getByRole("heading", { level: 2, name: "Rojo Fuego" })).toBeVisible();
+    expect(entryCover(/Verde Hoja/)).toBeNull();
+    expect(screen.getByRole("heading", { level: 2, name: "Verde Hoja" })).toBeVisible();
   });
 });

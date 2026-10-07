@@ -5,7 +5,12 @@ from typing import Annotated
 from fastapi import APIRouter, Path, Query, Response, status
 
 from api.dependencies import ReferenceDb, UserDb
-from api.schemas.hall_of_fame import HallOfFameEntryIn, HallOfFameEntryOut, HallOfFamePatch
+from api.schemas.hall_of_fame import (
+    COMPLETED_GAME_RESPONSE,
+    HallOfFameEntryIn,
+    HallOfFameEntryOut,
+    HallOfFamePatch,
+)
 from api.services import hall_of_fame as service
 
 router = APIRouter(prefix="/hall-of-fame", tags=["Hall of Fame"])
@@ -24,20 +29,31 @@ def list_entries(
     return service.list_entries(user, reference, game)
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, summary="Registrar un equipo")
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    summary="Registrar un equipo",
+    responses={status.HTTP_409_CONFLICT: COMPLETED_GAME_RESPONSE},
+)
 def add_entry(body: HallOfFameEntryIn, user: UserDb, reference: ReferenceDb) -> HallOfFameEntryOut:
     """Registra el equipo con el que se completó un juego. Guarda los tipos que tenía cada
-    miembro en ese juego. `422` si el juego o algún Pokémon no existen en los datos cargados
-    (o en la generación del juego)."""
+    miembro en ese juego. `409` si el juego ya está registrado: cada juego se registra una
+    sola vez (CA-68). `422` si el juego o algún Pokémon no existen en los datos cargados (o en
+    la generación del juego)."""
     return service.add_entry(user, reference, body)
 
 
-@router.patch("/{entry_id}", summary="Corregir un registro")
+@router.patch(
+    "/{entry_id}",
+    summary="Corregir un registro",
+    responses={status.HTTP_409_CONFLICT: COMPLETED_GAME_RESPONSE},
+)
 def update_entry(
     entry_id: EntryId, change: HallOfFamePatch, user: UserDb, reference: ReferenceDb
 ) -> HallOfFameEntryOut:
     """Cambia el juego, la fecha, las notas o el equipo. Si cambia el juego o el equipo, se
-    vuelven a copiar los tipos. `404` si el registro no existe; `422` como al registrarlo."""
+    vuelven a copiar los tipos. `404` si el registro no existe; `409` si el juego nuevo ya
+    está registrado; `422` como al registrarlo."""
     return service.update_entry(user, reference, entry_id, change)
 
 

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 
 import { currentLocation, renderApp } from "../test/render";
 import {
+  addEntry,
   addFavorite,
   confirmAll,
   generationCalls,
@@ -155,6 +156,16 @@ describe("Resultado", () => {
 });
 
 describe("Resultado con datos pendientes", () => {
+  it("says that a game already in the Hall of Fame cannot be generated again (CA-68)", async () => {
+    addEntry("firered");
+    renderApp(RESULT);
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Rojo Fuego ya está registrado en el Hall of Fame: cada juego se completa una sola vez.",
+    );
+    expect(currentLocation()).toBe(RESULT);
+  });
+
   it("leads to the review when the API answers 409 (RN-18)", async () => {
     renderApp(RESULT);
 

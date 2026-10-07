@@ -118,11 +118,11 @@ Cada fase es un PR desde `main`, con sus tests y su documentación
 | Fase | Rama | Contenido | Pruebas |
 |------|------|-----------|---------|
 | 0 | `docs/plan-pokedex` | Este plan y ADR-0013. | — |
-| 1 | `feat/hall-of-fame-unico` | Un registro por juego: migración (se detiene si hay repetidos), `409` al registrar uno ya registrado, juegos registrados fuera de los objetivos y del registro a mano, aviso al borrar. | Migración con y sin repetidos; API; pantallas. |
+| 1 ✅ | `feat/hall-of-fame-unico` | Un registro por juego: migración (se detiene si hay repetidos), `409` al registrar uno ya registrado, juegos registrados fuera de los objetivos y del registro a mano. | Migración con y sin repetidos; API; pantallas; E2E. |
 | 2 | `feat/pokedex-datos` | Tablas y carga de las Pokédex, las apariciones y los datos curados nuevos; nombres en español que faltan. | Extracto sin red; casos conocidos en las comprobaciones de la carga. |
 | 3 | `feat/pokedex-motor` | `core/pokedex/` con RN-22 a RN-26. | Una prueba por regla (`@pytest.mark.rn`) y un escenario real de Rojo Fuego. |
 | 4 | `feat/pokedex-api` | Tablas de `user.sqlite`, migración y endpoints. | API con la base de prueba. |
-| 5 | `feat/pokedex-web` | Las pantallas, manual y CHANGELOG. | Vitest de cada pantalla y E2E. |
+| 5 | `feat/pokedex-web` | Las pantallas, el aviso al borrar un registro con Pokédex, manual y CHANGELOG. | Vitest de cada pantalla y E2E. |
 | 6 | `chore/release-X.Y.0` | Versión MENOR y cierre de #94. | — |
 
 ## Decisiones tomadas al planificar
@@ -136,6 +136,19 @@ Casos que el DDF no cubría y que salieron al comprobar los datos:
 - **Probabilidad que cambia con la hora** (2.ª generación): cuenta la mayor e indica el momento
   ([CA-81](../01-ddf/cuestiones-abiertas.md#resueltas)). El resto de condiciones (enjambres,
   radio…) se decidirán si aparecen en la fase 3.
+
+### Decisiones tomadas al implementar la fase 1
+
+- **El `409` de un juego ya registrado lleva su registro** (`CompletedGameOut`, con
+  `hall_of_fame_entry`), para distinguirlo del de los datos pendientes: la web lleva a la
+  revisión solo con este último.
+- **Tras registrar desde el resultado ya no se genera otra vez**: el juego queda completado y el
+  resultado lo dice. El E2E comprueba que **Nuevo juego** deja de ofrecerlo.
+- **`GET /api/games?all=true` añade `completed`**, y `target` es falso en un juego completado.
+- **El aviso al borrar un registro pasa a la fase 5**, porque solo tiene sentido cuando haya
+  Pokédex que borrar.
+- **La simulación de la API de la web** aplica la misma regla, y su registro inicial del *Hall
+  of Fame* pasa a ser de Verde Hoja para que Rojo Fuego siga siendo juego objetivo.
 
 ## Riesgos
 

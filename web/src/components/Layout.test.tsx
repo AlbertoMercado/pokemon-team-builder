@@ -72,6 +72,10 @@ describe("Aviso de las portadas (RF-18, ADR-0011)", () => {
         "portada de Rojo Fuego",
         "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Rojo_Fuego.png",
       ],
+      [
+        "portada de Verde Hoja",
+        "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Verde_Hoja.png",
+      ],
     ]);
   });
 
@@ -80,7 +84,7 @@ describe("Aviso de las portadas (RF-18, ADR-0011)", () => {
     renderApp("/");
     await screen.findByRole("heading", { level: 1, name: "Inicio" });
     // Wait until the games have answered: the paragraph would appear then.
-    await screen.findByRole("link", { name: "Rojo Fuego" });
+    await screen.findByRole("link", { name: "Verde Hoja" });
 
     expect(screen.queryByText(/Las portadas de los juegos/)).not.toBeInTheDocument();
   });

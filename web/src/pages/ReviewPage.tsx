@@ -29,7 +29,8 @@ const SECONDARY = `${BUTTON} border-slate-300 bg-white hover:border-red-700`;
 export default function ReviewPage() {
   const { game = "" } = useParams();
   const review = useReview(game);
-  const games = useGames();
+  // Every game: a completed one is no longer a target, but it keeps its name (CA-68).
+  const games = useGames({ all: true });
   const found = games.data?.find((candidate) => candidate.game === game);
   const gameName = found?.name ?? game;
 

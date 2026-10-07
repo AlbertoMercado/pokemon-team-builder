@@ -8,7 +8,7 @@
 import { useState, type ReactNode } from "react";
 import { Link, Navigate, useParams } from "react-router";
 
-import { ApiError } from "../api/client";
+import { ApiError, completedGameEntry } from "../api/client";
 import { useFavorites } from "../api/queries/favorites";
 import { useGames } from "../api/queries/games";
 import { useGeneration } from "../api/queries/generation";
@@ -51,14 +51,17 @@ const CARD = "space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-s
 export default function ResultPage() {
   const { game = "" } = useParams();
   const generation = useGeneration(game);
-  const games = useGames();
+  // Every game: a completed one is no longer a target, but it keeps its name (CA-68).
+  const games = useGames({ all: true });
   const found = games.data?.find((candidate) => candidate.game === game);
   const gameName = found?.name ?? game;
   // What the user did with the selector; it stays while the result is generated again.
   const [registered, setRegistered] = useState<HallOfFameEntry | null>(null);
   const [discarded, setDiscarded] = useState(false);
 
-  if (generation.error instanceof ApiError && generation.error.status === 409) {
+  // A 409 is data to confirm, unless the game is already in the Hall of Fame (CA-68).
+  const completed = completedGameEntry(generation.error) !== undefined;
+  if (generation.error instanceof ApiError && generation.error.status === 409 && !completed) {
     return <Navigate to={`/juego/${game}/revision`} replace />;
   }
 
@@ -94,7 +97,9 @@ export default function ResultPage() {
           </Link>
         </p>
       )}
-      {generation.error !== null ? (
+      {completed ? (
+        registered === null && generation.error !== null && <Completed error={generation.error} />
+      ) : generation.error !== null ? (
         <ErrorMessage error={generation.error} />
       ) : generation.data === undefined ? (
         <p className="text-slate-500">Generando los equipos…</p>
@@ -127,12 +132,24 @@ function Registered({ entry }: { entry: HallOfFameEntry }) {
         {`Equipo registrado en el Hall of Fame: ${entry.game_name}, ${formatDate(entry.completed_on)}.`}
       </p>
       <p className="text-sm text-green-900">
-        {`${entry.members.map((member) => member.name).join(", ")}. Desde ahora, sus líneas quedan excluidas de las próximas generaciones (RN-16), así que el resultado de abajo ya es otro.`}{" "}
+        {`${entry.members.map((member) => member.name).join(", ")}. ${entry.game_name} queda completado: ya no aparece en Nuevo juego, y las líneas de su equipo quedan excluidas de las próximas generaciones (RN-16).`}{" "}
         <Link to="/hall-of-fame" className="underline">
           Ver el Hall of Fame
         </Link>
       </p>
     </div>
+  );
+}
+
+/** The game is already in the Hall of Fame: it cannot be generated again (CA-68). */
+function Completed({ error }: { error: Error }) {
+  return (
+    <p role="status" className="rounded border border-slate-200 bg-white px-3 py-2">
+      {`${error.message}. `}
+      <Link to="/hall-of-fame" className="text-red-700 underline">
+        Ver el Hall of Fame
+      </Link>
+    </p>
   );
 }
 

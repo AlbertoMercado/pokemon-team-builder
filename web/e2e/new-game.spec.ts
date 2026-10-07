@@ -76,14 +76,9 @@ test("a new game from the favourites to the Hall of Fame", async ({ page, reques
     "Equipo registrado en el Hall of Fame: Firered",
   );
 
-  // RN-16: the result is generated again without the lines just used.
-  const used = page.getByRole("region", { name: "Favoritos descartados" });
-  await expect(used.getByRole("heading", { name: "Ya usados en tu recorrido" })).toBeVisible();
-  // The starter used is excluded too: RN-21 chooses among the others (CA-62).
-  await expect(used.getByText(/^Venusaur queda excluido/)).toBeVisible();
-  // The line of Dragonite is never excluded: it is still in the team (RN-16, RN-13).
-  await expect(used.getByText(/^Dragonite/)).toHaveCount(0);
-  await expect(page.getByRole("list", { name: "Posiciones" }).first()).toContainText("Dragonite");
+  // CA-68: Fire Red is completed: it is no longer offered in «Nuevo juego».
+  await expect(page.getByRole("status")).toContainText("Firered queda completado");
+  await expect(page.getByRole("region", { name: "Equipo recomendado" })).toHaveCount(0);
 
   // The Hall of Fame shows the entry as the last completed game.
   await page.getByRole("status").getByRole("link", { name: "Ver el Hall of Fame" }).click();
@@ -92,4 +87,9 @@ test("a new game from the favourites to the Hall of Fame", async ({ page, reques
   await expect(entry.getByText("Prueba E2E")).toBeVisible();
   // Only the members: each one also holds the list of its types.
   await expect(entry.getByRole("list", { name: "Equipo" }).locator(":scope > li")).toHaveCount(6);
+
+  // CA-68: «Nuevo juego» no longer offers Fire Red, only Leaf Green.
+  await page.goto("/juego");
+  await expect(page.getByRole("link", { name: /Leafgreen/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Firered/ })).toHaveCount(0);
 });

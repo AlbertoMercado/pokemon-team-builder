@@ -95,6 +95,12 @@ def hall_of_fame(user: Session) -> list[tuple[HallOfFameEntry, list[HallOfFameMe
     return [(entry, members.get(entry.id or 0, [])) for entry in entries]
 
 
+def completed_games(user: Session) -> dict[str, int]:
+    """The games recorded in the Hall of Fame, with the id of their entry (CA-68)."""
+    entries = user.exec(select(HallOfFameEntry)).all()
+    return {entry.game: entry.id for entry in entries if entry.id is not None}
+
+
 def hall_of_fame_entry(user: Session, entry_id: int) -> HallOfFameEntry | None:
     return user.get(HallOfFameEntry, entry_id)
 

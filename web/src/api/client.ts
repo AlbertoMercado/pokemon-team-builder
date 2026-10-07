@@ -51,6 +51,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+/** The `409` of a game already in the Hall of Fame (CA-68): the id of its entry. */
+export function completedGameEntry(error: unknown): number | undefined {
+  if (!(error instanceof ApiError) || error.status !== 409 || !isRecord(error.detail)) {
+    return undefined;
+  }
+  const entry = error.detail.hall_of_fame_entry;
+  return typeof entry === "number" ? entry : undefined;
+}
+
 /** No reference data loaded (`503`) or no API: the whole application is affected. */
 export function isUnavailable(error: unknown): boolean {
   return error instanceof NetworkError || (error instanceof ApiError && error.status === 503);

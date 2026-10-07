@@ -275,6 +275,11 @@ curl -X DELETE http://127.0.0.1:8000/api/hall-of-fame/1
 
 - Puedes registrar cualquier juego cargado, aunque no se pueda elegir como juego objetivo
   (por ejemplo, Rojo o Oro).
+- Cada juego se registra **una sola vez**: registrar otra vez el mismo responde `409`, con el
+  registro que ya tiene en `detail.hall_of_fame_entry`. Desde ese momento el juego deja de
+  aparecer en `GET /api/games` (en `?all=true` sale con `completed: true`), y su revisión y su
+  generación también responden `409`. Para volver a jugarlo, elimina antes su registro
+  ([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - El equipo tiene de 1 a 6 Pokémon. Usa la forma concreta: `vulpix-alola` para Vulpix de Alola.
 - Se guardan los tipos que tenía cada Pokémon **en ese juego** (Magneton era solo Eléctrico en
   Rojo).
@@ -300,5 +305,6 @@ curl -X DELETE http://127.0.0.1:8000/api/hall-of-fame/1
 | `409` al confirmar un dato | El dato se cargó sin ambigüedad (automático): no se revisa. | Nada. |
 | `422` al registrar en el *Hall of Fame* | El juego o algún Pokémon no existen en los datos cargados, o el Pokémon no existía en la generación de ese juego (Treecko en Rojo). El equipo tiene que tener de 1 a 6. | Revisa los identificadores y el juego. |
 | `409` al generar | Quedan datos sin confirmar. | Confírmalos con la revisión; `detail.pending` dice cuáles. |
+| `409` al revisar, generar o registrar un juego | Ya está registrado en el *Hall of Fame*: cada juego se registra una sola vez. | Elimina su registro si quieres volver a jugarlo; `detail.hall_of_fame_entry` dice cuál es. |
 | `422` al confirmar un dato | El valor no es del tipo del dato (un booleano, o una lista en un combate clave) o el equipo incluye Pokémon que no existen en la generación del juego. | Revisa el valor y los identificadores. |
 | `Address already in use` al arrancar | Ya hay otra API (u otro programa) en el puerto 8000. | Para la otra o arranca en otro puerto: `--port 8001`. |

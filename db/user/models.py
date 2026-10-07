@@ -60,13 +60,14 @@ class RuleSetting(UserModel, table=True):
 class HallOfFameEntry(UserModel, table=True):
     """A completed game, in the user's journey (RF-12, RN-16).
 
-    ``sequence`` is the order of registration and breaks ties between equal dates.
+    Each game is recorded once (CA-68). ``sequence`` is the order of registration and breaks
+    ties between equal dates.
     """
 
     __tablename__ = "hall_of_fame_entry"
 
     id: int | None = Field(default=None, primary_key=True)
-    game: str
+    game: str = Field(unique=True)
     completed_on: date
     sequence: int = Field(unique=True)
     notes: str | None = None

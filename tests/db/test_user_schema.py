@@ -10,7 +10,7 @@ from alembic import command
 from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
 from alembic.script import ScriptDirectory
-from sqlalchemy import Engine, inspect
+from sqlalchemy import Engine, inspect, text
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
@@ -159,3 +159,59 @@ def test_the_hash_of_a_proposal_is_stable_and_tells_values_apart() -> None:
     assert value_hash(["geodude", "onix"]) == value_hash(["geodude", "onix"])
     hashes = {value_hash(v) for v in (True, False, None, ["geodude"], ["geodude", "onix"])}
     assert len(hashes) == 5
+
+
+def test_a_game_is_recorded_once(engine: Engine) -> None:
+    """CA-68: each game is recorded once in the Hall of Fame."""
+    with Session(engine) as session:
+        for sequence in (1, 2):
+            session.add(
+                HallOfFameEntry(game="firered", completed_on=date(2026, 9, 1), sequence=sequence)
+            )
+        with pytest.raises(IntegrityError):
+            session.commit()
+
+
+def _at_first_revision(path: Path, *games: str) -> Engine:
+    """A user.sqlite at revision 0001 with an entry for each of ``games``."""
+    engine = create_sqlite_engine(path)
+    with engine.begin() as connection:
+        config = alembic_config()
+        config.attributes["connection"] = connection
+        command.upgrade(config, "0001")
+    with engine.begin() as connection:
+        for sequence, game in enumerate(games, start=1):
+            connection.execute(
+                text(
+                    "INSERT INTO hall_of_fame_entry (game, completed_on, sequence) "
+                    "VALUES (:game, '2026-09-01', :sequence)"
+                ),
+                {"game": game, "sequence": sequence},
+            )
+    return engine
+
+
+def _revision(engine: Engine) -> str | None:
+    with engine.connect() as connection:
+        return MigrationContext.configure(connection).get_current_revision()
+
+
+def test_the_migration_to_one_entry_per_game_keeps_the_entries(tmp_path: Path) -> None:
+    path = tmp_path / "user.sqlite"
+    engine = _at_first_revision(path, "firered", "leafgreen")
+    upgrade(path)
+    with Session(engine) as session:
+        assert session.exec(select(HallOfFameEntry.game)).all() == ["firered", "leafgreen"]
+    engine.dispose()
+
+
+def test_the_migration_stops_if_a_game_is_repeated(tmp_path: Path) -> None:
+    """CA-68: it says which games are repeated and deletes nothing."""
+    path = tmp_path / "user.sqlite"
+    engine = _at_first_revision(path, "firered", "leafgreen", "firered")
+    with pytest.raises(Exception, match="repetidos: firered"):
+        upgrade(path)
+    assert _revision(engine) == "0001"
+    with Session(engine) as session:
+        assert len(session.exec(select(HallOfFameEntry)).all()) == 3
+    engine.dispose()

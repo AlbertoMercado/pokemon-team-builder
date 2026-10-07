@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 from sqlmodel import Session
 
-from api.errors import InvalidValueError, NotFoundError
+from api.errors import ConflictError, InvalidValueError, NotFoundError
 from api.repositories import reference as reference_repo
 from api.repositories import user as user_repo
 from api.repositories.user import MemberRow
@@ -59,6 +59,7 @@ def _one(user: Session, reference: Session, entry_id: int) -> HallOfFameEntryOut
 
 def add_entry(user: Session, reference: Session, body: HallOfFameEntryIn) -> HallOfFameEntryOut:
     game = _game(reference, body.game)
+    _check_not_completed(user, game)
     members = _members(reference, game, body.members)
     entry = user_repo.add_hall_of_fame_entry(
         user, game.slug, body.completed_on, body.notes, members
@@ -74,6 +75,8 @@ def update_entry(
     entry = _entry(user, entry_id)
     fields = change.model_fields_set
     game = _game(reference, change.game if change.game is not None else entry.game)
+    if game.slug != entry.game:
+        _check_not_completed(user, game)
     members = None
     if change.members is not None or "game" in fields:
         slugs = change.members
@@ -127,6 +130,17 @@ def _entry(user: Session, entry_id: int) -> user_db.HallOfFameEntry:
     if found is None:
         raise NotFoundError(f"El registro {entry_id} no existe en el Hall of Fame")
     return found
+
+
+def _check_not_completed(user: Session, game: Game) -> None:
+    """``ConflictError`` if ``game`` is already recorded: each game is recorded once (CA-68)."""
+    entry = user_repo.completed_games(user).get(game.slug)
+    if entry is not None:
+        raise ConflictError(
+            f"{game.name_es} ya está registrado en el Hall of Fame (registro {entry}): cada "
+            "juego se registra una sola vez",
+            {"hall_of_fame_entry": entry},
+        )
 
 
 def _game(reference: Session, slug: str) -> Game:
