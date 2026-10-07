@@ -40,8 +40,11 @@ Comportamiento común:
 - **La dirección guarda el estado**: los filtros del catálogo (`?q=`, `?type=`, `?favorite=`) y
   del *Hall of Fame* (`?game=`) van en la URL, así que se conservan al recargar o volver atrás.
 - **El resultado se genera al entrar** y con **Volver a generar**; es una consulta sin estado que
-  se repite al cambiar los favoritos o las confirmaciones. Si la API responde `409`, la web lleva
-  a la revisión.
+  se repite al cambiar los favoritos o las confirmaciones. Si la API responde `409` con datos
+  pendientes, la web lleva a la revisión; si es porque el juego ya está en el *Hall of Fame*
+  ([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)), lo dice en el resultado.
+- **Un juego, un registro**: el formulario del *Hall of Fame* no ofrece los juegos ya registrados
+  (`completed` en `GET /api/games?all=true`), salvo el del propio registro al corregirlo.
 
 En todas las pantallas, una barra de navegación lleva a Catálogo, Favoritos, Reglas, Nuevo
 juego y *Hall of Fame*.
@@ -51,6 +54,7 @@ juego y *Hall of Fame*.
 | Respuesta | En la web |
 |-----------|-----------|
 | `503` | Un aviso en toda la aplicación: no hay datos cargados, con el comando de la [carga](../04-manual-usuario/cargar-datos.md). |
-| `409` al generar | Se va a la revisión, que muestra lo pendiente. |
+| `409` al generar con datos pendientes | Se va a la revisión, que muestra lo pendiente. |
+| `409` al generar un juego ya registrado | Un aviso en el resultado, con enlace al *Hall of Fame*. |
 | `404`, `409` y `422` del resto | El mensaje de `detail` junto al formulario o la acción que lo produjo. |
 | Error de red | Un aviso de que la API no responde, con el comando para arrancarla. |

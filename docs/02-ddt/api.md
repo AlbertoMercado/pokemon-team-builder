@@ -15,9 +15,11 @@ Convenciones y decisiones de diseño de la API HTTP, servida por FastAPI bajo el
 - Los recursos se identifican con las claves naturales del
   [modelo de datos](modelo-datos.md) (`firered`, `vulpix-alola`, `RN-07`).
 - Los errores usan el formato por defecto de FastAPI (`{"detail": ...}`). `detail` es un texto,
-  salvo en los `422` de validación de FastAPI (una lista) y en el `409` de los datos pendientes,
-  que es un objeto con el mensaje y los datos (`PendingDataOut`). Cada endpoint dice en su
-  descripción cuándo responde cada código:
+  salvo en los `422` de validación de FastAPI (una lista) y en dos `409`, que son un objeto con
+  el mensaje: el de los datos pendientes, con esos datos (`PendingDataOut`), y el de un juego ya
+  registrado en el *Hall of Fame*, con su registro (`CompletedGameOut`,
+  [CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). Cada endpoint dice en su descripción
+  cuándo responde cada código:
     - `404`: el recurso no existe.
     - `409`: la operación no se puede hacer en el estado actual (p. ej., generar con datos sin
       confirmar).

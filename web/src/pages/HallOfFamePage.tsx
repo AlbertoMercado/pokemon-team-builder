@@ -1,8 +1,9 @@
 /**
  * Hall of Fame (RF-12, RF-13, RN-16): the journey in order, with the last completed game
  * marked and a filter by game (`?game=`). An entry is recorded by hand (also for a game that is
- * not a target game), corrected or removed after a confirmation. Every change alters the
- * exclusions of RN-16 from the next generation on.
+ * not a target game), corrected or removed after a confirmation. Each game is recorded once
+ * (CA-68): the form leaves out the games already recorded. Every change alters the exclusions
+ * of RN-16 from the next generation on.
  */
 import { useState } from "react";
 import { useSearchParams } from "react-router";
@@ -80,7 +81,15 @@ export default function HallOfFamePage() {
         <EntryForm
           title="Registrar un equipo"
           games={games.data ?? []}
-          initial={{ game: game ?? "", completed_on: todayIso(), notes: null, members: [] }}
+          initial={{
+            // The filtered game, unless it is already recorded (CA-68).
+            game: games.data?.some((option) => option.game === game && !option.completed)
+              ? (game ?? "")
+              : "",
+            completed_on: todayIso(),
+            notes: null,
+            members: [],
+          }}
           saving={add.isPending}
           error={add.error}
           onSave={(entry) => {
@@ -258,6 +267,8 @@ interface EntryFormProps {
 function EntryForm({ title, games, initial, saving, error, onSave, onCancel }: EntryFormProps) {
   const [game, setGame] = useState(initial.game);
   const [date, setDate] = useState(initial.completed_on);
+  // Each game is recorded once (CA-68): the completed ones are left out, except this entry's.
+  const choices = games.filter((option) => !option.completed || option.game === initial.game);
   const [notes, setNotes] = useState(initial.notes ?? "");
   const [members, setMembers] = useState<string[]>([...initial.members]);
   const missing =
@@ -296,7 +307,7 @@ function EntryForm({ title, games, initial, saving, error, onSave, onCancel }: E
             }}
           >
             <option value="">Elige un juego</option>
-            {games.map((option) => (
+            {choices.map((option) => (
               <option key={option.game} value={option.game}>
                 {option.name}
               </option>

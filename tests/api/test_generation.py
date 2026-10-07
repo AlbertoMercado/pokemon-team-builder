@@ -245,9 +245,11 @@ def test_without_reference_data_nothing_is_generated(make_client: ClientFactory)
 
 def test_the_409_is_in_the_openapi_contract(client: TestClient) -> None:
     operation = client.get("/api/openapi.json").json()["paths"]["/api/games/{game}/generations"]
-    assert operation["post"]["responses"]["409"]["content"]["application/json"]["schema"] == {
-        "$ref": "#/components/schemas/PendingDataOut"
-    }
+    schema = operation["post"]["responses"]["409"]["content"]["application/json"]["schema"]
+    assert schema["anyOf"] == [
+        {"$ref": "#/components/schemas/PendingDataOut"},
+        {"$ref": "#/components/schemas/CompletedGameOut"},
+    ]
 
 
 def _register_leafgreen(client: TestClient, *members: str) -> int:

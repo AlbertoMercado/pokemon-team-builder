@@ -194,7 +194,9 @@ mensaje aparece junto a la regla.
 
 En **Nuevo juego** aparecen los juegos que puedes elegir: los juegos completos, que permiten la
 crianza y tienen todos los datos que necesitan las reglas
-([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Hoy son Rojo Fuego y Verde Hoja; Rubí,
+([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)), salvo los que ya están en tu *Hall of
+Fame*, porque cada juego se completa una sola vez
+([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). Hoy son Rojo Fuego y Verde Hoja; Rubí,
 Zafiro y Esmeralda no aparecen hasta tener sus combates clave, aunque sí puedes registrarlos en
 el **Hall of Fame**. Pulsa uno para revisar sus datos. Cambiar de juego no cambia tus favoritos.
 
@@ -290,9 +292,12 @@ encajar cada una con el equipo, pero no entre sí (por ejemplo, si comparten tip
 algún problema, lo explica y **no se registra**: cambia la elección y vuelve a probar. Los
 Pokémon con datos sin confirmar se indican, pero no impiden registrarlo.
 
-Al registrarlo, el equipo cuenta para tu recorrido desde ese momento: el resultado se vuelve a
-generar sin sus líneas evolutivas ([RN-16](../01-ddf/reglas-negocio.md#rn-16)). Si después
-quieres cambiar la fecha o el equipo, hazlo en el [*Hall of Fame*](#hall-of-fame).
+Al registrarlo, el juego queda **completado**: cada juego se registra una sola vez, así que deja
+de aparecer en **Nuevo juego** y el resultado ya no se vuelve a generar
+([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). Su equipo cuenta para tu recorrido desde
+ese momento ([RN-16](../01-ddf/reglas-negocio.md#rn-16)). Si después quieres cambiar la fecha o
+el equipo, hazlo en el [*Hall of Fame*](#hall-of-fame); para volver a jugar ese juego, elimina
+antes su registro.
 
 Si no te convence ninguno, **Descartar los equipos** no registra nada.
 
@@ -311,7 +316,7 @@ o eliminar un registro cambia los equipos que se generan a partir de ese momento
 | Acción | Cómo |
 |--------|------|
 | **Filtrar por juego** | Elige el juego en **Juego**. El filtro se guarda en la dirección de la página. |
-| **Registrar un equipo** | Además de hacerlo desde el resultado, puedes registrar a mano cualquier juego cargado, también los que no pueden ser juego objetivo (como Rojo, Oro o Rubí). Elige el juego, la fecha y, si quieres, notas, y añade de 1 a 6 Pokémon con el buscador, en orden. **Guardar** lo registra. |
+| **Registrar un equipo** | Además de hacerlo desde el resultado, puedes registrar a mano cualquier juego cargado, también los que no pueden ser juego objetivo (como Rojo, Oro o Rubí). Cada juego se registra una sola vez: los que ya están en tu *Hall of Fame* no aparecen. Elige el juego, la fecha y, si quieres, notas, y añade de 1 a 6 Pokémon con el buscador, en orden. **Guardar** lo registra. |
 | **Corregir** | Cambia el juego, la fecha, las notas o el equipo. Si cambias la fecha, el recorrido se reordena. |
 | **Eliminar** | Pide confirmación: **Sí, eliminar** borra el registro y su equipo. |
 

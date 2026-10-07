@@ -9,7 +9,14 @@ class GameOut(BaseModel):
     name: str = Field(description="Nombre en español.")
     generation: int = Field(description="Generación del juego.")
     version_group: str = Field(description="Grupo de versiones, p. ej. `firered-leafgreen`.")
-    target: bool = Field(description="Si se puede elegir como juego objetivo (RF-05).")
+    target: bool = Field(
+        description="Si se puede elegir como juego objetivo: es un juego completo y no está "
+        "registrado en el *Hall of Fame* (RF-05)."
+    )
+    completed: bool = Field(
+        description="Si ya está registrado en el *Hall of Fame*. Cada juego se registra una sola "
+        "vez (CA-68)."
+    )
     cover_url: str | None = Field(
         description="URL de su portada en esta API (`/api/games/{game}/cover`); nula si el juego "
         "no tiene portada (RF-18)."

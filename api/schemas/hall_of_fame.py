@@ -48,7 +48,10 @@ class HallOfFameEntryOut(BaseModel):
 
 
 class HallOfFameEntryIn(BaseModel):
-    game: str = Field(description="Juego completado: cualquiera de los cargados.")
+    game: str = Field(
+        description="Juego completado: cualquiera de los cargados que no esté ya registrado "
+        "(CA-68)."
+    )
     completed_on: date = Field(description="Cuándo se completó.")
     notes: str | None = Field(default=None, description="Notas opcionales.")
     members: list[str] = Field(min_length=1, max_length=TEAM_SIZE, description=MEMBERS_DESCRIPTION)
@@ -72,3 +75,23 @@ class HallOfFamePatch(BaseModel):
             if name in self.model_fields_set and getattr(self, name) is None:
                 raise ValueError(f"{name} no puede ser nulo")
         return self
+
+
+class CompletedGameDetail(BaseModel):
+    message: str = Field(description="Explicación en español.")
+    hall_of_fame_entry: int = Field(description="El registro del *Hall of Fame* de ese juego.")
+
+
+class CompletedGameOut(BaseModel):
+    """Body of the 409 when the game is already recorded in the Hall of Fame (CA-68)."""
+
+    detail: CompletedGameDetail = Field(
+        description="El mensaje y el registro del *Hall of Fame* que ya tiene el juego."
+    )
+
+
+COMPLETED_GAME_RESPONSE: dict[str, object] = {
+    "model": CompletedGameOut,
+    "description": "El juego ya está registrado en el *Hall of Fame*: cada juego se completa "
+    "una sola vez (CA-68).",
+}

@@ -188,9 +188,10 @@ export interface paths {
         /**
          * Juegos objetivo
          * @description Los juegos que se pueden elegir como objetivo, en orden de lanzamiento: los juegos
-         *     completos, que permiten la crianza y tienen todos los datos que necesitan las reglas
-         *     (RF-05). Con `all=true`, todos los juegos cargados; `target` dice cuáles pueden ser juego
-         *     objetivo.
+         *     completos, que permiten la crianza y tienen todos los datos que necesitan las reglas, y que
+         *     no están ya registrados en el *Hall of Fame* (RF-05, CA-68). Con `all=true`, todos los
+         *     juegos cargados; `target` dice cuáles pueden ser juego objetivo y `completed`, cuáles ya
+         *     están registrados.
          */
         get: operations["list_games_api_games_get"];
         put?: never;
@@ -235,7 +236,8 @@ export interface paths {
          * Datos sin verificar del juego
          * @description Los datos inferidos o pendientes que intervienen en la generación con los favoritos y
          *     las reglas actuales, con su propuesta y su estado (RN-18). Con `pending` a 0 se puede
-         *     generar. `404` si el juego no es juego objetivo.
+         *     generar. `404` si el juego no es juego objetivo; `409` si ya está registrado en el *Hall of
+         *     Fame* (CA-68).
          */
         get: operations["get_review_api_games__game__review_get"];
         put?: never;
@@ -258,7 +260,8 @@ export interface paths {
          * Confirmar o corregir un dato
          * @description Confirma el dato con el valor propuesto o con uno corregido: un booleano o, en un
          *     combate clave, la lista de Pokémon de su equipo. `404` si el dato no existe en el juego;
-         *     `409` si se cargó sin ambigüedad (automático); `422` si el valor no es del tipo del dato o
+         *     `409` si se cargó sin ambigüedad (automático) o si el juego ya está registrado en el *Hall
+         *     of Fame* (CA-68); `422` si el valor no es del tipo del dato o
          *     el equipo incluye Pokémon que no existen en la generación del juego.
          */
         put: operations["confirm_api_games__game__review__fact_key__put"];
@@ -282,7 +285,7 @@ export interface paths {
          * Aceptar todas las propuestas
          * @description Confirma de una vez todas las propuestas inferidas que intervienen y aún no están
          *     confirmadas. Los datos pendientes, sin propuesta, se confirman uno a uno. Devuelve la
-         *     revisión actualizada.
+         *     revisión actualizada. `409` si el juego ya está registrado en el *Hall of Fame* (CA-68).
          */
         post: operations["accept_proposals_api_games__game__review_accept_proposals_post"];
         delete?: never;
@@ -303,8 +306,9 @@ export interface paths {
         /**
          * Generar equipos
          * @description Genera los equipos con los favoritos, las reglas y las confirmaciones actuales. No se
-         *     guarda: es un cálculo. `409` con los datos pendientes si queda alguno sin confirmar; `404`
-         *     si el juego no es juego objetivo.
+         *     guarda: es un cálculo. `409` con los datos pendientes si queda alguno sin confirmar, o con
+         *     el registro del *Hall of Fame* si el juego ya está registrado (CA-68); `404` si el juego no
+         *     es juego objetivo.
          */
         post: operations["generate_api_games__game__generations_post"];
         delete?: never;
@@ -326,8 +330,9 @@ export interface paths {
          * Comprobar un equipo elegido
          * @description Comprueba el equipo elegido en el resultado (favoritos y sugerencias) con las reglas
          *     activas: que cada miembro pase los filtros (RN-03, RN-11, RN-16), que no haya dos
-         *     incompatibles (RN-07, RN-12, RN-14) y que se cumplan las reglas de presencia (RN-13,
-         *     RN-14). No se guarda. `409` si quedan datos sin confirmar, como al generar; `422` si un
+         *     incompatibles (RN-07, RN-12, RN-14, RN-21) y que se cumplan las reglas de presencia
+         *     (RN-13, RN-14, RN-21). No se guarda. `409` si quedan datos sin confirmar, como al generar,
+         *     o si el juego ya está registrado en el *Hall of Fame* (CA-68); `422` si un
          *     miembro se repite o no existe en la generación del juego; `404` si el juego no es juego
          *     objetivo.
          */
@@ -355,8 +360,9 @@ export interface paths {
         /**
          * Registrar un equipo
          * @description Registra el equipo con el que se completó un juego. Guarda los tipos que tenía cada
-         *     miembro en ese juego. `422` si el juego o algún Pokémon no existen en los datos cargados
-         *     (o en la generación del juego).
+         *     miembro en ese juego. `409` si el juego ya está registrado: cada juego se registra una
+         *     sola vez (CA-68). `422` si el juego o algún Pokémon no existen en los datos cargados (o en
+         *     la generación del juego).
          */
         post: operations["add_entry_api_hall_of_fame_post"];
         delete?: never;
@@ -385,7 +391,8 @@ export interface paths {
         /**
          * Corregir un registro
          * @description Cambia el juego, la fecha, las notas o el equipo. Si cambia el juego o el equipo, se
-         *     vuelven a copiar los tipos. `404` si el registro no existe; `422` como al registrarlo.
+         *     vuelven a copiar los tipos. `404` si el registro no existe; `409` si el juego nuevo ya
+         *     está registrado; `422` como al registrarlo.
          */
         patch: operations["update_entry_api_hall_of_fame__entry_id__patch"];
         trace?: never;
@@ -465,6 +472,27 @@ export interface components {
              * @description URL de su imagen en esta API (`/api/pokemon/{pokemon}/image`); nula si la forma no tiene imagen.
              */
             image_url: string | null;
+        };
+        /** CompletedGameDetail */
+        CompletedGameDetail: {
+            /**
+             * Message
+             * @description Explicación en español.
+             */
+            message: string;
+            /**
+             * Hall Of Fame Entry
+             * @description El registro del *Hall of Fame* de ese juego.
+             */
+            hall_of_fame_entry: number;
+        };
+        /**
+         * CompletedGameOut
+         * @description Body of the 409 when the game is already recorded in the Hall of Fame (CA-68).
+         */
+        CompletedGameOut: {
+            /** @description El mensaje y el registro del *Hall of Fame* que ya tiene el juego. */
+            detail: components["schemas"]["CompletedGameDetail"];
         };
         ConditionValue: string | number | boolean;
         /** ConfirmationIn */
@@ -665,9 +693,14 @@ export interface components {
             version_group: string;
             /**
              * Target
-             * @description Si se puede elegir como juego objetivo (RF-05).
+             * @description Si se puede elegir como juego objetivo: es un juego completo y no está registrado en el *Hall of Fame* (RF-05).
              */
             target: boolean;
+            /**
+             * Completed
+             * @description Si ya está registrado en el *Hall of Fame*. Cada juego se registra una sola vez (CA-68).
+             */
+            completed: boolean;
             /**
              * Cover Url
              * @description URL de su portada en esta API (`/api/games/{game}/cover`); nula si el juego no tiene portada (RF-18).
@@ -748,7 +781,7 @@ export interface components {
         HallOfFameEntryIn: {
             /**
              * Game
-             * @description Juego completado: cualquiera de los cargados.
+             * @description Juego completado: cualquiera de los cargados que no esté ya registrado (CA-68).
              */
             game: string;
             /**
@@ -1744,6 +1777,15 @@ export interface operations {
                     "application/json": components["schemas"]["ReviewOut"];
                 };
             };
+            /** @description El juego ya está registrado en el *Hall of Fame*: cada juego se completa una sola vez (CA-68). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompletedGameOut"];
+                };
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -1814,6 +1856,15 @@ export interface operations {
                     "application/json": components["schemas"]["ReviewOut"];
                 };
             };
+            /** @description El juego ya está registrado en el *Hall of Fame*: cada juego se completa una sola vez (CA-68). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompletedGameOut"];
+                };
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -1846,13 +1897,13 @@ export interface operations {
                     "application/json": components["schemas"]["GenerationOut"];
                 };
             };
-            /** @description Quedan datos sin verificar que intervienen (RN-18). */
+            /** @description Quedan datos sin verificar que intervienen (RN-18), o el juego ya está registrado en el *Hall of Fame* (CA-68). */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PendingDataOut"];
+                    "application/json": components["schemas"]["PendingDataOut"] | components["schemas"]["CompletedGameOut"];
                 };
             };
             /** @description Validation Error */
@@ -1891,13 +1942,13 @@ export interface operations {
                     "application/json": components["schemas"]["TeamCheckOut"];
                 };
             };
-            /** @description Quedan datos sin verificar que intervienen (RN-18). */
+            /** @description Quedan datos sin verificar que intervienen (RN-18), o el juego ya está registrado en el *Hall of Fame* (CA-68). */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PendingDataOut"];
+                    "application/json": components["schemas"]["PendingDataOut"] | components["schemas"]["CompletedGameOut"];
                 };
             };
             /** @description Validation Error */
@@ -1965,6 +2016,15 @@ export interface operations {
                     "application/json": components["schemas"]["HallOfFameEntryOut"];
                 };
             };
+            /** @description El juego ya está registrado en el *Hall of Fame*: cada juego se completa una sola vez (CA-68). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompletedGameOut"];
+                };
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -2029,6 +2089,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HallOfFameEntryOut"];
+                };
+            };
+            /** @description El juego ya está registrado en el *Hall of Fame*: cada juego se completa una sola vez (CA-68). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompletedGameOut"];
                 };
             };
             /** @description Validation Error */

@@ -1,25 +1,31 @@
-"""Games that can be chosen as the target game (RF-05), or every loaded game (RF-12)."""
+"""Games that can be chosen as the target game (RF-05), or every loaded game (RF-12).
+
+A game already recorded in the Hall of Fame is completed: it is no longer a target game (CA-68).
+"""
 
 from sqlmodel import Session
 
 from api.repositories import reference as reference_repo
+from api.repositories import user as user_repo
 from api.schemas.games import GameOut
 from api.services import wikidex
 from api.services.images import cover_url
 from db.reference import Game
 
 
-def list_games(reference: Session, *, every: bool = False) -> list[GameOut]:
+def list_games(reference: Session, user: Session, *, every: bool = False) -> list[GameOut]:
     """The target games or, with ``every``, all the loaded ones, in release order.
 
-    Any loaded game can be recorded in the Hall of Fame, also those that are not a target.
+    Any loaded game that is not completed can be recorded in the Hall of Fame, also those that
+    are not a target.
     """
-    targets = {game.slug for game in reference_repo.target_games(reference)}
-    games = (
-        sorted(reference_repo.all_games(reference).values(), key=lambda g: g.release_order)
-        if every
-        else reference_repo.target_games(reference)
-    )
+    completed = user_repo.completed_games(user)
+    targets = {
+        game.slug for game in reference_repo.target_games(reference) if game.slug not in completed
+    }
+    games = sorted(reference_repo.all_games(reference).values(), key=lambda g: g.release_order)
+    if not every:
+        games = [game for game in games if game.slug in targets]
     return [
         GameOut(
             game=game.slug,
@@ -27,6 +33,7 @@ def list_games(reference: Session, *, every: bool = False) -> list[GameOut]:
             generation=game.generation,
             version_group=game.version_group,
             target=game.slug in targets,
+            completed=game.slug in completed,
             cover_url=cover_url(game.slug, game.cover is not None),
             cover_source_url=cover_source_url(game),
         )

@@ -7,7 +7,7 @@ import { server, withoutApi, withoutCovers, withoutData } from "../test/server";
 
 /** The cover next to the last completed game, if any. */
 async function lastGameCover(): Promise<string | null> {
-  const link = await screen.findByRole("link", { name: "Rojo Fuego" });
+  const link = await screen.findByRole("link", { name: "Verde Hoja" });
   return link.closest("div")?.querySelector("img")?.getAttribute("src") ?? null;
 }
 
@@ -18,7 +18,7 @@ describe("Inicio", () => {
     const favorites = await screen.findByRole("link", { name: "2 favoritos" });
     expect(favorites).toHaveAttribute("href", "/favoritos");
 
-    expect(screen.getByRole("link", { name: "Rojo Fuego" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Verde Hoja" })).toHaveAttribute(
       "href",
       "/hall-of-fame",
     );
@@ -88,7 +88,7 @@ describe("Inicio", () => {
 describe("Portada del último juego completado (RF-18)", () => {
   it("shows the cover of the last completed game", async () => {
     renderApp("/");
-    expect(await lastGameCover()).toBe("/api/games/firered/cover");
+    expect(await lastGameCover()).toBe("/api/games/leafgreen/cover");
   });
 
   it("shows only its name without cover", async () => {

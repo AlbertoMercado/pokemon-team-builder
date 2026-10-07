@@ -174,3 +174,44 @@ def test_remove_an_entry(client: TestClient, data_dir: Path) -> None:
 
 def test_unknown_entries_are_not_found(client: TestClient) -> None:
     assert client.patch(f"{HALL_OF_FAME}/99", json={"notes": "x"}).status_code == 404
+
+
+def test_a_game_is_registered_once(client: TestClient) -> None:
+    """CA-68: a second entry for the same game is a 409 that names the first one."""
+    first = _register(client, "firered", "2026-05-01", "gengar")
+    again = {"game": "firered", "completed_on": "2026-06-01", "members": ["gengar"]}
+    response = client.post(HALL_OF_FAME, json=again)
+    assert response.status_code == 409
+    assert response.json()["detail"]["hall_of_fame_entry"] == first["id"]
+
+    other = _register(client, "leafgreen", "2026-06-01", "gengar")
+    moved = client.patch(f"{HALL_OF_FAME}/{other['id']}", json={"game": "firered"})
+    assert moved.status_code == 409
+    # Correcting an entry without changing its game is still possible.
+    same = client.patch(f"{HALL_OF_FAME}/{first['id']}", json={"game": "firered"})
+    assert same.status_code == 200
+
+
+def test_a_registered_game_is_no_longer_a_target(client: TestClient) -> None:
+    """CA-68: it leaves the target games, the review and the generation answer 409, and it is
+    a target again once its entry is removed."""
+    entry = _register(client, "firered", "2026-05-01", "gengar")
+
+    assert [g["game"] for g in client.get("/api/games").json()] == ["leafgreen"]
+    every = {
+        g["game"]: (g["target"], g["completed"])
+        for g in client.get("/api/games", params={"all": "true"}).json()
+    }
+    assert every["firered"] == (False, True)
+    assert every["leafgreen"] == (True, False)
+    for response in (
+        client.get("/api/games/firered/review"),
+        client.post("/api/games/firered/generations"),
+    ):
+        assert response.status_code == 409
+        detail = response.json()["detail"]
+        assert detail["hall_of_fame_entry"] == entry["id"]
+        assert "ya está registrado en el Hall of Fame" in detail["message"]
+
+    client.delete(f"{HALL_OF_FAME}/{entry['id']}")
+    assert [g["game"] for g in client.get("/api/games").json()] == ["firered", "leafgreen"]

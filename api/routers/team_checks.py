@@ -4,6 +4,7 @@ from fastapi import APIRouter, status
 
 from api.dependencies import ReferenceDb, TargetGame, UserDb
 from api.schemas.generation import PendingDataOut
+from api.schemas.hall_of_fame import CompletedGameOut
 from api.schemas.team_check import TeamCheckIn, TeamCheckOut
 from api.services import generation as service
 
@@ -15,8 +16,9 @@ router = APIRouter(prefix="/games/{game}/team-checks", tags=["Generación"])
     summary="Comprobar un equipo elegido",
     responses={
         status.HTTP_409_CONFLICT: {
-            "model": PendingDataOut,
-            "description": "Quedan datos sin verificar que intervienen (RN-18).",
+            "model": PendingDataOut | CompletedGameOut,
+            "description": "Quedan datos sin verificar que intervienen (RN-18), o el juego ya "
+            "está registrado en el *Hall of Fame* (CA-68).",
         }
     },
 )
@@ -25,8 +27,9 @@ def check_team(
 ) -> TeamCheckOut:
     """Comprueba el equipo elegido en el resultado (favoritos y sugerencias) con las reglas
     activas: que cada miembro pase los filtros (RN-03, RN-11, RN-16), que no haya dos
-    incompatibles (RN-07, RN-12, RN-14) y que se cumplan las reglas de presencia (RN-13,
-    RN-14). No se guarda. `409` si quedan datos sin confirmar, como al generar; `422` si un
+    incompatibles (RN-07, RN-12, RN-14, RN-21) y que se cumplan las reglas de presencia
+    (RN-13, RN-14, RN-21). No se guarda. `409` si quedan datos sin confirmar, como al generar,
+    o si el juego ya está registrado en el *Hall of Fame* (CA-68); `422` si un
     miembro se repite o no existe en la generación del juego; `404` si el juego no es juego
     objetivo."""
     return service.check_chosen_team(user, reference, game, body.members)

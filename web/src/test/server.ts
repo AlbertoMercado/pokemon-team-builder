@@ -140,6 +140,7 @@ export const games: Game[] = [
     generation: 3,
     version_group: "emerald",
     target: true,
+    completed: false,
     cover_url: null,
     cover_source_url: null,
   },
@@ -149,6 +150,7 @@ export const games: Game[] = [
     generation: 3,
     version_group: "firered-leafgreen",
     target: true,
+    completed: false,
     cover_url: "/api/games/firered/cover",
     cover_source_url: "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Rojo_Fuego.png",
   },
@@ -290,6 +292,7 @@ export const allGames: Game[] = [
     generation: 1,
     version_group: "red-blue",
     target: false,
+    completed: false,
     cover_url: "/api/games/red/cover",
     cover_source_url: "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Pok%C3%A9mon_Rojo.jpg",
   },
@@ -300,8 +303,9 @@ export const allGames: Game[] = [
     generation: 3,
     version_group: "firered-leafgreen",
     target: true,
-    cover_url: null,
-    cover_source_url: null,
+    completed: false,
+    cover_url: "/api/games/leafgreen/cover",
+    cover_source_url: "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Verde_Hoja.png",
   },
 ];
 
@@ -314,10 +318,11 @@ interface StoredEntry {
   members: string[];
 }
 
+// Leaf Green, so that Fire Red, the game of the screens, is still a target game (CA-68).
 const INITIAL_ENTRIES: StoredEntry[] = [
   {
     id: 1,
-    game: "firered",
+    game: "leafgreen",
     completed_on: "2026-09-20",
     notes: null,
     members: ["venusaur", "lapras"],
@@ -325,6 +330,39 @@ const INITIAL_ENTRIES: StoredEntry[] = [
 ];
 let entries: StoredEntry[] = INITIAL_ENTRIES.map((entry) => ({ ...entry }));
 let nextEntryId = 2;
+
+/** The games already in the Hall of Fame, with their entry: no longer target games (CA-68). */
+function completedGames(): Map<string, number> {
+  return new Map(entries.map((entry) => [entry.game, entry.id]));
+}
+
+/** The `409` of the API for a game already in the Hall of Fame (CA-68). */
+function completedGame(game: string) {
+  const entry = completedGames().get(game);
+  const name = allGames.find((candidate) => candidate.game === game)?.name ?? game;
+  return entry === undefined
+    ? null
+    : HttpResponse.json(
+        {
+          detail: {
+            message: `${name} ya está registrado en el Hall of Fame: cada juego se completa una sola vez. Para volver a jugarlo, elimina antes su registro`,
+            hall_of_fame_entry: entry,
+          },
+        },
+        { status: 409 },
+      );
+}
+
+/** `GET /api/games`: the target games that are not completed, or every game with its state. */
+function gamesOut(all: boolean): Game[] {
+  const completed = completedGames();
+  const marked = (all ? allGames : games).map((game) => ({
+    ...game,
+    target: game.target && !completed.has(game.game),
+    completed: completed.has(game.game),
+  }));
+  return all ? marked : marked.filter((game) => game.target);
+}
 
 /** Name, types and image of a form: from the catalogue or from the generations. */
 function member(
@@ -380,6 +418,11 @@ function invalidEntry(game: string | undefined, members: string[] | undefined) {
 /** Adds a favourite straight to the simulated API, as if done before the test. */
 export function addFavorite(pokemon: string): void {
   favoriteSet.add(pokemon);
+}
+
+/** Records ``game`` straight in the simulated Hall of Fame, as if done before the test. */
+export function addEntry(game: string): void {
+  entries.push({ id: nextEntryId++, game, completed_on: "2026-10-01", notes: null, members: [] });
 }
 
 /** Confirms every fact of the review, as the user does before generating. */
@@ -701,6 +744,8 @@ export const handlers = [
     requests.entries.push(body);
     const invalid = invalidEntry(body.game, body.members);
     if (invalid) return invalid;
+    const completed = completedGame(body.game);
+    if (completed) return completed;
     const id = nextEntryId++;
     entries.push({
       id,
@@ -722,6 +767,8 @@ export const handlers = [
       if (!found) return HttpResponse.json({ detail: "El registro no existe" }, { status: 404 });
       const invalid = invalidEntry(change.game ?? undefined, change.members ?? undefined);
       if (invalid) return invalid;
+      const completed = change.game && change.game !== found.game && completedGame(change.game);
+      if (completed) return completed;
       Object.assign(found, {
         ...(change.game ? { game: change.game } : {}),
         ...(change.completed_on ? { completed_on: change.completed_on } : {}),
@@ -744,12 +791,15 @@ export const handlers = [
     return HttpResponse.json(checkTeam(members));
   }),
   http.get("/api/games", ({ request }) =>
-    HttpResponse.json(new URL(request.url).searchParams.get("all") === "true" ? allGames : games),
+    HttpResponse.json(gamesOut(new URL(request.url).searchParams.get("all") === "true")),
   ),
-  http.get<{ game: string }>("/api/games/:game/review", ({ params }) =>
-    params.game === "firered"
-      ? HttpResponse.json(reviewOut())
-      : HttpResponse.json({ detail: `${params.game} no es un juego objetivo` }, { status: 404 }),
+  http.get<{ game: string }>(
+    "/api/games/:game/review",
+    ({ params }) =>
+      completedGame(params.game) ??
+      (params.game === "firered"
+        ? HttpResponse.json(reviewOut())
+        : HttpResponse.json({ detail: `${params.game} no es un juego objetivo` }, { status: 404 })),
   ),
   http.put<{ fact_key: string }, { value: ReviewValue }>(
     "/api/games/firered/review/:fact_key",
@@ -770,6 +820,8 @@ export const handlers = [
   ),
   http.post("/api/games/firered/generations", () => {
     generationCalls.count += 1;
+    const completed = completedGame("firered");
+    if (completed) return completed;
     const pending = fireredFacts.filter((candidate) => candidate.status === "pending");
     if (pending.length > 0) {
       return HttpResponse.json(
@@ -848,9 +900,7 @@ export function withoutCovers(): void {
     list.map((game) => ({ ...game, cover_url: null, cover_source_url: null }));
   server.use(
     http.get("/api/games", ({ request }) =>
-      HttpResponse.json(
-        bare(new URL(request.url).searchParams.get("all") === "true" ? allGames : games),
-      ),
+      HttpResponse.json(bare(gamesOut(new URL(request.url).searchParams.get("all") === "true"))),
     ),
     http.get("/api/hall-of-fame", ({ request }) =>
       HttpResponse.json(
