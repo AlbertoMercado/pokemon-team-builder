@@ -16,6 +16,7 @@ import {
 } from "../api/queries/hallOfFame";
 import type { Game, HallOfFameEntry, HallOfFameEntryIn } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
+import GameCover from "../components/GameCover";
 import PokemonSprite from "../components/PokemonSprite";
 import TeamEditor, { TEAM_SIZE } from "../components/TeamEditor";
 import { TypeBadges } from "../components/TypeBadge";
@@ -166,6 +167,7 @@ function Entry({ entry, games }: { entry: HallOfFameEntry; games: Game[] }) {
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-mono text-sm text-slate-500">{`${String(entry.order)}.`}</span>
+        <GameCover url={entry.cover_url} size="small" />
         <h2 className="text-lg font-semibold">{entry.game_name}</h2>
         <span className="text-slate-600">{formatDate(entry.completed_on)}</span>
         {entry.last && (

@@ -2,7 +2,7 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { currentLocation, renderApp } from "../test/render";
-import { addFavorite, confirmAll, generationCalls } from "../test/server";
+import { addFavorite, confirmAll, generationCalls, withoutCovers } from "../test/server";
 
 const RESULT = "/juego/firered/resultado";
 
@@ -140,5 +140,32 @@ describe("Resultado con datos pendientes", () => {
       await screen.findByRole("heading", { level: 1, name: "Revisión de datos: Rojo Fuego" }),
     ).toBeInTheDocument();
     expect(currentLocation()).toBe("/juego/firered/revision");
+  });
+});
+
+describe("Portada en el resultado (RF-18)", () => {
+  beforeEach(() => {
+    confirmAll();
+  });
+
+  it("shows the cover of the game in the header", async () => {
+    renderApp("/juego/firered/resultado");
+    await screen.findByRole("heading", { level: 1, name: "Resultado: Rojo Fuego" });
+
+    const heading = screen.getByRole("heading", { level: 1 });
+    expect(heading.parentElement?.querySelector("img")).toHaveAttribute(
+      "src",
+      "/api/games/firered/cover",
+    );
+  });
+
+  it("shows only the name of the game without cover", async () => {
+    withoutCovers();
+    renderApp("/juego/firered/resultado");
+    await screen.findByRole("heading", { level: 1, name: "Resultado: Rojo Fuego" });
+
+    expect(
+      screen.getByRole("heading", { level: 1 }).parentElement?.querySelector("img"),
+    ).toBeNull();
   });
 });

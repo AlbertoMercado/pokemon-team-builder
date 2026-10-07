@@ -3,7 +3,13 @@ import { http, HttpResponse } from "msw";
 
 import { LOAD_COMMAND, START_COMMAND } from "../lib/commands";
 import { renderApp } from "../test/render";
-import { server, withoutApi, withoutData } from "../test/server";
+import { server, withoutApi, withoutCovers, withoutData } from "../test/server";
+
+/** The cover next to the last completed game, if any. */
+async function lastGameCover(): Promise<string | null> {
+  const link = await screen.findByRole("link", { name: "Rojo Fuego" });
+  return link.closest("div")?.querySelector("img")?.getAttribute("src") ?? null;
+}
 
 describe("Inicio", () => {
   it("shows the favourites, the last completed game and the loaded data", async () => {
@@ -76,5 +82,18 @@ describe("Inicio", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Algo salió mal");
     expect(await screen.findByRole("link", { name: "2 favoritos" })).toBeInTheDocument();
+  });
+});
+
+describe("Portada del último juego completado (RF-18)", () => {
+  it("shows the cover of the last completed game", async () => {
+    renderApp("/");
+    expect(await lastGameCover()).toBe("/api/games/firered/cover");
+  });
+
+  it("shows only its name without cover", async () => {
+    withoutCovers();
+    renderApp("/");
+    expect(await lastGameCover()).toBeNull();
   });
 });

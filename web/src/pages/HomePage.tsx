@@ -11,6 +11,7 @@ import { useHallOfFame } from "../api/queries/hallOfFame";
 import { useMeta } from "../api/queries/meta";
 import type { FavoritesOut, HallOfFameEntry, Meta } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
+import GameCover from "../components/GameCover";
 import { formatDate, formatDateTime, shortCommit } from "../lib/format";
 
 export default function HomePage() {
@@ -111,12 +112,15 @@ function LastGame({ entries }: { entries: HallOfFameEntry[] }) {
   }
   return (
     <div>
-      <p>
-        <Link to="/hall-of-fame" className="font-semibold text-red-700 underline">
-          {last.game_name}
-        </Link>
-        , el {formatDate(last.completed_on)}.
-      </p>
+      <div className="flex items-center gap-3">
+        <GameCover url={last.cover_url} size="small" />
+        <p>
+          <Link to="/hall-of-fame" className="font-semibold text-red-700 underline">
+            {last.game_name}
+          </Link>
+          , el {formatDate(last.completed_on)}.
+        </p>
+      </div>
       <ul aria-label="Equipo" className="mt-2 flex flex-wrap gap-1">
         {last.members.map((member) => (
           <li key={member.position} className="rounded bg-slate-100 px-2 py-0.5 text-sm">

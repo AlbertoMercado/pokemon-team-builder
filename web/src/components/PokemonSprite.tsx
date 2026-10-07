@@ -7,12 +7,10 @@
  * - `PokemonArtwork`: its official artwork, larger, for the detail. Without it, or if it does
  *   not load, its sprite is shown instead.
  *
- * Each image sits in a square box of a fixed size and is scaled to fit in it, centred and
- * without distortion, so every row has the same height whatever the shape of the Pokémon. The
- * box is set in CSS because Tailwind's base styles give images `height: auto`, which overrides
- * the `height` attribute (#65).
+ * Each image sits in a square box of a fixed size (`Picture`), so every row has the same
+ * height whatever the shape of the Pokémon (#65).
  */
-import { useState, type ReactNode } from "react";
+import Picture from "./Picture";
 
 // Pixels for the width and height attributes, and the Tailwind class of the same box.
 const SIZES = {
@@ -21,34 +19,6 @@ const SIZES = {
   large: { pixels: 128, box: "size-32" },
 } as const;
 const ARTWORK = { pixels: 160, box: "size-40" } as const;
-
-interface PictureProps {
-  url: string | null | undefined;
-  size: { pixels: number; box: string };
-  className: string;
-  fallback?: ReactNode;
-}
-
-function Picture({ url, size, className, fallback = null }: PictureProps) {
-  const [failed, setFailed] = useState<string | null>(null);
-  if (!url || failed === url) {
-    return fallback;
-  }
-  return (
-    <img
-      src={url}
-      alt=""
-      width={size.pixels}
-      height={size.pixels}
-      loading="lazy"
-      decoding="async"
-      className={`${size.box} max-w-none shrink-0 object-contain ${className}`}
-      onError={() => {
-        setFailed(url);
-      }}
-    />
-  );
-}
 
 interface SpriteProps {
   url: string | null | undefined;
@@ -67,11 +37,6 @@ interface ArtworkProps {
 
 export function PokemonArtwork({ url, spriteUrl }: ArtworkProps) {
   return (
-    <Picture
-      url={url}
-      size={ARTWORK}
-      className=""
-      fallback={<PokemonSprite url={spriteUrl} size="large" />}
-    />
+    <Picture url={url} size={ARTWORK} fallback={<PokemonSprite url={spriteUrl} size="large" />} />
   );
 }

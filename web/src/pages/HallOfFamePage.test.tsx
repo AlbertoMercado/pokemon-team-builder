@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 
 import { currentLocation, renderApp } from "../test/render";
-import { server } from "../test/server";
+import { server, withoutCovers } from "../test/server";
 
 async function journey(): Promise<string[]> {
   const list = await screen.findByRole("list", { name: "Recorrido" });
@@ -169,5 +169,35 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
     );
     expect(screen.getByRole("form", { name: "Registrar un equipo" })).toBeVisible();
     expect(await journey()).toHaveLength(1);
+  });
+});
+
+describe("Portadas en el Hall of Fame (RF-18)", () => {
+  /** The cover next to the name of the game of each entry, outside its team. */
+  function entryCover(name: RegExp): string | null {
+    const heading = within(screen.getByRole("listitem", { name })).getByRole("heading", {
+      level: 2,
+    });
+    return heading.parentElement?.querySelector("img")?.getAttribute("src") ?? null;
+  }
+
+  it("shows the cover of each game, also of a game that is not a target", async () => {
+    renderApp("/hall-of-fame");
+    await journey();
+    const form = await record("Rojo", "2026-08-01", "Gengar");
+    await userEvent.click(form.getByRole("button", { name: "Guardar" }));
+    await screen.findByRole("listitem", { name: /^Rojo, / });
+
+    expect(entryCover(/^Rojo,/)).toBe("/api/games/red/cover");
+    expect(entryCover(/Rojo Fuego/)).toBe("/api/games/firered/cover");
+  });
+
+  it("shows only the name of the game without cover", async () => {
+    withoutCovers();
+    renderApp("/hall-of-fame");
+    await journey();
+
+    expect(entryCover(/Rojo Fuego/)).toBeNull();
+    expect(screen.getByRole("heading", { level: 2, name: "Rojo Fuego" })).toBeVisible();
   });
 });

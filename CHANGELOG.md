@@ -16,6 +16,11 @@ versión: [versiones](docs/05-operacion/versiones.md).
   Hall of Fame la indican en `cover_url`, con la página de WikiDex de la que sale en
   `cover_source_url`. En la revisión de datos, cada combate clave enlaza en `source_url` a la
   versión de la página de WikiDex de la que sale su equipo (RF-18, ADR-0004, ADR-0011, #49).
+- **Web**: cada juego se muestra con su portada junto al nombre: al elegir el juego, en la
+  revisión de datos y el resultado, en el último juego completado del Inicio y en el Hall of
+  Fame. El pie añade su titularidad y un enlace a la página de cada portada en WikiDex. En la
+  revisión, cada combate clave enlaza a la página de WikiDex de la que sale su equipo
+  (RF-18, ADR-0004, ADR-0011, #49).
 
 ### Cambiado
 

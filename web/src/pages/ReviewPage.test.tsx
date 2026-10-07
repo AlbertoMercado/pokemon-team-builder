@@ -3,9 +3,15 @@ import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 
 import { renderApp } from "../test/render";
-import { server } from "../test/server";
+import { server, withoutCovers } from "../test/server";
 
 const card = (name: string) => screen.getByRole("listitem", { name });
+
+/** The cover next to the main heading, if any. */
+function headerCover(): string | null {
+  const heading = screen.getByRole("heading", { level: 1 });
+  return heading.parentElement?.querySelector("img")?.getAttribute("src") ?? null;
+}
 
 describe("Revisión de datos", () => {
   it("groups the data to confirm and warns about the responsibility (RF-15)", async () => {
@@ -149,5 +155,37 @@ describe("Revisión de datos", () => {
   it("explains that a game is not a target game (404)", async () => {
     renderApp("/juego/red/revision");
     expect(await screen.findByRole("alert")).toHaveTextContent("red no es un juego objetivo");
+  });
+});
+
+describe("Portada y fuentes en la revisión (RF-18, ADR-0004)", () => {
+  it("shows the cover of the game in the header", async () => {
+    renderApp("/juego/firered/revision");
+    await screen.findByText("Faltan 5 datos por confirmar.");
+
+    expect(headerCover()).toBe("/api/games/firered/cover");
+  });
+
+  it("shows only the name of the game without cover", async () => {
+    withoutCovers();
+    renderApp("/juego/firered/revision");
+    await screen.findByText("Faltan 5 datos por confirmar.");
+
+    expect(headerCover()).toBeNull();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Revisión de datos: Rojo Fuego" }),
+    ).toBeVisible();
+  });
+
+  it("links a key battle to the WikiDex revision its team comes from", async () => {
+    renderApp("/juego/firered/revision");
+    await screen.findByText("Faltan 5 datos por confirmar.");
+
+    expect(within(card("Equipo de Brock")).getByRole("link", { name: "WikiDex" })).toHaveAttribute(
+      "href",
+      "https://www.wikidex.net/index.php?title=Brock&oldid=3562807",
+    );
+    // Misty has no known source.
+    expect(within(card("Equipo de Misty")).queryByRole("link")).not.toBeInTheDocument();
   });
 });

@@ -27,6 +27,7 @@ import type {
 } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
 import FavoriteButton from "../components/FavoriteButton";
+import GameCover from "../components/GameCover";
 import PokemonSprite from "../components/PokemonSprite";
 import TeamSelector from "../components/TeamSelector";
 import { TypeBadges } from "../components/TypeBadge";
@@ -49,7 +50,8 @@ export default function ResultPage() {
   const { game = "" } = useParams();
   const generation = useGeneration(game);
   const games = useGames();
-  const gameName = games.data?.find((candidate) => candidate.game === game)?.name ?? game;
+  const found = games.data?.find((candidate) => candidate.game === game);
+  const gameName = found?.name ?? game;
   // What the user did with the selector; it stays while the result is generated again.
   const [registered, setRegistered] = useState<HallOfFameEntry | null>(null);
   const [discarded, setDiscarded] = useState(false);
@@ -65,7 +67,10 @@ export default function ResultPage() {
           Revisar los datos
         </Link>
         <div className="flex flex-wrap items-center gap-4">
-          <h1 className="text-2xl font-bold">{`Resultado: ${gameName}`}</h1>
+          <div className="flex items-center gap-3">
+            <GameCover url={found?.cover_url} />
+            <h1 className="text-2xl font-bold">{`Resultado: ${gameName}`}</h1>
+          </div>
           <button
             type="button"
             disabled={generation.isFetching}

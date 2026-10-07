@@ -11,6 +11,7 @@ import { useAcceptProposals, useConfirmFact, useGames, useReview } from "../api/
 import { usePokemonNames } from "../api/queries/pokemon";
 import type { Review, ReviewFact } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
+import GameCover from "../components/GameCover";
 import TeamEditor from "../components/TeamEditor";
 
 const GROUPS = [
@@ -28,7 +29,8 @@ export default function ReviewPage() {
   const { game = "" } = useParams();
   const review = useReview(game);
   const games = useGames();
-  const gameName = games.data?.find((candidate) => candidate.game === game)?.name ?? game;
+  const found = games.data?.find((candidate) => candidate.game === game);
+  const gameName = found?.name ?? game;
 
   return (
     <div className="space-y-6">
@@ -36,7 +38,10 @@ export default function ReviewPage() {
         <Link to="/juego" className="text-sm text-red-700 underline">
           Elegir otro juego
         </Link>
-        <h1 className="text-2xl font-bold">{`Revisión de datos: ${gameName}`}</h1>
+        <div className="flex items-center gap-3">
+          <GameCover url={found?.cover_url} />
+          <h1 className="text-2xl font-bold">{`Revisión de datos: ${gameName}`}</h1>
+        </div>
         <p className="text-slate-700">
           Estos datos no se han podido cargar con certeza y se usan para generar tu equipo.
           Confírmalos con la propuesta o corrígelos.
@@ -257,6 +262,15 @@ function KeyBattleFact({ game, fact }: { game: string; fact: ReviewFact }) {
           </p>
           <Team members={value} />
         </div>
+      )}
+      {fact.source_url !== null && (
+        // The team comes from WikiDex, CC BY-NC-SA: its revision, to check it (ADR-0004).
+        <p className="text-sm text-slate-600">
+          Fuente:{" "}
+          <a className="text-red-700 underline" href={fact.source_url}>
+            WikiDex
+          </a>
+        </p>
       )}
       {editing ? (
         <KeyBattleEditor
