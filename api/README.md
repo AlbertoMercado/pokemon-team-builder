@@ -1,32 +1,28 @@
 # api/
 
-**Qué es**: la capa de aplicación HTTP con FastAPI. Implementadas las fases 1 a 6
-del [plan](../docs/02-ddt/plan-api.md): arranque, configuración, metadatos, catálogo, favoritos,
-reglas, juegos, construcción del `GameContext`, revisión de los datos sin verificar, generación
-de equipos y *Hall of Fame* con el recorrido.
+**Qué es**: la API HTTP con FastAPI: los routers validan la entrada, los servicios montan el
+`GameContext` y llaman a `core/`, y los repositorios acceden a `db/`.
 
-**Por qué existe**: expone los casos de uso al frontend ([API](../docs/02-ddt/api.md)).
+**Por qué existe**: expone los casos de uso a la web y a otras integraciones
+([ADR-0002](../docs/03-adr/0002-monolito-modular-nucleo-puro.md)).
 
-**Qué hace**: los routers validan la entrada HTTP, los servicios montan el `GameContext` a
-partir de las dos bases de datos y llaman a `core/`, y los repositorios acceden a `db/`.
+**Contenido** (el detalle, en el *docstring* de cada módulo):
 
-**Contenido**:
-
-| Ruta | Qué hace |
-|------|----------|
+| Ruta | Qué es |
+|------|--------|
 | `main.py` | `create_app(settings)` y `app`, la que sirve uvicorn. |
-| `config.py` | `Settings`: el directorio de datos (`PTB_DATA_DIR`). |
-| `database.py` | Motores y sesiones de las dos bases de datos; `503` si falta `reference.sqlite`. |
-| `openapi.py` | `python -m api.openapi [FICHERO]`: exporta el OpenAPI sin arrancar la API, para generar el cliente de la web. |
-| `errors.py` | Errores de los casos de uso y su código HTTP (`404`, `409`, `422`). |
-| `dependencies.py` | Dependencias de los routers: sesiones de las bases de datos, directorio de datos y datos de referencia del juego de la ruta (`404` si no es juego objetivo). |
-| `routers/` | Un router por grupo de endpoints de la [API](../docs/02-ddt/api.md). |
-| `services/` | Casos de uso. `context.py` construye el `GameContext` (con la parte de referencia de cada juego en caché), `review.py` revisa los datos, `generation.py` genera los equipos y comprueba el equipo elegido en el resultado, `hall_of_fame.py` gestiona el recorrido (RN-16), `catalog.py` busca Pokémon y monta su ficha, `images.py` da la URL y el fichero de la imagen de cada forma y de la portada de cada juego (ADR-0010, ADR-0011), `wikidex.py` construye los enlaces a las fuentes en WikiDex y `rounding.py` redondea las puntuaciones con el método del mayor resto (CA-51). |
+| `config.py` | `Settings`: directorio de datos (`PTB_DATA_DIR`) y de la web compilada (`PTB_WEB_DIR`). |
+| `database.py` | Bases de datos: migra `user.sqlite` al arrancar y responde `503` si `reference.sqlite` falta o es de otra versión. |
+| `dependencies.py` | Dependencias de los routers (sesiones, directorio de datos, juego de la ruta). |
+| `errors.py` | Errores de los casos de uso y su código HTTP. |
+| `web.py` | Sirve la web compilada en `/`. |
+| `openapi.py` | Exporta el contrato OpenAPI sin arrancar la API. |
+| `routers/` | Un router por grupo de endpoints. |
+| `schemas/` | Modelos pydantic de peticiones y respuestas: el contrato OpenAPI. |
+| `services/` | Casos de uso, uno por módulo (contexto, revisión, generación, *Hall of Fame*, catálogo, imágenes, enlaces a WikiDex…). |
 | `repositories/` | Acceso a `db/`. |
-| `schemas/` | Modelos pydantic de las peticiones y respuestas (el contrato OpenAPI). |
 
-Cómo se arranca: [Operación](../docs/05-operacion/api.md).
-
-**Restricciones**: puede importar `core/` y `db/`, nunca `ingest/` (`lint-imports`).
-
-Más detalle en [Estructura del código](../docs/02-ddt/estructura-codigo.md).
+**Más información**: convenciones y decisiones en el [DDT de la API](../docs/02-ddt/api.md);
+cómo se arranca en [Operación](../docs/05-operacion/api.md); cómo se usa en el
+[manual](../docs/04-manual-usuario/api.md); dependencias permitidas en la
+[arquitectura](../docs/02-ddt/arquitectura.md#reglas-de-dependencia).

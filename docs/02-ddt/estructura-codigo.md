@@ -1,54 +1,29 @@
 # Estructura del código
 
-Qué hay en cada directorio del repositorio, por qué existe, qué hace y cómo se comprueba que
-las dependencias entre paquetes respetan la [arquitectura](arquitectura.md)
-([ADR-0002](../03-adr/0002-monolito-modular-nucleo-puro.md)).
-
-Cada directorio de código tiene además un `README.md` breve que remite a esta página, y cada
-paquete de Python un *docstring* de módulo en su `__init__.py`.
+Qué hay en cada directorio del repositorio y cómo se comprueba que las dependencias entre
+paquetes respetan la [arquitectura](arquitectura.md#reglas-de-dependencia).
 
 ## Directorios
 
-| Directorio | Qué es | Por qué existe | Qué hace | Estado |
-|------------|--------|----------------|----------|--------|
-| `core/` | Paquete de Python: dominio puro. | Aislar las reglas de negocio de la infraestructura para probarlas a fondo con hypothesis ([ADR-0002](../03-adr/0002-monolito-modular-nucleo-puro.md)). | Implementa las reglas `RN-XX` y el motor de generación a partir de un `GameContext` inmutable. | Motor completo (fases 1 a 6): dominio, reglas, generación de equipos con sugerencias y agrupación, revisión de datos y comprobación de un equipo elegido ([detalle](motor.md)) |
-| `db/` | Paquete de Python: persistencia. | Un único lugar para los modelos de las dos bases de datos ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md)). | Define los modelos SQLModel de `reference.sqlite` (`db/reference/`) y `user.sqlite` y las migraciones de esta última. `db/sqlite.py` crea los motores con las claves foráneas activadas. | `reference.sqlite` y `user.sqlite` con sus migraciones implementadas ([detalle](modelo-datos.md#implementacion-de-usersqlite)) |
-| `ingest/` | Paquete de Python: CLI de ingesta. | Los datos de referencia vienen de fuentes externas y se cargan de forma puntual ([RF-11](../01-ddf/requisitos-funcionales.md#rf-11)). | Descarga (con caché), valida y normaliza PokeAPI, WikiDex y los datos curados, y construye `reference.sqlite`. | CLI, carga, comprobaciones y fuentes PokeAPI, datos curados y WikiDex implementados ([detalle](../05-operacion/ingesta.md)) |
-| `api/` | Paquete de Python: capa de aplicación. | Exponer los casos de uso al frontend por HTTP ([API](api.md)). | Routers de FastAPI, servicios que montan el `GameContext` y llaman a `core/`, y repositorios sobre `db/`. | Arranque, configuración, metadatos, catálogo, favoritos, reglas, juegos, `GameContext`, revisión de datos, generación de equipos, comprobación del equipo elegido y *Hall of Fame* ([detalle](../05-operacion/api.md)) |
-| `data/` | Datos, no código. | Separar los datos versionados de los generados ([ADR-0005](../03-adr/0005-datos-curados-yaml.md)). | `curated/`: YAML curados a mano, en git. `cache/`, `reports/` y `*.sqlite`: generados, fuera de git. | `curated/` con los datos de Rojo Fuego y Verde Hoja ([detalle](datos-curados.md)) |
-| `tests/` | Tests de Python (pytest + hypothesis). | Verificar cada regla y las propiedades del motor ([estrategia de pruebas](arquitectura.md#estrategia-de-pruebas)). | Contiene el guardián de arquitectura (`test_architecture.py`) y los tests de cada paquete en `tests/<paquete>/` (`tests/core/`, `tests/db/`, `tests/ingest/` y `tests/api/`); `tests/e2e/serve.py` arranca la API con la web para las pruebas de Playwright. Los tests importan módulos de prueba como `tests.core.builders`: mypy calcula los nombres de módulo desde la raíz del repositorio (`explicit_package_bases`). `tests/conftest.py` hace fallar cualquier petición HTTP, porque los tests nunca usan la red; los datos de ejemplo están en `tests/<paquete>/fixtures/`. pytest añade la raíz del repositorio al `sys.path` (`pythonpath` en `pyproject.toml`), porque el proyecto no se instala como paquete. | En uso |
-| `web/` | Frontend React + Vite + TypeScript + Tailwind. | Interfaz de la aplicación ([ADR-0001](../03-adr/0001-stack-tecnologico.md)). | Pantallas de catálogo, favoritos, reglas, nuevo juego, resultado y *Hall of Fame*, con un cliente de la API generado desde su OpenAPI. | Completa: todas las pantallas, servida por la API en un solo proceso y con pruebas de extremo a extremo ([detalle](../05-operacion/web.md)) |
-| `.claude/` | Configuración de Claude Code del proyecto. | Que los procedimientos repetibles se hagan siempre igual. | `skills/publicar-version/`: el protocolo para [publicar una versión](../05-operacion/versiones.md#publicar-una-version). | En uso |
-| `docs/` | Documentación MkDocs. | Docs-as-code: el diseño se versiona con el código. | DDF, DDT, ADR, manual de usuario y operación. | En uso |
+Cada directorio tiene un `README.md` con su índice y cada fichero, su *docstring* o comentario de
+cabecera ([cómo se documenta](documentacion.md#el-readme-de-un-directorio)).
 
-### `data/`
-
-```
-data/
-  curated/    YAML curados a mano (combates clave, mecánicas de juego…). En git.
-  cache/      Respuestas descargadas por la ingesta (WikiDex, volcado de PokeAPI). Fuera de git.
-  *.sqlite    reference.sqlite y user.sqlite. Fuera de git.
-  reports/    Informes de cada carga en JSON y Markdown. Fuera de git.
-```
-
-`data/cache/`, `data/reports/` y `*.sqlite` están en `.gitignore`: se pueden regenerar y no
-deben subirse al repositorio. Los informes de carga que importan se registran a mano en
-[Informes de carga](../05-operacion/informes-carga/index.md)
-([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)).
+| Directorio | Qué es | Índice |
+|------------|--------|--------|
+| `core/` | Dominio puro: las reglas `RN-XX` y el motor de generación ([motor](motor.md)). | [`core/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/core/README.md) |
+| `db/` | Modelos SQLModel de `reference.sqlite` y `user.sqlite` y migraciones ([modelo de datos](modelo-datos.md)). | [`db/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/db/README.md) |
+| `ingest/` | CLI que carga los datos de referencia ([ingesta](../05-operacion/ingesta.md)). | [`ingest/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/ingest/README.md) |
+| `api/` | API HTTP con FastAPI ([API](api.md)). | [`api/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/api/README.md) |
+| `web/` | Frontend React ([web](../05-operacion/web.md)). | [`web/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/web/README.md) |
+| `data/` | Datos curados (en git) y generados (fuera de git) ([datos curados](datos-curados.md)). | [`data/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/data/README.md) |
+| `tests/` | Tests de Python ([estrategia de pruebas](arquitectura.md#estrategia-de-pruebas)). | [`tests/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/tests/README.md) |
+| `docs/` | Documentación MkDocs ([cómo se documenta](documentacion.md)). | [Inicio](../index.md) |
+| `.claude/` | Skills de Claude Code del proyecto: [publicar una versión](../05-operacion/versiones.md#publicar-una-version). | — |
 
 ## Reglas de dependencia
 
-Dependencias permitidas entre paquetes de Python:
-
-```mermaid
-flowchart TD
-    api["api/"] --> core["core/"]
-    api --> db["db/"]
-    ingest["ingest/"] --> db
-```
-
-Cualquier otra dependencia entre paquetes del proyecto está prohibida, y `core/` no puede usar
-bibliotecas de terceros. Se comprueban de dos formas:
+Las dependencias permitidas entre paquetes están en la
+[arquitectura](arquitectura.md#reglas-de-dependencia). Se comprueban de dos formas:
 
 ### Contratos de import-linter
 
@@ -95,7 +70,7 @@ dependencias del código (SQLModel, pydantic…) sin mantener una segunda lista 
 - **Nuevo paquete de Python de primer nivel**: añadirlo a `root_packages` y a los contratos de
   `[tool.importlinter]`, a `files` de `[tool.mypy]`, a esta página, con su `README.md` y su *docstring*. Si cambia la arquitectura, con un ADR.
 - **Nueva dependencia permitida entre paquetes**: es un cambio de arquitectura. Se registra en
-  un ADR y se actualizan los contratos, el diagrama de esta página y la
+  un ADR y se actualizan los contratos y la
   [arquitectura](arquitectura.md#reglas-de-dependencia).
 
 ## Documentación del código

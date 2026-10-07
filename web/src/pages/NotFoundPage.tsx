@@ -1,3 +1,4 @@
+/** Page shown for an address that does not match any screen. */
 import { Link } from "react-router";
 
 export default function NotFoundPage() {

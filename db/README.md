@@ -1,23 +1,19 @@
 # db/
 
-**Qué es**: la capa de persistencia, con modelos SQLModel.
+**Qué es**: la capa de persistencia: los modelos SQLModel de las dos bases de datos SQLite.
 
-**Por qué existe**: concentra en un solo paquete los modelos de las dos bases de datos SQLite
-([ADR-0003](../docs/03-adr/0003-dos-bases-de-datos-sqlite.md)).
+**Por qué existe**: concentra en un solo paquete los modelos de `reference.sqlite` y
+`user.sqlite` ([ADR-0003](../docs/03-adr/0003-dos-bases-de-datos-sqlite.md)).
 
-**Qué hace**: define las tablas de `reference.sqlite` (escrita solo por `ingest/`) y de
-`user.sqlite` (escrita solo por `api/`, con migraciones). Tablas y columnas en el
-[modelo de datos](../docs/02-ddt/modelo-datos.md).
+**Contenido** (el detalle, en el *docstring* de cada módulo):
 
-**Contenido**:
+| Ruta | Qué es |
+|------|--------|
+| `sqlite.py` | Motor de SQLite con las claves foráneas activadas. |
+| `reference/` | Modelos de `reference.sqlite`, uno por grupo de tablas, y su esquema. |
+| `user/` | Modelos de `user.sqlite`, el *hash* de los valores propuestos y las migraciones de Alembic. |
 
-| Ruta | Qué hace |
-|------|----------|
-| `sqlite.py` | `create_sqlite_engine(path)`: motor de SQLite con las claves foráneas activadas. |
-| `reference/` | Modelos de `reference.sqlite` y `create_reference_schema(engine)`. Uno por grupo de tablas: `games.py`, `pokemon.py`, `evolution.py`, `battles.py` y `meta.py`; `base.py` tiene la clase base, los enums y las restricciones comunes. |
-| `user/` | Modelos de `user.sqlite` (`models.py`), el hash de los valores propuestos (`values.py`), `upgrade(path)` y las migraciones de Alembic (`migrations/`, `alembic.ini`). |
-
-**Restricciones**: no importa ningún otro paquete del proyecto (`lint-imports`).
-
-Más detalle en [Estructura del código](../docs/02-ddt/estructura-codigo.md) y en la
-[implementación de reference.sqlite](../docs/02-ddt/modelo-datos.md#implementacion-de-referencesqlite).
+**Más información**: tablas, columnas y migraciones en el
+[modelo de datos](../docs/02-ddt/modelo-datos.md); crear una migración en
+[Operación](../docs/05-operacion/api.md#crear-una-migracion); dependencias permitidas en la
+[arquitectura](../docs/02-ddt/arquitectura.md#reglas-de-dependencia).
