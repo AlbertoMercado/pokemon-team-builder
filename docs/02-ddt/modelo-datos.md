@@ -177,7 +177,7 @@ no existe es un aviso.
 |---------|----------|
 | `db/user/models.py` | `UserModel`, la clase base, con su propio `MetaData` y una convención de nombres para las restricciones (Alembic las necesita con nombre para alterarlas en SQLite), y los modelos de las cinco tablas. |
 | `db/user/values.py` | `ConfirmedValue`, el tipo del valor de una confirmación, y `value_hash(propuesta)`, el hash estable (SHA-256 del JSON) de un valor propuesto. |
-| `db/user/__init__.py` | `upgrade(path)`: crea el fichero si no existe y aplica las migraciones pendientes. La llama la API al arrancar. |
+| `db/user/__init__.py` | `upgrade(path)`: crea el fichero si no existe y aplica las migraciones pendientes. La llama la API al arrancar. Migra con las claves foráneas desactivadas, porque el *batch mode* reconstruye la tabla y borrar la antigua arrastraría en cascada a sus hijas (los miembros del *Hall of Fame*), y antes de confirmar las comprueba con `PRAGMA foreign_key_check`. |
 | `db/user/migrations/` | Entorno de Alembic (`env.py`, en *batch mode*), plantilla y migraciones (`versions/`). `db/user/alembic.ini` sirve para ejecutarlas a mano ([Operación](../05-operacion/api.md#migraciones)). |
 
 Decisiones de implementación:
