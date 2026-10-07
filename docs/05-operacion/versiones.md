@@ -135,5 +135,7 @@ cd web && npm ci && npm run build
 ```
 
 Al arrancar, la API aplica las migraciones pendientes de `user.sqlite`. Si el `CHANGELOG.md`
-indica que hay que repetir la carga, ejecuta antes la [ingesta](ingesta.md). En el servidor,
+indica que hay que repetir la carga, ejecuta antes la [ingesta](ingesta.md). En el propio
+ordenador, `scripts/start.sh` hace todo esto tras el `git pull`: la copia, las dependencias,
+la carga, la web y el arranque ([abrir la web](../04-manual-usuario/web.md#abrir-la-web)). En el servidor,
 sigue la [puesta en producción](puesta-en-produccion.md#actualizar-la-aplicacion).

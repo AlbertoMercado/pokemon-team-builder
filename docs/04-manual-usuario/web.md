@@ -12,8 +12,27 @@ generas el equipo para un juego y registras tu *Hall of Fame*.
 
 ## Abrir la web
 
-La primera vez, y cada vez que actualices la aplicación, compila la web desde la raíz del
-proyecto:
+La forma más sencilla, la primera vez y cada vez que actualices la aplicación, es un solo
+comando desde la raíz del proyecto:
+
+```bash
+scripts/start.sh
+```
+
+Hace, por orden:
+
+1. Una copia de seguridad de tus datos (`data/user.sqlite`) en `data/backups/`, con la fecha y
+   la hora en el nombre.
+2. Instala las dependencias de Python (`uv sync`).
+3. Carga los datos ([cargar los datos](cargar-datos.md)). Acepta sus opciones, como
+   `--offline` o `--no-covers`: `scripts/start.sh --offline`.
+4. Instala las dependencias de la web y la compila (`npm ci` y `npm run build`).
+5. Arranca la aplicación en `http://127.0.0.1:8000`.
+
+Si un paso falla, se detiene, dice cuál ha sido y no arranca la aplicación; si falla la carga,
+se conservan los datos anteriores. `PTB_PORT` cambia el puerto: `PTB_PORT=8080 scripts/start.sh`.
+
+También puedes hacer los pasos a mano. Compila la web desde la raíz del proyecto:
 
 ```bash
 cd web && npm ci && npm run build && cd ..

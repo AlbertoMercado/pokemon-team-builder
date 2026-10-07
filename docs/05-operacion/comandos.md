@@ -17,6 +17,7 @@ repositorio salvo los marcados «en `web/`». Cómo preparar el entorno la prime
 | Cargar los datos | `uv run python -m ingest [--data-dir DIR] [--offline] [--no-covers]` | [Ingesta](ingesta.md) |
 | Ver la base de datos | `uvx datasette data/reference.sqlite` | [Consultar los datos](ingesta.md#consultar-los-datos) |
 | Arrancar la aplicación | `uv run uvicorn api.main:app --reload` | [Arrancar la API](api.md) |
+| Preparar y arrancar todo: copia de `user.sqlite`, `uv sync`, carga, `npm ci` y `npm run build`, y la aplicación | `scripts/start.sh [--offline] [--no-covers]` | [Abrir la web](../04-manual-usuario/web.md#abrir-la-web) |
 | Migrar `user.sqlite` (la API lo hace al arrancar) | `uv run alembic -c db/user/alembic.ini upgrade head` | [Migraciones](api.md#migraciones) |
 | Documentación en local / construirla | `uv run mkdocs serve` / `uv run mkdocs build --strict` | [Cómo se documenta](../02-ddt/documentacion.md) |
 | Dependencias desactualizadas | `uv tree --outdated --depth 1` | [Dependencias](dependencias.md) |
