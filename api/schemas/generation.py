@@ -28,8 +28,8 @@ class PokemonOut(BaseModel):
 class RuleScoreOut(BaseModel):
     """What one active soft rule adds to the team's score (RF-09)."""
 
-    rule_id: str
-    name: str
+    rule_id: str = Field(description="Regla blanda, p. ej. `RN-17`.")
+    name: str = Field(description="Nombre de la regla.")
     weight: int = Field(description="Peso de la regla, de 0 a 10.")
     score: int = Field(description="Puntuación de la regla en el equipo, en porcentaje (0 a 100).")
     contribution: int = Field(
@@ -40,7 +40,7 @@ class RuleScoreOut(BaseModel):
 
 
 class SuggestionOut(BaseModel):
-    pokemon: PokemonOut
+    pokemon: PokemonOut = Field(description="El Pokémon sugerido, con sus tipos en el juego.")
     gain: int = Field(description="Lo que aportaría a la puntuación del equipo, redondeado.")
     verified: bool = Field(description="Falso si alguno de sus datos está sin confirmar (CA-31).")
 
@@ -75,13 +75,15 @@ class GroupOut(BaseModel):
         description="Por cada posición, los Pokémon que la pueden ocupar, todos con los mismos "
         "tipos. Cada combinación es uno de los equipos del grupo."
     )
-    teams: list[TeamOut]
+    teams: list[TeamOut] = Field(
+        description="Cada combinación de las posiciones: un equipo del grupo."
+    )
 
 
 class DiscardOut(BaseModel):
-    pokemon: str
-    name: str
-    rule_id: str
+    pokemon: str = Field(description="Identificador del favorito descartado.")
+    name: str = Field(description="Nombre en español.")
+    rule_id: str = Field(description="Regla que lo descarta.")
     reason: DiscardReason = Field(
         description="`generation`, `game` o `arrival` (RN-03), `breeding` (RN-11) o "
         "`journey` (RN-16)."
@@ -93,25 +95,27 @@ class DiscardOut(BaseModel):
 
 
 class PresenceOut(BaseModel):
-    rule_id: str
+    rule_id: str = Field(description="Regla de presencia, `RN-13` o `RN-14`.")
     level: int = Field(description="Nivel de la regla en el DDF que se aplica.")
     status: PresenceStatus = Field(
         description="`candidates` (el equipo incluye una de `options`), `reserved` (se reserva "
         "un hueco para una de `options`, que no son favoritos) o `unmet` (no se puede cumplir)."
     )
-    options: list[str]
-    detail: str
+    options: list[str] = Field(description="Los Pokémon que la cumplen en ese nivel.")
+    detail: str = Field(description="Explicación en español.")
 
 
 class ConfirmedFactOut(BaseModel):
-    fact_key: str
-    kind: FactKind
+    fact_key: str = Field(description="Clave estable del dato confirmado.")
+    kind: FactKind = Field(description="Tipo de dato, como en la revisión.")
     name: str = Field(description="Nombre en español de la mecánica, el entrenador o el Pokémon.")
-    value: ReviewValue
+    value: ReviewValue = Field(
+        description="Valor confirmado: un booleano o, en un combate clave, la lista de su equipo."
+    )
 
 
 class GenerationOut(BaseModel):
-    game: str
+    game: str = Field(description="Identificador del juego objetivo.")
     status: GenerationStatus = Field(
         description="`complete` si hay equipos de 6 favoritos; si no, `incomplete` (RN-08)."
     )
@@ -135,11 +139,13 @@ class GenerationOut(BaseModel):
 
 
 class PendingDataDetail(BaseModel):
-    message: str
+    message: str = Field(description="Explicación en español.")
     pending: list[ReviewFactOut] = Field(description="Los datos que faltan por confirmar.")
 
 
 class PendingDataOut(BaseModel):
     """Body of the 409 when some data that takes part is still unverified (RN-18)."""
 
-    detail: PendingDataDetail
+    detail: PendingDataDetail = Field(
+        description="El mensaje y los datos que faltan por confirmar."
+    )

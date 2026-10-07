@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from sqlmodel import Session
 
 from api.database import reference_session
-from api.dependencies import DataDir, ReferenceDb
+from api.dependencies import DataDir, GameSlug, ReferenceDb
 from api.schemas.games import GameOut
 from api.services import games as service
 from api.services import images
@@ -40,7 +40,7 @@ def list_games(
     response_class=FileResponse,
     responses={200: {"content": {"image/png": {}}, "description": "La portada, en PNG."}},
 )
-def game_cover(game: str, reference: ReferenceDb, data_dir: DataDir) -> FileResponse:
+def game_cover(game: GameSlug, reference: ReferenceDb, data_dir: DataDir) -> FileResponse:
     """La portada del juego, de hasta 256 px, que la carga de datos descarga de WikiDex y guarda
     en la caché local (ADR-0011). Vale para cualquier juego cargado, también los que no son
     juego objetivo. Es la URL que dan las respuestas en `cover_url`. `404` si el juego no está

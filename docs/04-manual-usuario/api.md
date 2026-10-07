@@ -1,15 +1,10 @@
 # Usar la API
 
 La API es la interfaz HTTP de la aplicación: la usa la web y se puede usar directamente, por
-ejemplo para probarla o automatizar algo. Qué hace cada endpoint, en detalle, está en la
-[API](../02-ddt/api.md); cómo se arranca y se configura, en
-[Operación](../05-operacion/api.md).
-
-!!! note "Disponible"
-    Arrancar la API, consultar su versión y la de los datos, gestionar los favoritos y las
-    reglas, consultar el catálogo de Pokémon, ver los juegos, revisar sus datos, generar
-    equipos, comprobar un equipo elegido y registrar tu *Hall of Fame*. Lo mismo se puede hacer
-    desde la [web](web.md).
+ejemplo para probarla o automatizar algo. Esta guía explica cómo hacer cada tarea; todos los
+endpoints, sus parámetros y los campos de cada respuesta están en la
+[referencia de la API](../02-ddt/api-referencia.md), y cómo se arranca y se configura, en
+[Operación](../05-operacion/api.md). Lo mismo se puede hacer desde la [web](web.md).
 
 ## Antes de empezar
 
@@ -53,9 +48,9 @@ curl http://127.0.0.1:8000/api/meta
 }
 ```
 
-- `app_version`: la versión de la aplicación.
-- `data`: la carga de datos con la que trabaja: los commits de PokeAPI y de sus imágenes (aquí
-  abreviados; la API devuelve los 40 caracteres), cuándo terminó y qué juegos tiene.
+Dice la versión de la aplicación y la carga de datos con la que trabaja (los commits aparecen
+aquí abreviados; qué es cada campo, en la
+[referencia](../02-ddt/api-referencia.md#esquema-meta)).
 
 Si has vuelto a cargar los datos y `ingested_at` sigue siendo la fecha anterior, reinicia la
 API.

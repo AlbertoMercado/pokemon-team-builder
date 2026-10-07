@@ -43,7 +43,7 @@ desincronizándose y llevando a errores (#76).
 | Tablas, columnas y migraciones | [Modelo de datos](modelo-datos.md) | Ingesta, API |
 | Qué datos necesita cada regla y de dónde salen | [Datos requeridos](datos-requeridos.md) | DDF, ingesta |
 | Esquema de `data/curated/*.yaml` | [Datos curados](datos-curados.md) | Ingesta, `data/README.md` |
-| Referencia de la API (endpoints, campos, errores) | OpenAPI, generado del código | Manual, DDT |
+| Referencia de la API (endpoints, campos, errores) | El código (*docstrings* y `description`), publicado en la [referencia de la API](api-referencia.md) ([ADR-0012](../03-adr/0012-referencia-api-desde-openapi.md)) | Manual, DDT |
 | Convenciones de la API y decisiones de diseño | [API](api.md) | Manual |
 | Cómo se usa cada interfaz (CLI, API y web) | [Manual de usuario](../04-manual-usuario/index.md) | `README.md` |
 | Cómo funciona la ingesta por dentro | [Ingesta de datos](../05-operacion/ingesta.md) | Manual |
@@ -56,8 +56,7 @@ desincronizándose y llevando a errores (#76).
 
 !!! note "En curso"
     La documentación se está ajustando a este mapa por temas (#76). Hasta terminar, algunos temas
-    aún tienen copias en otras páginas, y la referencia de la API todavía no está publicada desde
-    OpenAPI: mientras tanto, está en el [DDT de la API](api.md).
+    aún tienen copias en otras páginas.
 
 ## El README de un directorio
 
@@ -80,8 +79,10 @@ Todo código o cambio de base de datos se documenta **en el mismo PR**, en la fu
   su línea en el `README.md` del directorio si es una entrada nueva. Un directorio nuevo lleva su
   `README.md` y una fila en la [estructura del código](estructura-codigo.md).
 - **Base de datos**: cada tabla, columna o migración, en el [modelo de datos](modelo-datos.md).
-- **API**: las descripciones de OpenAPI (`Field(description=...)` y el *docstring* de cada
-  endpoint); el [DDT de la API](api.md) solo si cambia una convención o una decisión.
+- **API**: las descripciones del contrato (`Field(description=...)`, la `description` de cada
+  parámetro y el *docstring* de cada endpoint, con sus errores); la
+  [referencia](api-referencia.md) se genera sola y un test exige que no falte ninguna. El
+  [DDT de la API](api.md), solo si cambia una convención o una decisión.
 - **Interfaz de uso** (CLI, API o web): cómo se usa, orientado a tareas, en el
   [manual de usuario](../04-manual-usuario/index.md).
 - **Comando nuevo**: en [Comandos y CI](../05-operacion/comandos.md).

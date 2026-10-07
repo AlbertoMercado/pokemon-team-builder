@@ -66,7 +66,7 @@ quote-style = "double"
 [tool.mypy]
 python_version = "3.13"
 strict = true
-files = ["core", "db", "ingest", "api", "tests"]
+files = ["core", "db", "ingest", "api", "tests", "docs/hooks"]
 # Module names come from the repository root (tests/core/builders.py is tests.core.builders),
 # because tests/ is not a package: the project is not installed (tool.uv.package = false).
 mypy_path = "."

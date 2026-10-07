@@ -172,7 +172,8 @@ export interface paths {
         /**
          * Activar, desactivar o cambiar el peso de una regla
          * @description Cambia `enabled`, `weight` (de 0 a 10, solo en las blandas) o los dos. `404` si la regla
-         *     no existe; `409` si no es configurable o no es blanda y se le da peso.
+         *     no existe; `409` si no es configurable o no es blanda y se le da peso; `422` si el peso está
+         *     fuera de rango o no se indica nada.
          */
         patch: operations["update_rule_api_rules__rule_id__patch"];
         trace?: never;
@@ -472,14 +473,19 @@ export interface components {
         };
         /** ConfirmedFactOut */
         ConfirmedFactOut: {
-            /** Fact Key */
+            /**
+             * Fact Key
+             * @description Clave estable del dato confirmado.
+             */
             fact_key: string;
+            /** @description Tipo de dato, como en la revisión. */
             kind: components["schemas"]["FactKind"];
             /**
              * Name
              * @description Nombre en español de la mecánica, el entrenador o el Pokémon.
              */
             name: string;
+            /** @description Valor confirmado: un booleano o, en un combate clave, la lista de su equipo. */
             value: components["schemas"]["ReviewValue"];
         };
         /**
@@ -511,11 +517,20 @@ export interface components {
         };
         /** DiscardOut */
         DiscardOut: {
-            /** Pokemon */
+            /**
+             * Pokemon
+             * @description Identificador del favorito descartado.
+             */
             pokemon: string;
-            /** Name */
+            /**
+             * Name
+             * @description Nombre en español.
+             */
             name: string;
-            /** Rule Id */
+            /**
+             * Rule Id
+             * @description Regla que lo descarta.
+             */
             rule_id: string;
             /** @description `generation`, `game` o `arrival` (RN-03), `breeding` (RN-11) o `journey` (RN-16). */
             reason: components["schemas"]["DiscardReason"];
@@ -552,9 +567,15 @@ export interface components {
         };
         /** EvolutionOut */
         EvolutionOut: {
-            /** From Pokemon */
+            /**
+             * From Pokemon
+             * @description Forma que evoluciona.
+             */
             from_pokemon: string;
-            /** To Pokemon */
+            /**
+             * To Pokemon
+             * @description Forma a la que evoluciona.
+             */
             to_pokemon: string;
             /**
              * Version Group
@@ -602,6 +623,7 @@ export interface components {
             /**
              * Added At
              * Format: date-time
+             * @description Cuándo se añadió a favoritos.
              */
             added_at: string;
         };
@@ -630,7 +652,10 @@ export interface components {
              * @description Nombre en español.
              */
             name: string;
-            /** Generation */
+            /**
+             * Generation
+             * @description Generación del juego.
+             */
             generation: number;
             /**
              * Version Group
@@ -655,7 +680,10 @@ export interface components {
         };
         /** GenerationOut */
         GenerationOut: {
-            /** Game */
+            /**
+             * Game
+             * @description Identificador del juego objetivo.
+             */
             game: string;
             /** @description `complete` si hay equipos de 6 favoritos; si no, `incomplete` (RN-08). */
             status: components["schemas"]["GenerationStatus"];
@@ -704,7 +732,10 @@ export interface components {
              * @description Por cada posición, los Pokémon que la pueden ocupar, todos con los mismos tipos. Cada combinación es uno de los equipos del grupo.
              */
             positions: components["schemas"]["PokemonOut"][][];
-            /** Teams */
+            /**
+             * Teams
+             * @description Cada combinación de las posiciones: un equipo del grupo.
+             */
             teams: components["schemas"]["TeamOut"][];
         };
         /** HTTPValidationError */
@@ -725,7 +756,10 @@ export interface components {
              * @description Cuándo se completó.
              */
             completed_on: string;
-            /** Notes */
+            /**
+             * Notes
+             * @description Notas opcionales.
+             */
             notes?: string | null;
             /**
              * Members
@@ -735,7 +769,10 @@ export interface components {
         };
         /** HallOfFameEntryOut */
         HallOfFameEntryOut: {
-            /** Id */
+            /**
+             * Id
+             * @description Identificador del registro.
+             */
             id: number;
             /**
              * Game
@@ -765,9 +802,13 @@ export interface components {
             /**
              * Completed On
              * Format: date
+             * @description Cuándo se completó el juego.
              */
             completed_on: string;
-            /** Notes */
+            /**
+             * Notes
+             * @description Notas del usuario; nulas si no tiene.
+             */
             notes: string | null;
             /**
              * Order
@@ -779,7 +820,10 @@ export interface components {
              * @description Si es el último juego completado del recorrido.
              */
             last: boolean;
-            /** Members */
+            /**
+             * Members
+             * @description El equipo, en orden.
+             */
             members: components["schemas"]["HallOfFameMemberOut"][];
         };
         /** HallOfFameMemberOut */
@@ -815,11 +859,20 @@ export interface components {
          * @description What to change; at least one field. ``notes: null`` removes the notes.
          */
         HallOfFamePatch: {
-            /** Game */
+            /**
+             * Game
+             * @description Juego completado, si cambia.
+             */
             game?: string | null;
-            /** Completed On */
+            /**
+             * Completed On
+             * @description Fecha, si cambia.
+             */
             completed_on?: string | null;
-            /** Notes */
+            /**
+             * Notes
+             * @description Notas; `null` las quita.
+             */
             notes?: string | null;
             /**
              * Members
@@ -912,7 +965,10 @@ export interface components {
         };
         /** PendingDataDetail */
         PendingDataDetail: {
-            /** Message */
+            /**
+             * Message
+             * @description Explicación en español.
+             */
             message: string;
             /**
              * Pending
@@ -925,6 +981,7 @@ export interface components {
          * @description Body of the 409 when some data that takes part is still unverified (RN-18).
          */
         PendingDataOut: {
+            /** @description El mensaje y los datos que faltan por confirmar. */
             detail: components["schemas"]["PendingDataDetail"];
         };
         /** PokemonDetailOut */
@@ -974,11 +1031,20 @@ export interface components {
              * @description Generación en que apareció la especie.
              */
             generation: number;
-            /** Species */
+            /**
+             * Species
+             * @description Especie de la forma: la misma para sus formas regionales.
+             */
             species: string;
-            /** Is Legendary */
+            /**
+             * Is Legendary
+             * @description Si la especie es legendaria.
+             */
             is_legendary: boolean;
-            /** Is Mythical */
+            /**
+             * Is Mythical
+             * @description Si la especie es singular.
+             */
             is_mythical: boolean;
             /**
              * Line
@@ -1021,7 +1087,10 @@ export interface components {
         };
         /** PresenceOut */
         PresenceOut: {
-            /** Rule Id */
+            /**
+             * Rule Id
+             * @description Regla de presencia, `RN-13` o `RN-14`.
+             */
             rule_id: string;
             /**
              * Level
@@ -1030,9 +1099,15 @@ export interface components {
             level: number;
             /** @description `candidates` (el equipo incluye una de `options`), `reserved` (se reserva un hueco para una de `options`, que no son favoritos) o `unmet` (no se puede cumplir). */
             status: components["schemas"]["PresenceStatus"];
-            /** Options */
+            /**
+             * Options
+             * @description Los Pokémon que la cumplen en ese nivel.
+             */
             options: string[];
-            /** Detail */
+            /**
+             * Detail
+             * @description Explicación en español.
+             */
             detail: string;
         };
         /**
@@ -1085,7 +1160,10 @@ export interface components {
         };
         /** ReviewOut */
         ReviewOut: {
-            /** Game */
+            /**
+             * Game
+             * @description Identificador del juego.
+             */
             game: string;
             /**
              * Pending
@@ -1116,7 +1194,10 @@ export interface components {
              * @description Identificador del DDF, p. ej. `RN-17`.
              */
             rule_id: string;
-            /** Name */
+            /**
+             * Name
+             * @description Nombre en español.
+             */
             name: string;
             /**
              * Description
@@ -1130,7 +1211,10 @@ export interface components {
              * @description Si el usuario la puede activar y desactivar.
              */
             configurable: boolean;
-            /** Enabled */
+            /**
+             * Enabled
+             * @description Si está activa.
+             */
             enabled: boolean;
             /**
              * Weight
@@ -1148,9 +1232,15 @@ export interface components {
          * @description What to change; at least one of the two.
          */
         RulePatch: {
-            /** Enabled */
+            /**
+             * Enabled
+             * @description Activarla (`true`) o desactivarla (`false`); solo en las configurables.
+             */
             enabled?: boolean | null;
-            /** Weight */
+            /**
+             * Weight
+             * @description Peso nuevo, de 0 a 10; solo en las blandas.
+             */
             weight?: number | null;
         };
         /**
@@ -1158,9 +1248,15 @@ export interface components {
          * @description What one active soft rule adds to the team's score (RF-09).
          */
         RuleScoreOut: {
-            /** Rule Id */
+            /**
+             * Rule Id
+             * @description Regla blanda, p. ej. `RN-17`.
+             */
             rule_id: string;
-            /** Name */
+            /**
+             * Name
+             * @description Nombre de la regla.
+             */
             name: string;
             /**
              * Weight
@@ -1185,6 +1281,7 @@ export interface components {
         };
         /** SuggestionOut */
         SuggestionOut: {
+            /** @description El Pokémon sugerido, con sus tipos en el juego. */
             pokemon: components["schemas"]["PokemonOut"];
             /**
              * Gain
@@ -1294,7 +1391,7 @@ export interface operations {
     list_pokemon_api_pokemon_get: {
         parameters: {
             query?: {
-                /** @description Parte del nombre o del identificador; sin distinguir mayúsculas ni tildes. */
+                /** @description Parte del nombre o del identificador, sin distinguir mayúsculas ni tildes; los guiones del identificador cuentan como espacios (`mr mime`). */
                 q?: string | null;
                 /** @description Un tipo actual, p. ej. `fire`. */
                 type?: string | null;
@@ -1332,6 +1429,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador de la forma, p. ej. `vulpix-alola` (RN-05). */
                 pokemon: string;
             };
             cookie?: never;
@@ -1363,6 +1461,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador de la forma, p. ej. `vulpix-alola` (RN-05). */
                 pokemon: string;
             };
             cookie?: never;
@@ -1394,6 +1493,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador de la forma, p. ej. `vulpix-alola` (RN-05). */
                 pokemon: string;
             };
             cookie?: never;
@@ -1445,6 +1545,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador de la forma, p. ej. `vulpix-alola` (RN-05). */
                 pokemon: string;
             };
             cookie?: never;
@@ -1476,6 +1577,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador de la forma, p. ej. `vulpix-alola` (RN-05). */
                 pokemon: string;
             };
             cookie?: never;
@@ -1525,6 +1627,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador de la regla, p. ej. `RN-07`. */
                 rule_id: string;
             };
             cookie?: never;
@@ -1592,6 +1695,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador del juego, p. ej. `firered`. */
                 game: string;
             };
             cookie?: never;
@@ -1623,6 +1727,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador del juego, p. ej. `firered`. */
                 game: string;
             };
             cookie?: never;
@@ -1654,7 +1759,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Clave estable del dato, p. ej. `pokemon:firered:raichu:arrival`. */
                 fact_key: string;
+                /** @description Identificador del juego, p. ej. `firered`. */
                 game: string;
             };
             cookie?: never;
@@ -1690,6 +1797,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador del juego, p. ej. `firered`. */
                 game: string;
             };
             cookie?: never;
@@ -1721,6 +1829,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador del juego, p. ej. `firered`. */
                 game: string;
             };
             cookie?: never;
@@ -1761,6 +1870,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador del juego, p. ej. `firered`. */
                 game: string;
             };
             cookie?: never;
@@ -1803,6 +1913,7 @@ export interface operations {
     list_entries_api_hall_of_fame_get: {
         parameters: {
             query?: {
+                /** @description Solo los registros de este juego. */
                 game?: string | null;
             };
             header?: never;
@@ -1869,6 +1980,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador del registro (`id`). */
                 entry_id: number;
             };
             cookie?: never;
@@ -1898,6 +2010,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Identificador del registro (`id`). */
                 entry_id: number;
             };
             cookie?: never;

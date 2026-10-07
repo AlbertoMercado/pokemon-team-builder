@@ -29,6 +29,13 @@ theme:
     - search.highlight
     - content.code.copy
 
+hooks:
+  - docs/hooks/api_reference.py
+
+# The hooks are code, not pages.
+exclude_docs: |
+  hooks/
+
 markdown_extensions:
   - admonition
   - attr_list
@@ -64,6 +71,7 @@ nav:
       - Cómo se documenta: 02-ddt/documentacion.md
       - Modelo de datos: 02-ddt/modelo-datos.md
       - API: 02-ddt/api.md
+      - Referencia de la API: 02-ddt/api-referencia.md
       - Algoritmo de generación: 02-ddt/algoritmo-generacion.md
       - Datos requeridos: 02-ddt/datos-requeridos.md
       - Datos curados: 02-ddt/datos-curados.md
@@ -87,6 +95,7 @@ nav:
       - "0009 · Despliegue en una VM gratuita": 03-adr/0009-despliegue-vm-gratuita-tailscale.md
       - "0010 · Imágenes de los Pokémon": 03-adr/0010-imagenes-pokemon-cache-local.md
       - "0011 · Portadas de WikiDex de uso privado": 03-adr/0011-portadas-wikidex-uso-privado.md
+      - "0012 · Referencia de la API desde OpenAPI": 03-adr/0012-referencia-api-desde-openapi.md
   - Manual de usuario:
       - 04-manual-usuario/index.md
       - Cargar y actualizar los datos: 04-manual-usuario/cargar-datos.md

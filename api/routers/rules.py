@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Path
 from sqlmodel import Session
 
 from api.database import user_session
@@ -22,7 +22,12 @@ def list_rules(user: UserDb) -> list[RuleOut]:
 
 
 @router.patch("/{rule_id}", summary="Activar, desactivar o cambiar el peso de una regla")
-def update_rule(rule_id: str, change: RulePatch, user: UserDb) -> RuleOut:
+def update_rule(
+    rule_id: Annotated[str, Path(description="Identificador de la regla, p. ej. `RN-07`.")],
+    change: RulePatch,
+    user: UserDb,
+) -> RuleOut:
     """Cambia `enabled`, `weight` (de 0 a 10, solo en las blandas) o los dos. `404` si la regla
-    no existe; `409` si no es configurable o no es blanda y se le da peso."""
+    no existe; `409` si no es configurable o no es blanda y se le da peso; `422` si el peso está
+    fuera de rango o no se indica nada."""
     return service.update_rule(user, rule_id, change)

@@ -24,7 +24,7 @@ class HallOfFameMemberOut(BaseModel):
 
 
 class HallOfFameEntryOut(BaseModel):
-    id: int
+    id: int = Field(description="Identificador del registro.")
     game: str = Field(description="Identificador del juego completado.")
     game_name: str = Field(description="Nombre en español del juego.")
     generation: int | None = Field(
@@ -38,28 +38,28 @@ class HallOfFameEntryOut(BaseModel):
         description="Página del fichero de la portada en WikiDex, su titular y procedencia "
         "(CA-56, ADR-0011); nula si el juego no tiene portada."
     )
-    completed_on: date
-    notes: str | None
+    completed_on: date = Field(description="Cuándo se completó el juego.")
+    notes: str | None = Field(description="Notas del usuario; nulas si no tiene.")
     order: int = Field(
         description="Posición en el recorrido: por fecha y, a igualdad, por orden de registro."
     )
     last: bool = Field(description="Si es el último juego completado del recorrido.")
-    members: list[HallOfFameMemberOut]
+    members: list[HallOfFameMemberOut] = Field(description="El equipo, en orden.")
 
 
 class HallOfFameEntryIn(BaseModel):
     game: str = Field(description="Juego completado: cualquiera de los cargados.")
     completed_on: date = Field(description="Cuándo se completó.")
-    notes: str | None = None
+    notes: str | None = Field(default=None, description="Notas opcionales.")
     members: list[str] = Field(min_length=1, max_length=TEAM_SIZE, description=MEMBERS_DESCRIPTION)
 
 
 class HallOfFamePatch(BaseModel):
     """What to change; at least one field. ``notes: null`` removes the notes."""
 
-    game: str | None = None
-    completed_on: date | None = None
-    notes: str | None = None
+    game: str | None = Field(default=None, description="Juego completado, si cambia.")
+    completed_on: date | None = Field(default=None, description="Fecha, si cambia.")
+    notes: str | None = Field(default=None, description="Notas; `null` las quita.")
     members: list[str] | None = Field(
         default=None, min_length=1, max_length=TEAM_SIZE, description=MEMBERS_DESCRIPTION
     )

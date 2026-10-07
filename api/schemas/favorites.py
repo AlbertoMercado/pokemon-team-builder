@@ -14,7 +14,7 @@ class FavoriteOut(BaseModel):
         description="URL de su imagen en esta API (`/api/pokemon/{pokemon}/image`); nula si la "
         "forma no tiene imagen."
     )
-    added_at: datetime
+    added_at: datetime = Field(description="Cuándo se añadió a favoritos.")
 
 
 class FavoritesOut(BaseModel):

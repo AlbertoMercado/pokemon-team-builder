@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 from fastapi.responses import FileResponse
 
-from api.dependencies import DataDir, ReferenceDb, UserDb
+from api.dependencies import DataDir, PokemonSlug, ReferenceDb, UserDb
 from api.schemas.catalog import CatalogOut, PokemonDetailOut
 from api.services import catalog as service
 from api.services import images
@@ -15,7 +15,10 @@ router = APIRouter(prefix="/pokemon", tags=["Catálogo"])
 
 Search = Annotated[
     str | None,
-    Query(description="Parte del nombre o del identificador; sin distinguir mayúsculas ni tildes."),
+    Query(
+        description="Parte del nombre o del identificador, sin distinguir mayúsculas ni tildes; "
+        "los guiones del identificador cuentan como espacios (`mr mime`)."
+    ),
 ]
 TypeFilter = Annotated[
     str | None, Query(alias="type", description="Un tipo actual, p. ej. `fire`.")
@@ -40,7 +43,7 @@ def list_pokemon(
 
 
 @router.get("/{pokemon}", summary="Ficha de un Pokémon")
-def pokemon_detail(pokemon: str, user: UserDb, reference: ReferenceDb) -> PokemonDetailOut:
+def pokemon_detail(pokemon: PokemonSlug, user: UserDb, reference: ReferenceDb) -> PokemonDetailOut:
     """Número, nombre, tipos actuales, línea evolutiva completa y el mecanismo de cada
     evolución. `404` si la forma no existe."""
     return service.pokemon_detail(user, reference, pokemon)
@@ -52,7 +55,7 @@ def pokemon_detail(pokemon: str, user: UserDb, reference: ReferenceDb) -> Pokemo
     response_class=FileResponse,
     responses={200: {"content": {"image/png": {}}, "description": "La imagen, en PNG."}},
 )
-def pokemon_image(pokemon: str, reference: ReferenceDb, data_dir: DataDir) -> FileResponse:
+def pokemon_image(pokemon: PokemonSlug, reference: ReferenceDb, data_dir: DataDir) -> FileResponse:
     """La imagen de la forma (su *sprite* de PokeAPI, recortado a la figura), que la carga de
     datos guarda en la caché local. Es la URL que dan las respuestas en `image_url`. `404` si
     la forma no existe o no tiene imagen."""
@@ -68,7 +71,9 @@ def pokemon_image(pokemon: str, reference: ReferenceDb, data_dir: DataDir) -> Fi
     response_class=FileResponse,
     responses={200: {"content": {"image/png": {}}, "description": "La ilustración, en PNG."}},
 )
-def pokemon_artwork(pokemon: str, reference: ReferenceDb, data_dir: DataDir) -> FileResponse:
+def pokemon_artwork(
+    pokemon: PokemonSlug, reference: ReferenceDb, data_dir: DataDir
+) -> FileResponse:
     """La ilustración oficial de la forma, de hasta 256 px, para la ficha. La carga de datos la
     guarda en la caché local. Es la URL que da la ficha en `artwork_url`. `404` si la forma no
     existe o no tiene ilustración."""
