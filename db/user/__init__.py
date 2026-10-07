@@ -27,6 +27,7 @@ __all__ = [
     "ConfirmedValue",
     "FactConfirmation",
     "Favorite",
+    "ForeignKeyError",
     "HallOfFameEntry",
     "HallOfFameMember",
     "RuleSetting",
@@ -43,14 +44,30 @@ def alembic_config() -> Config:
     return config
 
 
+class ForeignKeyError(RuntimeError):
+    """The migrations left rows that point to rows that do not exist."""
+
+
 def upgrade(path: Path) -> None:
-    """Apply every pending migration to the user.sqlite at ``path``."""
+    """Apply every pending migration to the user.sqlite at ``path``.
+
+    Batch migrations rebuild a table by copying it and dropping the old one; with foreign keys
+    on, that drop deletes the children of an ``ON DELETE CASCADE`` (the members of the Hall of
+    Fame). So they are turned off while migrating, outside the transaction because SQLite
+    ignores the pragma inside one, and checked before committing.
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
     engine = create_sqlite_engine(path)
     try:
-        with engine.begin() as connection:
-            config = alembic_config()
-            config.attributes["connection"] = connection
-            command.upgrade(config, "head")
+        with engine.connect() as connection:
+            connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+            connection.commit()
+            with connection.begin():
+                config = alembic_config()
+                config.attributes["connection"] = connection
+                command.upgrade(config, "head")
+                broken = connection.exec_driver_sql("PRAGMA foreign_key_check").all()
+                if broken:
+                    raise ForeignKeyError(f"Claves foráneas rotas tras migrar: {broken}")
     finally:
         engine.dispose()

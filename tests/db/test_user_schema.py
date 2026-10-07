@@ -205,6 +205,23 @@ def test_the_migration_to_one_entry_per_game_keeps_the_entries(tmp_path: Path) -
     engine.dispose()
 
 
+def test_the_migration_to_one_entry_per_game_keeps_the_members(tmp_path: Path) -> None:
+    """Rebuilding hall_of_fame_entry must not delete its members in cascade."""
+    path = tmp_path / "user.sqlite"
+    engine = _at_first_revision(path, "firered")
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                "INSERT INTO hall_of_fame_member (entry, position, pokemon, types) "
+                "VALUES (1, 1, 'venusaur', '[\"grass\", \"poison\"]')"
+            )
+        )
+    upgrade(path)
+    with Session(engine) as session:
+        assert session.exec(select(HallOfFameMember.pokemon)).all() == ["venusaur"]
+    engine.dispose()
+
+
 def test_the_migration_stops_if_a_game_is_repeated(tmp_path: Path) -> None:
     """CA-68: it says which games are repeated and deletes nothing."""
     path = tmp_path / "user.sqlite"
