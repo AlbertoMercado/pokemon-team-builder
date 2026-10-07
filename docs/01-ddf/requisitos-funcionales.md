@@ -109,8 +109,9 @@ Hay dos excepciones:
       activas.
     - Las reglas duras activables ([RN-07](reglas-negocio.md#rn-07),
       [RN-11](reglas-negocio.md#rn-11), [RN-12](reglas-negocio.md#rn-12),
-      [RN-13](reglas-negocio.md#rn-13), [RN-14](reglas-negocio.md#rn-14) y
-      [RN-16](reglas-negocio.md#rn-16)) se pueden activar y desactivar. Por defecto están
+      [RN-13](reglas-negocio.md#rn-13), [RN-14](reglas-negocio.md#rn-14),
+      [RN-16](reglas-negocio.md#rn-16) y [RN-21](reglas-negocio.md#rn-21)) se pueden activar
+      y desactivar. Por defecto están
       todas activas ([CA-41](cuestiones-abiertas.md#resueltas)).
     - La configuración se conserva entre sesiones.
 

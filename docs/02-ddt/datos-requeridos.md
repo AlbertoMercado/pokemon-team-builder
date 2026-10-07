@@ -19,6 +19,7 @@ columnas concretas están en el [modelo de datos](modelo-datos.md).
 | RN-15 | Método de cada paso de evolución en el juego objetivo, clasificado como tedioso o no. Qué mecánicas tiene cada juego (p. ej., ciclo de día y noche), para saber si una evolución se puede hacer en él. Movimientos que se aprenden subiendo de nivel, para el método «conocer un movimiento». |
 | RN-16 | *Hall of Fame*: juego, orden en el recorrido y miembros (forma). Generación de cada juego. Líneas evolutivas, con las excepciones de Dragonite y Eevee. |
 | RN-17 | Combates clave de cada juego con sus Pokémon rivales (forma). Tipos de esos Pokémon y tabla de eficacias del juego. |
+| RN-21 | Iniciales de cada juego objetivo: la forma de su evolución final ([CA-59](../01-ddf/cuestiones-abiertas.md#resueltas), [CA-63](../01-ddf/cuestiones-abiertas.md#resueltas)). PokeAPI no los tiene: son datos curados. Líneas evolutivas, para el «solo uno». |
 
 ## Entidades
 
@@ -32,7 +33,8 @@ Generación
 Juego
 :   Identificador, nombre en español, generación de lanzamiento y orden de lanzamiento. Lista
     de Pokémon (por forma) que pueden estar en él (RN-03). Mecánicas que condicionan las
-    evoluciones, como el ciclo de día y noche (RN-15).
+    evoluciones, como el ciclo de día y noche (RN-15). Iniciales, como la forma de su
+    evolución final (RN-21).
 
 Especie
 :   Número de la Pokédex nacional, nombre, grupos huevo, legendario (sí/no), singular (sí/no)
