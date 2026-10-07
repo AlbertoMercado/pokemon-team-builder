@@ -37,6 +37,11 @@ Hay dos excepciones:
 | [RF-17](#rf-17) | Mostrar imágenes de los Pokémon | Imágenes | Could |
 | [RF-18](#rf-18) | Mostrar la portada de los juegos | Imágenes | Could |
 | [RF-19](#rf-19) | Proteger el acceso a la aplicación | Seguridad | Could |
+| [RF-20](#rf-20) | Consultar el progreso de las Pokédex | Pokédex | Must |
+| [RF-21](#rf-21) | Marcar los Pokémon ya registrados | Pokédex | Must |
+| [RF-22](#rf-22) | Ficha del Pokémon objetivo | Pokédex | Must |
+| [RF-23](#rf-23) | Elegir otra forma de obtención | Pokédex | Must |
+| [RF-24](#rf-24) | Revisar los registrados y los imposibles | Pokédex | Must |
 
 ## Catálogo
 
@@ -107,6 +112,8 @@ Hay dos excepciones:
     - Un juego que no está completo no se ofrece ni se puede revisar o generar, aunque se
       intente por su dirección. Sí se puede registrar en el *Hall of Fame*, porque forma parte
       del recorrido ([RF-12](#rf-12)).
+    - Tampoco se ofrece un juego ya registrado en el *Hall of Fame*: cada juego se completa
+      una sola vez ([CA-68](cuestiones-abiertas.md#resueltas)).
     - Cambiar de juego no modifica la lista de favoritos.
 
 ### RF-06 · Configurar las reglas duras { #rf-06 }
@@ -291,6 +298,9 @@ Hay dos excepciones:
       uno de los equipos (una alternativa por posición y una sugerencia por hueco) y registrarlo
       para ese juego, o descartarlos sin registrar nada. Antes de registrarlo se comprueba que
       cumple las reglas activas ([CA-53](cuestiones-abiertas.md#resueltas)).
+    - Cada juego se registra **una sola vez**: los juegos ya registrados no aparecen al
+      registrar. Para volver a jugar uno hay que eliminar antes su registro
+      ([CA-68](cuestiones-abiertas.md#resueltas)).
 
 ### RF-13 · Consultar el Hall of Fame { #rf-13 }
 
@@ -302,6 +312,9 @@ Hay dos excepciones:
     - Cada registro muestra el equipo, el juego y la fecha.
     - Se puede corregir o eliminar un registro, porque cambia las exclusiones de
       [RN-16](reglas-negocio.md#rn-16).
+    - Eliminar un registro borra también la Pokédex de ese juego ([RF-20](#rf-20)). La
+      aplicación lo avisa y pide confirmación antes
+      ([CA-68](cuestiones-abiertas.md#resueltas)).
 
 ## Reglas personalizadas
 
@@ -391,3 +404,88 @@ protege la propia aplicación, de forma que no dependa solo de cómo se desplieg
       código.
 - **Nota**: el mecanismo y las protecciones que lo acompañan se deciden en
   [CA-57](cuestiones-abiertas.md#abiertas) y [CA-58](cuestiones-abiertas.md#abiertas).
+
+## Pokédex
+
+Ayuda a completar la Pokédex de los juegos superados para conseguir su diploma. Es una función
+independiente de la generación de equipos: solo comparte con ella el *Hall of Fame*
+([CA-79](cuestiones-abiertas.md#resueltas)). Sus reglas son
+[RN-22 a RN-26](reglas-negocio.md#reglas-de-la-pokedex).
+
+### RF-20 · Consultar el progreso de las Pokédex { #rf-20 }
+
+- **Prioridad**: Must
+- **Descripción**: el usuario ve los juegos que ha superado, es decir, los registrados en el
+  *Hall of Fame*, con el progreso de la Pokédex de cada uno
+  ([RN-22](reglas-negocio.md#rn-22)).
+- **Criterios de aceptación**:
+    - Aparece cada juego registrado en el *Hall of Fame*, una vez
+      ([CA-68](cuestiones-abiertas.md#resueltas)).
+    - De cada uno se muestran el porcentaje completado, su estado (**no iniciada**, **en
+      curso** o **completada**) y cuántos Pokémon están marcados como imposibles.
+    - Al eliminar el registro del *Hall of Fame*, su Pokédex desaparece con sus datos
+      ([RF-13](#rf-13)).
+
+### RF-21 · Marcar los Pokémon ya registrados { #rf-21 }
+
+- **Prioridad**: Must
+- **Descripción**: la primera vez que el usuario abre la Pokédex de un juego, ve la lista de
+  todos los Pokémon de esa Pokédex ([RN-22](reglas-negocio.md#rn-22)) y marca los que ya
+  tiene registrados.
+- **Criterios de aceptación**:
+    - La lista sigue el orden de la Pokédex, con el número, el nombre y los tipos de cada
+      Pokémon, y su imagen si la hay ([RF-17](#rf-17)).
+    - Registrado significa capturado u obtenido, no solo visto
+      ([CA-69](cuestiones-abiertas.md#resueltas)).
+    - Se marca y desmarca libremente hasta confirmar. Al confirmar, se guarda y se pasa a la
+      ficha del Pokémon objetivo ([RF-22](#rf-22)).
+    - Solo se muestra la primera vez. Las correcciones posteriores se hacen en el detalle
+      ([RF-24](#rf-24), [CA-77](cuestiones-abiertas.md#resueltas)).
+
+### RF-22 · Ficha del Pokémon objetivo { #rf-22 }
+
+- **Prioridad**: Must
+- **Descripción**: la aplicación muestra la ficha del siguiente Pokémon que hay que registrar
+  ([RN-23](reglas-negocio.md#rn-23)) con su forma de obtención más sencilla
+  ([RN-24](reglas-negocio.md#rn-24)).
+- **Criterios de aceptación**:
+    - La ficha muestra el número, el nombre, los tipos y la imagen del Pokémon, y la forma de
+      obtenerlo con su detalle: dónde y con qué probabilidad, desde qué juego o cómo
+      evoluciona ([RN-24](reglas-negocio.md#rn-24) a [RN-26](reglas-negocio.md#rn-26)).
+    - Si la forma es criarlo o evolucionarlo desde otro Pokémon que no está registrado, la
+      ficha enlaza a la de ese Pokémon, en lugar de explicarlo en la misma
+      ([CA-76](cuestiones-abiertas.md#resueltas)).
+    - Acciones:
+        - **Registrar**: lo marca como registrado y pasa al siguiente objetivo.
+        - **Marcar como imposible de obtener**: lo marca como imposible y pasa al siguiente.
+        - **Saltar de momento**: pasa al siguiente sin guardar nada. Al volver a entrar en la
+          Pokédex de ese juego, vuelve a salir primero
+          ([CA-77](cuestiones-abiertas.md#resueltas)).
+        - **Otras formas de obtención** ([RF-23](#rf-23)).
+    - Cuando no queda ningún Pokémon por registrar ni marcado como imposible, la aplicación lo
+      dice en lugar de mostrar una ficha.
+
+### RF-23 · Elegir otra forma de obtención { #rf-23 }
+
+- **Prioridad**: Must
+- **Descripción**: en la ficha, el usuario ve todas las formas de obtener el Pokémon, de la más
+  sencilla a la menos ([RN-24](reglas-negocio.md#rn-24)), y elige la que prefiere.
+- **Criterios de aceptación**:
+    - Aparecen todas las formas posibles en el orden de RN-24, con la recomendada marcada.
+    - La forma elegida se guarda para ese Pokémon en esa Pokédex. La ficha la muestra primero,
+      marcada como «elegida por ti», y se puede volver a la recomendada
+      ([CA-75](cuestiones-abiertas.md#resueltas)).
+    - Sirve también para detectar errores: no debería haber una forma más sencilla que la
+      recomendada; si la hay, es un fallo de los datos o de las reglas.
+
+### RF-24 · Revisar los registrados y los imposibles { #rf-24 }
+
+- **Prioridad**: Must
+- **Descripción**: una pantalla de detalle de la Pokédex de un juego con dos listas: los
+  Pokémon registrados y los imposibles de obtener.
+- **Criterios de aceptación**:
+    - Desde cualquiera de las dos listas se puede desmarcar un Pokémon, para corregir un
+      registro erróneo o un imposible que sí se puede obtener
+      ([CA-71](cuestiones-abiertas.md#resueltas)). Vuelve a poder ser objetivo.
+    - Los imposibles automáticos ([RN-25](reglas-negocio.md#rn-25)) aparecen con su motivo y
+      no se pueden desmarcar.
