@@ -40,6 +40,7 @@ DOCUMENTED_TABLES = {
     "game",
     "game_mechanic",
     "game_pokemon",
+    "game_starter",
     "type",
     "type_efficacy",
     "species",

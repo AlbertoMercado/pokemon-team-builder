@@ -1,0 +1,8 @@
+# Iniciales de cada juego objetivo (RN-21), como la forma de su evolución final en ese juego
+# (CA-59, CA-63). Esquema y significado: docs/02-ddt/datos-curados.md.
+games:
+  ruby: [sceptile, blaziken, swampert]
+  sapphire: [sceptile, blaziken, swampert]
+  emerald: [sceptile, blaziken, swampert]
+  firered: [venusaur, charizard, blastoise]
+  leafgreen: [venusaur, charizard, blastoise]

@@ -6,7 +6,7 @@ in docs/02-ddt/datos-curados.md.
 """
 
 import re
-from typing import Literal, Self
+from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -43,6 +43,26 @@ class GamesFile(CuratedModel):
     """``games.yaml``: mechanics of each target game that condition evolutions (RN-15)."""
 
     games: dict[Slug, dict[Mechanic, MechanicValue]]
+
+
+class StartersFile(CuratedModel):
+    """``starters.yaml``: the starters of each target game (RN-21).
+
+    Each starter is the form of its final evolution in that game, e.g. ``venusaur`` in
+    FireRed (CA-59, CA-63). Which Pokémon a game offers to start is not in doubt, so the
+    values have no origin.
+    """
+
+    games: dict[Slug, Annotated[list[Slug], Field(min_length=1)]]
+
+    @model_validator(mode="after")
+    def _unique_starters(self) -> Self:
+        repeated = sorted(
+            game for game, starters in self.games.items() if len(set(starters)) < len(starters)
+        )
+        if repeated:
+            raise ValueError(f"iniciales repetidos en: {repeated}")
+        return self
 
 
 class BreedingFile(CuratedModel):

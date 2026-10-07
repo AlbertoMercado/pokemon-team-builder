@@ -4,6 +4,7 @@ The rules checked here are described in docs/02-ddt/carga-datos.md, section
 "Cómo se interpreta el volcado de PokeAPI".
 """
 
+import dataclasses
 import shutil
 from collections.abc import Iterator
 from pathlib import Path
@@ -15,6 +16,7 @@ from db.reference import (
     EvolutionStep,
     Game,
     GamePokemon,
+    GameStarter,
     Origin,
     Pokemon,
     PokemonType,
@@ -24,7 +26,7 @@ from db.reference import (
     TypeEfficacy,
 )
 from db.sqlite import create_sqlite_engine
-from ingest.checks import FIRST_LOAD_CHECKS, check_counts, check_key_battles
+from ingest.checks import FIRST_LOAD_CHECKS, check_counts, check_key_battles, check_starters
 from ingest.load import build_reference
 from ingest.sources.curated import (
     CuratedData,
@@ -33,7 +35,7 @@ from ingest.sources.curated import (
     read_curated,
     read_pinned_commits,
 )
-from ingest.sources.curated.schemas import ArrivalFile, ArrivalRule
+from ingest.sources.curated.schemas import ArrivalFile, ArrivalRule, StartersFile
 from ingest.sources.pokeapi import PokeapiCsvSource
 from ingest.sources.pokeapi.download import CsvCache, MissingCsvError
 from ingest.sources.pokeapi.rows import CsvSchemaError
@@ -43,7 +45,11 @@ COMMIT = "bc92d3b6029ef1abe9e7ad424c400b338f3c11fe"
 SPRITES_COMMIT = "8491ffde1b247e4de574d4bb8e24b7bd9fa876fa"
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "pokeapi"
 REPOSITORY = Path(__file__).resolve().parents[2]
-CURATED = read_curated(REPOSITORY / "data" / "curated")
+# Of the starters, the extract only has Venusaur.
+CURATED = dataclasses.replace(
+    read_curated(REPOSITORY / "data" / "curated"),
+    starters=StartersFile(games={"firered": ["venusaur"]}),
+)
 
 
 def _offline_source(cache_dir: Path = FIXTURES, curated: CuratedData = CURATED) -> PokeapiCsvSource:
@@ -352,6 +358,7 @@ def _with_arrival(game: str, pokedex: str) -> CuratedData:
         games=CURATED.games,
         breeding=CURATED.breeding,
         arrival=ArrivalFile(games={game: rule}),
+        starters=CURATED.starters,
         key_battles=CURATED.key_battles,
     )
 
@@ -395,7 +402,23 @@ def test_first_load_checks_reject_an_incomplete_load(tmp_path: Path) -> None:
 
 
 def test_known_case_checks_pass_on_the_extract(loaded: Session) -> None:
-    """Every problem of the extract is a count or a key battle (it has no WikiDex teams)."""
+    """Every problem of the extract is a count, a key battle (it has no WikiDex teams) or a
+    missing starter (it only has Venusaur)."""
     problems = [problem for check in FIRST_LOAD_CHECKS for problem in check(loaded)]
     assert problems
-    assert set(problems) <= set(check_counts(loaded)) | set(check_key_battles(loaded))
+    expected = check_counts(loaded) + check_key_battles(loaded) + check_starters(loaded)
+    assert set(problems) <= set(expected)
+
+
+@pytest.mark.rn("RN-21")
+def test_starters_check_requires_a_final_evolution(loaded: Session) -> None:
+    """CA-59: a starter is the final evolution of its line, so Ivysaur cannot be one."""
+    loaded.add(GameStarter(game="firered", pokemon="ivysaur"))
+    loaded.flush()
+    try:
+        problems = check_starters(loaded)
+    finally:
+        loaded.rollback()
+
+    assert "ivysaur no es una evolución final en firered: no puede ser inicial" in problems
+    assert not any(problem.startswith("venusaur no es") for problem in problems)

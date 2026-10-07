@@ -33,6 +33,7 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 |---------|--------------|-------------|------------------|
 | [`pokeapi.yaml`](#pokeapiyaml) | Commits fijados del volcado de PokeAPI y del repositorio de imágenes. | `ingest_run.pokeapi_commit`, `ingest_run.sprites_commit` | — |
 | [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Rojo Fuego, Verde Hoja |
+| [`starters.yaml`](#startersyaml) | Iniciales de cada juego objetivo (RN-21). | `game_starter` | Los 5 juegos objetivo |
 | [`breeding.yaml`](#breedingyaml) | Bebés que solo nacen con incienso. | `species.requires_incense` | — |
 | [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Rojo Fuego, Verde Hoja |
 | [`covers.yaml`](#coversyaml) | Título del fichero de la portada de cada juego en WikiDex (RF-18). | `game.cover`, `game.cover_source` | Los 11 juegos cargados |
@@ -78,6 +79,26 @@ games:
 
 Cada mecánica se carga como una fila de `game_mechanic` con la clave revisable
 `mechanic:<juego>:<mecánica>` ([modelo de datos](modelo-datos.md#datos-revisables-fact_key)).
+
+### `starters.yaml`
+
+**Por qué existe**: [RN-21](../01-ddf/reglas-negocio.md#rn-21) obliga a llevar un inicial del
+juego objetivo, y PokeAPI no dice qué Pokémon ofrece cada juego para empezar.
+
+```yaml
+games:
+  firered: [venusaur, charizard, blastoise]   # formas de PokeAPI
+```
+
+Cada inicial es la **forma de su evolución final** en ese juego, no la especie con la que se
+empieza ([CA-59](../01-ddf/cuestiones-abiertas.md#resueltas)). Una forma regional se escribe
+con su identificador (p. ej., `typhlosion-hisui`) y solo en el juego que la ofrece
+([CA-63](../01-ddf/cuestiones-abiertas.md#resueltas)). Los valores no llevan `origin`: no hay
+duda de cuáles son los iniciales de un juego, así que el usuario no los confirma.
+
+Cada juego tiene al menos un inicial y ninguno repetido. Un inicial que no es una forma cargada
+hace fallar la carga (clave foránea), y las comprobaciones de la carga exigen que cada uno sea
+una evolución final en el juego.
 
 ### `breeding.yaml`
 
@@ -283,17 +304,19 @@ lista con una plantilla para añadirlo a este fichero
 | Fichero | Qué hace |
 |---------|----------|
 | `ingest/sources/curated/schemas.py` | Un modelo pydantic por fichero, con las validaciones de esta página. |
-| `ingest/sources/curated/__init__.py` | `read_curated(directorio)` lee y valida todos los ficheros (`CuratedData`). `CuratedSource` carga las mecánicas. |
+| `ingest/sources/curated/__init__.py` | `read_curated(directorio)` lee y valida todos los ficheros (`CuratedData`). `CuratedSource` carga las mecánicas y los iniciales. |
 | `ingest/sources/pokeapi/transform.py` | Usa `CuratedData` para marcar los bebés de incienso y proponer la llegada. |
 | `ingest/sources/wikidex/` | Usa la lista de combates de `CuratedData` para leer sus equipos de WikiDex y cargarlos ([ingesta](../05-operacion/ingesta.md#wikidex)). |
 
 Tests en `tests/ingest/test_curated.py` (los ficheros reales del repositorio, los esquemas y la
-fuente), en `tests/ingest/test_pokeapi.py` (bebés de incienso y propuestas de llegada) y en
+fuente), en `tests/ingest/test_pokeapi.py` (bebés de incienso, propuestas de llegada y
+comprobación de los iniciales) y en
 `tests/ingest/test_wikidex.py` (equipos de los combates clave).
 
 ## Añadir los datos de un juego
 
-1. Añadir sus mecánicas a `games.yaml` y su regla a `arrival.yaml`. Si no se conoce la regla,
+1. Añadir sus mecánicas a `games.yaml`, sus iniciales a `starters.yaml` y su regla a
+   `arrival.yaml`. Si no se conoce la regla,
    no añadirla: la llegada queda pendiente y la confirma el usuario.
 2. Crear `key_battles/<grupo-de-versiones>.yaml` con sus combates clave y la sección de
    WikiDex de sus equipos. Ejecutar la ingesta: los errores dicen qué página es de

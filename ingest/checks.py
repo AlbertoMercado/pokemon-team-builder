@@ -16,6 +16,7 @@ from db.reference import (
     Game,
     GameMechanic,
     GamePokemon,
+    GameStarter,
     Generation,
     KeyBattle,
     KeyBattlePokemon,
@@ -47,6 +48,7 @@ EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     GamePokemon: len(TARGET_GAMES) * SPECIES_COUNT,
     GameMechanic: len(CURATED_GAMES) * 2,  # day_night_cycle and contests
     KeyBattle: len(CURATED_GAMES) * KEY_BATTLES_PER_GAME,
+    GameStarter: len(TARGET_GAMES) * 3,
 }
 # 15 types in the 1st generation, 17 from the 2nd: one factor per pair.
 EFFICACY_PAIRS_BY_GENERATION = {1: 15 * 15, 2: 17 * 17, 3: 17 * 17}
@@ -211,6 +213,34 @@ def check_arrival_proposals(session: Session) -> list[str]:
     return problems
 
 
+def check_starters(session: Session) -> list[str]:
+    """Starters of every target game, each the final evolution of its line there (RN-21)."""
+    problems = []
+    expected = {
+        "firered": {"venusaur", "charizard", "blastoise"},
+        "emerald": {"sceptile", "blaziken", "swampert"},
+    }
+    for game, starters in expected.items():
+        found = set(session.exec(select(GameStarter.pokemon).where(GameStarter.game == game)))
+        if found != starters:
+            problems.append(
+                f"iniciales de {game}: {sorted(found)}, se esperaban {sorted(starters)}"
+            )
+    query = (
+        select(GameStarter.game, GameStarter.pokemon)
+        .distinct()
+        .join(Game, col(Game.slug) == GameStarter.game)
+        .join(
+            EvolutionStep,
+            (col(EvolutionStep.version_group) == Game.version_group)
+            & (col(EvolutionStep.from_pokemon) == GameStarter.pokemon),
+        )
+    )
+    for game, pokemon in session.exec(query).all():
+        problems.append(f"{pokemon} no es una evolución final en {game}: no puede ser inicial")
+    return problems
+
+
 def _team(session: Session, battle: str) -> list[str]:
     query = (
         select(KeyBattlePokemon.pokemon)
@@ -257,5 +287,6 @@ FIRST_LOAD_CHECKS: Sequence[Check] = (
     check_breeding_data,
     check_incense_babies,
     check_arrival_proposals,
+    check_starters,
     check_key_battles,
 )

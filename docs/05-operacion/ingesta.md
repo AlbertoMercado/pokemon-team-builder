@@ -152,7 +152,7 @@ Si algo falla en los pasos 1 a 8, se borra el temporal y `reference.sqlite` qued
 
 ## Informe
 
-Informe real de la carga del 2026-10-04, con el commit `bc92d3b` de PokeAPI, los datos
+Informe real de la carga del 2026-10-07, con el commit `bc92d3b` de PokeAPI, los datos
 curados y los equipos de WikiDex de Rojo Fuego y Verde Hoja:
 
 ```text
@@ -169,6 +169,7 @@ Filas cargadas por tabla:
   evolution_step          940
   game_mechanic             4
   game_pokemon           1930
+  game_starter             15
   key_battle               26
   pokemon_type           1131
   key_battle_pokemon      100
@@ -179,7 +180,7 @@ Datos revisables por origen:
 Imágenes: 386 de 386 formas
 Ilustraciones: 386 de 386 formas
 Portadas: 11 de 11 juegos
-Comprobaciones superadas: 9
+Comprobaciones superadas: 10
 Carga completada.
 ```
 

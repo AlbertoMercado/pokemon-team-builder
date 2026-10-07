@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from db.reference import BattleCategory, GameMechanic, Origin
+from db.reference import BattleCategory, GameMechanic, GameStarter, Origin
 from ingest import cli
 from ingest.sources.curated import CuratedDataError, CuratedSource, read_curated
 from ingest.sources.curated.schemas import (
@@ -16,6 +16,7 @@ from ingest.sources.curated.schemas import (
     GamesFile,
     KeyBattlesFile,
     MechanicValue,
+    StartersFile,
 )
 
 CURATED_DIR = Path(__file__).resolve().parents[2] / "data" / "curated"
@@ -27,6 +28,7 @@ def test_repository_curated_files_are_valid() -> None:
     assert curated.breeding.incense_babies == {"azurill": "sea-incense", "wynaut": "lax-incense"}
     assert set(curated.games.games) == {"firered", "leafgreen"}
     assert set(curated.arrival.games) == {"firered", "leafgreen"}
+    assert set(curated.starters.games) == {"ruby", "sapphire", "emerald", "firered", "leafgreen"}
     [firered_leafgreen] = curated.key_battles
     assert firered_leafgreen.games == ["firered", "leafgreen"]
     assert len(firered_leafgreen.battles) == 13  # Giovanni only as gym leader (CA-39)
@@ -68,6 +70,16 @@ def test_arrival_rule_pokedex_matches_its_origin(rule: dict[str, str]) -> None:
         ArrivalRule.model_validate(rule)
 
 
+@pytest.mark.rn("RN-21")
+@pytest.mark.parametrize(
+    ("starters", "error"),
+    [([], "at least 1"), (["venusaur", "venusaur"], "repetidos")],
+)
+def test_a_game_has_some_starters_without_repeats(starters: list[str], error: str) -> None:
+    with pytest.raises(ValidationError, match=error):
+        StartersFile.model_validate({"games": {"firered": starters}})
+
+
 def test_key_battle_ids_are_unique_and_valid() -> None:
     battle = {"id": "brock", "category": "gym_leader", "trainer": "Brock", "wikidex_page": "Brock"}
     with pytest.raises(ValidationError, match="repetidos"):
@@ -92,11 +104,17 @@ def test_invalid_file_names_the_file(tmp_path: Path) -> None:
 
 
 def test_curated_source_rows() -> None:
-    """Game mechanics; key battles are loaded by the WikiDex source with their teams."""
+    """Game mechanics and starters; key battles are loaded by the WikiDex source with their
+    teams."""
     rows = list(CuratedSource(read_curated(CURATED_DIR)).rows())
     mechanics = [row for row in rows if isinstance(row, GameMechanic)]
+    starters = [(row.game, row.pokemon) for row in rows if isinstance(row, GameStarter)]
 
-    assert len(mechanics) == len(rows) == 4
+    assert len(mechanics) == 4
+    assert len(starters) == 15
+    assert len(rows) == len(mechanics) + len(starters)
+    assert ("firered", "charizard") in starters
+    assert ("emerald", "swampert") in starters
     day_night = next(m for m in mechanics if m.fact_key == "mechanic:firered:day_night_cycle")
     assert (day_night.value, day_night.origin) == (False, Origin.INFERRED)
 
