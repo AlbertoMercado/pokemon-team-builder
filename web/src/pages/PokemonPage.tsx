@@ -10,7 +10,8 @@ import type { Evolution, LineMember, PokemonDetail } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
 import FavoriteButton from "../components/FavoriteButton";
 import FavoriteHint from "../components/FavoriteHint";
-import PokemonSprite, { PokemonArtwork } from "../components/PokemonSprite";
+import PokemonRow from "../components/PokemonRow";
+import { PokemonArtwork } from "../components/PokemonSprite";
 import { TypeBadges } from "../components/TypeBadge";
 import { describeMethods } from "../lib/evolution";
 import { formatDexNumber } from "../lib/format";
@@ -105,21 +106,15 @@ interface LineEntryProps {
 function LineEntry({ member, current, evolutions, names }: LineEntryProps) {
   return (
     <li className="rounded-lg border border-slate-200 bg-white px-3 py-2">
-      <div className="flex flex-wrap items-center gap-3">
-        <PokemonSprite url={member.image_url} />
-        <span className="font-mono text-sm text-slate-500">
-          {formatDexNumber(member.dex_number)}
-        </span>
-        <Link
-          to={`/pokemon/${member.pokemon}`}
-          aria-current={current ? "page" : undefined}
-          className={current ? "font-bold text-red-700" : "font-medium hover:text-red-700"}
-        >
-          {member.name}
-        </Link>
-        <TypeBadges types={member.types} />
-        {member.favorite && <span className="text-sm text-amber-600">★ Favorito</span>}
-      </div>
+      <PokemonRow
+        pokemon={member.pokemon}
+        name={member.name}
+        dexNumber={member.dex_number}
+        imageUrl={member.image_url}
+        types={member.types}
+        current={current}
+        extra={member.favorite && <span className="text-sm text-amber-600">★ Favorito</span>}
+      />
       {evolutions.map((evolution) => (
         <p key={evolution.from_pokemon} className="mt-1 text-sm text-slate-700">
           {`Desde ${names.get(evolution.from_pokemon) ?? evolution.from_pokemon}: `}

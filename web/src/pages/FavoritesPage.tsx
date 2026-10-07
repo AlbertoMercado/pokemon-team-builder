@@ -5,8 +5,7 @@ import { useFavorites } from "../api/queries/favorites";
 import ErrorMessage from "../components/ErrorMessage";
 import FavoriteButton from "../components/FavoriteButton";
 import FavoriteHint from "../components/FavoriteHint";
-import PokemonName from "../components/PokemonName";
-import { TypeBadges } from "../components/TypeBadge";
+import PokemonRow from "../components/PokemonRow";
 
 export default function FavoritesPage() {
   const favorites = useFavorites();
@@ -38,17 +37,17 @@ export default function FavoritesPage() {
             className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white"
           >
             {favorites.data.favorites.map((favorite) => (
-              <li key={favorite.pokemon} className="flex flex-wrap items-center gap-3 px-3 py-2">
-                <PokemonName
+              <li key={favorite.pokemon} className="px-3 py-2">
+                <PokemonRow
                   pokemon={favorite.pokemon}
                   name={favorite.name}
                   dexNumber={favorite.dex_number}
                   imageUrl={favorite.image_url}
+                  types={favorite.types}
+                  action={
+                    <FavoriteButton pokemon={favorite.pokemon} name={favorite.name} favorite />
+                  }
                 />
-                <TypeBadges types={favorite.types} />
-                <span className="ml-auto">
-                  <FavoriteButton pokemon={favorite.pokemon} name={favorite.name} favorite />
-                </span>
               </li>
             ))}
           </ul>

@@ -27,6 +27,13 @@ versión: [versiones](docs/05-operacion/versiones.md).
 - **Hay que repetir la carga de datos** al actualizar: la tabla `game` guarda ahora la portada
   de cada juego.
 
+### Corregido
+
+- **Web**: en el móvil, todas las filas del catálogo, los favoritos, las sugerencias del
+  resultado y la línea evolutiva miden lo mismo, con el número y el nombre arriba, los tipos
+  debajo y la estrella siempre a la derecha. Antes, con un nombre largo o dos tipos, la estrella
+  bajaba sola a otra línea y la fila salía más alta (RF-01, RF-04, #68).
+
 ## [1.1.1] - 2026-10-06
 
 Corrección de las imágenes de la 1.1.0. Basta con actualizar y compilar la web: no hace falta

@@ -103,7 +103,9 @@ todos los juegos.
     proponen salvo que también sean favoritas.
 
 La **estrella** junto a cada Pokémon lo añade a favoritos (☆) o lo quita (★). Está en el
-catálogo, en la ficha y en la lista de favoritos, y el cambio se ve enseguida en las tres.
+catálogo, en la ficha y en la lista de favoritos, y el cambio se ve enseguida en las tres. En las
+listas queda siempre a la derecha de cada fila; en el móvil, el número y el nombre van arriba y
+los tipos debajo.
 
 ### Catálogo
 
