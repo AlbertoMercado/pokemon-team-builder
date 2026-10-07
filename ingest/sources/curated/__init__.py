@@ -1,8 +1,9 @@
 """Curated data: versioned YAML files in ``data/curated/`` (ADR-0005).
 
 ``read_curated`` reads and validates every file. ``CuratedSource`` loads the rows that come
-only from curated data (game mechanics). The PokeAPI source also uses the curated data for
-incense babies and arrival proposals, and the WikiDex source for the list of key battles.
+only from curated data (game mechanics and starters). The PokeAPI source also uses the
+curated data for incense babies and arrival proposals, and the WikiDex source for the list of
+key battles.
 See docs/02-ddt/datos-curados.md.
 """
 
@@ -13,7 +14,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, ValidationError
 
-from db.reference import GameMechanic, Origin, ReferenceModel
+from db.reference import GameMechanic, GameStarter, Origin, ReferenceModel
 from ingest.sources.curated.schemas import (
     ArrivalFile,
     ArrivalRule,
@@ -22,6 +23,7 @@ from ingest.sources.curated.schemas import (
     GamesFile,
     KeyBattlesFile,
     PinnedCommitFile,
+    StartersFile,
 )
 
 
@@ -38,6 +40,7 @@ class CuratedData:
     games: GamesFile
     breeding: BreedingFile
     arrival: ArrivalFile
+    starters: StartersFile
     key_battles: list[KeyBattlesFile]
 
     def arrival_rule(self, game: str) -> ArrivalRule | None:
@@ -71,6 +74,7 @@ def read_curated(directory: Path) -> CuratedData:
         games=_read(directory / "games.yaml", GamesFile),
         breeding=_read(directory / "breeding.yaml", BreedingFile),
         arrival=_read(directory / "arrival.yaml", ArrivalFile),
+        starters=_read(directory / "starters.yaml", StartersFile),
         key_battles=[
             _read(path, KeyBattlesFile)
             for path in sorted((directory / "key_battles").glob("*.yaml"))
@@ -79,7 +83,8 @@ def read_curated(directory: Path) -> CuratedData:
 
 
 class CuratedSource:
-    """Ingest source of the rows that only come from curated data: game mechanics."""
+    """Ingest source of the rows that only come from curated data: game mechanics and
+    starters."""
 
     name = "curated"
     pokeapi_commit = None
@@ -97,3 +102,6 @@ class CuratedSource:
                     origin=Origin(entry.origin),
                     fact_key=f"mechanic:{game}:{mechanic}",
                 )
+        for game, starters in self._curated.starters.games.items():
+            for pokemon in starters:
+                yield GameStarter(game=game, pokemon=pokemon)

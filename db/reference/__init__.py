@@ -11,7 +11,14 @@ from sqlalchemy import Engine, inspect
 from db.reference.base import BattleCategory, Origin, ReferenceModel
 from db.reference.battles import KeyBattle, KeyBattlePokemon
 from db.reference.evolution import EvolutionStep
-from db.reference.games import Game, GameMechanic, GamePokemon, Generation, VersionGroup
+from db.reference.games import (
+    Game,
+    GameMechanic,
+    GamePokemon,
+    GameStarter,
+    Generation,
+    VersionGroup,
+)
 from db.reference.meta import IngestRun
 from db.reference.pokemon import (
     Pokemon,
@@ -28,6 +35,7 @@ __all__ = [
     "Game",
     "GameMechanic",
     "GamePokemon",
+    "GameStarter",
     "Generation",
     "IngestRun",
     "KeyBattle",

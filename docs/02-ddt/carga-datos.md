@@ -178,6 +178,9 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
 - **Datos curados**: 4 mecánicas (2 por juego) y 13 combates clave en cada uno de Rojo Fuego y
   Verde Hoja, de Brock a Azul (eran 15 hasta que CA-39 quitó los dos de Giovanni como jefe
   del Team Rocket).
+- **Iniciales**: 3 por juego objetivo: Venusaur, Charizard y Blastoise en Rojo Fuego, y
+  Sceptile, Blaziken y Swampert en Esmeralda. Ninguno evoluciona en su juego: todos son la
+  evolución final ([CA-59](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - **Bebés de incienso**: exactamente Azurill y Wynaut.
 - **Propuestas de llegada**: inferidas en Rojo Fuego y Verde Hoja y pendientes en el resto.
   Casos conocidos en Rojo Fuego: llegan Bulbasaur, Vaporeon, Golbat y Chansey, y no llegan

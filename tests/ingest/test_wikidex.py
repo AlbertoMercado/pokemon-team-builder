@@ -196,6 +196,7 @@ def _curated_with(*battles: BattleEntry) -> CuratedData:
         games=CURATED.games,
         breeding=CURATED.breeding,
         arrival=CURATED.arrival,
+        starters=CURATED.starters,
         key_battles=[battles_file],
     )
 

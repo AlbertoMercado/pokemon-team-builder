@@ -180,12 +180,13 @@ def _data_dir_with_fixture_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     """Data directory whose PokeAPI cache already has the test extract (no download).
 
     The extract has no WikiDex pages, so the CLI uses the repository's curated data without
-    key battles.
+    key battles; of the starters, it only has Venusaur.
     """
     data_dir = tmp_path / "data"
     shutil.copytree(POKEAPI_FIXTURES, data_dir / "cache" / "pokeapi")
     curated = tmp_path / "curated"
     shutil.copytree(REPOSITORY_CURATED, curated, ignore=shutil.ignore_patterns("key_battles"))
+    (curated / "starters.yaml").write_text("games:\n  firered: [venusaur]\n")
     monkeypatch.setattr(cli, "CURATED_DIR", curated)
     return data_dir
 

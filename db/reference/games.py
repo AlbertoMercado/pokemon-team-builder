@@ -1,4 +1,4 @@
-"""Generations, version groups, games and per-game data (RN-03, RN-15, RF-05)."""
+"""Generations, version groups, games and per-game data (RN-03, RN-15, RN-21, RF-05)."""
 
 from sqlalchemy import CheckConstraint
 from sqlmodel import Field
@@ -65,6 +65,18 @@ class GameMechanic(ReferenceModel, table=True):
     value: bool | None
     origin: Origin = Field(sa_type=enum_column(Origin))
     fact_key: str = Field(unique=True)
+
+
+class GameStarter(ReferenceModel, table=True):
+    """A starter of a target game, as the form of its final evolution there (RN-21, CA-59).
+
+    Curated data that is not in doubt, so it has no origin and the user does not confirm it.
+    """
+
+    __tablename__ = "game_starter"
+
+    game: str = Field(primary_key=True, foreign_key="game.slug")
+    pokemon: str = Field(primary_key=True, foreign_key="pokemon.slug")
 
 
 class GamePokemon(ReferenceModel, table=True):
