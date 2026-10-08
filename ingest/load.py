@@ -7,9 +7,10 @@ previous file, in a single atomic rename. If anything fails, the previous databa
 untouched (RF-11, ADR-0003).
 
 Once the rows are stored, only the complete games stay as target games (``ingest/targets.py``,
-RF-05); the others are reported with what they lack. Each form gets its images, the trimmed
-sprite and the official artwork (ADR-0010), and each game its cover (ADR-0011). A missing image
-is only a warning: the form or the game is loaded without it.
+RF-05); the others are reported with what they lack. Locations without a Spanish name are
+reported as a warning, since the English one is shown (ADR-0013). Each form gets its images,
+the trimmed sprite and the official artwork (ADR-0010), and each game its cover (ADR-0011). A
+missing image is only a warning: the form or the game is loaded without it.
 """
 
 from collections import defaultdict
@@ -22,7 +23,14 @@ from sqlalchemy import Connection, Engine, Row, Table, func, select, text
 from sqlmodel import Session, col
 from sqlmodel import select as select_model
 
-from db.reference import Game, IngestRun, Pokemon, ReferenceModel, create_reference_schema
+from db.reference import (
+    Game,
+    IngestRun,
+    Location,
+    Pokemon,
+    ReferenceModel,
+    create_reference_schema,
+)
 from db.sqlite import create_sqlite_engine
 from ingest.checks import Check
 from ingest.report import LoadReport
@@ -35,6 +43,7 @@ from ingest.user_keys import check_user_keys
 ORIGIN_COLUMN_SUFFIX = "origin"
 MAX_DANGLING_VALUES = 5
 MAX_FORMS_WITHOUT_IMAGE = 10
+MAX_UNNAMED_LOCATIONS = 10
 
 
 @dataclass(frozen=True)
@@ -76,6 +85,7 @@ def build_reference(
         _store_rows(engine, sources)
         _check_integrity(engine)
         _mark_target_games(engine, report)
+        _report_unnamed_locations(engine, report)
         if images is not None and images.sprites is not None:
             _attach_images(engine, images.sprites, report)
         if images is not None and images.covers is not None:
@@ -123,6 +133,24 @@ def _mark_target_games(engine: Engine, report: LoadReport) -> None:
     with Session(engine) as session:
         report.incomplete_games = mark_incomplete_games(session)
         session.commit()
+
+
+def _report_unnamed_locations(engine: Engine, report: LoadReport) -> None:
+    """Warn about the locations without a Spanish name, which show the English one."""
+    with Session(engine) as session:
+        query = select_model(Location.slug).where(col(Location.name_es).is_(None))
+        slugs = list(session.exec(query.order_by(col(Location.slug))).all())
+    if not slugs:
+        return
+    shown = ", ".join(slugs[:MAX_UNNAMED_LOCATIONS])
+    more = (
+        f" y {len(slugs) - MAX_UNNAMED_LOCATIONS} más" if len(slugs) > MAX_UNNAMED_LOCATIONS else ""
+    )
+    places = "1 lugar" if len(slugs) == 1 else f"{len(slugs)} lugares"
+    report.warnings.append(
+        f"{places} sin nombre en español, se muestra el inglés "
+        f"(añádelo a data/curated/locations.yaml): {shown}{more}"
+    )
 
 
 def _check_integrity(engine: Engine) -> None:

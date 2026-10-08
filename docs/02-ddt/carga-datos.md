@@ -16,6 +16,8 @@ cómo se usa: el [manual](../04-manual-usuario/cargar-datos.md); el esquema de l
 | Tipos | Los que existen hasta la 3.ª generación | 15 en la 1.ª, 17 desde la 2.ª |
 | Tabla de eficacias | Una por generación | 3 |
 | Combates clave | Los de los 5 juegos objetivo | Unos 30 entrenadores en WikiDex |
+| Pokédex | La Nacional y las de Kanto, Johto y Hoenn, con las especies cargadas | 4 (990 números) |
+| Apariciones | Las de los 11 juegos, en los lugares donde ocurren | Unas 11 000 en 212 lugares |
 
 Decisiones de alcance:
 
@@ -61,9 +63,11 @@ El volcado CSV de `PokeAPI/pokeapi` se carga del commit fijado en `data/curated/
 | `pokemon_egg_groups.csv`, `egg_groups.csv` | `species_egg_group` | Sin filtro adicional. |
 | `pokemon_evolution.csv`, `evolution_triggers.csv` | `evolution_step` | Ver [evoluciones](#evoluciones). Cualquier columna de condición desconocida con valor hace fallar la carga: hay que revisarla para RN-15 y RN-20 antes de cargarla. |
 | `items.csv`, `locations.csv`, `moves.csv`, `regions.csv` | Identificadores en `conditions` | Los ids de objetos, lugares, movimientos y regiones de las condiciones se sustituyen por su identificador (`thunder-stone`, `kings-rock`…). |
-| `pokedexes.csv`, `pokemon_dex_numbers.csv` | Propuestas de llegada | La Pokédex regional de la regla de cada juego en `arrival.yaml`: Kanto (151) para Rojo Fuego y Verde Hoja ([datos curados](datos-curados.md#arrivalyaml)). |
+| `pokedexes.csv`, `pokemon_dex_numbers.csv`, `pokedex_version_groups.csv` | `pokedex`, `pokedex_number`; propuestas de llegada | Ver [Pokédex y apariciones](#pokedex-y-apariciones). La Pokédex regional de la regla de cada juego en `arrival.yaml`: Kanto (151) para Rojo Fuego y Verde Hoja ([datos curados](datos-curados.md#arrivalyaml)). |
+| `encounters.csv`, `encounter_slots.csv`, `encounter_methods.csv`, `encounter_condition_values.csv`, `encounter_condition_value_map.csv`, `location_areas.csv`, `location_names.csv` | `encounter`, `location` | Ver [Pokédex y apariciones](#pokedex-y-apariciones). |
 
-Todos los nombres en español de las 386 especies y de los 11 juegos están en el volcado.
+Todos los nombres en español de las 386 especies y de los 11 juegos están en el volcado. De los
+lugares, solo los de Hoenn: los de Kanto, Johto y Archi7 están en los datos curados.
 
 Cada fila se valida con un modelo pydantic (`ingest/sources/pokeapi/rows.py`): si falta una
 columna o un valor no tiene el tipo esperado, la carga falla en lugar de cargar datos
@@ -143,6 +147,45 @@ En PokeAPI, las evoluciones aleatorias se reconocen por `percentage_chance` o
     - Rubí, Zafiro y Esmeralda: dato **pendiente** hasta investigarlo (issue #8). El usuario
       lo confirmará antes de generar ([RN-18](../01-ddf/reglas-negocio.md#rn-18)).
 
+### Pokédex y apariciones
+
+Para la Pokédex de los juegos superados
+([ADR-0013](../03-adr/0013-obtencion-pokeapi-y-curados.md)):
+
+- **Pokédex**: se cargan la Nacional y las de los grupos de versiones cargados
+  (`pokedex_version_groups.csv`): Kanto, Johto original y Hoenn. De cada una, solo los números
+  de las especies cargadas: la Nacional tiene 386. Qué Pokédex completa cada juego es un dato
+  curado ([`pokedex.yaml`](datos-curados.md#pokedexyaml)).
+- **Apariciones**: las de las versiones de los 11 juegos cargados, cada una con su lugar
+  (`location_areas.csv` da el lugar y la zona), su método (`encounter_methods.csv`) y sus
+  condiciones (`encounter_condition_value_map.csv`), tal como vienen. Todas las formas de las
+  apariciones son formas por defecto de especies cargadas; si no, la carga falla.
+- **Una fila por Pokémon, zona, método y condiciones**: PokeAPI da una fila por hueco
+  (`encounter_slots.csv`) y cada hueco tiene su probabilidad (`rarity`) dentro de su zona y su
+  método. Las filas del mismo Pokémon se unen: sus probabilidades se suman y sus niveles forman
+  un intervalo. Ekans en la Ruta 4 de Rojo Fuego ocupa cuatro huecos (10, 10, 4 y 1 %): una fila
+  del 25 %, de nivel 6 a 12. La suma se limita al 100 %: los varios Voltorb estáticos de la
+  Central de Energía de Amarillo suman 200.
+- **Cada condición, su fila**: en la 2.ª generación, una misma zona tiene una fila por momento
+  del día (`time-morning`, `time-day`, `time-night`), con su probabilidad
+  ([CA-81](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- **Lo que PokeAPI ya distingue con las condiciones**: los fósiles son regalos con la condición
+  del fósil (`item-helix-fossil`) y el perro legendario errante de Rojo Fuego y Verde Hoja lleva
+  el inicial del que depende (`starter-squirtle`,
+  [CA-80](../01-ddf/cuestiones-abiertas.md#resueltas)). No hacen falta datos curados para ellos.
+- **También los métodos de spin-offs** (los discos extra de Colosseum y Pokémon Channel): es
+  `core/` quien los omite y quien deduce que un Pokémon que solo se obtiene así es imposible de
+  forma automática ([RN-25](../01-ddf/reglas-negocio.md#rn-25)).
+- **Lugares**: los que tienen apariciones. El nombre en español sale de `location_names.csv` o,
+  si no está, de [`locations.yaml`](datos-curados.md#locationsyaml); si no está en ninguno, el
+  lugar se carga con `name_es` nulo y el informe lo avisa. De los curados sale también el objeto
+  de evento sin el que no se llega a algunos lugares (Roca Ombligo, Isla Origen, Isla Suprema e
+  Isla del Sur).
+
+Clasificar cada método en las formas de [RN-26](../01-ddf/reglas-negocio.md#rn-26) (regalo,
+salvaje, errante…) es una regla de negocio y se hace en `core/`. La carga solo comprueba que no
+aparece ningún método sin clasificar ([comprobaciones](#comprobaciones-de-la-carga)).
+
 ## WikiDex
 
 - Una petición por página de entrenador (`action=parse&prop=wikitext`): 13 para Rojo Fuego y
@@ -167,7 +210,8 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
 
 
 - **Cantidades**: 3 generaciones, 7 grupos de versiones, 11 juegos, 17 tipos, 386 especies,
-  386 formas y 5 × 386 filas de disponibilidad. Tablas de eficacias completas: 15 × 15 pares
+  386 formas, 5 × 386 filas de disponibilidad, 4 Pokédex, 11 Pokédex de juego, 50
+  transferencias y 29 Pokémon de evento. Tablas de eficacias completas: 15 × 15 pares
   en la 1.ª generación y 17 × 17 en la 2.ª y la 3.ª.
 - **Juegos objetivo**: exactamente Rojo Fuego y Verde Hoja, los completos.
 - **Tipos por generación**: Clefairy es Normal en la 3.ª, Magnemite es solo Eléctrico en la
@@ -187,6 +231,18 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
   Sceptile, Blaziken y Swampert en Esmeralda. Ninguno evoluciona en su juego: todos son la
   evolución final ([CA-59](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - **Bebés de incienso**: exactamente Azurill y Wynaut.
+- **Pokédex** ([RN-22](../01-ddf/reglas-negocio.md#rn-22)): 4 Pokédex, con 386 especies en la
+  Nacional, 151 en Kanto, 251 en Johto y 202 en Hoenn. Rojo completa la de Kanto, Cristal la de
+  Johto y Rojo Fuego la Nacional.
+- **Apariciones** ([RN-26](../01-ddf/reglas-negocio.md#rn-26)): ningún método fuera de los que
+  clasifica `core/`. Casos conocidos en Rojo Fuego: Eevee, Lapras y Hitmonlee son regalos;
+  Lapras también aparece surfeando; Omanyte y Aerodactyl son regalos con su fósil; Snorlax, con
+  la Poké Flauta; Zapdos, estático; Raikou, errante si se eligió a Squirtle; Ekans, salvaje; ni
+  Sandshrew ni Mew aparecen. En Oro, Suicune es errante y Togepi, un huevo de regalo. Mew es de
+  evento en Rojo Fuego y a la Roca Ombligo solo se llega con el Misti-ticket.
+- **Transferencias** ([RN-25](../01-ddf/reglas-negocio.md#rn-25)): de Rojo a Oro, solo especies de la 1.ª
+  generación; de Oro a Plata y de Rojo Fuego a Rubí, sin límite; de Cristal a Esmeralda, no se
+  puede.
 - **Propuestas de llegada**: inferidas en Rojo Fuego y Verde Hoja y pendientes en el resto.
   Casos conocidos en Rojo Fuego: llegan Bulbasaur, Vaporeon, Golbat y Chansey, y no llegan
   Pikachu, Raichu, Clefairy, Crobat, Espeon ni Blissey.

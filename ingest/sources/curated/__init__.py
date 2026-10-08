@@ -1,9 +1,9 @@
 """Curated data: versioned YAML files in ``data/curated/`` (ADR-0005).
 
 ``read_curated`` reads and validates every file. ``CuratedSource`` loads the rows that come
-only from curated data (game mechanics and starters). The PokeAPI source also uses the
-curated data for incense babies and arrival proposals, and the WikiDex source for the list of
-key battles.
+only from curated data (game mechanics, starters, the Pokédex of each game, transfers and
+event Pokémon). The PokeAPI source also uses the curated data for incense babies, arrival
+proposals and locations, and the WikiDex source for the list of key battles.
 See docs/02-ddt/datos-curados.md.
 """
 
@@ -14,16 +14,28 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, ValidationError
 
-from db.reference import GameMechanic, GameStarter, Origin, ReferenceModel
+from db.reference import (
+    EventPokemon,
+    GameMechanic,
+    GamePokedex,
+    GameStarter,
+    GameTransfer,
+    Origin,
+    ReferenceModel,
+)
 from ingest.sources.curated.schemas import (
     ArrivalFile,
     ArrivalRule,
     BreedingFile,
     CoversFile,
+    EventsFile,
     GamesFile,
     KeyBattlesFile,
+    LocationsFile,
     PinnedCommitFile,
+    PokedexFile,
     StartersFile,
+    TransfersFile,
 )
 
 
@@ -42,6 +54,10 @@ class CuratedData:
     arrival: ArrivalFile
     starters: StartersFile
     key_battles: list[KeyBattlesFile]
+    pokedex: PokedexFile
+    transfers: TransfersFile
+    events: EventsFile
+    locations: LocationsFile
 
     def arrival_rule(self, game: str) -> ArrivalRule | None:
         return self.arrival.games.get(game)
@@ -79,12 +95,16 @@ def read_curated(directory: Path) -> CuratedData:
             _read(path, KeyBattlesFile)
             for path in sorted((directory / "key_battles").glob("*.yaml"))
         ],
+        pokedex=_read(directory / "pokedex.yaml", PokedexFile),
+        transfers=_read(directory / "transfers.yaml", TransfersFile),
+        events=_read(directory / "events.yaml", EventsFile),
+        locations=_read(directory / "locations.yaml", LocationsFile),
     )
 
 
 class CuratedSource:
-    """Ingest source of the rows that only come from curated data: game mechanics and
-    starters."""
+    """Ingest source of the rows that only come from curated data: game mechanics, starters,
+    the Pokédex of each game, transfers and event Pokémon."""
 
     name = "curated"
     pokeapi_commit = None
@@ -105,3 +125,37 @@ class CuratedSource:
         for game, starters in self._curated.starters.games.items():
             for pokemon in starters:
                 yield GameStarter(game=game, pokemon=pokemon)
+        for game, pokedexes in self._curated.pokedex.games.items():
+            for pokedex in pokedexes:
+                yield GamePokedex(game=game, pokedex=pokedex)
+        for (from_game, to_game), limit in transfer_pairs(self._curated.transfers).items():
+            yield GameTransfer(from_game=from_game, to_game=to_game, max_species_generation=limit)
+        events = {
+            (game, pokemon)
+            for group in self._curated.events.events
+            for game in group.games
+            for pokemon in group.pokemon
+        }
+        for game, pokemon in sorted(events):
+            yield EventPokemon(game=game, pokemon=pokemon)
+
+
+def transfer_pairs(transfers: TransfersFile) -> dict[tuple[str, str], int | None]:
+    """Every ordered pair of games of a group, with its species limit.
+
+    A pair in several groups keeps the least restrictive limit: none, or the latest
+    generation.
+    """
+    pairs: dict[tuple[str, str], int | None] = {}
+    for group in transfers.groups:
+        for from_game in group.games:
+            for to_game in group.games:
+                if from_game == to_game:
+                    continue
+                pair = (from_game, to_game)
+                limit = group.max_species_generation
+                if pair in pairs:
+                    previous = pairs[pair]
+                    limit = None if previous is None or limit is None else max(previous, limit)
+                pairs[pair] = limit
+    return pairs

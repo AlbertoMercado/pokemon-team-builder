@@ -18,7 +18,7 @@ puntual, no en cada arranque ([RF-11](../docs/01-ddf/requisitos-funcionales.md#r
 | `user_keys.py` | Que siga existiendo lo que usa `user.sqlite`. |
 | `report.py` | Informe de la carga. |
 | `sources/` | `Source`, la interfaz de una fuente. |
-| `sources/pokeapi/` | PokeAPI: CSV del commit fijado, validación de filas, transformación e imágenes de los Pokémon. |
+| `sources/pokeapi/` | PokeAPI: CSV del commit fijado, validación de filas, transformación (también de las Pokédex y las apariciones) e imágenes de los Pokémon. |
 | `sources/wikidex/` | WikiDex: páginas de los combates clave y portadas de los juegos, con caché y límite de peticiones. |
 | `sources/curated/` | Datos curados: esquemas y lectura de `data/curated/*.yaml`. |
 

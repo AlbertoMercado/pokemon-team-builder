@@ -1,0 +1,17 @@
+# Pokédex que completa cada juego (RN-22, CA-70). Esquema y significado:
+# docs/02-ddt/datos-curados.md.
+#
+# Si el juego tiene Pokédex Nacional, la Nacional; si no, la regional. Los nombres son los
+# identificadores de PokeAPI.
+games:
+  red: [kanto]
+  blue: [kanto]
+  yellow: [kanto]
+  gold: [original-johto]
+  silver: [original-johto]
+  crystal: [original-johto]
+  ruby: [national]
+  sapphire: [national]
+  emerald: [national]
+  firered: [national]
+  leafgreen: [national]

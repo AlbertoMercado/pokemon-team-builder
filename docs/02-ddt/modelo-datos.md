@@ -37,6 +37,15 @@ erDiagram
     POKEMON ||--o{ EVOLUTION_STEP : "origen / destino"
     VERSION_GROUP ||--o{ EVOLUTION_STEP : "métodos"
     TYPE ||--o{ TYPE_EFFICACY : ""
+    POKEDEX ||--o{ POKEDEX_NUMBER : numera
+    SPECIES ||--o{ POKEDEX_NUMBER : ""
+    GAME ||--o{ GAME_POKEDEX : completa
+    POKEDEX ||--o{ GAME_POKEDEX : ""
+    GAME ||--o{ ENCOUNTER : "apariciones"
+    LOCATION ||--o{ ENCOUNTER : ""
+    POKEMON ||--o{ ENCOUNTER : ""
+    GAME ||--o{ GAME_TRANSFER : "envía a"
+    GAME ||--o{ EVENT_POKEMON : "eventos"
 ```
 
 Implementada en `db/reference/` ([implementación](#implementacion-de-referencesqlite)). En
@@ -99,6 +108,27 @@ Módulo `db/reference/battles.py`.
 | `key_battle` | `slug` PK, `game` FK, `category`, `trainer_name`, `order`, `origin`, `fact_key` único, `source_page`?, `source_revision`? | `category`: `gym_leader`, `elite_four`, `champion`, `villain_boss` o `rival_final` ([RN-17](../01-ddf/reglas-negocio.md#rn-17)). `order` es único dentro de cada juego. La lista de combates de cada juego es curada; los equipos salen de WikiDex. `origin` es `automatic` si el equipo se ha leído sin ambigüedad. `source_page` y `source_revision` son la página y la revisión de WikiDex del equipo, para la trazabilidad y la atribución que exige su licencia ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)). |
 | `key_battle_pokemon` | `battle` FK y `position` PK, `pokemon` FK, `level`? | Ya sin el inicial del rival ([CA-26](../01-ddf/cuestiones-abiertas.md#resueltas)) y, si el equipo depende del inicial que elige el jugador, solo con los Pokémon comunes a todas las variantes ([CA-38](../01-ddf/cuestiones-abiertas.md#resueltas)). `position` es la del Pokémon en el equipo de WikiDex. |
 
+### Pokédex y formas de obtención
+
+Módulo `db/reference/pokedex.py`. Para la Pokédex de los juegos superados
+([RF-20](../01-ddf/requisitos-funcionales.md#rf-20) a
+[RF-24](../01-ddf/requisitos-funcionales.md#rf-24)); el origen de cada dato está en
+[ADR-0013](../03-adr/0013-obtencion-pokeapi-y-curados.md).
+
+| Tabla | Columnas | Notas |
+|-------|----------|-------|
+| `pokedex` | `slug` PK | La Nacional y las de los grupos de versiones cargados: `national`, `kanto`, `original-johto` y `hoenn`. |
+| `pokedex_number` | `pokedex` FK y `species` FK PK, `number` | Número de cada especie cargada en cada Pokédex, que da su orden ([RN-23](../01-ddf/reglas-negocio.md#rn-23)). Único dentro de cada Pokédex. |
+| `game_pokedex` | `game` FK y `pokedex` FK PK | La Pokédex que completa cada juego ([RN-22](../01-ddf/reglas-negocio.md#rn-22)). Datos curados ([`pokedex.yaml`](datos-curados.md#pokedexyaml)). Puede haber varias para un juego (la del juego base y las de sus contenidos descargables). |
+| `location` | `slug` PK, `name_es`?, `name_en`, `event_item`? | Los lugares con apariciones. `name_es` sale de PokeAPI o, si no lo tiene, de [`locations.yaml`](datos-curados.md#locationsyaml); es nulo si falta en los dos, y entonces se muestra `name_en` (el identificador si tampoco hay nombre en inglés). `event_item` es el objeto repartido en eventos sin el que no se llega al lugar, como `mysticticket` para la Roca Ombligo. |
+| `encounter` | `id` PK, `game` FK, `location` FK, `area`?, `pokemon` FK, `method`, `conditions` (JSON), `rarity`, `min_level`, `max_level` | Cada forma de obtener un Pokémon en un lugar, tal como la da PokeAPI ([carga](carga-datos.md#pokedex-y-apariciones)). `method` es el método de PokeAPI (`walk`, `surf`, `gift`, `npc-trade`, `roaming-grass`…) y `conditions`, la lista ordenada de sus condiciones (`time-night`, `starter-squirtle`, `item-helix-fossil`…). `area` es la parte del lugar (`b1f`) o nulo si solo tiene una. `rarity` es la probabilidad, en %, con ese método y esas condiciones en esa zona: de 1 a 100. |
+| `game_transfer` | `from_game` FK y `to_game` FK PK, `max_species_generation`? FK → `generation` | Qué juegos pueden enviar Pokémon a cuáles ([RN-25](../01-ddf/reglas-negocio.md#rn-25)). `max_species_generation` limita las especies a las de esa generación o anteriores (1 con la Cápsula del Tiempo); nulo si no hay límite. Un juego no se envía a sí mismo. Datos curados ([`transfers.yaml`](datos-curados.md#transfersyaml)). |
+| `event_pokemon` | `game` FK y `pokemon` FK PK | Pokémon que se obtienen en un juego por evento ([RN-24](../01-ddf/reglas-negocio.md#rn-24)). Datos curados ([`events.yaml`](datos-curados.md#eventsyaml)). |
+
+Decidir qué forma de obtención es más sencilla es una regla de negocio y se hace en `core/`, no
+en la base de datos: por eso se guardan los métodos y las condiciones de PokeAPI sin reducirlos
+a una clase, como los pasos de evolución.
+
 ### Metadatos
 
 Módulo `db/reference/meta.py`.
@@ -116,7 +146,7 @@ Qué hay en `db/` y por qué:
 | `db/sqlite.py` | `create_sqlite_engine(path)`: crea el motor de SQLAlchemy de un fichero SQLite y activa `PRAGMA foreign_keys` en cada conexión, porque SQLite no comprueba las claves foráneas si no se le pide. Lo usarán las dos bases de datos. |
 | `db/reference/base.py` | `ReferenceModel`, la clase base de todas las tablas, con su propio `MetaData`. Los enums `Origin` y `BattleCategory`, y las ayudas `enum_column` y `origin_check`. |
 | `db/reference/__init__.py` | Expone los modelos y `create_reference_schema(engine)`, que crea todas las tablas en una base de datos vacía. |
-| `db/reference/games.py`, `pokemon.py`, `evolution.py`, `battles.py`, `meta.py` | Los modelos SQLModel de cada grupo de tablas de esta página. |
+| `db/reference/games.py`, `pokemon.py`, `evolution.py`, `battles.py`, `pokedex.py`, `meta.py` | Los modelos SQLModel de cada grupo de tablas de esta página. |
 
 Decisiones de implementación:
 
@@ -132,15 +162,16 @@ Decisiones de implementación:
   los datos revisables y la API.
 - **Integridad en la base de datos**: además de las claves foráneas, restricciones `CHECK`
   impiden guardar datos incoherentes: un valor revisable es nulo **solo** si su origen es
-  `pending` (RN-18), `factor` solo admite 0, 50, 100 y 200, y `slot` solo 1 o 2.
+  `pending` (RN-18), `factor` solo admite 0, 50, 100 y 200, `slot` solo 1 o 2, `rarity` va de
+  1 a 100, `min_level` no supera a `max_level` y un juego no se transfiere a sí mismo.
 - **Orden de inserción**: los modelos declaran claves foráneas pero no relaciones
   (`Relationship`), así que SQLAlchemy no reordena las inserciones. La ingesta guarda todas
   las filas en una sola transacción con las claves foráneas desactivadas y después las
   comprueba con `PRAGMA foreign_key_check`, que dice qué tabla, columna y valor fallan: el
   orden no importa, ni siquiera dentro de una tabla
   ([ingesta](../05-operacion/ingesta.md#que-hace)).
-- **JSON**: `conditions`, `games` y `summary` son columnas JSON, porque su contenido es
-  variable y nunca se filtra por él en SQL.
+- **JSON**: `conditions` (de `evolution_step` y de `encounter`), `games` y `summary` son
+  columnas JSON, porque su contenido es variable y nunca se filtra por él en SQL.
 
 Los tests están en `tests/db/test_reference_schema.py`: comprueban que existen las tablas
 documentadas, guardan y leen un conjunto mínimo de Rojo Fuego, verifican que se rechazan los

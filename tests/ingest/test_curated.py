@@ -7,16 +7,27 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from db.reference import BattleCategory, GameMechanic, GameStarter, Origin
+from db.reference import (
+    BattleCategory,
+    EventPokemon,
+    GameMechanic,
+    GamePokedex,
+    GameStarter,
+    GameTransfer,
+    Origin,
+)
 from ingest import cli
-from ingest.sources.curated import CuratedDataError, CuratedSource, read_curated
+from ingest.sources.curated import CuratedDataError, CuratedSource, read_curated, transfer_pairs
 from ingest.sources.curated.schemas import (
     ArrivalRule,
     BreedingFile,
     GamesFile,
     KeyBattlesFile,
+    LocationEntry,
     MechanicValue,
     StartersFile,
+    TransferGroup,
+    TransfersFile,
 )
 
 CURATED_DIR = Path(__file__).resolve().parents[2] / "data" / "curated"
@@ -32,6 +43,8 @@ def test_repository_curated_files_are_valid() -> None:
     [firered_leafgreen] = curated.key_battles
     assert firered_leafgreen.games == ["firered", "leafgreen"]
     assert len(firered_leafgreen.battles) == 13  # Giovanni only as gym leader (CA-39)
+    assert len(curated.pokedex.games) == 11  # RN-22: every loaded game
+    assert curated.locations.locations["navel-rock"].event_item == "mysticticket"
 
 
 # --- Schemas -------------------------------------------------------------------------------
@@ -100,19 +113,66 @@ def test_invalid_file_names_the_file(tmp_path: Path) -> None:
         read_curated(tmp_path / "curated")
 
 
+def test_location_entry_needs_a_name_or_an_event_item() -> None:
+    with pytest.raises(ValidationError, match="name_es, event_item"):
+        LocationEntry(note="sin datos")
+
+
+def test_transfer_group_rejects_repeated_games() -> None:
+    with pytest.raises(ValidationError, match="repetidos"):
+        TransferGroup(games=["firered", "firered"])
+
+
+@pytest.mark.rn("RN-25")
+def test_transfer_pairs_keep_the_least_restrictive_limit() -> None:
+    """RN-25: Gold and Silver share the Time Capsule group (limit 1) and their own (none)."""
+    pairs = transfer_pairs(
+        TransfersFile(
+            groups=[
+                TransferGroup(games=["red", "gold", "silver"], max_species_generation=1),
+                TransferGroup(games=["gold", "silver"]),
+            ]
+        )
+    )
+
+    assert pairs[("red", "gold")] == 1
+    assert pairs[("gold", "red")] == 1
+    assert pairs[("gold", "silver")] is None
+    assert ("red", "red") not in pairs
+    assert len(pairs) == 6
+
+
 # --- Curated source ------------------------------------------------------------------------
 
 
 def test_curated_source_rows() -> None:
-    """Game mechanics and starters; key battles are loaded by the WikiDex source with their
-    teams."""
+    """Game mechanics, starters, the Pokédex of each game, transfers and event Pokémon; key
+    battles are loaded by the WikiDex source with their teams, and locations by PokeAPI's."""
     rows = list(CuratedSource(read_curated(CURATED_DIR)).rows())
     mechanics = [row for row in rows if isinstance(row, GameMechanic)]
     starters = [(row.game, row.pokemon) for row in rows if isinstance(row, GameStarter)]
+    pokedexes = {row.game: row.pokedex for row in rows if isinstance(row, GamePokedex)}
+    transfers = {
+        (row.from_game, row.to_game): row.max_species_generation
+        for row in rows
+        if isinstance(row, GameTransfer)
+    }
+    events = {(row.game, row.pokemon) for row in rows if isinstance(row, EventPokemon)}
 
     assert len(mechanics) == 4
     assert len(starters) == 15
-    assert len(rows) == len(mechanics) + len(starters)
+    assert len(rows) == len(mechanics) + len(starters) + len(pokedexes) + len(transfers) + len(
+        events
+    )
+    assert (pokedexes["red"], pokedexes["gold"], pokedexes["firered"]) == (
+        "kanto",
+        "original-johto",
+        "national",
+    )
+    assert transfers[("yellow", "crystal")] == 1  # Time Capsule
+    assert transfers[("crystal", "gold")] is None
+    assert ("crystal", "emerald") not in transfers
+    assert ("firered", "mew") in events
     assert ("firered", "charizard") in starters
     assert ("emerald", "swampert") in starters
     day_night = next(m for m in mechanics if m.fact_key == "mechanic:firered:day_night_cycle")

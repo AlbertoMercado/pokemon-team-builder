@@ -158,6 +158,79 @@ class CoversFile(CuratedModel):
         return self
 
 
+class PokedexFile(CuratedModel):
+    """``pokedex.yaml``: the Pokédex that each game completes (RN-22, CA-70).
+
+    A list, because a game with a reduced Pokédex completes the union of those of the base
+    game and its downloadable content.
+    """
+
+    games: dict[Slug, Annotated[list[Slug], Field(min_length=1)]]
+
+
+class TransferGroup(CuratedModel):
+    """Games that can send Pokémon to each other (RN-25).
+
+    ``max_species_generation`` limits the species to those of that generation or earlier,
+    such as 1 with the Time Capsule between the 1st and the 2nd generation.
+    """
+
+    games: list[Slug] = Field(min_length=2)
+    max_species_generation: int | None = Field(default=None, ge=1)
+    note: str | None = None
+
+    @model_validator(mode="after")
+    def _unique_games(self) -> Self:
+        if len(set(self.games)) < len(self.games):
+            raise ValueError(f"juegos repetidos en el grupo: {self.games}")
+        return self
+
+
+class TransfersFile(CuratedModel):
+    """``transfers.yaml``: groups of games that can send Pokémon to each other (CA-78).
+
+    Each game of a group can send to every other game of the group. If two groups join the
+    same games, the least restrictive one applies.
+    """
+
+    groups: list[TransferGroup] = Field(min_length=1)
+
+
+class EventGroup(CuratedModel):
+    """Pokémon obtained in some games only through an event distribution (RN-24)."""
+
+    games: list[Slug] = Field(min_length=1)
+    pokemon: list[Slug] = Field(min_length=1)
+    note: str | None = None
+
+
+class EventsFile(CuratedModel):
+    """``events.yaml``: the event Pokémon of each game (CA-78)."""
+
+    events: list[EventGroup] = Field(min_length=1)
+
+
+class LocationEntry(CuratedModel):
+    """What PokeAPI lacks of a location: its Spanish name, or the event item without which it
+    cannot be reached, such as the Mystic Ticket for Navel Rock."""
+
+    name_es: str | None = Field(default=None, min_length=1)
+    event_item: Slug | None = None
+    note: str | None = None
+
+    @model_validator(mode="after")
+    def _has_data(self) -> Self:
+        if self.name_es is None and self.event_item is None:
+            raise ValueError("cada lugar necesita name_es, event_item o los dos")
+        return self
+
+
+class LocationsFile(CuratedModel):
+    """``locations.yaml``: Spanish names and event items of locations (ADR-0013)."""
+
+    locations: dict[Slug, LocationEntry]
+
+
 class PinnedCommitFile(CuratedModel):
     """``pokeapi.yaml``: full SHAs of the pinned commits of PokeAPI.
 

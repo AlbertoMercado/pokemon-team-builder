@@ -6,8 +6,9 @@ real load):
     uv run python tests/ingest/fixtures/pokeapi/extract_pokeapi.py <full-csv-dir>
 
 It writes ``tests/ingest/fixtures/pokeapi/<commit>/``: small files are copied whole and
-large ones are filtered to the species in ``SPECIES`` (and the rows they reference). The
-species are chosen for their special cases; see the README next to this script.
+large ones are filtered to the species in ``SPECIES`` (and the rows they reference); the
+encounters, also to the loaded games. The species are chosen for their special cases; see the
+README next to this script.
 """
 
 import csv
@@ -37,9 +38,27 @@ SPECIES = frozenset(
         *(265, 266, 267, 268, 269),  # Wurmple: random evolution
         *(290, 291, 292),  # Nincada: Shedinja by "shed"
         *(349, 350),  # Feebas: beauty, then trade with item in later generations
-        386,  # Deoxys: default form "deoxys-normal", other forms not loaded
+        386,  # Deoxys: default form "deoxys-normal", other forms not loaded; Birth Island
+        23,  # Ekans: wild in FireRed, not in LeafGreen
+        27,  # Sandshrew: not in FireRed (LeafGreen exclusive)
+        *(100, 101),  # Voltorb, Electrode: several static ones in the Power Plant of Yellow
+        131,  # Lapras: gift and surf in FireRed
+        *(138, 140, 142),  # Omanyte, Kabuto, Aerodactyl: fossils
+        143,  # Snorlax: Poké Flute
+        145,  # Zapdos: static
+        151,  # Mew: event, no encounter
+        163,  # Hoothoot: only at night in Gold
+        175,  # Togepi: gift egg
+        *(243, 244, 245),  # Raikou, Entei, Suicune: roaming, by starter in FireRed
+        249,  # Lugia: static in Navel Rock, reached only with an event item
+        251,  # Celebi: event, spin-off bonus disc and Virtual Console
+        385,  # Jirachi: spin-off methods only
     }
 )
+# Versions of the loaded games (red to leafgreen): the encounters of the rest are left out.
+LOADED_VERSIONS = frozenset(str(version) for version in range(1, 12))
+# Items handed out at events that curated locations need (locations.yaml).
+EVENT_ITEMS = frozenset({"mysticticket", "auroraticket", "old-sea-map", "eon-ticket"})
 
 WHOLE_FILES = (
     "generations",
@@ -54,6 +73,9 @@ WHOLE_FILES = (
     "evolution_triggers",
     "regions",
     "pokedexes",
+    "pokedex_version_groups",
+    "encounter_methods",
+    "encounter_condition_values",
 )
 
 type Row = dict[str, str]
@@ -106,15 +128,32 @@ def main(source: Path) -> None:
     for name in ("pokemon_forms", "pokemon_types", "pokemon_types_past"):
         keep(source, name, lambda row: row["pokemon_id"] in pokemon_ids)
 
+    encounters = keep(
+        source,
+        "encounters",
+        lambda row: row["version_id"] in LOADED_VERSIONS and row["pokemon_id"] in pokemon_ids,
+    )
+    encounter_ids = {row["id"] for row in encounters}
+    keep(source, "encounter_condition_value_map", lambda row: row["encounter_id"] in encounter_ids)
+    keep(source, "encounter_slots", in_ids({row["encounter_slot_id"] for row in encounters}))
+    areas = keep(source, "location_areas", in_ids({row["location_area_id"] for row in encounters}))
+
     evolutions = keep(source, "pokemon_evolution", in_species("evolved_species_id"))
-    referenced = {
-        "items": {"trigger_item_id", "held_item_id"},
-        "locations": {"location_id"},
-        "moves": {"known_move_id", "used_move_id"},
-    }
-    for name, columns in referenced.items():
-        ids = {row[column] for row in evolutions for column in columns if row[column]}
-        keep(source, name, in_ids(ids))
+
+    def referenced(*columns: str) -> set[str]:
+        return {row[column] for row in evolutions for column in columns if row[column]}
+
+    items = referenced("trigger_item_id", "held_item_id")
+    keep(source, "items", lambda row: row["id"] in items or row["identifier"] in EVENT_ITEMS)
+    keep(source, "moves", in_ids(referenced("known_move_id", "used_move_id")))
+    locations = {row["location_id"] for row in evolutions if row["location_id"]}
+    locations |= {row["location_id"] for row in areas}
+    keep(source, "locations", in_ids(locations))
+    keep(
+        source,
+        "location_names",
+        lambda row: row["location_id"] in locations and row["local_language_id"] in {"7", "9"},
+    )
 
 
 if __name__ == "__main__":

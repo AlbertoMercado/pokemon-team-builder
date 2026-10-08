@@ -38,6 +38,10 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Rojo Fuego, Verde Hoja |
 | [`covers.yaml`](#coversyaml) | Título del fichero de la portada de cada juego en WikiDex (RF-18). | `game.cover`, `game.cover_source` | Los 11 juegos cargados |
 | [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Rojo Fuego, Verde Hoja |
+| [`pokedex.yaml`](#pokedexyaml) | Pokédex que completa cada juego (RN-22). | `game_pokedex` | Los 11 juegos cargados |
+| [`transfers.yaml`](#transfersyaml) | Juegos que pueden enviarse Pokémon (RN-25). | `game_transfer` | Los 11 juegos cargados |
+| [`events.yaml`](#eventsyaml) | Pokémon que solo se obtienen por evento (RN-24). | `event_pokemon` | Los 11 juegos cargados |
+| [`locations.yaml`](#locationsyaml) | Nombres en español de los lugares que PokeAPI no tiene y objetos de evento para llegar a algunos. | `location.name_es`, `location.event_item` | Kanto, Johto, Archi7 y Hoenn |
 | [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). **Pendiente de implementar.** | `evolution_method` | — |
 
 Los datos de Rubí, Zafiro y Esmeralda están pendientes (#8): hasta tenerlos, no se pueden elegir
@@ -251,6 +255,87 @@ En WikiDex, el Campeón tiene tres variantes según el inicial. Sin el inicial, 
 tres Pokémon comunes tiene Exeggutor y Gyarados, Arcanine y Exeggutor, o Gyarados y Arcanine:
 esos no cuentan ([CA-38](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
+### `pokedex.yaml`
+
+**Por qué existe**: qué Pokédex completa cada juego lo decide
+[RN-22](../01-ddf/reglas-negocio.md#rn-22) (la Nacional si el juego la tiene; si no, la
+regional), y PokeAPI solo dice qué Pokédex regional tiene cada grupo de versiones.
+
+```yaml
+games:
+  red: [kanto]
+  gold: [original-johto]
+  firered: [national]
+```
+
+Cada juego tiene una lista de Pokédex de PokeAPI, con al menos una: los juegos con Pokédex
+reducida completarán la unión de las del juego base y sus contenidos descargables. Un juego o
+una Pokédex que no se hayan cargado hacen fallar la carga.
+
+### `transfers.yaml`
+
+**Por qué existe**: PokeAPI no dice qué juegos pueden enviarse Pokémon
+([RN-25](../01-ddf/reglas-negocio.md#rn-25), [CA-78](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+```yaml
+groups:
+  - games: [red, blue, yellow, gold, silver, crystal]
+    max_species_generation: 1    # Cápsula del Tiempo: solo especies de la 1.ª generación
+  - games: [gold, silver, crystal]
+  - games: [ruby, sapphire, emerald, firered, leafgreen]
+```
+
+| Campo | Significado |
+|-------|-------------|
+| `games` | Juegos del grupo, al menos dos y sin repetir. Cada uno puede enviar Pokémon a los demás. |
+| `max_species_generation` | Solo se pueden enviar especies de esa generación o anteriores. Sin él, no hay límite. |
+| `note` | Opcional. |
+
+Si dos grupos unen los mismos juegos, se aplica el menos restrictivo: de Oro a Plata no hay
+límite, aunque los dos estén también en el grupo de la Cápsula del Tiempo.
+
+### `events.yaml`
+
+**Por qué existe**: PokeAPI no tiene los Pokémon de evento
+([RN-24](../01-ddf/reglas-negocio.md#rn-24), [CA-78](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+```yaml
+events:
+  - games: [ruby, sapphire, emerald, firered, leafgreen]
+    pokemon: [mew, celebi, jirachi, deoxys-normal]
+    note: Repartidos, entre otros, en los eventos del décimo aniversario (2006).
+```
+
+Solo los Pokémon que en esos juegos no se obtienen de otra forma: hoy, los singulares. Son
+formas, como en `starters.yaml` (`deoxys-normal`). Lo que solo se obtiene en spin-offs no es un
+evento: lo deduce `core/` de las apariciones ([RN-25](../01-ddf/reglas-negocio.md#rn-25)).
+
+### `locations.yaml`
+
+**Por qué existe**: PokeAPI no tiene el nombre en español de los lugares de Kanto, Johto y
+Archi7, ni dice a qué lugares solo se llega con un objeto repartido en eventos
+([ADR-0013](../03-adr/0013-obtencion-pokeapi-y-curados.md)).
+
+```yaml
+locations:
+  pallet-town:
+    name_es: Pueblo Paleta
+  navel-rock:
+    name_es: Roca Ombligo
+    event_item: mysticticket
+    note: Solo se llega con un objeto repartido por evento.
+```
+
+| Campo | Significado |
+|-------|-------------|
+| `name_es` | Nombre en español, comprobado en WikiDex. No se admite si PokeAPI ya lo tiene. |
+| `event_item` | Identificador de PokeAPI del objeto de evento sin el que no se llega al lugar. |
+| `note` | Opcional. |
+
+Cada lugar lleva `name_es`, `event_item` o los dos, y tiene que ser un lugar con apariciones en
+los juegos cargados: una errata hace fallar la carga. Un lugar sin nombre en español se carga
+con el inglés y el informe lo avisa ([ingesta](../05-operacion/ingesta.md#informe)).
+
 ### `evolution_methods.yaml`
 
 !!! note "Pendiente de implementar"
@@ -305,13 +390,13 @@ lista con una plantilla para añadirlo a este fichero
 | Fichero | Qué hace |
 |---------|----------|
 | `ingest/sources/curated/schemas.py` | Un modelo pydantic por fichero, con las validaciones de esta página. |
-| `ingest/sources/curated/__init__.py` | `read_curated(directorio)` lee y valida todos los ficheros (`CuratedData`). `CuratedSource` carga las mecánicas y los iniciales. |
-| `ingest/sources/pokeapi/transform.py` | Usa `CuratedData` para marcar los bebés de incienso y proponer la llegada. |
+| `ingest/sources/curated/__init__.py` | `read_curated(directorio)` lee y valida todos los ficheros (`CuratedData`). `CuratedSource` carga las mecánicas, los iniciales, la Pokédex de cada juego, las transferencias (`transfer_pairs`) y los Pokémon de evento. |
+| `ingest/sources/pokeapi/transform.py` | Usa `CuratedData` para marcar los bebés de incienso, proponer la llegada y completar los lugares. |
 | `ingest/sources/wikidex/` | Usa la lista de combates de `CuratedData` para leer sus equipos de WikiDex y cargarlos ([ingesta](../05-operacion/ingesta.md#wikidex)). |
 
 Tests en `tests/ingest/test_curated.py` (los ficheros reales del repositorio, los esquemas y la
-fuente), en `tests/ingest/test_pokeapi.py` (bebés de incienso, propuestas de llegada y
-comprobación de los iniciales) y en
+fuente), en `tests/ingest/test_pokeapi.py` (bebés de incienso, propuestas de llegada,
+comprobación de los iniciales y lugares) y en
 `tests/ingest/test_wikidex.py` (equipos de los combates clave).
 
 ## Añadir los datos de un juego

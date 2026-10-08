@@ -52,25 +52,24 @@ Hechas el 2026-10-07 con el volcado CSV de PokeAPI del commit fijado (`bc92d3b`)
 
 ### Datos de referencia
 
-| Tabla | Contenido | Origen |
-|-------|-----------|--------|
-| `pokedex`, `pokedex_number` | Las Pokédex y el número de cada especie en ellas. | PokeAPI |
-| `game_pokedex` | Qué Pokédex usa cada juego (RN-22). | Curado |
-| `location`, `encounter` | Los lugares, con su nombre en español, y cada aparición: juego, lugar, Pokémon, método, probabilidad por zona y método, niveles y condiciones. | PokeAPI; los nombres que faltan, curados |
-| `game_transfer` | Qué juegos pueden enviar Pokémon a cuáles, y con qué límite de especies (RN-25). | Curado |
-| `special_obtention` | Pokémon de evento, solo de spin-offs, fósiles (Fósil y lugar donde se revive), y regalos y errantes que dependen del inicial. | Curado |
+Implementados en la fase 2: las tablas están en el
+[modelo de datos](modelo-datos.md#pokedex-y-formas-de-obtencion), cómo se cargan en el
+[diseño de la carga](carga-datos.md#pokedex-y-apariciones) y los ficheros curados en
+[datos curados](datos-curados.md#pokedexyaml).
 
-Cada método de PokeAPI pasa a una de las clases de [RN-26](../01-ddf/reglas-negocio.md#rn-26):
+Cada método de PokeAPI pasa a una de las clases de [RN-26](../01-ddf/reglas-negocio.md#rn-26)
+en `core/` (fase 3):
 
-| Clase | Métodos de PokeAPI |
-|-------|--------------------|
+| Clase | Métodos y condiciones de PokeAPI |
+|-------|----------------------------------|
 | Regalo | `gift`, `gift-egg`, salvo los fósiles |
 | Intercambio con PNJ | `npc-trade` |
-| Fósil | los `gift` marcados como fósil en los datos curados |
+| Fósil | `gift` con una condición `item-*-fossil` u `item-old-amber` |
 | Estático (100 %) | `static`, `pokeflute`, `devon-scope` |
 | Salvaje, por este orden a igual probabilidad | `walk`; `surf`; `seaweed`; `old-rod`; `good-rod`; `super-rod`; `rock-smash` y `headbutt-*` |
-| Errante | `roaming-grass`, `roaming-water` |
-| Se omite (spin-off) | `colosseum-bonus-disc-*` y similares |
+| Errante | `roaming-grass`, `roaming-water`; con `starter-*`, depende del inicial (CA-80) |
+| Se omite (spin-off) | `colosseum-bonus-disc-*`, `pokemon-channel-pal` |
+| Por decidir en la fase 3 | Ver [abajo](#decisiones-tomadas-al-implementar-la-fase-2) |
 
 ### Motor (`core/pokedex/`)
 
@@ -119,7 +118,7 @@ Cada fase es un PR desde `main`, con sus tests y su documentación
 |------|------|-----------|---------|
 | 0 | `docs/plan-pokedex` | Este plan y ADR-0013. | — |
 | 1 ✅ | `feat/hall-of-fame-unico` | Un registro por juego: migración (se detiene si hay repetidos), `409` al registrar uno ya registrado, juegos registrados fuera de los objetivos y del registro a mano. | Migración con y sin repetidos; API; pantallas; E2E. |
-| 2 | `feat/pokedex-datos` | Tablas y carga de las Pokédex, las apariciones y los datos curados nuevos; nombres en español que faltan. | Extracto sin red; casos conocidos en las comprobaciones de la carga. |
+| 2 ✅ | `feat/pokedex-datos` | Tablas y carga de las Pokédex, las apariciones y los datos curados nuevos; nombres en español que faltan. | Extracto sin red; casos conocidos en las comprobaciones de la carga. |
 | 3 | `feat/pokedex-motor` | `core/pokedex/` con RN-22 a RN-26. | Una prueba por regla (`@pytest.mark.rn`) y un escenario real de Rojo Fuego. |
 | 4 | `feat/pokedex-api` | Tablas de `user.sqlite`, migración y endpoints. | API con la base de prueba. |
 | 5 | `feat/pokedex-web` | Las pantallas, el aviso al borrar un registro con Pokédex, manual y CHANGELOG. | Vitest de cada pantalla y E2E. |
@@ -150,10 +149,39 @@ Casos que el DDF no cubría y que salieron al comprobar los datos:
 - **La simulación de la API de la web** aplica la misma regla, y su registro inicial del *Hall
   of Fame* pasa a ser de Verde Hoja para que Rojo Fuego siga siendo juego objetivo.
 
+### Decisiones tomadas al implementar la fase 2
+
+- **Fósiles y errantes según el inicial, de PokeAPI**: PokeAPI sí los distingue, con las
+  condiciones del regalo (`item-helix-fossil`) y del errante (`starter-squirtle`). No van en
+  los datos curados, que se quedan en lo que PokeAPI no tiene (ADR-0013).
+- **Sin `special_obtention`**: los datos curados son cuatro ficheros, uno por tema:
+  `pokedex.yaml`, `transfers.yaml`, `events.yaml` (los singulares) y `locations.yaml` (nombres
+  en español y objetos de evento de los lugares).
+- **Las apariciones se guardan como las da PokeAPI**, con su método y sus condiciones, y se
+  cargan también las de los spin-offs: clasificarlas es de `core/`, como los pasos de evolución.
+  La carga solo comprueba que no hay métodos sin clasificar.
+- **Probabilidad unida por Pokémon, zona, método y condiciones**: se suman los huecos y se limita
+  al 100 %.
+- **Lugares a los que solo se llega por evento** (Roca Ombligo, Isla Origen, Isla Suprema e Isla
+  del Sur): PokeAPI los da como estáticos; `location.event_item` dice con qué objeto de evento se
+  llega.
+- **Los 146 nombres en español que faltaban**, comprobados en WikiDex: la carga real no deja
+  ningún lugar sin nombre.
+
+Casos que aparecen en los datos y que el DDF no cubre. Se decidirán al empezar la fase 3, antes
+de clasificarlos:
+
+- **Lugares de evento**: ¿sus apariciones cuentan como evento (forma 7 de RN-24) o como
+  estáticas?
+- **Premios del casino** (`gift` con `coins-*`, como el Porygon de Ciudad Azulona): ¿regalo?
+- **Métodos sin clase**: `squirt-bottle` y `wailmer-pail` (Sudowoodo), `feebas-tile-fishing`.
+- **Condiciones**: enjambres (`swarm-*`), avance de la historia (`story-progress-*`), día de la
+  semana (Lapras los viernes en la Cueva Unión), opción de la televisión (Latios o Latias en
+  Esmeralda), amistad del primer Pokémon (el huevo de Togepi), consola virtual (Celebi en
+  Cristal).
+
 ## Riesgos
 
-- **Nombres en español**: unos 150 lugares de Kanto, Johto y las Islas Sete hay que traducirlos a
-  mano una vez. Mientras falte uno, la carga lo dice y se usa el nombre en inglés.
 - **Errores de PokeAPI**: los que aparezcan se corrigen en datos curados y se avisan aguas arriba.
 - **Tamaño**: es la función más grande desde el generador. Si aparece una decisión que el DDF no
   cubre, se pregunta antes de seguir.

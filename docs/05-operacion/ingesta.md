@@ -131,7 +131,8 @@ flowchart TD
    `species.evolves_from → species: happiny`. Todas las fuentes tienen que venir del mismo
    commit de PokeAPI.
    Después, cada forma recibe la ruta de su [imagen](#imagenes-de-los-pokemon), de la caché o
-   descargándola. Las que no tienen imagen son avisos, no errores.
+   descargándola. Las que no tienen imagen son avisos, no errores, como los lugares sin nombre
+   en español.
 6. **Comprobaciones de la carga** (`ingest/checks.py`): cantidades esperadas y casos
    conocidos de la primera carga ([detalle](../02-ddt/carga-datos.md#comprobaciones-de-la-carga)).
    Si alguna falla, la carga se rechaza.
@@ -152,24 +153,31 @@ Si algo falla en los pasos 1 a 8, se borra el temporal y `reference.sqlite` qued
 
 ## Informe
 
-Informe real de la carga del 2026-10-07, con el commit `bc92d3b` de PokeAPI, los datos
+Informe real de la carga del 2026-10-08, con el commit `bc92d3b` de PokeAPI, los datos
 curados y los equipos de WikiDex de Rojo Fuego y Verde Hoja:
 
 ```text
 Carga de data/reference.sqlite
 Filas cargadas por tabla:
   generation                3
+  location                212
+  pokedex                   4
   species                 386
   type                     17
   version_group             7
   game                     11
+  pokedex_number          990
   pokemon                 386
   species_egg_group       504
   type_efficacy           803
+  encounter             11051
+  event_pokemon            29
   evolution_step          940
   game_mechanic             4
+  game_pokedex             11
   game_pokemon           1930
   game_starter             15
+  game_transfer            50
   key_battle               26
   pokemon_type           1131
   key_battle_pokemon      100
@@ -184,7 +192,7 @@ Juegos que no se pueden elegir como objetivo (datos incompletos):
   Rubí: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
   Zafiro: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
   Esmeralda: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
-Comprobaciones superadas: 10
+Comprobaciones superadas: 13
 Carga completada.
 ```
 
@@ -201,6 +209,11 @@ Carga completada.
 - **Portadas**: cuántos juegos tienen portada. Con `--no-covers` no aparece. Los que no la
   tienen también van en **Avisos**, por ejemplo:
   `1 juego sin portada, su fichero no está en WikiDex: emerald`.
+- **Lugares sin nombre en español**: si a algún lugar con apariciones le falta el nombre en
+  español en PokeAPI y en los datos curados, se carga con el inglés y va en **Avisos**, por
+  ejemplo: `1 lugar sin nombre en español, se muestra el inglés (añádelo a
+  data/curated/locations.yaml): mt-moon`. Se completa en
+  [`locations.yaml`](../02-ddt/datos-curados.md#locationsyaml).
 - **Juegos que no se pueden elegir como objetivo**: los que no están completos y qué les falta
   ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Se cargan igualmente y se pueden
   registrar en el *Hall of Fame*, pero no aparecen al elegir el juego. No es un error: la
