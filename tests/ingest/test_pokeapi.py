@@ -4,6 +4,7 @@ The rules checked here are described in docs/02-ddt/carga-datos.md, section
 "Cómo se interpreta el volcado de PokeAPI".
 """
 
+import csv
 import dataclasses
 import shutil
 from collections.abc import Iterator
@@ -13,11 +14,15 @@ import pytest
 from sqlmodel import Session, col, select
 
 from db.reference import (
+    Encounter,
     EvolutionStep,
     Game,
     GamePokemon,
     GameStarter,
+    Location,
     Origin,
+    Pokedex,
+    PokedexNumber,
     Pokemon,
     PokemonType,
     Species,
@@ -41,7 +46,13 @@ from ingest.sources.curated import (
     read_curated,
     read_pinned_commits,
 )
-from ingest.sources.curated.schemas import ArrivalFile, ArrivalRule, StartersFile
+from ingest.sources.curated.schemas import (
+    ArrivalFile,
+    ArrivalRule,
+    LocationEntry,
+    LocationsFile,
+    StartersFile,
+)
 from ingest.sources.pokeapi import PokeapiCsvSource
 from ingest.sources.pokeapi.download import CsvCache, MissingCsvError
 from ingest.sources.pokeapi.rows import CsvSchemaError
@@ -51,10 +62,20 @@ COMMIT = "bc92d3b6029ef1abe9e7ad424c400b338f3c11fe"
 SPRITES_COMMIT = "8491ffde1b247e4de574d4bb8e24b7bd9fa876fa"
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "pokeapi"
 REPOSITORY = Path(__file__).resolve().parents[2]
-# Of the starters, the extract only has Venusaur.
+REPOSITORY_CURATED = read_curated(REPOSITORY / "data" / "curated")
+with (FIXTURES / COMMIT / "locations.csv").open(encoding="utf-8") as _file:
+    EXTRACT_LOCATIONS = {row["identifier"] for row in csv.DictReader(_file)}
+# Of the starters, the extract only has Venusaur, and only some of the curated locations.
 CURATED = dataclasses.replace(
-    read_curated(REPOSITORY / "data" / "curated"),
+    REPOSITORY_CURATED,
     starters=StartersFile(games={"firered": ["venusaur"]}),
+    locations=LocationsFile(
+        locations={
+            slug: entry
+            for slug, entry in REPOSITORY_CURATED.locations.locations.items()
+            if slug in EXTRACT_LOCATIONS
+        }
+    ),
 )
 
 
@@ -365,15 +386,7 @@ def test_arrival_without_rule_stays_pending(loaded: Session) -> None:
 
 def _with_arrival(game: str, pokedex: str) -> CuratedData:
     rule = ArrivalRule(regional_pokedex=pokedex, origin="inferred")
-    return CuratedData(
-        pokeapi_commit=CURATED.pokeapi_commit,
-        sprites_commit=CURATED.sprites_commit,
-        games=CURATED.games,
-        breeding=CURATED.breeding,
-        arrival=ArrivalFile(games={game: rule}),
-        starters=CURATED.starters,
-        key_battles=CURATED.key_battles,
-    )
+    return dataclasses.replace(CURATED, arrival=ArrivalFile(games={game: rule}))
 
 
 @pytest.mark.rn("RN-03")
@@ -400,11 +413,143 @@ def test_arrival_rule_for_a_game_that_is_not_a_target_fails() -> None:
         list(source.rows())
 
 
+# --- Pokédexes and encounters (RN-22, RN-26) ----------------------------------------------
+
+
+def _encounters(session: Session, game: str, pokemon: str) -> list[Encounter]:
+    query = select(Encounter).where(Encounter.game == game, Encounter.pokemon == pokemon)
+    return list(session.exec(query).all())
+
+
+@pytest.mark.rn("RN-22")
+def test_loads_the_national_pokedex_and_those_of_the_loaded_games(loaded: Session) -> None:
+    """RN-22: the Pokédex of each game is one of these, in the order of their numbers."""
+    assert set(loaded.exec(select(Pokedex.slug)).all()) == {
+        "national",
+        "kanto",
+        "original-johto",
+        "hoenn",
+    }
+    numbers = {(row.pokedex, row.species): row.number for row in loaded.exec(select(PokedexNumber))}
+    assert numbers[("kanto", "mew")] == 151
+    assert numbers[("national", "deoxys")] == 386
+    assert numbers[("original-johto", "hoothoot")] == 15
+    # Only loaded species: no Happiny in the National Pokédex.
+    assert ("national", "happiny") not in numbers
+
+
+@pytest.mark.rn("RN-26")
+def test_gifts_fossils_and_roaming_keep_their_pokeapi_method_and_conditions(
+    loaded: Session,
+) -> None:
+    """RN-26: the data to tell a gift, a fossil and a roaming Pokémon apart, as in the plan."""
+    [eevee] = _encounters(loaded, "firered", "eevee")
+    assert (eevee.method, eevee.location, eevee.area, eevee.rarity) == (
+        "gift",
+        "celadon-city",
+        "celadon-mansion",
+        100,
+    )
+    [omanyte] = _encounters(loaded, "firered", "omanyte")
+    assert (omanyte.method, omanyte.conditions) == ("gift", ["item-helix-fossil"])
+    # CA-80: which legendary dog roams depends on the starter.
+    [raikou] = _encounters(loaded, "firered", "raikou")
+    assert raikou.method == "roaming-grass"
+    assert raikou.conditions == ["starter-squirtle", "story-progress-beat-elite-four-round-two"]
+    assert {e.method for e in _encounters(loaded, "firered", "lapras")} == {"gift", "surf"}
+    assert _encounters(loaded, "firered", "sandshrew") == []  # LeafGreen exclusive
+    assert _encounters(loaded, "firered", "mew") == []  # event
+
+
+@pytest.mark.rn("RN-26")
+def test_slots_of_the_same_encounter_add_up_their_rarity_and_levels(loaded: Session) -> None:
+    """RN-26 shows the probability in each zone: Ekans in Route 4 of FireRed has four slots,
+    10 + 10 + 4 + 1 %, levels 6 to 12."""
+    [route_4] = [
+        e for e in _encounters(loaded, "firered", "ekans") if e.location == "kanto-route-4"
+    ]
+    assert (route_4.method, route_4.area, route_4.conditions) == ("walk", None, [])
+    assert (route_4.rarity, route_4.min_level, route_4.max_level) == (25, 6, 12)
+
+
+@pytest.mark.rn("RN-26")
+def test_joined_rarity_is_capped_at_one_hundred(loaded: Session) -> None:
+    """RN-26: several static Voltorb in the Power Plant of Yellow make one sure encounter."""
+    static = [e for e in _encounters(loaded, "yellow", "voltorb") if e.method == "static"]
+    assert static
+    assert all(e.rarity == 100 for e in static)
+
+
+@pytest.mark.rn("RN-26")
+def test_each_time_of_day_is_its_own_encounter(loaded: Session) -> None:
+    """RN-26, CA-81: in the 2nd generation the probability can change with the time."""
+    times = {
+        tuple(e.conditions) for e in _encounters(loaded, "gold", "hoothoot") if e.method == "walk"
+    }
+    assert ("time-night",) in times
+    assert ("time-day",) not in times  # Hoothoot only comes out at night
+
+
+@pytest.mark.rn("RN-25")
+def test_spin_off_methods_are_loaded_for_core_to_omit(loaded: Session) -> None:
+    """RN-25: Jirachi only comes from spin-offs in Ruby, which core/ tells from its methods."""
+    methods = {e.method for e in _encounters(loaded, "ruby", "jirachi")}
+    assert methods == {"colosseum-bonus-disc-us", "pokemon-channel-pal"}
+
+
+def test_locations_are_named_from_pokeapi_or_the_curated_data(loaded: Session) -> None:
+    route_4 = loaded.get(Location, "kanto-route-4")
+    assert route_4 is not None
+    assert (route_4.name_es, route_4.name_en) == ("Ruta 4", "Route 4")  # curated
+    route_119 = loaded.get(Location, "hoenn-route-119")
+    assert route_119 is not None
+    assert route_119.name_es == "Ruta 119"  # from PokeAPI
+    navel_rock = loaded.get(Location, "navel-rock")
+    assert navel_rock is not None
+    assert (navel_rock.name_es, navel_rock.event_item) == ("Roca Ombligo", "mysticticket")
+
+
+def _with_locations(**entries: LocationEntry) -> CuratedData:
+    return dataclasses.replace(CURATED, locations=LocationsFile(locations=entries))
+
+
+def test_location_without_spanish_name_is_loaded_with_a_warning(tmp_path: Path) -> None:
+    target = tmp_path / "reference.sqlite"
+    source = _offline_source(curated=_with_locations())
+
+    report = build_reference([source, CuratedSource(CURATED)], target)
+
+    assert report.succeeded, report.errors
+    [warning] = [w for w in report.warnings if "sin nombre en español" in w]
+    assert warning.startswith("110 lugares sin nombre en español")
+    assert "azalea-town" in warning
+    engine = create_sqlite_engine(target)
+    with Session(engine) as session:
+        route_4 = session.get(Location, "kanto-route-4")
+        assert route_4 is not None
+        assert (route_4.name_es, route_4.name_en) == (None, "Route 4")
+    engine.dispose()
+
+
+@pytest.mark.parametrize(
+    ("entries", "message"),
+    [
+        ({"atlantis": LocationEntry(name_es="Atlántida")}, "atlantis"),
+        ({"hoenn-route-119": LocationEntry(name_es="Ruta 119")}, "ya tiene nombre"),
+        ({"navel-rock": LocationEntry(event_item="golden-ticket")}, "golden-ticket"),
+    ],
+)
+def test_wrong_curated_locations_fail(entries: dict[str, LocationEntry], message: str) -> None:
+    source = _offline_source(curated=_with_locations(**entries))
+    with pytest.raises(TransformError, match=message):
+        list(source.rows())
+
+
 # --- Checks of the first load --------------------------------------------------------------
 
 
 def test_first_load_checks_reject_an_incomplete_load(tmp_path: Path) -> None:
-    """The extract has ~50 species, not 386: the counts check rejects it."""
+    """The extract has ~70 species, not 386: the counts check rejects it."""
     target = tmp_path / "reference.sqlite"
 
     report = build_reference([_offline_source()], target, FIRST_LOAD_CHECKS)

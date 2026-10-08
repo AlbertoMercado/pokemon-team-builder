@@ -1,6 +1,7 @@
 """WikiDex source of the ingest: cache and rate limit, team parsing and key battle rows,
 on real pages cut down to their FireRed and LeafGreen section (no network)."""
 
+import dataclasses
 import json
 from collections.abc import Mapping
 from pathlib import Path
@@ -190,15 +191,7 @@ def _curated_with(*battles: BattleEntry) -> CuratedData:
     battles_file = KeyBattlesFile(
         games=["firered", "leafgreen"], wikidex_section=SECTION, battles=list(battles)
     )
-    return CuratedData(
-        pokeapi_commit=CURATED.pokeapi_commit,
-        sprites_commit=CURATED.sprites_commit,
-        games=CURATED.games,
-        breeding=CURATED.breeding,
-        arrival=CURATED.arrival,
-        starters=CURATED.starters,
-        key_battles=[battles_file],
-    )
+    return dataclasses.replace(CURATED, key_battles=[battles_file])
 
 
 def _rows(*battles: BattleEntry) -> list[ReferenceModel]:

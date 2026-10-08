@@ -1,0 +1,13 @@
+# Juegos que pueden enviarse Pokémon entre sí (RN-25, CA-78). Esquema y significado:
+# docs/02-ddt/datos-curados.md.
+#
+# Cada juego de un grupo puede enviar Pokémon a los demás del grupo. Si dos grupos unen los
+# mismos juegos, se aplica el menos restrictivo.
+groups:
+  - games: [red, blue, yellow, gold, silver, crystal]
+    max_species_generation: 1
+    note: >-
+      Con la Cápsula del Tiempo, solo con los Pokémon que existen en la 1.ª generación.
+  - games: [gold, silver, crystal]
+  - games: [ruby, sapphire, emerald, firered, leafgreen]
+    note: De la 1.ª o la 2.ª generación a la 3.ª no se puede.

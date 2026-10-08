@@ -12,15 +12,22 @@ from sqlmodel import Session, SQLModel, select
 
 from db.reference import (
     BattleCategory,
+    Encounter,
+    EventPokemon,
     EvolutionStep,
     Game,
     GameMechanic,
+    GamePokedex,
     GamePokemon,
+    GameTransfer,
     Generation,
     IngestRun,
     KeyBattle,
     KeyBattlePokemon,
+    Location,
     Origin,
+    Pokedex,
+    PokedexNumber,
     Pokemon,
     PokemonType,
     ReferenceModel,
@@ -50,6 +57,13 @@ DOCUMENTED_TABLES = {
     "evolution_step",
     "key_battle",
     "key_battle_pokemon",
+    "pokedex",
+    "pokedex_number",
+    "game_pokedex",
+    "location",
+    "encounter",
+    "game_transfer",
+    "event_pokemon",
     "ingest_run",
 }
 
@@ -217,6 +231,28 @@ def test_round_trip_of_a_minimal_firered_dataset(session: Session) -> None:
     assert battle.category is BattleCategory.GYM_LEADER
     assert session.exec(select(IngestRun)).one().games == ["firered"]
 
+    _insert(
+        session,
+        Pokedex(slug="national"),
+        PokedexNumber(pokedex="national", species="bulbasaur", number=1),
+        GamePokedex(game="firered", pokedex="national"),
+        Location(slug="kanto-route-1", name_es="Ruta 1", name_en="Route 1"),
+        Encounter(
+            game="firered",
+            location="kanto-route-1",
+            pokemon="bulbasaur",
+            method="walk",
+            conditions=["time-day"],
+            rarity=20,
+            min_level=2,
+            max_level=5,
+        ),
+        EventPokemon(game="firered", pokemon="ivysaur"),
+    )
+    session.commit()
+    encounter = session.exec(select(Encounter)).one()
+    assert (encounter.conditions, encounter.area) == (["time-day"], None)
+
     # Enums are stored as their text value, which is what fact keys and the API use.
     stored = session.connection().execute(text("SELECT category, origin FROM key_battle"))
     assert stored.one() == ("gym_leader", "automatic")
@@ -262,5 +298,47 @@ def test_type_efficacy_factor_is_a_known_value(session: Session) -> None:
 
 def test_pokemon_type_has_at_most_two_slots(session: Session) -> None:
     session.add(PokemonType(pokemon="bulbasaur", generation=3, slot=3, type="grass"))
+    with pytest.raises(IntegrityError):
+        session.flush()
+
+
+def _encounter(rarity: int = 20, min_level: int = 2, max_level: int = 5) -> Encounter:
+    return Encounter(
+        game="firered",
+        location="kanto-route-1",
+        pokemon="bulbasaur",
+        method="walk",
+        rarity=rarity,
+        min_level=min_level,
+        max_level=max_level,
+    )
+
+
+@pytest.mark.parametrize(
+    "encounter",
+    [_encounter(rarity=0), _encounter(rarity=101), _encounter(min_level=6, max_level=5)],
+)
+def test_encounter_rarity_is_a_percent_and_levels_a_range(
+    session: Session, encounter: Encounter
+) -> None:
+    _insert(session, Location(slug="kanto-route-1", name_en="Route 1"))
+    session.add(encounter)
+    with pytest.raises(IntegrityError):
+        session.flush()
+
+
+def test_a_game_does_not_transfer_to_itself(session: Session) -> None:
+    session.add(GameTransfer(from_game="firered", to_game="firered"))
+    with pytest.raises(IntegrityError):
+        session.flush()
+
+
+def test_pokedex_numbers_are_unique_in_a_pokedex(session: Session) -> None:
+    _insert(
+        session,
+        Pokedex(slug="kanto"),
+        PokedexNumber(pokedex="kanto", species="bulbasaur", number=1),
+    )
+    session.add(PokedexNumber(pokedex="kanto", species="ivysaur", number=1))
     with pytest.raises(IntegrityError):
         session.flush()

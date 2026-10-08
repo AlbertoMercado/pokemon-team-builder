@@ -10,7 +10,9 @@ datos reales, los tests comprueban las transformaciones con los mismos casos que
 completa, pero en milisegundos.
 
 **Qué contiene**: los ficheros pequeños completos (generaciones, versiones, tipos, eficacias,
-Pokédex…) y los grandes filtrados a unas 50 especies elegidas por sus casos especiales:
+Pokédex, métodos y condiciones de aparición…) y los grandes filtrados a unas 70 especies
+elegidas por sus casos especiales. Las apariciones, además, solo de los 11 juegos cargados, y los
+lugares, solo los de esas apariciones:
 
 | Especies | Caso |
 |----------|------|
@@ -31,7 +33,18 @@ Pokédex…) y los grandes filtrados a unas 50 especies elegidas por sus casos e
 | Wurmple y sus evoluciones | Evolución aleatoria |
 | Nincada, Ninjask, Shedinja | Muda (`shed`) |
 | Feebas, Milotic | Belleza y, en generaciones posteriores, intercambio con objeto |
-| Deoxys | Forma por defecto `deoxys-normal`; sus otras formas no se cargan |
+| Deoxys | Forma por defecto `deoxys-normal`; sus otras formas no se cargan. Estático en la Isla Origen |
+| Ekans, Sandshrew | Salvaje en Rojo Fuego; Sandshrew no aparece (exclusivo de Verde Hoja) |
+| Voltorb, Electrode | Varios Voltorb estáticos en la Central de Energía de Amarillo: la probabilidad unida se limita al 100 % |
+| Lapras | Regalo y surf en Rojo Fuego |
+| Omanyte, Kabuto, Aerodactyl | Fósiles: regalos con la condición del fósil |
+| Snorlax, Zapdos | Poké Flauta y estático |
+| Mew | De evento: sin apariciones |
+| Hoothoot | Solo de noche en Oro: una aparición por momento del día |
+| Togepi | Huevo de regalo |
+| Raikou, Entei, Suicune | Errantes; en Rojo Fuego, según el inicial |
+| Lugia | Estático en la Roca Ombligo, a la que solo se llega con un objeto de evento |
+| Celebi, Jirachi | Singulares de evento, con métodos de spin-offs |
 
 **Cómo se regenera** (por ejemplo, al cambiar el commit fijado o la lista de especies):
 

@@ -12,15 +12,22 @@ from sqlalchemy import func
 from sqlmodel import Session, col, select
 
 from db.reference import (
+    Encounter,
+    EventPokemon,
     EvolutionStep,
     Game,
     GameMechanic,
+    GamePokedex,
     GamePokemon,
     GameStarter,
+    GameTransfer,
     Generation,
     KeyBattle,
     KeyBattlePokemon,
+    Location,
     Origin,
+    Pokedex,
+    PokedexNumber,
     Pokemon,
     PokemonType,
     ReferenceModel,
@@ -49,7 +56,42 @@ EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     GameMechanic: len(CURATED_GAMES) * 2,  # day_night_cycle and contests
     KeyBattle: len(CURATED_GAMES) * KEY_BATTLES_PER_GAME,
     GameStarter: len(TARGET_GAMES) * 3,
+    Pokedex: 4,  # national, kanto, original-johto and hoenn
+    GamePokedex: 11,
+    GameTransfer: 6 * 5 + 5 * 4,  # every ordered pair within the 1st-2nd and the 3rd gen.
+    EventPokemon: 3 * 1 + 3 * 2 + 5 * 4,
 }
+SPECIES_BY_POKEDEX = {"national": SPECIES_COUNT, "kanto": 151, "original-johto": 251, "hoenn": 202}
+# Encounter methods of the loaded games. ``core/`` classifies each of them (RN-26): a new one
+# upstream must be reviewed before it is loaded.
+ENCOUNTER_METHODS = frozenset(
+    {
+        "walk",
+        "surf",
+        "seaweed",
+        "old-rod",
+        "good-rod",
+        "super-rod",
+        "feebas-tile-fishing",
+        "rock-smash",
+        "headbutt-low",
+        "headbutt-normal",
+        "headbutt-high",
+        "gift",
+        "gift-egg",
+        "npc-trade",
+        "static",
+        "pokeflute",
+        "squirt-bottle",
+        "wailmer-pail",
+        "devon-scope",
+        "roaming-grass",
+        "roaming-water",
+        "colosseum-bonus-disc-us",
+        "colosseum-bonus-disc-jpn",
+        "pokemon-channel-pal",
+    }
+)
 # 15 types in the 1st generation, 17 from the 2nd: one factor per pair.
 EFFICACY_PAIRS_BY_GENERATION = {1: 15 * 15, 2: 17 * 17, 3: 17 * 17}
 
@@ -60,6 +102,11 @@ def check_counts(session: Session) -> list[str]:
         count = session.exec(select(func.count()).select_from(model)).one()
         if count != expected:
             problems.append(f"{model.__tablename__}: {count} filas, se esperaban {expected}")
+    for pokedex, expected in SPECIES_BY_POKEDEX.items():
+        query = select(func.count()).select_from(PokedexNumber)
+        count = session.exec(query.where(PokedexNumber.pokedex == pokedex)).one()
+        if count != expected:
+            problems.append(f"Pokédex {pokedex}: {count} especies, se esperaban {expected}")
     for generation, expected in EFFICACY_PAIRS_BY_GENERATION.items():
         query = select(func.count()).select_from(TypeEfficacy)
         count = session.exec(query.where(TypeEfficacy.generation == generation)).one()
@@ -279,6 +326,79 @@ def check_key_battles(session: Session) -> list[str]:
     return problems
 
 
+def check_pokedexes(session: Session) -> list[str]:
+    """The Pokédex of each game (RN-22); their species are counted in ``check_counts``."""
+    problems = []
+    expected_pokedex = {"red": "kanto", "crystal": "original-johto", "firered": "national"}
+    for game, pokedex in expected_pokedex.items():
+        found = list(session.exec(select(GamePokedex.pokedex).where(GamePokedex.game == game)))
+        if found != [pokedex]:
+            problems.append(f"Pokédex de {game}: {found}, se esperaba {pokedex}")
+    return problems
+
+
+def _methods(session: Session, game: str, pokemon: str) -> set[tuple[str, tuple[str, ...]]]:
+    query = select(Encounter.method, Encounter.conditions).where(
+        Encounter.game == game, Encounter.pokemon == pokemon
+    )
+    return {(method, tuple(conditions)) for method, conditions in session.exec(query).all()}
+
+
+def check_encounters(session: Session) -> list[str]:
+    """Known ways of obtaining Pokémon (RN-26, plan of the Pokédex) and known methods."""
+    problems = []
+    methods = set(session.exec(select(Encounter.method).distinct()).all())
+    if unknown := sorted(methods - ENCOUNTER_METHODS):
+        problems.append(f"métodos de aparición sin clasificar: {unknown}")
+    expected = [
+        ("firered", "eevee", ("gift", ())),
+        ("firered", "lapras", ("gift", ())),
+        ("firered", "lapras", ("surf", ())),
+        ("firered", "hitmonlee", ("gift", ())),
+        ("firered", "omanyte", ("gift", ("item-helix-fossil",))),
+        ("firered", "aerodactyl", ("gift", ("item-old-amber",))),
+        ("firered", "snorlax", ("pokeflute", ())),
+        ("firered", "zapdos", ("static", ())),
+        (
+            "firered",
+            "raikou",
+            ("roaming-grass", ("starter-squirtle", "story-progress-beat-elite-four-round-two")),
+        ),
+        ("firered", "ekans", ("walk", ())),
+        ("gold", "suicune", ("roaming-grass", ("story-progress-awakened-beasts",))),
+        ("gold", "togepi", ("gift-egg", ())),
+    ]
+    for game, pokemon, method in expected:
+        if method not in _methods(session, game, pokemon):
+            problems.append(f"{pokemon} en {game}: falta {method}")
+    for game, pokemon in [("firered", "sandshrew"), ("firered", "mew")]:
+        if found := _methods(session, game, pokemon):
+            problems.append(f"{pokemon} no debería aparecer en {game}: {sorted(found)}")
+    if session.get(EventPokemon, ("firered", "mew")) is None:
+        problems.append("mew debería ser de evento en firered")
+    navel_rock = session.get(Location, "navel-rock")
+    if navel_rock is None or navel_rock.event_item != "mysticticket":
+        problems.append("a navel-rock solo se debería llegar con el mysticticket")
+    return problems
+
+
+def check_transfers(session: Session) -> list[str]:
+    """Transfers between games (RN-25)."""
+    expected = {
+        ("red", "gold"): 1,  # Time Capsule
+        ("gold", "silver"): None,
+        ("firered", "ruby"): None,
+    }
+    problems = []
+    for pair, limit in expected.items():
+        transfer = session.get(GameTransfer, pair)
+        if transfer is None or transfer.max_species_generation != limit:
+            problems.append(f"transferencia {pair}: {transfer}, se esperaba el límite {limit}")
+    if session.get(GameTransfer, ("crystal", "emerald")) is not None:
+        problems.append("de la 2.ª generación a la 3.ª no se puede transferir")
+    return problems
+
+
 FIRST_LOAD_CHECKS: Sequence[Check] = (
     check_counts,
     check_target_games,
@@ -290,4 +410,7 @@ FIRST_LOAD_CHECKS: Sequence[Check] = (
     check_arrival_proposals,
     check_starters,
     check_key_battles,
+    check_pokedexes,
+    check_encounters,
+    check_transfers,
 )

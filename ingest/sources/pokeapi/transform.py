@@ -9,11 +9,15 @@ from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 
 from db.reference import (
+    Encounter,
     EvolutionStep,
     Game,
     GamePokemon,
     Generation,
+    Location,
     Origin,
+    Pokedex,
+    PokedexNumber,
     Pokemon,
     PokemonType,
     ReferenceModel,
@@ -29,10 +33,16 @@ from ingest.sources.curated import CuratedData
 from ingest.sources.pokeapi.rows import (
     DexNumberRow,
     EggGroupRow,
+    EncounterConditionRow,
+    EncounterRow,
+    EncounterSlotRow,
     EvolutionRow,
     GenerationRow,
     IdentifierRow,
+    LocationAreaRow,
+    LocationNameRow,
     PokedexRow,
+    PokedexVersionGroupRow,
     PokemonFormRow,
     PokemonRow,
     PokemonTypePastRow,
@@ -50,6 +60,9 @@ from ingest.sources.pokeapi.rows import (
 )
 
 SPANISH_LANGUAGE_ID = 7
+ENGLISH_LANGUAGE_ID = 9
+NATIONAL_POKEDEX = "national"
+MAX_RARITY = 100
 
 # PokeAPI ids from 10000 on are special types (``unknown``, ``shadow``), not real ones.
 FIRST_SPECIAL_TYPE_ID = 10000
@@ -64,6 +77,10 @@ FLAG_CONDITIONS = frozenset(
 )
 # Form columns: they only say which form evolves, which is the default one for loaded rows.
 FORM_COLUMNS = frozenset({"required_pokemon_form_id", "evolved_pokemon_form_id"})
+
+
+# Game, location id, area, form, method and condition values of a joined encounter.
+type _EncounterKey = tuple[str, int, str | None, str, str, tuple[str, ...]]
 
 
 class TransformError(Exception):
@@ -98,12 +115,21 @@ class PokeapiTables:
     regions: list[IdentifierRow]
     pokedexes: list[PokedexRow]
     dex_numbers: list[DexNumberRow]
+    pokedex_version_groups: list[PokedexVersionGroupRow]
+    location_names: list[LocationNameRow]
+    location_areas: list[LocationAreaRow]
+    encounter_methods: list[IdentifierRow]
+    encounter_slots: list[EncounterSlotRow]
+    encounters: list[EncounterRow]
+    encounter_condition_values: list[IdentifierRow]
+    encounter_conditions: list[EncounterConditionRow]
 
 
 def build_rows(tables: PokeapiTables, curated: CuratedData) -> list[ReferenceModel]:
     """Every reference.sqlite row that comes from PokeAPI, for the generations in scope.
 
-    ``curated`` provides the incense babies (CA-36) and the arrival rules (CA-28).
+    ``curated`` provides the incense babies (CA-36), the arrival rules (CA-28) and the
+    Spanish names and event items of locations (ADR-0013).
     """
     return list(_Builder(tables, curated).rows())
 
@@ -157,6 +183,8 @@ class _Builder:
         yield from self._pokemon_types()
         yield from self._evolution_steps()
         yield from self._game_pokemon()
+        yield from self._pokedexes()
+        yield from self._encounters()
 
     # --- Games -----------------------------------------------------------------------------
 
@@ -450,3 +478,119 @@ class _Builder:
         if len(stages) > 1 and stages[0].identifier in self.incense_babies:
             stages = stages[1:]
         return stages
+
+    # --- Pokédexes and encounters ----------------------------------------------------------
+
+    def _pokedexes(self) -> Iterator[ReferenceModel]:
+        """The National Pokédex and those of the loaded version groups, with the number of
+        every loaded species in them (RN-22)."""
+        groups = {vg.id for vg in self.version_groups}
+        loaded = {
+            row.pokedex_id
+            for row in self.t.pokedex_version_groups
+            if row.version_group_id in groups
+        }
+        slugs = {p.id: p.identifier for p in self.t.pokedexes}
+        loaded.add(_lookup({v: k for k, v in slugs.items()}, NATIONAL_POKEDEX, "Pokédex"))
+        for pokedex_id in sorted(loaded):
+            yield Pokedex(slug=_lookup(slugs, pokedex_id, "Pokédex"))
+        for row in self.t.dex_numbers:
+            if row.pokedex_id in loaded and row.species_id in self.species:
+                yield PokedexNumber(
+                    pokedex=slugs[row.pokedex_id],
+                    species=self.species[row.species_id].identifier,
+                    number=row.pokedex_number,
+                )
+
+    def _encounters(self) -> Iterator[ReferenceModel]:
+        """Encounters of the loaded games and the locations where they happen (RN-26).
+
+        Rows of the same Pokémon in the same area, method and conditions are joined: their
+        slots add up their rarity, capped at 100 % (several static Voltorb in the Power Plant
+        of Yellow), and their levels make one range. Spin-off methods (Colosseum bonus disc,
+        Pokémon Channel) are loaded too: ``core/`` decides what they mean (RN-25).
+        """
+        groups = {vg.id for vg in self.version_groups}
+        games = {v.id: v.identifier for v in self.t.versions if v.version_group_id in groups}
+        pokemon = {p.id: p.identifier for p in self.default_pokemon.values()}
+        slots = {s.id: s for s in self.t.encounter_slots}
+        methods = {m.id: m.identifier for m in self.t.encounter_methods}
+        areas = {a.id: a for a in self.t.location_areas}
+        values = {v.id: v.identifier for v in self.t.encounter_condition_values}
+        encounters = [e for e in self.t.encounters if e.version_id in games]
+        wanted = {e.id for e in encounters}
+        conditions: dict[int, list[str]] = defaultdict(list)
+        for row in self.t.encounter_conditions:
+            if row.encounter_id in wanted:
+                conditions[row.encounter_id].append(
+                    _lookup(values, row.encounter_condition_value_id, "Condición de aparición")
+                )
+
+        rarities: dict[_EncounterKey, dict[int, int]] = defaultdict(dict)
+        levels: dict[_EncounterKey, tuple[int, int]] = {}
+        for encounter in encounters:
+            slot = _lookup(slots, encounter.encounter_slot_id, "Hueco de aparición")
+            area = _lookup(areas, encounter.location_area_id, "Zona")
+            key: _EncounterKey = (
+                games[encounter.version_id],
+                area.location_id,
+                area.identifier,
+                _lookup(pokemon, encounter.pokemon_id, "Forma cargada de la aparición"),
+                _lookup(methods, slot.encounter_method_id, "Método de aparición"),
+                tuple(sorted(conditions[encounter.id])),
+            )
+            rarities[key][slot.id] = slot.rarity
+            low, high = levels.get(key, (encounter.min_level, encounter.max_level))
+            levels[key] = (min(low, encounter.min_level), max(high, encounter.max_level))
+
+        yield from self._locations({key[1] for key in rarities})
+        location_slugs = {loc.id: loc.identifier for loc in self.t.locations}
+        for key, by_slot in rarities.items():
+            game, location_id, area_slug, form, method, condition_values = key
+            yield Encounter(
+                game=game,
+                location=location_slugs[location_id],
+                area=area_slug,
+                pokemon=form,
+                method=method,
+                conditions=list(condition_values),
+                rarity=min(sum(by_slot.values()), MAX_RARITY),
+                min_level=levels[key][0],
+                max_level=levels[key][1],
+            )
+
+    def _locations(self, used: set[int]) -> Iterator[Location]:
+        """The locations with encounters, named in Spanish from PokeAPI or the curated data.
+
+        A location without a Spanish name is loaded with ``name_es`` null and the load warns
+        about it. Without an English name either, ``name_en`` is its identifier.
+        """
+        names: dict[int, dict[int, str]] = defaultdict(dict)
+        for row in self.t.location_names:
+            if row.name is not None:
+                names[row.location_id][row.local_language_id] = row.name
+        slugs = {loc.id: loc.identifier for loc in self.t.locations}
+        curated = self.curated.locations.locations
+        unknown = sorted(set(curated) - {slugs[i] for i in used if i in slugs})
+        if unknown:
+            raise TransformError(f"locations.yaml: {unknown} no son lugares con apariciones")
+        items = {i.identifier for i in self.t.items}
+        for location_id in sorted(used):
+            slug = _lookup(slugs, location_id, "Lugar")
+            entry = curated.get(slug)
+            name_es = names[location_id].get(SPANISH_LANGUAGE_ID)
+            if entry is not None and entry.name_es is not None:
+                if name_es is not None:
+                    raise TransformError(
+                        f"locations.yaml: {slug} ya tiene nombre en español en PokeAPI ({name_es})"
+                    )
+                name_es = entry.name_es
+            event_item = entry.event_item if entry is not None else None
+            if event_item is not None and event_item not in items:
+                raise TransformError(f"locations.yaml: el objeto {event_item} no existe en PokeAPI")
+            yield Location(
+                slug=slug,
+                name_es=name_es,
+                name_en=names[location_id].get(ENGLISH_LANGUAGE_ID, slug),
+                event_item=event_item,
+            )

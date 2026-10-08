@@ -1,0 +1,19 @@
+# Pokémon que en algunos juegos solo se obtienen por evento (RN-24, CA-78). Esquema y
+# significado: docs/02-ddt/datos-curados.md.
+#
+# Solo los singulares, que no se obtienen de otra forma en esos juegos. Son formas, como en
+# starters.yaml: Deoxys es deoxys-normal. Los lugares a los que solo se llega con un objeto de
+# evento (Roca Ombligo, Isla Origen…) están en locations.yaml.
+events:
+  - games: [red, blue, yellow]
+    pokemon: [mew]
+  - games: [gold, silver, crystal]
+    pokemon: [mew, celebi]
+    note: >-
+      Mew llega con la Cápsula del Tiempo desde un juego de la 1.ª generación, donde también es
+      de evento.
+  - games: [ruby, sapphire, emerald, firered, leafgreen]
+    pokemon: [mew, celebi, jirachi, deoxys-normal]
+    note: >-
+      Repartidos, entre otros, en los eventos del décimo aniversario (2006). Los de los discos
+      de Colosseum y Pokémon Channel son de spin-offs y no cuentan (CA-73).

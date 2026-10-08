@@ -20,6 +20,15 @@ from db.reference.games import (
     VersionGroup,
 )
 from db.reference.meta import IngestRun
+from db.reference.pokedex import (
+    Encounter,
+    EventPokemon,
+    GamePokedex,
+    GameTransfer,
+    Location,
+    Pokedex,
+    PokedexNumber,
+)
 from db.reference.pokemon import (
     Pokemon,
     PokemonType,
@@ -31,16 +40,23 @@ from db.reference.pokemon import (
 
 __all__ = [
     "BattleCategory",
+    "Encounter",
+    "EventPokemon",
     "EvolutionStep",
     "Game",
     "GameMechanic",
+    "GamePokedex",
     "GamePokemon",
     "GameStarter",
+    "GameTransfer",
     "Generation",
     "IngestRun",
     "KeyBattle",
     "KeyBattlePokemon",
+    "Location",
     "Origin",
+    "Pokedex",
+    "PokedexNumber",
     "Pokemon",
     "PokemonType",
     "ReferenceModel",

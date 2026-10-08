@@ -77,7 +77,15 @@ tiene los Pokémon de evento ni la compatibilidad entre juegos.
 
 ### Acciones derivadas
 
-- [ ] Cargar las Pokédex, las apariciones y los datos curados nuevos (#94).
+- [x] Cargar las Pokédex, las apariciones y los datos curados nuevos (#94, fase 2 del
+  [plan](../02-ddt/plan-pokedex.md#decisiones-tomadas-al-implementar-la-fase-2)).
+
+### Nota de la implementación (2026-10-08)
+
+Al cargar los datos se vio que PokeAPI **sí** distingue los fósiles y los errantes que dependen
+del inicial, con las condiciones de la aparición (`item-helix-fossil`, `starter-squirtle`). No
+van en los datos curados; la decisión no cambia: lo curado sigue siendo solo lo que PokeAPI no
+tiene.
 
 ## Referencias
 

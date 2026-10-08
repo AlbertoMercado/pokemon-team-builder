@@ -17,6 +17,11 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ### Añadido
 
+- **Ingesta**: carga los datos de la futura Pokédex: la Pokédex de cada juego, dónde y cómo se
+  obtiene cada Pokémon en los 11 juegos (lugar, método, probabilidad y niveles), qué juegos
+  pueden enviarse Pokémon y los Pokémon de evento, con los nombres en español de todos los
+  lugares (#94). **Al actualizar hay que repetir la carga de datos**
+  (`uv run python -m ingest`): hasta entonces, la API pide repetirla.
 - **Arranque**: `scripts/start.sh` prepara y arranca la aplicación en un solo comando: copia
   `user.sqlite` en `data/backups/`, instala las dependencias, carga los datos, compila la web y
   arranca la API, que la sirve. Acepta las opciones de la carga, como `--offline`.

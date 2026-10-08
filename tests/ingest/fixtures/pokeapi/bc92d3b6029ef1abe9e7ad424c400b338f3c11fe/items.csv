@@ -3,8 +3,13 @@ id,identifier,category_id,cost,fling_power,fling_effect_id
 82,fire-stone,10,3000,30,
 83,thunder-stone,10,3000,30,
 84,water-stone,10,3000,30,
+85,leaf-stone,10,3000,30,
 110,oval-stone,10,2000,80,
 198,kings-rock,12,5000,30,7
+534,eon-ticket,20,0,,
+556,mysticticket,20,0,,
+557,auroraticket,20,0,,
+562,old-sea-map,20,0,,
 580,prism-scale,10,2000,30,
 1633,galarica-cuff,9,3000,30,
 1643,galarica-wreath,9,3000,30,

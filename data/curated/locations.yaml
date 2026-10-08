@@ -1,0 +1,317 @@
+# Lo que PokeAPI no tiene de los lugares con apariciones (ADR-0013): el nombre en español
+# de los de Kanto, Johto y Archi7, y el objeto de evento sin el que no se llega a algunos.
+# Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# Nombres comprobados en WikiDex el 2026-10-08. Un lugar que ya tiene nombre en español en
+# PokeAPI no puede llevar name_es aquí. Los lugares que faltan se cargan con su nombre en
+# inglés y la carga avisa.
+locations:
+  # Kanto
+  pallet-town:
+    name_es: Pueblo Paleta
+  viridian-city:
+    name_es: Ciudad Verde
+  pewter-city:
+    name_es: Ciudad Plateada
+  cerulean-city:
+    name_es: Ciudad Celeste
+  vermilion-city:
+    name_es: Ciudad Carmín
+  celadon-city:
+    name_es: Ciudad Azulona
+  fuchsia-city:
+    name_es: Ciudad Fucsia
+  saffron-city:
+    name_es: Ciudad Azafrán
+  cinnabar-island:
+    name_es: Isla Canela
+  viridian-forest:
+    name_es: Bosque Verde
+  mt-moon:
+    name_es: Monte Moon
+  digletts-cave:
+    name_es: Cueva Diglett
+  rock-tunnel:
+    name_es: Túnel Roca
+  pokemon-tower:
+    name_es: Torre Pokémon
+  kanto-power-plant:
+    name_es: Central de Energía
+  kanto-underground-path:
+    name_es: Vía Subterránea
+  seafoam-islands:
+    name_es: Islas Espuma
+  pokemon-mansion:
+    name_es: Mansión Pokémon
+  kanto-safari-zone:
+    name_es: Zona Safari
+  cerulean-cave:
+    name_es: Cueva Celeste
+  kanto-victory-road-1:
+    name_es: Calle Victoria
+  kanto-victory-road-2:
+    name_es: Calle Victoria
+  ss-anne:
+    name_es: S.S. Anne
+  # Rutas de Kanto (las marítimas también se llaman «Ruta»)
+  kanto-route-1:
+    name_es: Ruta 1
+  kanto-route-2:
+    name_es: Ruta 2
+  kanto-route-3:
+    name_es: Ruta 3
+  kanto-route-4:
+    name_es: Ruta 4
+  kanto-route-5:
+    name_es: Ruta 5
+  kanto-route-6:
+    name_es: Ruta 6
+  kanto-route-7:
+    name_es: Ruta 7
+  kanto-route-8:
+    name_es: Ruta 8
+  kanto-route-9:
+    name_es: Ruta 9
+  kanto-route-10:
+    name_es: Ruta 10
+  kanto-route-11:
+    name_es: Ruta 11
+  kanto-route-12:
+    name_es: Ruta 12
+  kanto-route-13:
+    name_es: Ruta 13
+  kanto-route-14:
+    name_es: Ruta 14
+  kanto-route-15:
+    name_es: Ruta 15
+  kanto-route-16:
+    name_es: Ruta 16
+  kanto-route-17:
+    name_es: Ruta 17
+  kanto-route-18:
+    name_es: Ruta 18
+  kanto-route-22:
+    name_es: Ruta 22
+  kanto-route-23:
+    name_es: Ruta 23
+  kanto-route-24:
+    name_es: Ruta 24
+  kanto-route-25:
+    name_es: Ruta 25
+  kanto-route-26:
+    name_es: Ruta 26
+  kanto-route-27:
+    name_es: Ruta 27
+  kanto-route-28:
+    name_es: Ruta 28
+  kanto-sea-route-19:
+    name_es: Ruta 19
+  kanto-sea-route-20:
+    name_es: Ruta 20
+  kanto-sea-route-21:
+    name_es: Ruta 21
+  # Johto
+  new-bark-town:
+    name_es: Pueblo Primavera
+  cherrygrove-city:
+    name_es: Ciudad Cerezo
+  violet-city:
+    name_es: Ciudad Malva
+  azalea-town:
+    name_es: Pueblo Azalea
+  goldenrod-city:
+    name_es: Ciudad Trigal
+  ecruteak-city:
+    name_es: Ciudad Iris
+  olivine-city:
+    name_es: Ciudad Olivo
+  cianwood-city:
+    name_es: Ciudad Orquídea
+  blackthorn-city:
+    name_es: Ciudad Endrino
+  sprout-tower:
+    name_es: Torre Bellsprout
+  ruins-of-alph:
+    name_es: Ruinas Alfa
+  union-cave:
+    name_es: Cueva Unión
+  slowpoke-well:
+    name_es: Pozo Slowpoke
+  ilex-forest:
+    name_es: Encinar
+  national-park:
+    name_es: Parque Nacional
+  burned-tower:
+    name_es: Torre Quemada
+  bell-tower:
+    name_es: Torre Hojalata
+  whirl-islands:
+    name_es: Islas Remolino
+  mt-mortar:
+    name_es: Monte Mortero
+  lake-of-rage:
+    name_es: Lago de la Furia
+  team-rocket-hq:
+    name_es: Guarida Rocket
+  ice-path:
+    name_es: Ruta Helada
+  dragons-den:
+    name_es: Guarida Dragón
+  dark-cave:
+    name_es: Cueva Oscura
+  tohjo-falls:
+    name_es: Cataratas Tohjo
+  mt-silver:
+    name_es: Monte Plateado
+  # Rutas de Johto
+  johto-route-29:
+    name_es: Ruta 29
+  johto-route-30:
+    name_es: Ruta 30
+  johto-route-31:
+    name_es: Ruta 31
+  johto-route-32:
+    name_es: Ruta 32
+  johto-route-33:
+    name_es: Ruta 33
+  johto-route-34:
+    name_es: Ruta 34
+  johto-route-35:
+    name_es: Ruta 35
+  johto-route-36:
+    name_es: Ruta 36
+  johto-route-37:
+    name_es: Ruta 37
+  johto-route-38:
+    name_es: Ruta 38
+  johto-route-39:
+    name_es: Ruta 39
+  johto-route-42:
+    name_es: Ruta 42
+  johto-route-43:
+    name_es: Ruta 43
+  johto-route-44:
+    name_es: Ruta 44
+  johto-route-45:
+    name_es: Ruta 45
+  johto-route-46:
+    name_es: Ruta 46
+  johto-sea-route-40:
+    name_es: Ruta 40
+  johto-sea-route-41:
+    name_es: Ruta 41
+  # Archi7 (Islas Sete)
+  one-island:
+    name_es: Isla Prima
+  kindle-road:
+    name_es: Camino Candente
+  treasure-beach:
+    name_es: Playa Tesoro
+  mt-ember:
+    name_es: Monte Ascuas
+  cape-brink:
+    name_es: Cabo Extremo
+  bond-bridge:
+    name_es: Puente Unión
+  three-isle-port:
+    name_es: Puerto Isla Tera
+  berry-forest:
+    name_es: Bosque Baya
+  four-island:
+    name_es: Isla Quarta
+  icefall-cave:
+    name_es: Cueva Glaciada
+  five-island:
+    name_es: Isla Inta
+  five-isle-meadow:
+    name_es: Prado Isla Inta
+  memorial-pillar:
+    name_es: Pilar Recuerdo
+  water-labyrinth:
+    name_es: Aquarinto
+  resort-gorgeous:
+    name_es: Lugar de Recreo
+  lost-cave:
+    name_es: Cueva Perdida
+  outcast-island:
+    name_es: Isla Aislada
+  green-path:
+    name_es: Vía Verde
+  water-path:
+    name_es: Vía Acuática
+  ruin-valley:
+    name_es: Valle Ruinas
+  pattern-bush:
+    name_es: Bosquejo
+  kanto-altering-cave:
+    name_es: Cueva Cambiante
+  trainer-tower:
+    name_es: Torre Desafío
+  canyon-entrance:
+    name_es: Entrada al Cañón
+  sevault-canyon:
+    name_es: Cañón Sétano
+  tanoby-ruins:
+    name_es: Ruinas Sete
+  monean-chamber:
+    name_es: Cámara Anémuna
+  liptoo-chamber:
+    name_es: Cámara Tulipdos
+  weepth-chamber:
+    name_es: Cámara Tristante
+  dilford-chamber:
+    name_es: Cámara Quarciso
+  scufib-chamber:
+    name_es: Cámara Hibinca
+  rixy-chamber:
+    name_es: Cámara Seiris
+  viapos-chamber:
+    name_es: Cámara Pasiete
+  # Hoenn: lugares de Esmeralda y lugares que PokeAPI no nombra en español
+  abandoned-ship:
+    name_es: Nao Abandonada
+  mirage-island:
+    name_es: Isla Espejismo
+  magma-hideout:
+    name_es: Guarida Magma
+  mirage-tower:
+    name_es: Torre Espejismo
+  desert-underpass:
+    name_es: Gruta Desértica
+  artisan-cave:
+    name_es: Cueva Taller
+  hoenn-altering-cave:
+    name_es: Cueva Cambiante
+  terra-cave:
+    name_es: Cueva Terrena
+  marine-cave:
+    name_es: Cueva Marina
+  hoenn-battle-frontier:
+    name_es: Frente Batalla
+  # Lugares que no son un sitio del mapa: errantes y regalos de los spin-offs
+  roaming-kanto:
+    name_es: Errante por Kanto
+  roaming-johto:
+    name_es: Errante por Johto
+  roaming-hoenn:
+    name_es: Errante por Hoenn
+  kanto-pokecenter:
+    name_es: Centro Pokémon
+  hoenn-pokecenter:
+    name_es: Centro Pokémon
+  # Lugares a los que solo se llega con un objeto repartido en eventos
+  navel-rock:
+    name_es: Roca Ombligo
+    event_item: mysticticket
+    note: Solo se llega con un objeto repartido por evento.
+  birth-island:
+    name_es: Isla Origen
+    event_item: auroraticket
+    note: Solo se llega con un objeto repartido por evento.
+  faraway-island:
+    name_es: Isla Suprema
+    event_item: old-sea-map
+    note: Solo se llega con un objeto repartido por evento.
+  southern-island:
+    event_item: eon-ticket
+    note: Solo se llega con un objeto repartido por evento.

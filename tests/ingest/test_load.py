@@ -180,13 +180,15 @@ def _data_dir_with_fixture_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     """Data directory whose PokeAPI cache already has the test extract (no download).
 
     The extract has no WikiDex pages, so the CLI uses the repository's curated data without
-    key battles; of the starters, it only has Venusaur.
+    key battles; of the starters, it only has Venusaur, and it has few of the curated
+    locations, so they are left out.
     """
     data_dir = tmp_path / "data"
     shutil.copytree(POKEAPI_FIXTURES, data_dir / "cache" / "pokeapi")
     curated = tmp_path / "curated"
     shutil.copytree(REPOSITORY_CURATED, curated, ignore=shutil.ignore_patterns("key_battles"))
     (curated / "starters.yaml").write_text("games:\n  firered: [venusaur]\n")
+    (curated / "locations.yaml").write_text("locations: {}\n")
     monkeypatch.setattr(cli, "CURATED_DIR", curated)
     return data_dir
 
@@ -194,7 +196,7 @@ def _data_dir_with_fixture_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 def test_cli_builds_reference_in_the_data_dir(
     tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    # The extract has ~45 species, so the checks of the full first load are disabled here.
+    # The extract has ~70 species, so the checks of the full first load are disabled here.
     monkeypatch.setattr(cli, "FIRST_LOAD_CHECKS", ())
     data_dir = _data_dir_with_fixture_cache(tmp_path, monkeypatch)
 
@@ -207,6 +209,8 @@ def test_cli_builds_reference_in_the_data_dir(
     # Offline with an empty sprite cache: the forms are loaded without image (ADR-0010).
     assert "Imágenes: 0 de " in output
     assert "formas sin imagen, no está en la caché" in output
+    # Without the curated names, the places of Kanto have no Spanish name (ADR-0013).
+    assert "lugares sin nombre en español, se muestra el inglés" in output
 
 
 def test_cli_fails_when_the_checks_fail(

@@ -82,6 +82,7 @@ Cuando esté implementada, el procedimiento será el del
 | `Datos del usuario: Registros del Hall of Fame con …` | Un registro de tu *Hall of Fame* usa un juego o un Pokémon que la nueva carga ya no tiene. El número es el `id` del registro. | Corrige o elimina ese registro (`PATCH` o `DELETE /api/hall-of-fame/{id}`) y repite la carga. |
 | Aviso `N juegos sin portada, …` | No se ha podido obtener la portada de esos juegos: sin conexión, WikiDex no responde o ha cambiado el nombre del fichero. | Nada: la carga se completa y esos juegos se muestran sin portada. Si el aviso dice que el fichero no está en WikiDex, avisa al arquitecto para corregir `data/curated/covers.yaml`. |
 | Aviso `N formas sin imagen, …` | No se ha podido obtener la imagen de esas formas: sin conexión, el servidor de imágenes no responde o no la tiene. | Nada: la carga se completa y esas formas se muestran sin imagen. Repite la carga con conexión para descargar las que falten. |
+| Aviso `N lugares sin nombre en español, …` | A esos lugares les falta el nombre en español en PokeAPI y en `data/curated/locations.yaml`. | Nada: la carga se completa y esos lugares se muestran con su nombre en inglés. Avisa al arquitecto para añadirlo. |
 | Aviso `Confirmaciones de datos que ya no existen…` | Confirmaste datos que la nueva carga ya no tiene. | Nada: la carga se completa y esas confirmaciones se ignoran. |
 
 ## Consultar los datos cargados

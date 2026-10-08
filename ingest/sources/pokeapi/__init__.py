@@ -1,4 +1,5 @@
-"""PokeAPI source: species, forms, types, type charts, egg groups, evolutions and games.
+"""PokeAPI source: species, forms, types, type charts, egg groups, evolutions, games,
+Pokédexes and encounters.
 
 Reads the CSV dump of the PokeAPI repository pinned to the commit in
 ``data/curated/pokeapi.yaml`` (ADR-0004), and uses the curated data for incense babies and
@@ -15,10 +16,16 @@ from ingest.sources.pokeapi.index import PokemonIndex, build_index
 from ingest.sources.pokeapi.rows import (
     DexNumberRow,
     EggGroupRow,
+    EncounterConditionRow,
+    EncounterRow,
+    EncounterSlotRow,
     EvolutionRow,
     GenerationRow,
     IdentifierRow,
+    LocationAreaRow,
+    LocationNameRow,
     PokedexRow,
+    PokedexVersionGroupRow,
     PokemonFormRow,
     PokemonRow,
     PokemonTypePastRow,
@@ -91,4 +98,18 @@ class PokeapiCsvSource:
             regions=read_rows(c.path("regions"), IdentifierRow),
             pokedexes=read_rows(c.path("pokedexes"), PokedexRow),
             dex_numbers=read_rows(c.path("pokemon_dex_numbers"), DexNumberRow),
+            pokedex_version_groups=read_rows(
+                c.path("pokedex_version_groups"), PokedexVersionGroupRow
+            ),
+            location_names=read_rows(c.path("location_names"), LocationNameRow),
+            location_areas=read_rows(c.path("location_areas"), LocationAreaRow),
+            encounter_methods=read_rows(c.path("encounter_methods"), IdentifierRow),
+            encounter_slots=read_rows(c.path("encounter_slots"), EncounterSlotRow),
+            encounters=read_rows(c.path("encounters"), EncounterRow),
+            encounter_condition_values=read_rows(
+                c.path("encounter_condition_values"), IdentifierRow
+            ),
+            encounter_conditions=read_rows(
+                c.path("encounter_condition_value_map"), EncounterConditionRow
+            ),
         )

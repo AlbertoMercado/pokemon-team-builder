@@ -160,6 +160,56 @@ class PokedexRow(CsvRow):
 class DexNumberRow(CsvRow):
     species_id: int
     pokedex_id: int
+    pokedex_number: int
+
+
+class PokedexVersionGroupRow(CsvRow):
+    pokedex_id: int
+    version_group_id: int
+
+
+# --- Encounters ----------------------------------------------------------------------------
+
+
+class LocationNameRow(CsvRow):
+    """``name`` is empty in a few rows that only have a subtitle."""
+
+    location_id: int
+    local_language_id: int
+    name: str | None = None
+
+
+class LocationAreaRow(CsvRow):
+    """A part of a location; ``identifier`` is empty when the location has a single one."""
+
+    id: int
+    location_id: int
+    identifier: str | None = None
+
+
+class EncounterSlotRow(CsvRow):
+    """``rarity`` is the probability, in percent, of the slot within its area and method."""
+
+    id: int
+    encounter_method_id: int
+    rarity: int
+
+
+class EncounterRow(CsvRow):
+    id: int
+    version_id: int
+    location_area_id: int
+    encounter_slot_id: int
+    pokemon_id: int
+    min_level: int
+    max_level: int
+
+
+class EncounterConditionRow(CsvRow):
+    """A condition value of an encounter, such as ``time-night``."""
+
+    encounter_id: int
+    encounter_condition_value_id: int
 
 
 # --- Evolutions ----------------------------------------------------------------------------
