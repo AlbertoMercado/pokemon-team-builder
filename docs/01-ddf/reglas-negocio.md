@@ -699,13 +699,24 @@ generación de equipos ([CA-79](cuestiones-abiertas.md#resueltas)).
     5. **Transferirlo desde un juego compatible** en el que se obtiene, aunque no esté
        superado ([RN-25](#rn-25)). Así se cubren los exclusivos de cada versión.
     6. **Regalo que depende del inicial elegido**: «Regalo en X si elegiste a Y». Cuenta casi
-       como un evento, porque depende de una elección hecha al empezar la partida.
-    7. **Evento**: «Pokémon obtenido por evento».
+       como un evento, porque depende de una elección hecha al empezar la partida. Los propios
+       iniciales también: «Regalo en Pueblo Paleta si lo elegiste como inicial»
+       ([CA-87](cuestiones-abiertas.md#resueltas)).
+    7. **Evento**: «Pokémon obtenido por evento». También los que están en un lugar al que solo
+       se llega con un objeto de evento, indicando el lugar y el objeto, y los de la consola
+       virtual ([CA-82](cuestiones-abiertas.md#resueltas)).
 - **Fase posterior**: lo más sencillo es **evolucionar la fase anterior**, indicando el método
   (subir al nivel N, piedra, intercambio, intercambio con un objeto, amistad, girar la consola…).
-  Las demás formas siguen el orden de la primera fase.
+  Si hay varios métodos, primero el menos tedioso según [RN-15](#rn-15); los imposibles en el
+  juego se omiten. Las demás formas siguen el orden de la primera fase; las de criar, solo si es
+  la etapa que nace del huevo ([CA-86](cuestiones-abiertas.md#resueltas)).
 - **Criar** solo es posible en los juegos con crianza, desde la 2.ª generación, y si la línea
-  se puede criar (como en [RN-11](#rn-11)). En la 1.ª generación no hay crianza.
+  se puede criar (como en [RN-11](#rn-11)). En la 1.ª generación no hay crianza. Se obtiene la
+  etapa que nace del huevo ([CA-25](cuestiones-abiertas.md#resueltas)) desde otra de su línea
+  que no sea un bebé; el bebé de incienso, como Azurill, también, indicando el incienso
+  ([CA-86](cuestiones-abiertas.md#resueltas)).
+- **Se obtiene en otro juego** (forma 5) si allí hay alguna forma de obtenerlo en el juego
+  (forma 3) ([CA-86](cuestiones-abiertas.md#resueltas)).
 - **Enlaces**: si la forma es criarlo o evolucionarlo desde otro Pokémon que no está
   registrado, la ficha enlaza a la de ese Pokémon ([CA-76](cuestiones-abiertas.md#resueltas)).
 - **Sin ninguna forma**: si no se conoce ninguna, la ficha lo dice y el usuario puede marcarlo
@@ -740,21 +751,34 @@ generación de equipos ([CA-79](cuestiones-abiertas.md#resueltas)).
 
 - **Tipo**: Pokédex
 - **Formas y cómo se muestran** ([CA-75](cuestiones-abiertas.md#resueltas)), en este orden:
-    1. **Regalo**: «Regalo en X», como el Eevee de Ciudad Azulona.
-    2. **Intercambio con un PNJ**: «Intercambiar con un PNJ en X».
+    1. **Regalo**: «Regalo en X», como el Eevee de Ciudad Azulona. Los premios del casino son
+       regalos e indican las fichas: «Premio del casino en Ciudad Azulona por 9999 fichas»
+       ([CA-83](cuestiones-abiertas.md#resueltas)). Si se elige uno entre varios, se indica
+       entre cuáles: «Regalo en Ciudad Azafrán, a elegir entre Hitmonlee y Hitmonchan»
+       ([CA-87](cuestiones-abiertas.md#resueltas)).
+    2. **Intercambio con un PNJ**: «Intercambiar con un PNJ en X», indicando el Pokémon que pide.
     3. **Fósil**: «Revivir el Fósil X en Y», como el Fósil Hélix en Isla Canela.
-    4. **Estático**, como los legendarios o Snorlax: «Aparece salvaje en X: 100 %».
+    4. **Estático**, como los legendarios, Snorlax o Sudowoodo: «Aparece salvaje en X: 100 %»
+       ([CA-84](cuestiones-abiertas.md#resueltas)).
     5. **Salvaje**: «Aparece salvaje en X: N %», donde N es su probabilidad de aparición en esa
        zona con ese método. Primero el lugar con mayor probabilidad; a igual probabilidad, por
-       método: andar (hierba o cueva), surfear, caña vieja, caña buena, supercaña y, por último,
-       golpe roca o cabezazo. Si la probabilidad cambia con la hora, cuenta la mayor y se indica
+       método: andar (hierba o cueva), surfear, buceo, caña vieja, caña buena, supercaña, las
+       casillas de Feebas y, por último, golpe roca o cabezazo
+       ([CA-84](cuestiones-abiertas.md#resueltas)). Si la probabilidad cambia con la hora, cuenta la mayor y se indica
        el momento: «Aparece salvaje en la Ruta 29 (noche): 50 %»
        ([CA-81](cuestiones-abiertas.md#resueltas)).
-    6. **Errante**: «Pokémon errante». Si qué Pokémon vaga depende del inicial elegido, se indica:
+    6. **Salvaje en enjambre**: como el salvaje, «Aparece en enjambre en X: N %»
+       ([CA-85](cuestiones-abiertas.md#resueltas)).
+    7. **Errante**: «Pokémon errante». Si qué Pokémon vaga depende del inicial elegido, se indica:
        «Pokémon errante si elegiste a Squirtle», como Raikou en Rojo Fuego
-       ([CA-80](cuestiones-abiertas.md#resueltas)).
+       ([CA-80](cuestiones-abiertas.md#resueltas)); lo mismo con la opción de la televisión de
+       Esmeralda: «Pokémon errante si elegiste rojo en la televisión».
 - **Sin tener en cuenta el avance**: el juego ya está superado, así que no importa en qué
-  momento de la partida se puede llegar a cada lugar.
+  momento de la partida se puede llegar a cada lugar ni las condiciones de avance de la
+  historia.
+- **Otras condiciones**, como el día de la semana o la amistad del primer Pokémon del equipo,
+  no cambian la forma y se indican con ella: «Aparece salvaje en la Cueva Unión (los viernes):
+  100 %» ([CA-85](cuestiones-abiertas.md#resueltas)).
 - Los regalos que dependen del inicial elegido no van aquí, sino casi al final
   ([RN-24](#rn-24)).
 

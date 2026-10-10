@@ -10,6 +10,7 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
 | Ruta | Qué es |
 |------|--------|
 | `core/` | Tests del motor. `builders.py` y `scenario.py` son los datos de prueba (ver abajo). |
+| `core/pokedex/` | Tests de la Pokédex. `builders.py` y `core/pokedex_scenario.py` son sus datos de prueba (ver abajo). |
 | `db/` | Esquemas de `reference.sqlite` y `user.sqlite` (migraciones incluidas). |
 | `ingest/` | Carga, fuentes, imágenes y portadas, sobre extractos reales. |
 | `api/` | Endpoints con el `TestClient` de FastAPI sobre un directorio de datos temporal (`conftest.py`); `factories.py` crea los `reference.sqlite` de prueba y `scenario.py` escribe el escenario de Rojo Fuego. |
@@ -35,5 +36,11 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
 - **Escenario real**: `core/scenario.py` construye el contexto de Rojo Fuego desde
   `core/fixtures/firered.json`, un extracto de un `reference.sqlite` real (los Pokémon que pueden
   llegar al juego, la tabla de tipos de la 3.ª generación y los 13 combates clave).
+  `core/pokedex_scenario.py` construye la Pokédex de Rojo Fuego desde
+  `core/fixtures/pokedex_firered.json` (sus 386 especies con sus apariciones y evoluciones, y los
+  juegos que pueden enviarle Pokémon). En la Pokédex, `core/pokedex/builders.py`
+  (`pokedex(species("pichu"), species("pikachu", evolves_from="pichu"))`) hace de constructor.
+- **Nombres únicos**: los ficheros de test no tienen `__init__.py`, así que su nombre no se puede
+  repetir en otro directorio (por eso `test_pokedex_scenario_firered.py`).
 - **Imports**: pytest añade la raíz del repositorio al `sys.path` (`pythonpath` en
   `pyproject.toml`) y los tests importan módulos de prueba como `tests.core.builders`.
