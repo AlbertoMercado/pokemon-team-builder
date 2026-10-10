@@ -521,8 +521,122 @@ nada. La API usa `involved_facts` para `GET /api/games/{game}/review` (muestra l
 pendientes con su estado) y `pending_facts` para responder `409` al generar si queda algo
 ([API](api.md#generacion)).
 
+## Pokédex (`core/pokedex/`)
+
+Las reglas de la Pokédex de los juegos superados
+([RN-22](../01-ddf/reglas-negocio.md#rn-22) a [RN-26](../01-ddf/reglas-negocio.md#rn-26)).
+Es independiente del generador ([CA-79](../01-ddf/cuestiones-abiertas.md#resueltas)): solo
+comparte `GameInfo`, `EvolutionStep`, `core/evolution.py` y los grupos huevo de
+`core/breeding.py`.
+
+### Contexto (`core/pokedex/domain.py`)
+
+`PokedexContext` es su única entrada, que construye `api/services/` a partir de las dos bases
+de datos. Todo se identifica por especie, porque la Pokédex registra especies
+([RN-22](../01-ddf/reglas-negocio.md#rn-22)):
+
+| Modelo | Contenido |
+|--------|-----------|
+| `PokedexContext` | El juego (`GameInfo`, con sus mecánicas), si tiene crianza, sus especies en el orden de la Pokédex, las registradas e imposibles que marcó el usuario, si se confirmó la lista inicial, sus iniciales y los juegos que pueden enviarle Pokémon. |
+| `DexSpecies` | Una especie: su número en la Pokédex, su generación, sus grupos huevo, si es un bebé de incienso, los pasos de evolución que llevan a ella en el juego, sus apariciones y si es de evento en el juego. |
+| `Encounter` | Una aparición tal como la da PokeAPI: lugar, zona, método, probabilidad y condiciones, más el objeto de evento sin el que no se llega al lugar ([modelo de datos](modelo-datos.md#pokedex-y-formas-de-obtencion)). |
+| `TransferSource` | Un juego que puede enviar Pokémon a este ([RN-25](../01-ddf/reglas-negocio.md#rn-25)): si está superado y qué tiene registrado, sus apariciones por especie, sus iniciales y el límite de generación de la Cápsula del Tiempo. |
+
+Al crearse comprueba que los números de la Pokédex van en orden y sin repetir, que lo marcado y
+las evoluciones son de especies de la Pokédex, que nada está registrado e imposible a la vez y
+que el juego no se envía a sí mismo.
+
+### Formas de obtenerlo en el juego (`core/pokedex/encounters.py`)
+
+`in_game_ways(apariciones, especie, iniciales, regalos_a_elegir)` convierte las apariciones en
+formas (`InGameWay`), en el orden de [RN-26](../01-ddf/reglas-negocio.md#rn-26). Cada método de
+PokeAPI tiene una clase, que sus condiciones pueden cambiar:
+
+| Clase | Métodos y condiciones de PokeAPI |
+|-------|----------------------------------|
+| Regalo (`gift`) | `gift` y `gift-egg`, también los premios del casino (`coins-*`, [CA-83](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| Intercambio con PNJ (`npc_trade`) | `npc-trade`; `trade-*` es el Pokémon que pide. |
+| Fósil (`fossil`) | `gift` con `item-*-fossil` o `item-old-amber`. |
+| Estático (`static`) | `static`, `pokeflute`, `devon-scope`, `squirt-bottle` y `wailmer-pail` ([CA-84](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| Salvaje (`wild`), por este orden a igual probabilidad | `walk`; `surf`; `seaweed`; `old-rod`; `good-rod`; `super-rod`; `feebas-tile-fishing`; `rock-smash` y `headbutt-*` ([CA-84](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| Salvaje en enjambre (`swarm`) | Un salvaje con `swarm-yes` ([CA-85](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| Errante (`roaming`) | `roaming-grass` y `roaming-water`. |
+| Regalo que depende del inicial (`starter_gift`) | Un regalo o intercambio con `starter-*`, y el regalo sin condiciones de un inicial del juego ([CA-87](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| Evento (`event`) | Cualquiera en un lugar con objeto de evento o con `other-virtual-console` ([CA-82](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| Se omite (spin-off) | `colosseum-bonus-disc-*` y `pokemon-channel-pal` ([CA-73](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+
+Las dos últimas clases no son de la forma 3 de [RN-24](../01-ddf/reglas-negocio.md#rn-24): van
+casi al final. Un método que el módulo no conoce es un error (`UnknownEncounterMethodError`): la
+carga comprueba que todos los de los juegos cargados son de esta tabla (`ingest/checks.py`).
+
+De las condiciones:
+
+- **Hora del día** (`time-*`): las filas de un lugar que solo se diferencian en la hora se unen
+  en una forma con la mayor probabilidad, y `times` dice en qué momentos; vacío si es la misma
+  en los tres ([CA-81](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- **Elección** (`starter-*`, `tv-option-*`): va en `choice`
+  ([CA-80](../01-ddf/cuestiones-abiertas.md#resueltas),
+  [CA-85](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- **Objeto**: el fósil que se revive o el objeto de evento van en `item`.
+- **Avance de la historia** (`story-progress-*`) y `swarm-no`: no cuentan.
+- **El resto** (`coins-*`, `trade-*`, `weekday-*`, `first-party-pokemon-high-friendship`…): va en
+  `conditions`, para mostrarlo con la forma.
+
+`shared_gifts(apariciones_por_especie)` da los lugares en los que se elige un regalo entre
+varios sin condiciones; esa forma lleva en `alternatives` los demás Pokémon del lugar
+([CA-87](../01-ddf/cuestiones-abiertas.md#resueltas)). El contexto y cada `TransferSource` lo
+calculan una vez (`gift_choices`).
+
+### Formas de obtención (`core/pokedex/obtention.py`)
+
+`obtention_methods(ctx, especie)` devuelve una `Obtention` con todas las formas
+(`ObtentionMethod`) de la más sencilla a la menos
+([RN-24](../01-ddf/reglas-negocio.md#rn-24)):
+
+| Clase (`MethodKind`) | Cuándo |
+|----------------------|--------|
+| `evolve` | Tiene una fase anterior en el juego. Una por método, primero el menos tedioso según `step_tedium`; se omiten los imposibles en el juego ([CA-86](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `breed_registered` (1) | Es la etapa que nace del huevo y otra de su línea que pone huevos está registrada. |
+| `transfer_registered` (2) | Está registrado en la Pokédex de un juego superado que puede enviárselo. |
+| `in_game` (3) | Cada forma de obtenerlo en el juego, salvo las dos últimas clases de la tabla anterior. |
+| `breed` (4) | Como la 1, desde una especie de su línea que se obtiene en el juego (forma 3). |
+| `transfer` (5) | Se obtiene (forma 3) en un juego que puede enviárselo; `way` es su forma más sencilla allí. |
+| `starter_gift` (6) | Los regalos que dependen del inicial. |
+| `event` (7) | Las formas de evento en un lugar y, si es de evento en el juego, una sin lugar. |
+
+- **Crianza** ([CA-86](../01-ddf/cuestiones-abiertas.md#resueltas)): solo en juegos con
+  crianza. Nace del huevo la primera etapa de la línea y, si es un bebé de incienso, también la
+  segunda; `incense` marca el bebé. Los progenitores son las demás especies de la línea con algún
+  grupo huevo distinto de `no-eggs` y `ditto`.
+- **Enlaces** ([CA-76](../01-ddf/cuestiones-abiertas.md#resueltas)): `pokemon` es la especie
+  que se evoluciona o se cría, y `pokemon_registered` dice si el usuario la tiene.
+- **Imposible de forma automática** ([RN-25](../01-ddf/reglas-negocio.md#rn-25)):
+  `automatically_impossible` es verdadero si no hay ninguna forma y alguna aparición, en el
+  juego o en los que pueden enviárselo, es de un spin-off. Sin ninguna forma ni spin-offs es
+  falso: la ficha lo dice y el usuario puede marcarlo.
+- **Clave estable** (`key`): identifica la forma para guardar la que elige el usuario
+  ([RF-23](../01-ddf/requisitos-funcionales.md#rf-23)): `evolve:ivysaur:level-up:minimum_level=16`,
+  `breed:pikachu`, `transfer:leafgreen` o `in_game:gift@celadon-city/celadon-mansion`. Sale de
+  los datos, así que sigue valiendo tras repetir la carga mientras no cambien.
+
+### Progreso y objetivo (`core/pokedex/progress.py`)
+
+- `progress(ctx)`: los registrados, el total, los imposibles (marcados y automáticos) y el estado
+  (`not_started` si no se confirmó la lista inicial, `completed` si están todos y, si no,
+  `in_progress`). `percent` se redondea hacia abajo
+  ([RN-22](../01-ddf/reglas-negocio.md#rn-22)).
+- `objective(ctx, saltados)`: la primera especie, en el orden de la Pokédex, que no está
+  registrada, ni es imposible, ni se ha saltado; `None` si no queda ninguna
+  ([RN-23](../01-ddf/reglas-negocio.md#rn-23)). Los saltados los pasa quien llama: no se guardan
+  ([CA-77](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- `impossible_species(ctx)`: las marcadas y las automáticas, para el detalle
+  ([RF-24](../01-ddf/requisitos-funcionales.md#rf-24)).
+
+Con los datos reales de Rojo Fuego, el progreso, el objetivo y las formas de las 386 especies se
+calculan en menos de 0,2 s.
+
 ## Pruebas
 
 Los tests del motor están en `tests/core/`: qué comprueba cada fichero, en su *docstring*, y sus
-convenciones (constructores legibles, escenario real de Rojo Fuego y el marcador
+convenciones (constructores legibles, escenarios reales de Rojo Fuego y el marcador
 `@pytest.mark.rn`), en [`tests/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/tests/README.md#convenciones).

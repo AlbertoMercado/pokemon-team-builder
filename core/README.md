@@ -1,7 +1,8 @@
 # core/
 
-**Qué es**: el dominio puro de la aplicación: las reglas de negocio (`RN-XX`) y el motor de
-generación de equipos, a partir de un `GameContext` inmutable.
+**Qué es**: el dominio puro de la aplicación: las reglas de negocio (`RN-XX`), el motor de
+generación de equipos, a partir de un `GameContext` inmutable, y las reglas de la Pokédex, a
+partir de un `PokedexContext`.
 
 **Por qué existe**: aísla las reglas de la red, la base de datos y las bibliotecas de terceros,
 para probarlas a fondo con hypothesis ([ADR-0002](../docs/03-adr/0002-monolito-modular-nucleo-puro.md)).
@@ -22,7 +23,9 @@ para probarlas a fondo con hypothesis ([ADR-0002](../docs/03-adr/0002-monolito-m
 | `breeding.py` | Crianza: si una línea se puede criar y qué etapa nace del huevo. |
 | `review.py` | Qué datos sin verificar intervienen en una generación. |
 | `journey.py` | Qué excluye el recorrido del *Hall of Fame*. |
+| `pokedex/` | La Pokédex de los juegos superados: progreso, Pokémon objetivo y formas de obtención. |
 
-**Más información**: diseño en [motor de reglas](../docs/02-ddt/motor.md) y
+**Más información**: diseño en [motor de reglas](../docs/02-ddt/motor.md) (la Pokédex, en
+[su sección](../docs/02-ddt/motor.md#pokedex-corepokedex)) y
 [algoritmo de generación](../docs/02-ddt/algoritmo-generacion.md); dependencias permitidas en la
 [arquitectura](../docs/02-ddt/arquitectura.md#reglas-de-dependencia).

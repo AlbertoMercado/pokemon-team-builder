@@ -57,31 +57,11 @@ Implementados en la fase 2: las tablas están en el
 [diseño de la carga](carga-datos.md#pokedex-y-apariciones) y los ficheros curados en
 [datos curados](datos-curados.md#pokedexyaml).
 
-Cada método de PokeAPI pasa a una de las clases de [RN-26](../01-ddf/reglas-negocio.md#rn-26)
-en `core/` (fase 3):
-
-| Clase | Métodos y condiciones de PokeAPI |
-|-------|----------------------------------|
-| Regalo | `gift`, `gift-egg`, salvo los fósiles |
-| Intercambio con PNJ | `npc-trade` |
-| Fósil | `gift` con una condición `item-*-fossil` u `item-old-amber` |
-| Estático (100 %) | `static`, `pokeflute`, `devon-scope` |
-| Salvaje, por este orden a igual probabilidad | `walk`; `surf`; `seaweed`; `old-rod`; `good-rod`; `super-rod`; `rock-smash` y `headbutt-*` |
-| Errante | `roaming-grass`, `roaming-water`; con `starter-*`, depende del inicial (CA-80) |
-| Se omite (spin-off) | `colosseum-bonus-disc-*`, `pokemon-channel-pal` |
-| Por decidir en la fase 3 | Ver [abajo](#decisiones-tomadas-al-implementar-la-fase-2) |
-
 ### Motor (`core/pokedex/`)
 
-Funciones puras sobre un contexto de la Pokédex de un juego: sus Pokémon, los registrados y los
-imposibles, las Pokédex de los otros juegos superados, las apariciones, las líneas evolutivas
-con sus métodos, la crianza y los datos curados.
-
-- `progress`: porcentaje redondeado hacia abajo, estado y número de imposibles (RN-22).
-- `objective`: el primero sin registrar ni imposible, sin los saltados (RN-23).
-- `obtention_methods`: todas las formas de obtener un Pokémon, ordenadas por RN-24 a RN-26, con
-  su detalle (lugar y probabilidad, juego de origen, método de evolución, Pokémon que hay que
-  criar o evolucionar) y si es imposible de forma automática (RN-25).
+Implementado en la fase 3: el contexto, la clase de cada método de PokeAPI, el orden de las
+formas, la crianza y las claves de cada forma están en el
+[motor de reglas](motor.md#pokedex-corepokedex).
 
 ### Datos del usuario y API
 
@@ -119,7 +99,7 @@ Cada fase es un PR desde `main`, con sus tests y su documentación
 | 0 | `docs/plan-pokedex` | Este plan y ADR-0013. | — |
 | 1 ✅ | `feat/hall-of-fame-unico` | Un registro por juego: migración (se detiene si hay repetidos), `409` al registrar uno ya registrado, juegos registrados fuera de los objetivos y del registro a mano. | Migración con y sin repetidos; API; pantallas; E2E. |
 | 2 ✅ | `feat/pokedex-datos` | Tablas y carga de las Pokédex, las apariciones y los datos curados nuevos; nombres en español que faltan. | Extracto sin red; casos conocidos en las comprobaciones de la carga. |
-| 3 | `feat/pokedex-motor` | `core/pokedex/` con RN-22 a RN-26. | Una prueba por regla (`@pytest.mark.rn`) y un escenario real de Rojo Fuego. |
+| 3 ✅ | `feat/pokedex-motor` | `core/pokedex/` con RN-22 a RN-26. | Una prueba por regla (`@pytest.mark.rn`) y un escenario real de Rojo Fuego. |
 | 4 | `feat/pokedex-api` | Tablas de `user.sqlite`, migración y endpoints. | API con la base de prueba. |
 | 5 | `feat/pokedex-web` | Las pantallas, el aviso al borrar un registro con Pokédex, manual y CHANGELOG. | Vitest de cada pantalla y E2E. |
 | 6 | `chore/release-X.Y.0` | Versión MENOR y cierre de #94. | — |
@@ -168,17 +148,27 @@ Casos que el DDF no cubría y que salieron al comprobar los datos:
 - **Los 146 nombres en español que faltaban**, comprobados en WikiDex: la carga real no deja
   ningún lugar sin nombre.
 
-Casos que aparecen en los datos y que el DDF no cubre. Se decidirán al empezar la fase 3, antes
-de clasificarlos:
+Casos que aparecían en los datos y que el DDF no cubría. Se decidieron al empezar la fase 3
+como [CA-82 a CA-87](../01-ddf/cuestiones-abiertas.md#resueltas): lugares de evento, premios
+del casino, Sudowoodo y Feebas, y las condiciones de las apariciones (enjambres, avance de la
+historia, día de la semana, televisión, amistad y consola virtual) y los regalos a elegir.
 
-- **Lugares de evento**: ¿sus apariciones cuentan como evento (forma 7 de RN-24) o como
-  estáticas?
-- **Premios del casino** (`gift` con `coins-*`, como el Porygon de Ciudad Azulona): ¿regalo?
-- **Métodos sin clase**: `squirt-bottle` y `wailmer-pail` (Sudowoodo), `feebas-tile-fishing`.
-- **Condiciones**: enjambres (`swarm-*`), avance de la historia (`story-progress-*`), día de la
-  semana (Lapras los viernes en la Cueva Unión), opción de la televisión (Latios o Latias en
-  Esmeralda), amistad del primer Pokémon (el huevo de Togepi), consola virtual (Celebi en
-  Cristal).
+### Decisiones tomadas al implementar la fase 3
+
+- **Los regalos a elegir** salieron con los datos y se decidieron como
+  [CA-87](../01-ddf/cuestiones-abiertas.md#resueltas): el inicial del juego cuenta como regalo
+  que depende del inicial; el resto, como regalo que dice entre cuáles se elige.
+- **Todo por especie**: la Pokédex registra especies, así que la API traduce las formas de las
+  apariciones, los eventos y las evoluciones a su especie (`deoxys-normal` es `deoxys`).
+- **Los saltados no se guardan**: `objective` los recibe de quien llama, como dice
+  [CA-77](../01-ddf/cuestiones-abiertas.md#resueltas); la web los pasa a la API
+  (`?skipped=…`).
+- **Cada forma tiene una clave estable** (`key`), que guardará `pokedex_entry` como la forma
+  elegida (fase 4).
+- **Para la fase 4: los iniciales de cada juego.** `game_starter` solo tiene los de los juegos
+  objetivo (la 3.ª generación). La Pokédex necesita también los de la 1.ª y la 2.ª (Bulbasaur,
+  Charmander y Squirtle; Pikachu en Amarillo; Chikorita, Cyndaquil y Totodile) para que su
+  regalo cuente como regalo que depende del inicial.
 
 ## Riesgos
 

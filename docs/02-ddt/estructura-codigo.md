@@ -10,7 +10,7 @@ cabecera ([cómo se documenta](documentacion.md#el-readme-de-un-directorio)).
 
 | Directorio | Qué es | Índice |
 |------------|--------|--------|
-| `core/` | Dominio puro: las reglas `RN-XX` y el motor de generación ([motor](motor.md)). | [`core/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/core/README.md) |
+| `core/` | Dominio puro: las reglas `RN-XX`, el motor de generación y la Pokédex ([motor](motor.md)). | [`core/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/core/README.md) |
 | `db/` | Modelos SQLModel de `reference.sqlite` y `user.sqlite` y migraciones ([modelo de datos](modelo-datos.md)). | [`db/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/db/README.md) |
 | `ingest/` | CLI que carga los datos de referencia ([ingesta](../05-operacion/ingesta.md)). | [`ingest/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/ingest/README.md) |
 | `api/` | API HTTP con FastAPI ([API](api.md)). | [`api/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/api/README.md) |
