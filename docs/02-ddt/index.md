@@ -29,8 +29,7 @@ arquitectura se registran como [ADR](../03-adr/index.md).
 - [Diseño de la web](web.md): pantallas, rutas, endpoints que usan y cómo se muestran los
   errores.
 
-En curso: el [plan de la Pokédex](plan-pokedex.md) (#94). Los planes de implementación ya
-ejecutados están en el [historial](../06-historial/index.md).
+Los planes de implementación ya ejecutados están en el [historial](../06-historial/index.md).
 
 ## Decisiones
 
