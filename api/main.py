@@ -22,12 +22,14 @@ from api.routers import (
     generations,
     hall_of_fame,
     meta,
+    pokedex,
     review,
     rules,
     team_checks,
 )
 from api.services.context import GameReferences
 from api.services.meta import app_version
+from api.services.pokedex_reference import PokedexReferences
 from api.web import mount_web
 
 
@@ -39,6 +41,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.databases = Databases(chosen)
         app.state.game_references = GameReferences()
+        app.state.pokedex_references = PokedexReferences()
         yield
         app.state.databases.dispose()
 
@@ -62,6 +65,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         generations.router,
         team_checks.router,
         hall_of_fame.router,
+        pokedex.router,
         meta.router,
     ):
         app.include_router(router, prefix="/api")

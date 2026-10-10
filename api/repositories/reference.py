@@ -7,13 +7,19 @@ from dataclasses import dataclass
 from sqlmodel import Session, col, func, select
 
 from db.reference import (
+    Encounter,
+    EventPokemon,
     EvolutionStep,
     Game,
     GameMechanic,
+    GamePokedex,
     GamePokemon,
     GameStarter,
+    GameTransfer,
     KeyBattle,
     KeyBattlePokemon,
+    Location,
+    PokedexNumber,
     Pokemon,
     PokemonType,
     Species,
@@ -261,3 +267,55 @@ def types_in_generation(
     for row in rows:
         types.setdefault(row.pokemon, []).append(row.type)
     return {slug: tuple(found) for slug, found in types.items()}
+
+
+# --- The Pokédex of a game (RN-22 to RN-26) ----------------------------------------------
+
+
+def pokedex_numbers(reference: Session, game: str) -> list[tuple[str, int]]:
+    """The species of the Pokédex that ``game`` completes, with their number, in its order.
+
+    With several Pokédexes (a base game and its DLC), those of the first come first, and a
+    species keeps its first number (RN-22).
+    """
+    rows = reference.exec(
+        select(PokedexNumber.species, PokedexNumber.number)
+        .join(GamePokedex, col(GamePokedex.pokedex) == col(PokedexNumber.pokedex))
+        .where(GamePokedex.game == game)
+        .order_by(col(GamePokedex.pokedex), col(PokedexNumber.number))
+    ).all()
+    seen: dict[str, int] = {}
+    for species, number in rows:
+        seen.setdefault(species, number)
+    return list(seen.items())
+
+
+def encounters(reference: Session, game: str) -> Sequence[tuple[Encounter, Location]]:
+    """Every encounter of ``game`` with its place (RN-26)."""
+    return reference.exec(
+        select(Encounter, Location)
+        .join(Location, col(Location.slug) == col(Encounter.location))
+        .where(Encounter.game == game)
+        .order_by(col(Encounter.id))
+    ).all()
+
+
+def all_locations(reference: Session) -> Sequence[Location]:
+    return reference.exec(select(Location)).all()
+
+
+def event_pokemon(reference: Session, game: str) -> Sequence[str]:
+    """The forms obtained by event in ``game`` (RN-24)."""
+    return reference.exec(select(EventPokemon.pokemon).where(EventPokemon.game == game)).all()
+
+
+def transfers_to(reference: Session, game: str) -> list[tuple[Game, int | None]]:
+    """The games that can send Pokémon to ``game``, in release order, with the generation
+    limit of their species (RN-25)."""
+    rows = reference.exec(
+        select(Game, GameTransfer.max_species_generation)
+        .join(GameTransfer, col(GameTransfer.from_game) == col(Game.slug))
+        .where(GameTransfer.to_game == game)
+        .order_by(col(Game.release_order), col(Game.slug))
+    ).all()
+    return [(found, limit) for found, limit in rows]

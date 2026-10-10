@@ -16,10 +16,13 @@ from sqlmodel import Session, select
 
 from db.sqlite import create_sqlite_engine
 from db.user import (
+    DexStatus,
     FactConfirmation,
     Favorite,
     HallOfFameEntry,
     HallOfFameMember,
+    Pokedex,
+    PokedexEntry,
     RuleSetting,
     UserModel,
     alembic_config,
@@ -170,6 +173,52 @@ def test_a_game_is_recorded_once(engine: Engine) -> None:
             )
         with pytest.raises(IntegrityError):
             session.commit()
+
+
+def _pokedex(session: Session) -> int:
+    """A Hall of Fame entry with its Pokédex started; returns the entry's id."""
+    entry = HallOfFameEntry(game="firered", completed_on=date(2026, 9, 1), sequence=1)
+    session.add(entry)
+    session.commit()
+    assert entry.id is not None
+    session.add(Pokedex(entry=entry.id, started_at=NOW))
+    session.commit()
+    return entry.id
+
+
+def test_pokedex_marks_round_trip_as_text(engine: Engine) -> None:
+    """The status is stored as its value, like the enums of reference.sqlite."""
+    with Session(engine) as session:
+        entry = _pokedex(session)
+        session.add(PokedexEntry(pokedex=entry, species="pikachu", status=DexStatus.REGISTERED))
+        session.add(PokedexEntry(pokedex=entry, species="mew", chosen_method="event"))
+        session.commit()
+        stored = session.connection().execute(text("SELECT species, status FROM pokedex_entry"))
+        assert sorted(stored.all()) == [("mew", None), ("pikachu", "registered")]
+        found = session.get(PokedexEntry, (entry, "pikachu"))
+        assert found is not None
+        assert found.status is DexStatus.REGISTERED
+
+
+def test_a_pokedex_mark_is_never_empty(engine: Engine) -> None:
+    """A species without a status nor a chosen way has no row."""
+    with Session(engine) as session:
+        session.add(PokedexEntry(pokedex=_pokedex(session), species="pikachu"))
+        with pytest.raises(IntegrityError):
+            session.commit()
+
+
+def test_deleting_an_entry_deletes_its_pokedex(engine: Engine) -> None:
+    """CA-68: removing the Hall of Fame entry removes its Pokédex and its marks."""
+    with Session(engine) as session:
+        entry = _pokedex(session)
+        session.add(PokedexEntry(pokedex=entry, species="pikachu", status=DexStatus.IMPOSSIBLE))
+        session.commit()
+        found = session.get(HallOfFameEntry, entry)
+        session.delete(found)
+        session.commit()
+        assert session.exec(select(Pokedex)).all() == []
+        assert session.exec(select(PokedexEntry)).all() == []
 
 
 def _at_first_revision(path: Path, *games: str) -> Engine:

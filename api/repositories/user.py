@@ -1,5 +1,5 @@
-"""Reads and writes of user.sqlite: favourites, rule settings, confirmations and the Hall of
-Fame."""
+"""Reads and writes of user.sqlite: favourites, rule settings, confirmations, the Hall of
+Fame and the Pokédex of each completed game."""
 
 from collections.abc import Iterable, Sequence
 from datetime import UTC, date, datetime
@@ -8,10 +8,13 @@ from sqlmodel import Session, col, func, select
 
 from db.user import (
     ConfirmedValue,
+    DexStatus,
     FactConfirmation,
     Favorite,
     HallOfFameEntry,
     HallOfFameMember,
+    Pokedex,
+    PokedexEntry,
     RuleSetting,
 )
 
@@ -146,3 +149,57 @@ def _add_members(user: Session, entry: HallOfFameEntry, members: list[MemberRow]
         HallOfFameMember(entry=entry.id, position=position, pokemon=pokemon, types=list(types))
         for position, (pokemon, types) in enumerate(members, start=1)
     )
+
+
+# --- The Pokédex of each completed game (RF-20 to RF-24) ----------------------------------
+
+
+def started_pokedexes(user: Session) -> set[int]:
+    """The Hall of Fame entries whose Pokédex has its initial list confirmed (RF-21)."""
+    return set(user.exec(select(Pokedex.entry)).all())
+
+
+def pokedex_marks(user: Session, entry: int | None = None) -> dict[int, dict[str, PokedexEntry]]:
+    """The marks of each Pokédex (only that of ``entry`` if given), by species."""
+    query = select(PokedexEntry)
+    if entry is not None:
+        query = query.where(PokedexEntry.pokedex == entry)
+    marks: dict[int, dict[str, PokedexEntry]] = {}
+    for row in user.exec(query):
+        marks.setdefault(row.pokedex, {})[row.species] = row
+    return marks
+
+
+def start_pokedex(user: Session, entry: int, registered: Iterable[str]) -> None:
+    """Confirms the initial list of the Pokédex of ``entry`` with its registered species."""
+    user.add(Pokedex(entry=entry, started_at=datetime.now(UTC)))
+    user.flush()
+    user.add_all(
+        PokedexEntry(pokedex=entry, species=species, status=DexStatus.REGISTERED)
+        for species in sorted(set(registered))
+    )
+    user.commit()
+
+
+def save_pokedex_mark(
+    user: Session, entry: int, species: str, status: DexStatus | None, chosen_method: str | None
+) -> None:
+    """Saves the mark of ``species``; without status nor chosen way, its row is removed."""
+    row = user.get(PokedexEntry, (entry, species))
+    if status is None and chosen_method is None:
+        if row is not None:
+            user.delete(row)
+    else:
+        row = row or PokedexEntry(pokedex=entry, species=species)
+        row.status = status
+        row.chosen_method = chosen_method
+        user.add(row)
+    user.commit()
+
+
+def remove_pokedex(user: Session, entry: int) -> None:
+    """Removes the Pokédex of ``entry`` and its marks (``ON DELETE CASCADE``), if it has one."""
+    found = user.get(Pokedex, entry)
+    if found is not None:
+        user.delete(found)
+        user.commit()

@@ -52,8 +52,9 @@ def update_entry(
     entry_id: EntryId, change: HallOfFamePatch, user: UserDb, reference: ReferenceDb
 ) -> HallOfFameEntryOut:
     """Cambia el juego, la fecha, las notas o el equipo. Si cambia el juego o el equipo, se
-    vuelven a copiar los tipos. `404` si el registro no existe; `409` si el juego nuevo ya
-    está registrado; `422` como al registrarlo."""
+    vuelven a copiar los tipos; si cambia el juego, se borra la Pokédex del anterior (CA-68).
+    `404` si el registro no existe; `409` si el juego nuevo ya está registrado; `422` como al
+    registrarlo."""
     return service.update_entry(user, reference, entry_id, change)
 
 
@@ -61,6 +62,6 @@ def update_entry(
     "/{entry_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Eliminar un registro"
 )
 def remove_entry(entry_id: EntryId, user: UserDb) -> Response:
-    """Elimina el registro y su equipo. `404` si no existe."""
+    """Elimina el registro, su equipo y la Pokédex del juego (CA-68). `404` si no existe."""
     service.remove_entry(user, entry_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

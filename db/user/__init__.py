@@ -11,10 +11,13 @@ from alembic.config import Config
 
 from db.sqlite import create_sqlite_engine
 from db.user.models import (
+    DexStatus,
     FactConfirmation,
     Favorite,
     HallOfFameEntry,
     HallOfFameMember,
+    Pokedex,
+    PokedexEntry,
     RuleSetting,
     UserModel,
 )
@@ -25,11 +28,14 @@ MIGRATIONS = Path(__file__).resolve().parent / "migrations"
 __all__ = [
     "MIGRATIONS",
     "ConfirmedValue",
+    "DexStatus",
     "FactConfirmation",
     "Favorite",
     "ForeignKeyError",
     "HallOfFameEntry",
     "HallOfFameMember",
+    "Pokedex",
+    "PokedexEntry",
     "RuleSetting",
     "UserModel",
     "alembic_config",

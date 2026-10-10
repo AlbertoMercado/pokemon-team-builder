@@ -1,4 +1,5 @@
-"""SQLModel models of user.sqlite: the user's favourites, settings, journey and confirmations.
+"""SQLModel models of user.sqlite: the user's favourites, settings, journey, confirmations and
+the Pokédex of each completed game.
 
 Columns that point to reference.sqlite (``pokemon``, ``game``, ``fact_key``) hold natural keys
 and cannot be foreign keys, because they live in another file (ADR-0003). Tables and columns
@@ -6,8 +7,10 @@ are documented in docs/02-ddt/modelo-datos.md.
 """
 
 from datetime import date, datetime
+from enum import StrEnum
 
 from sqlalchemy import JSON, CheckConstraint, Column, ForeignKey, Integer, MetaData
+from sqlalchemy import Enum as SAEnum
 from sqlmodel import Field, SQLModel
 
 from db.user.values import ConfirmedValue
@@ -87,6 +90,63 @@ class HallOfFameMember(UserModel, table=True):
     position: int = Field(primary_key=True)
     pokemon: str
     types: list[str] = Field(sa_type=JSON)
+
+
+class DexStatus(StrEnum):
+    """How the user marked a species in a Pokédex (RF-21, RF-22)."""
+
+    REGISTERED = "registered"
+    IMPOSSIBLE = "impossible"
+
+
+class Pokedex(UserModel, table=True):
+    """The Pokédex of a completed game, once its initial list is confirmed (RF-20, RF-21).
+
+    It belongs to its Hall of Fame entry: removing the entry removes it (CA-68).
+    """
+
+    __tablename__ = "pokedex"
+
+    entry: int = Field(
+        sa_column=Column(
+            Integer, ForeignKey("hall_of_fame_entry.id", ondelete="CASCADE"), primary_key=True
+        )
+    )
+    started_at: datetime
+
+
+class PokedexEntry(UserModel, table=True):
+    """A species of a Pokédex that the user marked or whose way of obtaining it chose.
+
+    ``status`` is registered or impossible, or null if only a way was chosen (RF-23).
+    ``chosen_method`` is the key of the way chosen (``core.pokedex``), null for the
+    recommended one. A species without marks has no row.
+    """
+
+    __tablename__ = "pokedex_entry"
+    __table_args__ = (
+        CheckConstraint("status IS NULL OR status IN ('registered', 'impossible')", name="status"),
+        CheckConstraint("status IS NOT NULL OR chosen_method IS NOT NULL", name="not_empty"),
+    )
+
+    pokedex: int = Field(
+        sa_column=Column(Integer, ForeignKey("pokedex.entry", ondelete="CASCADE"), primary_key=True)
+    )
+    species: str = Field(primary_key=True)
+    # Stored as its text value (``registered``), like the enums of reference.sqlite.
+    status: DexStatus | None = Field(
+        default=None,
+        sa_column=Column(
+            SAEnum(
+                DexStatus,
+                values_callable=lambda members: [member.value for member in members],
+                native_enum=False,
+                length=10,
+            ),
+            nullable=True,
+        ),
+    )
+    chosen_method: str | None = None
 
 
 class FactConfirmation(UserModel, table=True):

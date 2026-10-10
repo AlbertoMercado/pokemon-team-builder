@@ -62,7 +62,7 @@ Módulo `db/reference/games.py`.
 | `version_group` | `slug` PK, `generation` FK → `generation`, `order` único | P. ej., `firered-leafgreen`. `order` es el orden cronológico de PokeAPI y decide qué pasos de evolución se aplican a cada grupo ([plan de carga](carga-datos.md#evoluciones)). |
 | `game` | `slug` PK, `name_es`, `version_group` FK, `generation` FK, `release_order`, `has_breeding`, `is_target`, `cover`?, `cover_source`? | `is_target` solo es verdadero en los juegos completos, que se pueden elegir como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)); la ingesta lo calcula al final de la carga (`ingest/targets.py`). Es falso en la 1.ª generación y en juegos sin crianza ([CA-29](../01-ddf/cuestiones-abiertas.md#resueltas)). `cover` es la ruta de su portada relativa al directorio de datos y `cover_source`, el título de su fichero en WikiDex; nulas si no tiene portada ([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)). Hoy, solo Rojo Fuego y Verde Hoja ([CA-67](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `game_mechanic` | `game` FK y `mechanic` PK, `value` (sí/no)?, `origin`, `fact_key` único | P. ej., `day_night_cycle`. Datos curados, normalmente inferidos. `value` es nulo solo si `origin` es `pending`. |
-| `game_starter` | `game` FK y `pokemon` FK PK | Iniciales del juego objetivo, como la forma de su evolución final ([RN-21](../01-ddf/reglas-negocio.md#rn-21), [CA-59](../01-ddf/cuestiones-abiertas.md#resueltas)). Datos curados sin origen: no se confirman. |
+| `game_starter` | `game` FK y `pokemon` FK PK | Iniciales de cada juego, como la forma de su evolución final; los usan RN-21 y la Pokédex ([CA-87](../01-ddf/cuestiones-abiertas.md#resueltas)) ([RN-21](../01-ddf/reglas-negocio.md#rn-21), [CA-59](../01-ddf/cuestiones-abiertas.md#resueltas)). Datos curados sin origen: no se confirman. |
 | `game_pokemon` | `game` FK y `pokemon` FK PK, `exists_in_game`?, `exists_origin`, `can_arrive`?, `arrival_origin` | Disponibilidad por forma ([RN-03](../01-ddf/reglas-negocio.md#rn-03)). `can_arrive`: si la etapa que nace del huevo puede llegar y evolucionar antes de completar el juego ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Cada valor es nulo solo si su origen es `pending`. La columna no se llama `exists` porque es palabra reservada de SQL. |
 
 ### Pokémon
@@ -183,6 +183,8 @@ fichero anterior.
 ```mermaid
 erDiagram
     HALL_OF_FAME_ENTRY ||--|{ HALL_OF_FAME_MEMBER : incluye
+    HALL_OF_FAME_ENTRY ||--o| POKEDEX : "su Pokédex"
+    POKEDEX ||--o{ POKEDEX_ENTRY : marca
     FAVORITE
     RULE_SETTING
     FACT_CONFIRMATION
@@ -194,19 +196,22 @@ erDiagram
 | `rule_setting` | `rule_id` PK, `enabled`, `weight` | Solo reglas configurables. `weight` de 0 a 10 en las blandas ([CA-05](../01-ddf/cuestiones-abiertas.md#resueltas)). Si no hay fila, se usan los valores por defecto del catálogo. |
 | `hall_of_fame_entry` | `id` PK, `game` único, `completed_on`, `sequence`, `notes` | Cada juego se registra una sola vez ([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)); la migración `0002` lo exige y, si encuentra juegos repetidos, se detiene sin borrar nada y dice cuáles. `sequence` es el orden de registro y desempata dos fechas iguales ([RF-12](../01-ddf/requisitos-funcionales.md#rf-12)). |
 | `hall_of_fame_member` | `entry`, `position`, `pokemon`, `types` | `types` guarda los tipos que tenía en ese juego, como copia ([CA-07](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `pokedex` | `entry` PK FK → `hall_of_fame_entry`, `started_at` | La Pokédex del juego de ese registro, desde que se confirma su lista inicial ([RF-21](../01-ddf/requisitos-funcionales.md#rf-21)): sin fila, está «no iniciada». Borrar el registro, o cambiarle el juego, la borra con sus marcas ([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `pokedex_entry` | `pokedex` FK → `pokedex` y `species` PK, `status`?, `chosen_method`? | Una especie que el usuario ha marcado: `status` es `registered` o `impossible` ([RF-22](../01-ddf/requisitos-funcionales.md#rf-22), [RF-24](../01-ddf/requisitos-funcionales.md#rf-24)), y `chosen_method`, la clave (`key`) de la forma de obtención que eligió ([RF-23](../01-ddf/requisitos-funcionales.md#rf-23), [motor](motor.md#pokedex-corepokedex)). Una especie sin marca ni forma elegida no tiene fila. |
 | `fact_confirmation` | `fact_key` PK, `game`, `confirmed_value`, `proposed_value_hash`, `confirmed_at` | Si una nueva carga propone un valor con otro hash, la confirmación deja de valer ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). |
 
-Las columnas que apuntan a `reference.sqlite` (`pokemon`, `game`, `fact_key`) no pueden ser
+Las columnas que apuntan a `reference.sqlite` (`pokemon`, `game`, `fact_key`, `species`) no pueden ser
 claves foráneas, porque están en otro fichero. Las comprueba la ingesta antes de sustituir la
 base de datos de referencia ([ingesta](../05-operacion/ingesta.md#que-hace)): un favorito o un
 dato del *Hall of Fame* que ya no existe rechaza la carga, y una confirmación de un dato que ya
-no existe es un aviso.
+no existe es un aviso. Una marca de la Pokédex de una especie que ya no está en la Pokédex del
+juego no se comprueba: la API la ignora.
 
 ### Implementación de `user.sqlite`
 
 | Fichero | Qué hace |
 |---------|----------|
-| `db/user/models.py` | `UserModel`, la clase base, con su propio `MetaData` y una convención de nombres para las restricciones (Alembic las necesita con nombre para alterarlas en SQLite), y los modelos de las cinco tablas. |
+| `db/user/models.py` | `UserModel`, la clase base, con su propio `MetaData` y una convención de nombres para las restricciones (Alembic las necesita con nombre para alterarlas en SQLite), y los modelos de las siete tablas. |
 | `db/user/values.py` | `ConfirmedValue`, el tipo del valor de una confirmación, y `value_hash(propuesta)`, el hash estable (SHA-256 del JSON) de un valor propuesto. |
 | `db/user/__init__.py` | `upgrade(path)`: crea el fichero si no existe y aplica las migraciones pendientes. La llama la API al arrancar. Migra con las claves foráneas desactivadas, porque el *batch mode* reconstruye la tabla y borrar la antigua arrastraría en cascada a sus hijas (los miembros del *Hall of Fame*), y antes de confirmar las comprueba con `PRAGMA foreign_key_check`. |
 | `db/user/migrations/` | Entorno de Alembic (`env.py`, en *batch mode*), plantilla y migraciones (`versions/`). `db/user/alembic.ini` sirve para ejecutarlas a mano ([Operación](../05-operacion/api.md#migraciones)). |
@@ -219,12 +224,17 @@ Decisiones de implementación:
   si estaba pendiente). Una confirmación vale mientras la carga actual proponga el mismo valor.
 - **`hall_of_fame_member.types`** es JSON con los tipos ordenados que tenía en el juego.
 - **Restricciones**: `rule_setting.weight` es nulo o de 0 a 10; `hall_of_fame_member.position`,
-  de 1 a 6; `hall_of_fame_entry.sequence` es único; borrar un registro borra sus miembros.
+  de 1 a 6; `hall_of_fame_entry.sequence` es único; borrar un registro borra sus miembros y su
+  Pokédex; `pokedex_entry` tiene estado, forma elegida o las dos.
+- **`pokedex_entry.status`** se guarda con su valor (`registered`), como los enums de
+  `reference.sqlite`.
 - **Fechas** con zona horaria (UTC), como en `reference.sqlite`.
 
 | Migración | Qué hace |
 |-----------|----------|
 | `0001_initial_tables` | Crea las cinco tablas. |
+| `0002_unique_hall_of_fame_game` | Cada juego, una vez en el *Hall of Fame* ([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)); se detiene si hay juegos repetidos. |
+| `0003_pokedex` | Crea `pokedex` y `pokedex_entry`. |
 
 ## Datos revisables (`fact_key`)
 

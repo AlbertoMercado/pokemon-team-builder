@@ -19,7 +19,7 @@
 | `openapi.py` | Exporta el contrato OpenAPI sin arrancar la API. |
 | `routers/` | Un router por grupo de endpoints. |
 | `schemas/` | Modelos pydantic de peticiones y respuestas: el contrato OpenAPI. |
-| `services/` | Casos de uso, uno por módulo (contexto, revisión, generación, *Hall of Fame*, catálogo, imágenes, enlaces a WikiDex…). |
+| `services/` | Casos de uso, uno por módulo (contexto, revisión, generación, *Hall of Fame*, Pokédex, catálogo, imágenes, enlaces a WikiDex…). |
 | `repositories/` | Acceso a `db/`. |
 
 **Más información**: convenciones y decisiones en el [DDT de la API](../docs/02-ddt/api.md);

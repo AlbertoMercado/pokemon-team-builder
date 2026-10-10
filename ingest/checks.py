@@ -55,7 +55,7 @@ EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     GamePokemon: len(TARGET_GAMES) * SPECIES_COUNT,
     GameMechanic: len(CURATED_GAMES) * 2,  # day_night_cycle and contests
     KeyBattle: len(CURATED_GAMES) * KEY_BATTLES_PER_GAME,
-    GameStarter: len(TARGET_GAMES) * 3,
+    GameStarter: len(TARGET_GAMES) * 3 + 5 * 3 + 1,  # and the 1st and 2nd gen. (Yellow, 1)
     Pokedex: 4,  # national, kanto, original-johto and hoenn
     GamePokedex: 11,
     GameTransfer: 6 * 5 + 5 * 4,  # every ordered pair within the 1st-2nd and the 3rd gen.
@@ -262,11 +262,13 @@ def check_arrival_proposals(session: Session) -> list[str]:
 
 
 def check_starters(session: Session) -> list[str]:
-    """Starters of every target game, each the final evolution of its line there (RN-21)."""
+    """Starters of every game, each the final evolution of its line there (RN-21, CA-87)."""
     problems = []
     expected = {
         "firered": {"venusaur", "charizard", "blastoise"},
         "emerald": {"sceptile", "blaziken", "swampert"},
+        "yellow": {"raichu"},
+        "crystal": {"meganium", "typhlosion", "feraligatr"},
     }
     for game, starters in expected.items():
         found = set(session.exec(select(GameStarter.pokemon).where(GameStarter.game == game)))
