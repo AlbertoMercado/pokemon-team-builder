@@ -13,3 +13,4 @@ Planes de implementación por fases, ya ejecutados:
 | [Web](plan-web.md) | Todas las pantallas y la aplicación en un solo proceso. | 1.0.0 |
 | [Imágenes de los Pokémon](plan-imagenes.md) | RF-17 ([ADR-0010](../03-adr/0010-imagenes-pokemon-cache-local.md)). | 1.1.0 |
 | [Portadas de los juegos](plan-portadas.md) | RF-18 ([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)). | 1.2.0 |
+| [Pokédex](plan-pokedex.md) | RF-20 a RF-24, un registro por juego en el *Hall of Fame* ([ADR-0013](../03-adr/0013-obtencion-pokeapi-y-curados.md)). | 1.5.0 |

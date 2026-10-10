@@ -1,5 +1,5 @@
 """The FireRed Pokédex with real data (``tests/core/pokedex_scenario.py``): the known cases
-of the plan (docs/02-ddt/plan-pokedex.md) and that the whole Pokédex is fast."""
+of the plan (docs/06-historial/plan-pokedex.md) and that the whole Pokédex is fast."""
 
 import time
 from collections.abc import Iterable

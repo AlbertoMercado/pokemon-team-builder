@@ -1,12 +1,20 @@
 # Plan de la Pokédex
 
+!!! warning "Histórico: no se mantiene"
+    Este plan ya se ejecutó y se conserva como historial de cómo y por qué se hizo. No se
+    actualiza: lo vigente sobre la Pokédex está en el [DDF](../01-ddf/reglas-negocio.md#reglas-de-la-pokedex),
+    el [motor](../02-ddt/motor.md#pokedex-corepokedex), el
+    [modelo de datos](../02-ddt/modelo-datos.md#pokedex-y-formas-de-obtencion), el
+    [diseño de la web](../02-ddt/web.md#pantallas) y el
+    [manual](../04-manual-usuario/web.md#pokedex); lo pendiente, en las
+    [issues](https://github.com/AlbertoMercado/pokemon-team-builder/issues).
+
 Plan para completar la Pokédex de los juegos superados
 ([RF-20](../01-ddf/requisitos-funcionales.md#rf-20) a
 [RF-24](../01-ddf/requisitos-funcionales.md#rf-24), reglas
 [RN-22 a RN-26](../01-ddf/reglas-negocio.md#reglas-de-la-pokedex)), issue #94. La decisión de
 arquitectura sobre los datos está en [ADR-0013](../03-adr/0013-obtencion-pokeapi-y-curados.md).
-Cuando se ejecute, este plan pasará al [historial](../06-historial/index.md) y su diseño
-vigente, a su fuente.
+Ejecutado en la versión 1.5.0; su diseño vigente está en su fuente.
 
 ## Alcance
 
@@ -30,7 +38,7 @@ efecto de la Pokédex en la generación de equipos
 - **Función aparte**: la Pokédex no toca el generador. Comparte con él el *Hall of Fame* y los
   datos de referencia.
 - **Núcleo puro**: las reglas van en `core/`, sin red ni base de datos, como el motor
-  ([arquitectura](arquitectura.md#reglas-de-dependencia)).
+  ([arquitectura](../02-ddt/arquitectura.md#reglas-de-dependencia)).
 - **Datos sin red**: todo sale de la carga (PokeAPI y datos curados); la aplicación no consulta
   nada externo.
 - **Lo curado, mínimo**: solo lo que PokeAPI no tiene (ADR-0013).
@@ -53,32 +61,32 @@ Hechas el 2026-10-07 con el volcado CSV de PokeAPI del commit fijado (`bc92d3b`)
 ### Datos de referencia
 
 Implementados en la fase 2: las tablas están en el
-[modelo de datos](modelo-datos.md#pokedex-y-formas-de-obtencion), cómo se cargan en el
-[diseño de la carga](carga-datos.md#pokedex-y-apariciones) y los ficheros curados en
-[datos curados](datos-curados.md#pokedexyaml).
+[modelo de datos](../02-ddt/modelo-datos.md#pokedex-y-formas-de-obtencion), cómo se cargan en el
+[diseño de la carga](../02-ddt/carga-datos.md#pokedex-y-apariciones) y los ficheros curados en
+[datos curados](../02-ddt/datos-curados.md#pokedexyaml).
 
 ### Motor (`core/pokedex/`)
 
 Implementado en la fase 3: el contexto, la clase de cada método de PokeAPI, el orden de las
 formas, la crianza y las claves de cada forma están en el
-[motor de reglas](motor.md#pokedex-corepokedex).
+[motor de reglas](../02-ddt/motor.md#pokedex-corepokedex).
 
 ### Datos del usuario y API
 
 Implementados en la fase 4: las tablas, en el
-[modelo de datos](modelo-datos.md#base-de-datos-del-usuario-usersqlite); los endpoints, en la
-[referencia de la API](api-referencia.md) (sección Pokédex), y cómo se usan, en el
+[modelo de datos](../02-ddt/modelo-datos.md#base-de-datos-del-usuario-usersqlite); los endpoints, en la
+[referencia de la API](../02-ddt/api-referencia.md) (sección Pokédex), y cómo se usan, en el
 [manual](../04-manual-usuario/api.md#pokedex-completar-un-juego-superado).
 
 ### Web
 
-Implementada en la fase 5: las pantallas y sus rutas, en el [diseño de la web](web.md#pantallas),
+Implementada en la fase 5: las pantallas y sus rutas, en el [diseño de la web](../02-ddt/web.md#pantallas),
 y cómo se usan, en el [manual](../04-manual-usuario/web.md#pokedex).
 
 ## Fases
 
 Cada fase es un PR desde `main`, con sus tests y su documentación
-([cómo se documenta](documentacion.md#en-cada-pr)).
+([cómo se documenta](../02-ddt/documentacion.md#en-cada-pr)).
 
 | Fase | Rama | Contenido | Pruebas |
 |------|------|-----------|---------|
@@ -88,7 +96,7 @@ Cada fase es un PR desde `main`, con sus tests y su documentación
 | 3 ✅ | `feat/pokedex-motor` | `core/pokedex/` con RN-22 a RN-26. | Una prueba por regla (`@pytest.mark.rn`) y un escenario real de Rojo Fuego. |
 | 4 ✅ | `feat/pokedex-api` | Tablas de `user.sqlite`, migración y endpoints. | API con la base de prueba. |
 | 5 ✅ | `feat/pokedex-web` | Las pantallas, el aviso al borrar un registro con Pokédex, manual y CHANGELOG. | Vitest de cada pantalla y E2E. |
-| 6 | `chore/release-X.Y.0` | Versión MENOR y cierre de #94. | — |
+| 6 ✅ | `chore/release-1.5.0` | Versión MENOR y cierre de #94. | — |
 
 ## Decisiones tomadas al planificar
 

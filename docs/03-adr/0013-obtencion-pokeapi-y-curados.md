@@ -25,7 +25,7 @@ volcado CSV de un commit fijado ([ADR-0004](0004-pokeapi-volcado-csv.md)), tiene
 en tablas (`encounters.csv`, `encounter_slots.csv`, `encounter_methods.csv`,
 `location_areas.csv`) y las Pokédex (`pokedexes.csv`, `pokemon_dex_numbers.csv`).
 
-Comprobado el 2026-10-07 en el commit fijado ([plan](../02-ddt/plan-pokedex.md#comprobaciones-previas)):
+Comprobado el 2026-10-07 en el commit fijado ([plan](../06-historial/plan-pokedex.md#comprobaciones-previas)):
 PokeAPI cubre los 11 juegos, con regalos, intercambios, estáticos y errantes, pero no tiene los
 nombres en español de los lugares de Kanto y Johto, no distingue los fósiles de los regalos y no
 tiene los Pokémon de evento ni la compatibilidad entre juegos.
@@ -78,7 +78,7 @@ tiene los Pokémon de evento ni la compatibilidad entre juegos.
 ### Acciones derivadas
 
 - [x] Cargar las Pokédex, las apariciones y los datos curados nuevos (#94, fase 2 del
-  [plan](../02-ddt/plan-pokedex.md#decisiones-tomadas-al-implementar-la-fase-2)).
+  [plan](../06-historial/plan-pokedex.md#decisiones-tomadas-al-implementar-la-fase-2)).
 
 ### Nota de la implementación (2026-10-08)
 
@@ -89,6 +89,6 @@ tiene.
 
 ## Referencias
 
-- [Plan de la Pokédex](../02-ddt/plan-pokedex.md)
+- [Plan de la Pokédex](../06-historial/plan-pokedex.md)
 - [PokeAPI: volcado CSV](https://github.com/PokeAPI/pokeapi/tree/master/data/v2/csv)
 - Issue #94

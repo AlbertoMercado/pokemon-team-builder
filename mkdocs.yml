@@ -82,7 +82,6 @@ nav:
       - Datos curados: 02-ddt/datos-curados.md
       - Diseño de la carga: 02-ddt/carga-datos.md
       - Diseño de la web: 02-ddt/web.md
-      - Plan de la Pokédex: 02-ddt/plan-pokedex.md
   - Decisiones (ADR):
       - 03-adr/index.md
       - Plantilla: 03-adr/0000-plantilla.md
@@ -123,3 +122,4 @@ nav:
       - Plan de la web: 06-historial/plan-web.md
       - Plan de las imágenes: 06-historial/plan-imagenes.md
       - Plan de las portadas: 06-historial/plan-portadas.md
+      - Plan de la Pokédex: 06-historial/plan-pokedex.md

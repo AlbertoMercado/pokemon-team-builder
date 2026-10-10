@@ -51,7 +51,7 @@ registra especies. Cada aparición va en una línea:
 `[lugar, zona, método, probabilidad, condiciones, objeto de evento]`.
 
 **Por qué existe**: con datos reales, `tests/core/pokedex/test_pokedex_scenario_firered.py`
-comprueba los casos conocidos del [plan de la Pokédex](../../../docs/02-ddt/plan-pokedex.md) y
+comprueba los casos conocidos del [plan de la Pokédex](../../../docs/06-historial/plan-pokedex.md) y
 que la Pokédex entera se calcula en menos de un segundo. `tests/core/pokedex_scenario.py` lo
 convierte en un `PokedexContext`.
 

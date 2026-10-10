@@ -6,35 +6,52 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+## [1.5.0] - 2026-10-10
+
+Nueva sección **Pokédex**: cada juego que has superado tiene su Pokédex, y la aplicación te
+propone uno a uno el siguiente Pokémon que registrar y la forma más sencilla de obtenerlo
+(RF-20 a RF-24, #94). Por eso, cada juego se registra una sola vez en el *Hall of Fame*.
+
+**Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`, o
+`scripts/start.sh`, que la hace): trae las Pokédex, las apariciones y los iniciales de todos
+los juegos. Hasta repetirla, la API pide hacerlo. Al arrancar, la API migra `user.sqlite` a las
+tablas de la Pokédex; si algún juego estuviera registrado más de una vez en el *Hall of Fame*,
+no arranca y dice cuál: elimina con la versión anterior los registros que sobren.
+
+### Añadido
+
+- **Pokédex** en la web: el progreso de cada juego superado; la primera vez, la lista para
+  marcar los que ya tienes; después, el siguiente Pokémon que registrar con la forma más
+  sencilla de obtenerlo (evolucionarlo, criarlo, transferirlo de otro juego, dónde aparece y
+  con qué probabilidad, regalos y eventos), con las demás formas para elegir otra y la opción de
+  saltarlo de momento; y el detalle de registrados e imposibles para corregir errores (RF-20 a
+  RF-24, RN-22 a RN-26, #101, #103).
+- **API de la Pokédex** (`/api/pokedex`): el progreso, la lista inicial, el Pokémon objetivo, la
+  ficha con todas las formas de obtención y las marcas de cada Pokémon (#102).
+- **Ingesta**: carga la Pokédex de cada juego, dónde y cómo se obtiene cada Pokémon en los 11
+  juegos (lugar, método, probabilidad y niveles), qué juegos pueden enviarse Pokémon, los
+  Pokémon de evento, los nombres en español de todos los lugares y los iniciales de todos los
+  juegos, no solo de los objetivo (#100, #102).
+- **Arranque**: `scripts/start.sh` prepara y arranca la aplicación en un solo comando: copia
+  `user.sqlite` en `data/backups/`, instala las dependencias, carga los datos, compila la web y
+  arranca la API, que la sirve. Acepta las opciones de la carga, como `--offline` (#93).
+
 ### Cambiado
 
 - **Hall of Fame**: cada juego se registra una sola vez. Un juego registrado deja de aparecer en
   **Nuevo juego** y en el formulario del *Hall of Fame*, y la API responde `409` si se intenta
   revisar, generar o registrar otra vez. Tras registrar un equipo desde el resultado, ya no se
-  vuelve a generar. Para volver a jugar un juego, se elimina antes su registro (CA-68, #94).
-  Al actualizar, si algún juego estuviera registrado más de una vez, la aplicación no arranca y
-  dice cuál: elimina con la versión anterior los registros que sobren.
-
-### Añadido
-
-- **Pokédex**: una sección nueva para completar la Pokédex de cada juego del *Hall of Fame*
-  (RF-20 a RF-24, #94). Muestra el progreso de cada juego; la primera vez, la lista para marcar
-  los que ya tienes; después, el siguiente Pokémon que registrar con la forma más sencilla de
-  obtenerlo (evolucionarlo, criarlo, transferirlo, dónde aparece y con qué probabilidad,
-  regalos y eventos), con las demás formas para elegir otra; y el detalle de registrados e
-  imposibles para corregir errores. También en la API (`/api/pokedex`).
+  vuelve a generar. Para volver a jugar un juego, se elimina antes su registro (CA-68, #97).
 - **Hall of Fame**: borrar un registro, o cambiarle el juego, borra su Pokédex; si ya la habías
-  empezado, la web lo avisa antes.
-- **Ingesta**: carga los iniciales de todos los juegos, no solo de los objetivo, para la
-  Pokédex.
-- **Ingesta**: carga los datos de la futura Pokédex: la Pokédex de cada juego, dónde y cómo se
-  obtiene cada Pokémon en los 11 juegos (lugar, método, probabilidad y niveles), qué juegos
-  pueden enviarse Pokémon y los Pokémon de evento, con los nombres en español de todos los
-  lugares (#94). **Al actualizar hay que repetir la carga de datos**
-  (`uv run python -m ingest`): hasta entonces, la API pide repetirla.
-- **Arranque**: `scripts/start.sh` prepara y arranca la aplicación en un solo comando: copia
-  `user.sqlite` en `data/backups/`, instala las dependencias, carga los datos, compila la web y
-  arranca la API, que la sirve. Acepta las opciones de la carga, como `--offline`.
+  empezado, la web lo avisa antes (CA-68, #102, #103).
+
+### Pendiente
+
+- Mecánicas y combates clave de Rubí, Zafiro y Esmeralda, para poder elegirlos como juego
+  objetivo, y restricciones de llegada del resto de juegos (CA-28, #8).
+- Bloqueos de la carga: informe y código de salida 2 (RF-16, #78).
+- Pruebas más robustas de la web (#77).
+- Sin prioridad: puesta en producción (ADR-0009, #51) y protección del acceso (RF-19, #52).
 
 ## [1.4.0] - 2026-10-07
 
@@ -234,7 +251,8 @@ Hoja**.
   acceso (RF-19, #52).
 - Restricciones de llegada del resto de juegos (CA-28, #8).
 
-[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.4.0...HEAD
+[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.1.1...v1.2.0
