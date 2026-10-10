@@ -17,6 +17,13 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ### Añadido
 
+- **API de la Pokédex** (`/api/pokedex`): cada juego del *Hall of Fame* tiene su Pokédex, con
+  su progreso, la lista inicial de los ya registrados, el siguiente Pokémon que registrar y
+  todas sus formas de obtenerlo, de la más sencilla a la menos, y para marcarlos como
+  registrados o imposibles (RF-20 a RF-24, #94). Borrar un registro del *Hall of Fame*, o
+  cambiarle el juego, borra su Pokédex.
+- **Ingesta**: carga los iniciales de todos los juegos, no solo de los objetivo, para la
+  Pokédex.
 - **Ingesta**: carga los datos de la futura Pokédex: la Pokédex de cada juego, dónde y cómo se
   obtiene cada Pokémon en los 11 juegos (lugar, método, probabilidad y niveles), qué juegos
   pueden enviarse Pokémon y los Pokémon de evento, con los nombres en español de todos los

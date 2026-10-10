@@ -48,7 +48,7 @@ class GamesFile(CuratedModel):
 
 
 class StartersFile(CuratedModel):
-    """``starters.yaml``: the starters of each target game (RN-21).
+    """``starters.yaml``: the starters of each game (RN-21, CA-87).
 
     Each starter is the form of its final evolution in that game, e.g. ``venusaur`` in
     FireRed (CA-59, CA-63). Which Pokémon a game offers to start is not in doubt, so the

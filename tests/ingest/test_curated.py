@@ -39,7 +39,7 @@ def test_repository_curated_files_are_valid() -> None:
     assert curated.breeding.incense_babies == {"azurill": "sea-incense", "wynaut": "lax-incense"}
     assert set(curated.games.games) == {"firered", "leafgreen"}
     assert set(curated.arrival.games) == {"firered", "leafgreen"}
-    assert set(curated.starters.games) == {"ruby", "sapphire", "emerald", "firered", "leafgreen"}
+    assert len(curated.starters.games) == 11  # every loaded game, for the Pokédex (CA-87)
     [firered_leafgreen] = curated.key_battles
     assert firered_leafgreen.games == ["firered", "leafgreen"]
     assert len(firered_leafgreen.battles) == 13  # Giovanni only as gym leader (CA-39)
@@ -160,7 +160,7 @@ def test_curated_source_rows() -> None:
     events = {(row.game, row.pokemon) for row in rows if isinstance(row, EventPokemon)}
 
     assert len(mechanics) == 4
-    assert len(starters) == 15
+    assert len(starters) == 31  # 3 per game, 1 in Yellow
     assert len(rows) == len(mechanics) + len(starters) + len(pokedexes) + len(transfers) + len(
         events
     )
@@ -175,6 +175,7 @@ def test_curated_source_rows() -> None:
     assert ("firered", "mew") in events
     assert ("firered", "charizard") in starters
     assert ("emerald", "swampert") in starters
+    assert ("yellow", "raichu") in starters
     day_night = next(m for m in mechanics if m.fact_key == "mechanic:firered:day_night_cycle")
     assert (day_night.value, day_night.origin) == (False, Origin.INFERRED)
 

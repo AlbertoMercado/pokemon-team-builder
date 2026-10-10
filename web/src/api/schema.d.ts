@@ -383,7 +383,7 @@ export interface paths {
         post?: never;
         /**
          * Eliminar un registro
-         * @description Elimina el registro y su equipo. `404` si no existe.
+         * @description Elimina el registro, su equipo y la Pokédex del juego (CA-68). `404` si no existe.
          */
         delete: operations["remove_entry_api_hall_of_fame__entry_id__delete"];
         options?: never;
@@ -391,10 +391,131 @@ export interface paths {
         /**
          * Corregir un registro
          * @description Cambia el juego, la fecha, las notas o el equipo. Si cambia el juego o el equipo, se
-         *     vuelven a copiar los tipos. `404` si el registro no existe; `409` si el juego nuevo ya
-         *     está registrado; `422` como al registrarlo.
+         *     vuelven a copiar los tipos; si cambia el juego, se borra la Pokédex del anterior (CA-68).
+         *     `404` si el registro no existe; `409` si el juego nuevo ya está registrado; `422` como al
+         *     registrarlo.
          */
         patch: operations["update_entry_api_hall_of_fame__entry_id__patch"];
+        trace?: never;
+    };
+    "/api/pokedex": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pokédex de los juegos superados
+         * @description Los juegos registrados en el *Hall of Fame*, en el orden del recorrido, con el progreso
+         *     de su Pokédex (RF-20, RN-22). Los juegos que ya no están cargados no aparecen.
+         */
+        get: operations["list_pokedexes_api_pokedex_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pokedex/{game}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pokédex de un juego
+         * @description Todos los Pokémon de la Pokédex del juego, en su orden, con lo que ha marcado el usuario:
+         *     la lista inicial (RF-21) y el detalle de registrados e imposibles (RF-24). `404` si el
+         *     juego no está en el *Hall of Fame*.
+         */
+        get: operations["get_pokedex_api_pokedex__game__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pokedex/{game}/initial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Confirmar la lista inicial
+         * @description Guarda los Pokémon que el usuario ya tiene registrados y empieza la Pokédex (RF-21).
+         *     Solo una vez: después se corrige con cada Pokémon. `404` si el juego no está en el *Hall of
+         *     Fame*; `409` si ya estaba confirmada; `422` si alguna especie no está en la Pokédex.
+         */
+        put: operations["start_pokedex_api_pokedex__game__initial_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pokedex/{game}/objective": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pokémon objetivo
+         * @description La ficha del primer Pokémon de la Pokédex que no está registrado, ni es imposible, ni se
+         *     ha saltado (RN-23, RF-22), con todas sus formas de obtención. Nula si no queda ninguno.
+         *     `404` si el juego no está en el *Hall of Fame*.
+         */
+        get: operations["get_objective_api_pokedex__game__objective_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pokedex/{game}/pokemon/{species}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ficha de un Pokémon
+         * @description El Pokémon con todas sus formas de obtención, de la más sencilla a la menos, la
+         *     recomendada y la elegida por el usuario marcadas (RF-22, RF-23, RN-24 a RN-26). `404` si
+         *     el juego no está en el *Hall of Fame* o la especie no está en su Pokédex.
+         */
+        get: operations["get_pokemon_api_pokedex__game__pokemon__species__get"];
+        /**
+         * Marcar un Pokémon
+         * @description Lo registra, lo marca como imposible o lo desmarca (`status`), y elige su forma de
+         *     obtención (`chosen_method`). Solo cambian los campos indicados (RF-22 a RF-24). `404` como
+         *     en la ficha; `409` si no se ha confirmado la lista inicial; `422` si la forma no es suya.
+         */
+        put: operations["mark_pokemon_api_pokedex__game__pokemon__species__put"];
+        post?: never;
+        /**
+         * Desmarcar un Pokémon
+         * @description Quita su marca y la forma elegida, para corregir un error (RF-24). `404` como en la
+         *     ficha; `409` si no se ha confirmado la lista inicial.
+         */
+        delete: operations["unmark_pokemon_api_pokedex__game__pokemon__species__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/meta": {
@@ -544,6 +665,27 @@ export interface components {
              */
             games: string[];
         };
+        /** DexEvolutionOut */
+        DexEvolutionOut: {
+            /**
+             * Trigger
+             * @description Disparador de PokeAPI (`level-up`, `use-item`, `trade`…).
+             */
+            trigger: string;
+            /**
+             * Conditions
+             * @description Condiciones de PokeAPI (`minimum_level`, `trigger_item`…).
+             */
+            conditions: {
+                [key: string]: string | number | boolean;
+            };
+        };
+        /**
+         * DexStatus
+         * @description How the user marked a species in a Pokédex (RF-21, RF-22).
+         * @enum {string}
+         */
+        DexStatus: "registered" | "impossible";
         /** DiscardOut */
         DiscardOut: {
             /**
@@ -579,6 +721,12 @@ export interface components {
          * @enum {string}
          */
         DiscardReason: "generation" | "game" | "arrival" | "breeding" | "journey";
+        /**
+         * EncounterKind
+         * @description Kinds of RN-26 in their order, then the two that RN-24 puts almost last.
+         * @enum {string}
+         */
+        EncounterKind: "gift" | "npc_trade" | "fossil" | "static" | "wild" | "swarm" | "roaming" | "starter_gift" | "event";
         /** EvolutionMethodOut */
         EvolutionMethodOut: {
             /**
@@ -920,6 +1068,14 @@ export interface components {
          * @enum {string}
          */
         IncompleteReason: "reserved_slot" | "not_enough_candidates" | "no_valid_team";
+        /** InitialListIn */
+        InitialListIn: {
+            /**
+             * Registered
+             * @description Las especies que el usuario ya tiene registradas; puede estar vacía (RF-21).
+             */
+            registered: string[];
+        };
         /** LineMemberOut */
         LineMemberOut: {
             /**
@@ -979,6 +1135,71 @@ export interface components {
             /** @description La carga de los datos; nula si no hay registro. */
             data: components["schemas"]["DataVersion"] | null;
         };
+        /**
+         * MethodKind
+         * @description Forms of RN-24 in their order, after evolving the previous stage.
+         * @enum {string}
+         */
+        MethodKind: "evolve" | "breed_registered" | "transfer_registered" | "in_game" | "breed" | "transfer" | "starter_gift" | "event";
+        /** ObjectiveOut */
+        ObjectiveOut: {
+            /** @description La ficha del Pokémon objetivo; nula si no queda ninguno por registrar (RN-23, RF-22). */
+            pokemon: components["schemas"]["PokedexPokemonOut"] | null;
+        };
+        /** ObtentionMethodOut */
+        ObtentionMethodOut: {
+            /**
+             * Key
+             * @description Identificador estable de la forma, para elegirla (RF-23).
+             */
+            key: string;
+            /** @description `evolve`, `breed_registered` (1), `transfer_registered` (2), `in_game` (3), `breed` (4), `transfer` (5), `starter_gift` (6) o `event` (7), en el orden de RN-24. */
+            kind: components["schemas"]["MethodKind"];
+            /**
+             * Recommended
+             * @description Si es la más sencilla (RN-24).
+             */
+            recommended: boolean;
+            /**
+             * Chosen
+             * @description Si es la que eligió el usuario (RF-23, CA-75).
+             */
+            chosen: boolean;
+            /** @description Dónde se obtiene: en el juego, en un regalo que depende del inicial, en un evento con lugar o, al transferirlo de un juego no superado, allí. */
+            way: components["schemas"]["WayOut"] | null;
+            /**
+             * Game
+             * @description Juego desde el que se transfiere (RN-25).
+             */
+            game: string | null;
+            /**
+             * Game Name
+             * @description Nombre en español de ese juego.
+             */
+            game_name: string | null;
+            /**
+             * Pokemon
+             * @description Especie que se evoluciona o se cría.
+             */
+            pokemon: string | null;
+            /**
+             * Pokemon Name
+             * @description Nombre en español de esa especie.
+             */
+            pokemon_name: string | null;
+            /**
+             * Pokemon Registered
+             * @description Si esa especie está registrada; si no, la ficha enlaza a la suya (CA-76).
+             */
+            pokemon_registered: boolean;
+            /** @description El paso de evolución, al evolucionarlo. */
+            evolution: components["schemas"]["DexEvolutionOut"] | null;
+            /**
+             * Incense
+             * @description Si criarlo exige que el progenitor lleve un incienso.
+             */
+            incense: boolean;
+        };
         /** OpenSlotsOut */
         OpenSlotsOut: {
             /**
@@ -1018,6 +1239,198 @@ export interface components {
             /** @description El mensaje y los datos que faltan por confirmar. */
             detail: components["schemas"]["PendingDataDetail"];
         };
+        /** PokedexGameOut */
+        PokedexGameOut: {
+            /**
+             * Game
+             * @description Identificador del juego superado.
+             */
+            game: string;
+            /**
+             * Game Name
+             * @description Nombre en español del juego.
+             */
+            game_name: string;
+            /**
+             * Cover Url
+             * @description URL de su portada en esta API; nula si no tiene (RF-18).
+             */
+            cover_url: string | null;
+            /**
+             * Hall Of Fame Entry
+             * @description El registro del *Hall of Fame* del juego.
+             */
+            hall_of_fame_entry: number;
+            /** @description Progreso de su Pokédex (RN-22). */
+            progress: components["schemas"]["PokedexProgressOut"];
+        };
+        /**
+         * PokedexMarkIn
+         * @description What to change; at least one field.
+         */
+        PokedexMarkIn: {
+            /**
+             * Status
+             * @description `registered`, `impossible` o `null` para desmarcarlo (RF-22, RF-24).
+             */
+            status?: ("registered" | "impossible") | null;
+            /**
+             * Chosen Method
+             * @description Clave de una de sus formas (`key`), o `null` para volver a la recomendada (RF-23).
+             */
+            chosen_method?: string | null;
+        };
+        /** PokedexOut */
+        PokedexOut: {
+            /**
+             * Game
+             * @description Identificador del juego superado.
+             */
+            game: string;
+            /**
+             * Game Name
+             * @description Nombre en español del juego.
+             */
+            game_name: string;
+            /**
+             * Hall Of Fame Entry
+             * @description El registro del *Hall of Fame* del juego.
+             */
+            hall_of_fame_entry: number;
+            /** @description Progreso de la Pokédex (RN-22). */
+            progress: components["schemas"]["PokedexProgressOut"];
+            /**
+             * Species
+             * @description Todos los Pokémon de la Pokédex, en su orden (RF-21, RF-24).
+             */
+            species: components["schemas"]["PokedexSpeciesOut"][];
+        };
+        /** PokedexPokemonOut */
+        PokedexPokemonOut: {
+            /**
+             * Species
+             * @description Identificador de la especie: la Pokédex registra especies.
+             */
+            species: string;
+            /**
+             * Number
+             * @description Número en la Pokédex del juego, que da su orden (RN-23).
+             */
+            number: number;
+            /**
+             * Name
+             * @description Nombre en español.
+             */
+            name: string;
+            /**
+             * Pokemon
+             * @description Su forma base, la de su imagen y sus tipos.
+             */
+            pokemon: string;
+            /**
+             * Types
+             * @description Tipos en la generación del juego (RN-10).
+             */
+            types: string[];
+            /**
+             * Image Url
+             * @description URL de su imagen en esta API; nula si no tiene (RF-17).
+             */
+            image_url: string | null;
+            /** @description `registered`, `impossible` (marcado por el usuario) o nulo si no está marcado (RF-21, RF-22). */
+            status: components["schemas"]["DexStatus"] | null;
+            /**
+             * Automatically Impossible
+             * @description Si solo se obtiene en spin-offs, sin ninguna otra forma (RN-25).
+             */
+            automatically_impossible: boolean;
+            /**
+             * Artwork Url
+             * @description URL de su ilustración oficial en esta API; nula si no tiene.
+             */
+            artwork_url: string | null;
+            /**
+             * Chosen Method
+             * @description Clave de la forma elegida por el usuario; nula si sigue la recomendada.
+             */
+            chosen_method: string | null;
+            /**
+             * Methods
+             * @description Todas las formas de obtenerlo, de la más sencilla a la menos (RN-24); vacía si no se conoce ninguna.
+             */
+            methods: components["schemas"]["ObtentionMethodOut"][];
+        };
+        /** PokedexProgressOut */
+        PokedexProgressOut: {
+            /**
+             * Registered
+             * @description Pokémon registrados (capturados u obtenidos, CA-69).
+             */
+            registered: number;
+            /**
+             * Total
+             * @description Pokémon de la Pokédex del juego (RN-22).
+             */
+            total: number;
+            /**
+             * Impossible
+             * @description Pokémon sin registrar imposibles de obtener: los marcados por el usuario y los que solo se obtienen en spin-offs (RN-25). Cuentan en el total (CA-71).
+             */
+            impossible: number;
+            /**
+             * Percent
+             * @description Porcentaje de registrados sobre el total, redondeado hacia abajo: 100 solo con la Pokédex completa (RN-22).
+             */
+            percent: number;
+            /** @description `not_started` hasta confirmar la lista inicial (RF-21), `in_progress` o `completed` con todos registrados. */
+            status: components["schemas"]["PokedexStatus"];
+        };
+        /** PokedexSpeciesOut */
+        PokedexSpeciesOut: {
+            /**
+             * Species
+             * @description Identificador de la especie: la Pokédex registra especies.
+             */
+            species: string;
+            /**
+             * Number
+             * @description Número en la Pokédex del juego, que da su orden (RN-23).
+             */
+            number: number;
+            /**
+             * Name
+             * @description Nombre en español.
+             */
+            name: string;
+            /**
+             * Pokemon
+             * @description Su forma base, la de su imagen y sus tipos.
+             */
+            pokemon: string;
+            /**
+             * Types
+             * @description Tipos en la generación del juego (RN-10).
+             */
+            types: string[];
+            /**
+             * Image Url
+             * @description URL de su imagen en esta API; nula si no tiene (RF-17).
+             */
+            image_url: string | null;
+            /** @description `registered`, `impossible` (marcado por el usuario) o nulo si no está marcado (RF-21, RF-22). */
+            status: components["schemas"]["DexStatus"] | null;
+            /**
+             * Automatically Impossible
+             * @description Si solo se obtiene en spin-offs, sin ninguna otra forma (RN-25).
+             */
+            automatically_impossible: boolean;
+        };
+        /**
+         * PokedexStatus
+         * @description States of a Pokédex (RN-22).
+         * @enum {string}
+         */
+        PokedexStatus: "not_started" | "in_progress" | "completed";
         /** PokemonDetailOut */
         PokemonDetailOut: {
             /**
@@ -1313,6 +1726,19 @@ export interface components {
              */
             penalized: string[];
         };
+        /** SpeciesRefOut */
+        SpeciesRefOut: {
+            /**
+             * Species
+             * @description Identificador de la especie.
+             */
+            species: string;
+            /**
+             * Name
+             * @description Nombre en español.
+             */
+            name: string;
+        };
         /** SuggestionOut */
         SuggestionOut: {
             /** @description El Pokémon sugerido, con sus tipos en el juego. */
@@ -1412,6 +1838,64 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /**
+         * WayOut
+         * @description A way of obtaining it from the encounters of a game (RN-26).
+         */
+        WayOut: {
+            /** @description `gift`, `npc_trade`, `fossil`, `static`, `wild`, `swarm` (salvaje en enjambre), `roaming`, `starter_gift` (depende del inicial) o `event` (RN-26, CA-82 a CA-87). */
+            kind: components["schemas"]["EncounterKind"];
+            /**
+             * Location
+             * @description Identificador del lugar.
+             */
+            location: string;
+            /**
+             * Location Name
+             * @description Nombre del lugar en español; en inglés si no se conoce.
+             */
+            location_name: string;
+            /**
+             * Area
+             * @description Zona del lugar (`b1f`); nula si solo tiene una.
+             */
+            area: string | null;
+            /**
+             * Method
+             * @description Método de PokeAPI (`walk`, `surf`, `gift`…).
+             */
+            method: string;
+            /**
+             * Rarity
+             * @description Probabilidad, en %, de encontrarlo en esa zona con ese método; con `times`, la mayor de esos momentos (CA-81).
+             */
+            rarity: number;
+            /**
+             * Times
+             * @description Momentos del día (`morning`, `day`, `night`) en que tiene esa probabilidad; vacío si no depende de la hora (CA-81).
+             */
+            times: string[];
+            /**
+             * Choice
+             * @description La elección de la que depende: `starter-<especie>` (el inicial elegido, CA-80, CA-87) o `tv-option-<color>` (la televisión de Esmeralda, CA-85).
+             */
+            choice: string | null;
+            /**
+             * Item
+             * @description El fósil que se revive o el objeto de evento con el que se llega al lugar (CA-82).
+             */
+            item: string | null;
+            /**
+             * Conditions
+             * @description El resto de condiciones de PokeAPI, para mostrarlas con la forma (`coins-9999`, `trade-abra`, `weekday-friday`…; CA-83, CA-85).
+             */
+            conditions: string[];
+            /**
+             * Alternatives
+             * @description Los demás Pokémon de un regalo en el que se elige uno (CA-87).
+             */
+            alternatives: components["schemas"]["SpeciesRefOut"][];
         };
     };
     responses: never;
@@ -2099,6 +2583,254 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["CompletedGameOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_pokedexes_api_pokedex_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PokedexGameOut"][];
+                };
+            };
+        };
+    };
+    get_pokedex_api_pokedex__game__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Identificador de un juego registrado en el *Hall of Fame*. */
+                game: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PokedexOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_pokedex_api_pokedex__game__initial_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Identificador de un juego registrado en el *Hall of Fame*. */
+                game: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InitialListIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PokedexOut"];
+                };
+            };
+            /** @description La lista inicial ya está confirmada. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_objective_api_pokedex__game__objective_get: {
+        parameters: {
+            query?: {
+                /** @description Especies saltadas de momento; no se guardan, y al volver a entrar el objetivo vuelve a ser el primero sin registrar (CA-77). */
+                skipped?: string[] | null;
+            };
+            header?: never;
+            path: {
+                /** @description Identificador de un juego registrado en el *Hall of Fame*. */
+                game: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObjectiveOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_pokemon_api_pokedex__game__pokemon__species__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Identificador de un juego registrado en el *Hall of Fame*. */
+                game: string;
+                /** @description Identificador de la especie, p. ej. `pikachu` (no de la forma). */
+                species: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PokedexPokemonOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_pokemon_api_pokedex__game__pokemon__species__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Identificador de un juego registrado en el *Hall of Fame*. */
+                game: string;
+                /** @description Identificador de la especie, p. ej. `pikachu` (no de la forma). */
+                species: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PokedexMarkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PokedexPokemonOut"];
+                };
+            };
+            /** @description La lista inicial no está confirmada. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unmark_pokemon_api_pokedex__game__pokemon__species__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Identificador de un juego registrado en el *Hall of Fame*. */
+                game: string;
+                /** @description Identificador de la especie, p. ej. `pikachu` (no de la forma). */
+                species: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description La lista inicial no está confirmada. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

@@ -33,7 +33,7 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 |---------|--------------|-------------|------------------|
 | [`pokeapi.yaml`](#pokeapiyaml) | Commits fijados del volcado de PokeAPI y del repositorio de imágenes. | `ingest_run.pokeapi_commit`, `ingest_run.sprites_commit` | — |
 | [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Rojo Fuego, Verde Hoja |
-| [`starters.yaml`](#startersyaml) | Iniciales de cada juego objetivo (RN-21). | `game_starter` | Los 5 juegos objetivo |
+| [`starters.yaml`](#startersyaml) | Iniciales de cada juego (RN-21, CA-87). | `game_starter` | Los 11 juegos cargados |
 | [`breeding.yaml`](#breedingyaml) | Bebés que solo nacen con incienso. | `species.requires_incense` | — |
 | [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Rojo Fuego, Verde Hoja |
 | [`covers.yaml`](#coversyaml) | Título del fichero de la portada de cada juego en WikiDex (RF-18). | `game.cover`, `game.cover_source` | Los 11 juegos cargados |
@@ -88,7 +88,9 @@ Cada mecánica se carga como una fila de `game_mechanic` con la clave revisable
 ### `starters.yaml`
 
 **Por qué existe**: [RN-21](../01-ddf/reglas-negocio.md#rn-21) obliga a llevar un inicial del
-juego objetivo, y PokeAPI no dice qué Pokémon ofrece cada juego para empezar.
+juego objetivo, y en la Pokédex el inicial cuenta como regalo que depende del inicial elegido
+([CA-87](../01-ddf/cuestiones-abiertas.md#resueltas)); PokeAPI no dice qué Pokémon ofrece cada
+juego para empezar. Por eso están todos los juegos cargados, no solo los objetivo.
 
 ```yaml
 games:
@@ -99,7 +101,8 @@ Cada inicial es la **forma de su evolución final** en ese juego, no la especie 
 empieza ([CA-59](../01-ddf/cuestiones-abiertas.md#resueltas)). Una forma regional se escribe
 con su identificador (p. ej., `typhlosion-hisui`) y solo en el juego que la ofrece
 ([CA-63](../01-ddf/cuestiones-abiertas.md#resueltas)). Los valores no llevan `origin`: no hay
-duda de cuáles son los iniciales de un juego, así que el usuario no los confirma.
+duda de cuáles son los iniciales de un juego, así que el usuario no los confirma. En Amarillo,
+el inicial es Pikachu, que se escribe como `raichu`.
 
 Cada juego tiene al menos un inicial y ninguno repetido. Un inicial que no es una forma cargada
 hace fallar la carga (clave foránea), y las comprobaciones de la carga exigen que cada uno sea

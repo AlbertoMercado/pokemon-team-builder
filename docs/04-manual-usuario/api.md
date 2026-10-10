@@ -289,6 +289,56 @@ curl -X DELETE http://127.0.0.1:8000/api/hall-of-fame/1
 - Si un Pokémon queda descartado por el recorrido, la generación lo dice en `discards`, con el
   motivo `journey` y el juego en que lo usaste. Para no aplicar esta regla, desactiva RN-16 en
   [reglas](#reglas).
+- Eliminar un registro, o cambiarle el juego, **borra la Pokédex** de ese juego
+  ([Pokédex](#pokedex-completar-un-juego-superado)).
+
+## Pokédex: completar un juego superado
+
+Cada juego registrado en el *Hall of Fame* tiene su Pokédex, para completarla y conseguir el
+diploma ([RF-20](../01-ddf/requisitos-funcionales.md#rf-20) a
+[RF-24](../01-ddf/requisitos-funcionales.md#rf-24)). Los Pokémon se indican por **especie**
+(`pikachu`), no por forma: la Pokédex registra especies.
+
+```bash
+# Tus juegos superados con el progreso de cada Pokédex
+curl http://127.0.0.1:8000/api/pokedex
+
+# La primera vez: la lista de la Pokédex y los que ya tienes registrados
+curl http://127.0.0.1:8000/api/pokedex/firered
+curl -X PUT http://127.0.0.1:8000/api/pokedex/firered/initial \
+     -H "Content-Type: application/json" -d '{"registered": ["bulbasaur", "pikachu"]}'
+
+# El siguiente que hay que registrar, con sus formas de obtenerlo
+curl http://127.0.0.1:8000/api/pokedex/firered/objective
+curl "http://127.0.0.1:8000/api/pokedex/firered/objective?skipped=ivysaur"   # saltarlo de momento
+
+# Registrarlo, marcarlo como imposible o elegir otra forma de obtenerlo
+curl -X PUT http://127.0.0.1:8000/api/pokedex/firered/pokemon/ivysaur \
+     -H "Content-Type: application/json" -d '{"status": "registered"}'
+curl -X PUT http://127.0.0.1:8000/api/pokedex/firered/pokemon/sandshrew \
+     -H "Content-Type: application/json" -d '{"chosen_method": "transfer:emerald"}'
+
+# Corregir un error: quitarle la marca
+curl -X DELETE http://127.0.0.1:8000/api/pokedex/firered/pokemon/ivysaur
+```
+
+- **El progreso** cuenta los registrados sobre el total de la Pokédex, redondeado hacia abajo.
+  Los imposibles cuentan en el total y se indican aparte: los que marcas tú y los que solo se
+  obtienen en spin-offs ([RN-22](../01-ddf/reglas-negocio.md#rn-22)).
+- **La lista inicial** se confirma una sola vez (`409` la segunda); después se corrige Pokémon a
+  Pokémon. Hasta confirmarla, la Pokédex está `not_started` y no se puede marcar ninguno.
+- **El objetivo** es el primero de la Pokédex que no está registrado ni es imposible. Los que
+  pasas en `skipped` se saltan solo en esa petición: no se guardan
+  ([RN-23](../01-ddf/reglas-negocio.md#rn-23)). `pokemon` es nulo si no queda ninguno.
+- **Las formas de obtenerlo** (`methods`) van de la más sencilla a la menos
+  ([RN-24](../01-ddf/reglas-negocio.md#rn-24) a [RN-26](../01-ddf/reglas-negocio.md#rn-26)):
+  evolucionarlo, criarlo, transferirlo desde otro juego, dónde aparece en el juego (`way`, con
+  su probabilidad), los regalos que dependen del inicial y los eventos. `recommended` marca la
+  más sencilla y `chosen` la que hayas elegido; para volver a la recomendada, envía
+  `{"chosen_method": null}`. Si evolucionarlo o criarlo parte de un Pokémon que no tienes
+  (`pokemon_registered: false`), consulta su ficha en `…/pokemon/{especie}`.
+- **Lo transferido desde un juego superado** se da por disponible si está registrado en su
+  Pokédex, aunque ya no lo tengas: si no es así, elige otra forma.
 
 ## Errores habituales
 
@@ -306,5 +356,9 @@ curl -X DELETE http://127.0.0.1:8000/api/hall-of-fame/1
 | `422` al registrar en el *Hall of Fame* | El juego o algún Pokémon no existen en los datos cargados, o el Pokémon no existía en la generación de ese juego (Treecko en Rojo). El equipo tiene que tener de 1 a 6. | Revisa los identificadores y el juego. |
 | `409` al generar | Quedan datos sin confirmar. | Confírmalos con la revisión; `detail.pending` dice cuáles. |
 | `409` al revisar, generar o registrar un juego | Ya está registrado en el *Hall of Fame*: cada juego se registra una sola vez. | Elimina su registro si quieres volver a jugarlo; `detail.hall_of_fame_entry` dice cuál es. |
+| `404` en la Pokédex | El juego no está en el *Hall of Fame*, o la especie no está en su Pokédex. | Registra antes el juego; usa la especie (`pikachu`), no la forma. |
+| `409` al marcar un Pokémon de la Pokédex | No has confirmado la lista inicial. | Confírmala con `PUT …/initial` (puede ir vacía). |
+| `409` al confirmar la lista inicial | Ya estaba confirmada. | Corrige cada Pokémon con `PUT` o `DELETE …/pokemon/{especie}`. |
+| `422` al elegir una forma de obtención | `chosen_method` no es la clave (`key`) de una de sus formas. | Copia la clave de `methods` en la ficha. |
 | `422` al confirmar un dato | El valor no es del tipo del dato (un booleano, o una lista en un combate clave) o el equipo incluye Pokémon que no existen en la generación del juego. | Revisa el valor y los identificadores. |
 | `Address already in use` al arrancar | Ya hay otra API (u otro programa) en el puerto 8000. | Para la otra o arranca en otro puerto: `--port 8001`. |

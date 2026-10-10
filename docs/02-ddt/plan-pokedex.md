@@ -65,22 +65,10 @@ formas, la crianza y las claves de cada forma están en el
 
 ### Datos del usuario y API
 
-| Tabla de `user.sqlite` | Contenido |
-|------------------------|-----------|
-| `pokedex` | Una por juego superado: si ya se marcó la lista inicial. |
-| `pokedex_entry` | Por Pokémon: registrado o imposible, y la forma de obtención elegida. |
-
-Se borran con su registro del *Hall of Fame*. La API sigue sus
-[convenciones](api.md):
-
-| Endpoint | Para qué |
-|----------|----------|
-| `GET /api/pokedex` | Juegos superados con su progreso (RF-20). |
-| `GET /api/pokedex/{game}` | La Pokédex de un juego, con sus registrados e imposibles (RF-21, RF-24). |
-| `PUT /api/pokedex/{game}/initial` | La lista inicial (RF-21). |
-| `GET /api/pokedex/{game}/objective?skipped=…` | El Pokémon objetivo; los saltados los pasa la web y no se guardan (RN-23). |
-| `GET /api/pokedex/{game}/pokemon/{species}` | La ficha con todas sus formas de obtención (RF-22, RF-23). |
-| `PUT /api/pokedex/{game}/pokemon/{species}` y `DELETE` | Registrar, marcar como imposible, elegir una forma y desmarcar (RF-22 a RF-24). |
+Implementados en la fase 4: las tablas, en el
+[modelo de datos](modelo-datos.md#base-de-datos-del-usuario-usersqlite); los endpoints, en la
+[referencia de la API](api-referencia.md) (sección Pokédex), y cómo se usan, en el
+[manual](../04-manual-usuario/api.md#pokedex-completar-un-juego-superado).
 
 ### Web
 
@@ -100,7 +88,7 @@ Cada fase es un PR desde `main`, con sus tests y su documentación
 | 1 ✅ | `feat/hall-of-fame-unico` | Un registro por juego: migración (se detiene si hay repetidos), `409` al registrar uno ya registrado, juegos registrados fuera de los objetivos y del registro a mano. | Migración con y sin repetidos; API; pantallas; E2E. |
 | 2 ✅ | `feat/pokedex-datos` | Tablas y carga de las Pokédex, las apariciones y los datos curados nuevos; nombres en español que faltan. | Extracto sin red; casos conocidos en las comprobaciones de la carga. |
 | 3 ✅ | `feat/pokedex-motor` | `core/pokedex/` con RN-22 a RN-26. | Una prueba por regla (`@pytest.mark.rn`) y un escenario real de Rojo Fuego. |
-| 4 | `feat/pokedex-api` | Tablas de `user.sqlite`, migración y endpoints. | API con la base de prueba. |
+| 4 ✅ | `feat/pokedex-api` | Tablas de `user.sqlite`, migración y endpoints. | API con la base de prueba. |
 | 5 | `feat/pokedex-web` | Las pantallas, el aviso al borrar un registro con Pokédex, manual y CHANGELOG. | Vitest de cada pantalla y E2E. |
 | 6 | `chore/release-X.Y.0` | Versión MENOR y cierre de #94. | — |
 
@@ -165,10 +153,29 @@ historia, día de la semana, televisión, amistad y consola virtual) y los regal
   (`?skipped=…`).
 - **Cada forma tiene una clave estable** (`key`), que guardará `pokedex_entry` como la forma
   elegida (fase 4).
-- **Para la fase 4: los iniciales de cada juego.** `game_starter` solo tiene los de los juegos
-  objetivo (la 3.ª generación). La Pokédex necesita también los de la 1.ª y la 2.ª (Bulbasaur,
-  Charmander y Squirtle; Pikachu en Amarillo; Chikorita, Cyndaquil y Totodile) para que su
-  regalo cuente como regalo que depende del inicial.
+- **Los iniciales de cada juego** (hechos en la fase 4): `game_starter` solo tenía los de los
+  juegos objetivo, y la Pokédex necesita también los de la 1.ª y la 2.ª generación.
+
+### Decisiones tomadas al implementar la fase 4
+
+- **Iniciales de todos los juegos** en `starters.yaml`, como la forma de su evolución final
+  (Pikachu en Amarillo es `raichu`). La API toma la primera etapa de la línea en la generación
+  del juego: Pikachu en Amarillo, no Pichu.
+- **Las mecánicas que no están cargadas cuentan como presentes**: hoy solo Rojo Fuego y Verde
+  Hoja tienen sus mecánicas curadas. Sin esto, Espeon sería imposible en Oro. Es mejor proponer
+  una evolución que el juego quizá no permite que esconder una que sí permite. Una mecánica
+  pendiente cuenta igual, como en el contexto del generador; una que vale «no» la quita.
+- **La Pokédex cuelga del registro del *Hall of Fame***: `pokedex.entry` es su clave foránea
+  con borrado en cascada. Cambiar el juego de un registro borra la Pokédex del anterior, como
+  borrarlo (CA-68); el aviso de la web está en la fase 5.
+- **Sin fila en `pokedex`, la Pokédex no está iniciada**: confirmar la lista inicial la crea.
+  Marcar un Pokémon antes responde `409`.
+- **Los saltados van en la consulta** (`?skipped=`), sin guardarse (CA-77).
+- **Una forma elegida que ya no existe tras una carga nueva se ignora**: la ficha vuelve a
+  mostrar la recomendada.
+- **Caché de los datos de referencia** (`PokedexReferences`), como la de `GameReferences`: la
+  Pokédex de un juego necesita también las apariciones de los que pueden enviarle Pokémon, y
+  así se leen una sola vez.
 
 ## Riesgos
 

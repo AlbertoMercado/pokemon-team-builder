@@ -71,7 +71,10 @@ def add_entry(user: Session, reference: Session, body: HallOfFameEntryIn) -> Hal
 def update_entry(
     user: Session, reference: Session, entry_id: int, change: HallOfFamePatch
 ) -> HallOfFameEntryOut:
-    """Changes the given fields; the types are copied again if the game or the team change."""
+    """Changes the given fields; the types are copied again if the game or the team change.
+
+    Changing the game removes the Pokédex of the old one, as removing the entry does (CA-68).
+    """
     entry = _entry(user, entry_id)
     fields = change.model_fields_set
     game = _game(reference, change.game if change.game is not None else entry.game)
@@ -84,6 +87,8 @@ def update_entry(
             [stored] = [ms for e, ms in user_repo.hall_of_fame(user) if e.id == entry_id]
             slugs = [member.pokemon for member in stored]
         members = _members(reference, game, slugs)
+    if game.slug != entry.game and entry.id is not None:
+        user_repo.remove_pokedex(user, entry.id)  # it was the Pokédex of the other game
     entry.game = game.slug
     if change.completed_on is not None:
         entry.completed_on = change.completed_on
