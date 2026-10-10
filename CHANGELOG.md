@@ -6,6 +6,12 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+### Corregido
+
+- **Web**: en la lista inicial de la Pokédex y en el equipo de cada registro del *Hall of Fame*,
+  todas las tarjetas de Pokémon tienen la misma altura. Antes, los tipos bajaban a otra línea
+  solo cuando no cabían junto al nombre, y unas tarjetas eran más altas que otras.
+
 ## [1.5.0] - 2026-10-10
 
 Nueva sección **Pokédex**: cada juego que has superado tiene su Pokédex, y la aplicación te

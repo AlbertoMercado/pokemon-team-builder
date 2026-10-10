@@ -217,13 +217,17 @@ function Entry({
       {entry.notes !== null && <p className="text-sm text-slate-700">{entry.notes}</p>}
       <ol aria-label="Equipo" className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
         {entry.members.map((member) => (
+          // The name on one line and the types always below, so every member is as tall as
+          // the others whatever its name or its types (like the initial list of the Pokédex).
           <li
             key={member.position}
-            className="flex flex-wrap items-center gap-2 rounded border border-slate-200 px-2 py-1"
+            className="flex items-center gap-2 rounded border border-slate-200 px-2 py-1"
           >
             <PokemonSprite url={member.image_url} />
-            <span className="font-medium">{member.name}</span>
-            <TypeBadges types={member.types} />
+            <span className="flex min-w-0 flex-col gap-1">
+              <span className="truncate font-medium">{member.name}</span>
+              <TypeBadges types={member.types} />
+            </span>
           </li>
         ))}
       </ol>

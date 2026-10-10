@@ -128,8 +128,11 @@ function InitialRow({
   onToggle: (species: string) => void;
 }) {
   return (
-    <li>
-      <label className="flex flex-wrap items-center gap-2 rounded border border-slate-200 bg-white px-2 py-1">
+    // Every row has the same shape whatever the length of the name or the number of types:
+    // the number and name on one line, the types always below, and the full height of the
+    // grid row, so that no card is taller than the others.
+    <li className="h-full">
+      <label className="flex h-full items-center gap-2 rounded border border-slate-200 bg-white px-2 py-1">
         <input
           type="checkbox"
           checked={checked}
@@ -138,9 +141,15 @@ function InitialRow({
           }}
         />
         <PokemonSprite url={species.image_url} />
-        <span className="font-mono text-sm text-slate-500">{formatDexNumber(species.number)}</span>
-        <span className="font-medium">{species.name}</span>
-        <TypeBadges types={species.types} />
+        <span className="flex min-w-0 flex-col gap-1">
+          <span className="flex items-baseline gap-2">
+            <span className="font-mono text-sm text-slate-500">
+              {formatDexNumber(species.number)}
+            </span>
+            <span className="truncate font-medium">{species.name}</span>
+          </span>
+          <TypeBadges types={species.types} />
+        </span>
       </label>
     </li>
   );
