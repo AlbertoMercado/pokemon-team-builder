@@ -2,6 +2,7 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 
+import { startPokedex } from "../test/pokedex";
 import { currentLocation, renderApp } from "../test/render";
 import { server, withoutCovers } from "../test/server";
 
@@ -149,6 +150,43 @@ describe("Hall of Fame (RF-12, RF-13)", () => {
     await userEvent.click(entry.getByRole("button", { name: "Sí, eliminar" }));
     expect(
       await screen.findByText("Todavía no has registrado ningún juego completado."),
+    ).toBeVisible();
+  });
+
+  it("warns that removing an entry removes its started Pokédex (CA-68)", async () => {
+    startPokedex("leafgreen", "bulbasaur", "pikachu");
+    renderApp("/hall-of-fame");
+    const entry = within(await screen.findByRole("listitem", { name: /Verde Hoja/ }));
+    await screen.findByRole("list", { name: "Recorrido" });
+
+    await userEvent.click(entry.getByRole("button", { name: "Eliminar" }));
+    const confirm = within(entry.getByRole("alertdialog", { name: "Confirmar la eliminación" }));
+    expect(
+      await confirm.findByText("Se borrará también su Pokédex, con 2 Pokémon registrados."),
+    ).toBeVisible();
+  });
+
+  it("does not warn when its Pokédex was not started", async () => {
+    renderApp("/hall-of-fame");
+    const entry = within(await screen.findByRole("listitem", { name: /Verde Hoja/ }));
+
+    await userEvent.click(entry.getByRole("button", { name: "Eliminar" }));
+    expect(entry.queryByText(/Se borrará también su Pokédex/)).not.toBeInTheDocument();
+  });
+
+  it("warns that changing the game removes its started Pokédex (CA-68)", async () => {
+    startPokedex("leafgreen", "bulbasaur");
+    renderApp("/hall-of-fame");
+    const entry = within(await screen.findByRole("listitem", { name: /Verde Hoja/ }));
+
+    await userEvent.click(entry.getByRole("button", { name: "Corregir" }));
+    const edit = within(screen.getByRole("form", { name: /Corregir: Verde Hoja/ }));
+    expect(edit.queryByText(/Al cambiar el juego/)).not.toBeInTheDocument();
+    await userEvent.selectOptions(edit.getByRole("combobox", { name: "Juego" }), "Rojo");
+    expect(
+      await edit.findByText(
+        "Al cambiar el juego: Se borrará también su Pokédex, con 1 Pokémon registrado.",
+      ),
     ).toBeVisible();
   });
 

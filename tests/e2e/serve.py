@@ -2,10 +2,11 @@
 
     uv run python -m tests.e2e.serve [--port 8765]
 
-Writes the real FireRed extract of the tests (``tests/api/scenario.py``) as reference.sqlite in
-a temporary data directory, with a new user.sqlite, and runs uvicorn with ``web/dist``, as the
-application runs installed. It uses neither the network nor the user's data, and the directory
-is removed when it stops. Playwright starts it (``web/playwright.config.ts``).
+Writes the real FireRed extract of the tests (``tests/api/scenario.py``), with the Pokédex of
+FireRed and LeafGreen, as reference.sqlite in a temporary data directory, with a new
+user.sqlite, and runs uvicorn with ``web/dist``, as the application runs installed. It uses
+neither the network nor the user's data, and the directory is removed when it stops.
+Playwright starts it (``web/playwright.config.ts``).
 """
 
 import argparse

@@ -2,7 +2,8 @@
  * The Hall of Fame: the user's journey (RF-12, RF-13, RN-16): /api/hall-of-fame.
  *
  * Recording, correcting or removing an entry changes the journey, so the exclusions of RN-16
- * change too: every change refreshes the Hall of Fame, the generations and the reviews.
+ * change too: every change refreshes the Hall of Fame, the generations and the reviews. It also
+ * changes the Pokédexes: each completed game has one, removed with its entry (CA-68).
  */
 import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 
@@ -24,6 +25,7 @@ function journeyChanged(client: QueryClient) {
     client.invalidateQueries({ queryKey: queryKeys.hallOfFame }),
     client.invalidateQueries({ queryKey: queryKeys.generations }),
     client.invalidateQueries({ queryKey: queryKeys.reviews }),
+    client.invalidateQueries({ queryKey: queryKeys.pokedex }),
   ]);
 }
 
@@ -52,7 +54,7 @@ export function useUpdateHallOfFameEntry() {
   });
 }
 
-/** Removes an entry and its team. */
+/** Removes an entry, its team and the Pokédex of its game. */
 export function useRemoveHallOfFameEntry() {
   const client = useQueryClient();
   return useMutation({

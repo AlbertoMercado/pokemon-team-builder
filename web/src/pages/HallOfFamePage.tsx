@@ -3,7 +3,8 @@
  * marked and a filter by game (`?game=`). An entry is recorded by hand (also for a game that is
  * not a target game), corrected or removed after a confirmation. Each game is recorded once
  * (CA-68): the form leaves out the games already recorded. Every change alters the exclusions
- * of RN-16 from the next generation on.
+ * of RN-16 from the next generation on. Removing an entry, or changing its game, removes the
+ * Pokédex of its game (CA-68): if it was started, the confirmation says so first.
  */
 import { useState } from "react";
 import { useSearchParams } from "react-router";
@@ -15,7 +16,8 @@ import {
   useRemoveHallOfFameEntry,
   useUpdateHallOfFameEntry,
 } from "../api/queries/hallOfFame";
-import type { Game, HallOfFameEntry, HallOfFameEntryIn } from "../api/types";
+import { usePokedexes } from "../api/queries/pokedex";
+import type { Game, HallOfFameEntry, HallOfFameEntryIn, PokedexProgress } from "../api/types";
 import ErrorMessage from "../components/ErrorMessage";
 import GameCover from "../components/GameCover";
 import PokemonSprite from "../components/PokemonSprite";
@@ -34,6 +36,7 @@ export default function HallOfFamePage() {
   const game = params.get("game") ?? undefined;
   const entries = useHallOfFame(game);
   const games = useGames({ all: true });
+  const pokedexes = usePokedexes();
   const add = useAddHallOfFameEntry();
   const [adding, setAdding] = useState(false);
 
@@ -119,7 +122,14 @@ export default function HallOfFamePage() {
       ) : (
         <ol aria-label="Recorrido" className="space-y-3">
           {entries.data.map((entry) => (
-            <Entry key={entry.id} entry={entry} games={games.data ?? []} />
+            <Entry
+              key={entry.id}
+              entry={entry}
+              games={games.data ?? []}
+              pokedex={
+                pokedexes.data?.find((found) => found.hall_of_fame_entry === entry.id)?.progress
+              }
+            />
           ))}
         </ol>
       )}
@@ -127,7 +137,25 @@ export default function HallOfFamePage() {
   );
 }
 
-function Entry({ entry, games }: { entry: HallOfFameEntry; games: Game[] }) {
+/** What is lost with the Pokédex of an entry, if it was started; `null` if nothing. */
+function pokedexLoss(progress: PokedexProgress | undefined): string | null {
+  if (progress === undefined || progress.status === "not_started") return null;
+  const { registered } = progress;
+  return `Se borrará también su Pokédex, con ${String(registered)} Pokémon ${
+    registered === 1 ? "registrado" : "registrados"
+  }.`;
+}
+
+function Entry({
+  entry,
+  games,
+  pokedex,
+}: {
+  entry: HallOfFameEntry;
+  games: Game[];
+  pokedex: PokedexProgress | undefined;
+}) {
+  const loss = pokedexLoss(pokedex);
   const update = useUpdateHallOfFameEntry();
   const remove = useRemoveHallOfFameEntry();
   const [editing, setEditing] = useState(false);
@@ -148,6 +176,7 @@ function Entry({ entry, games }: { entry: HallOfFameEntry; games: Game[] }) {
           }}
           saving={update.isPending}
           error={update.error}
+          changingGameLoses={loss}
           onSave={(change) => {
             update.mutate(
               { id: entry.id, change },
@@ -203,6 +232,7 @@ function Entry({ entry, games }: { entry: HallOfFameEntry; games: Game[] }) {
           <p className="text-sm">
             ¿Eliminar este registro? Sus líneas dejarán de excluirse en las próximas generaciones.
           </p>
+          {loss !== null && <p className="text-sm font-semibold text-red-800">{loss}</p>}
           <div className="flex gap-2">
             <button
               type="button"
@@ -259,12 +289,23 @@ interface EntryFormProps {
   initial: HallOfFameEntryIn;
   saving: boolean;
   error: Error | null;
+  /** When correcting: what changing the game removes (its started Pokédex), if anything. */
+  changingGameLoses?: string | null;
   onSave: (entry: HallOfFameEntryIn) => void;
   onCancel: () => void;
 }
 
 /** The fields of an entry. The web only checks the shape (1 to 6 Pokémon); the rest, the API. */
-function EntryForm({ title, games, initial, saving, error, onSave, onCancel }: EntryFormProps) {
+function EntryForm({
+  title,
+  games,
+  initial,
+  saving,
+  error,
+  changingGameLoses = null,
+  onSave,
+  onCancel,
+}: EntryFormProps) {
   const [game, setGame] = useState(initial.game);
   const [date, setDate] = useState(initial.completed_on);
   // Each game is recorded once (CA-68): the completed ones are left out, except this entry's.
@@ -340,6 +381,11 @@ function EntryForm({ title, games, initial, saving, error, onSave, onCancel }: E
       </div>
       <TeamEditor team={members} onChange={setMembers} label="Equipo del registro" />
       {missing !== null && <p className="text-sm text-slate-700">{missing}</p>}
+      {changingGameLoses !== null && game !== initial.game && (
+        <p role="alert" className="text-sm font-semibold text-red-800">
+          {`Al cambiar el juego: ${changingGameLoses}`}
+        </p>
+      )}
       {error !== null && <ErrorMessage error={error} />}
       <div className="flex gap-2">
         <button type="submit" className={PRIMARY} disabled={saving || missing !== null}>

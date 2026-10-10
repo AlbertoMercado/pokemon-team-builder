@@ -8,6 +8,10 @@ import GamesPage from "./pages/GamesPage";
 import HallOfFamePage from "./pages/HallOfFamePage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
+import PokedexDetailPage from "./pages/PokedexDetailPage";
+import PokedexGamePage from "./pages/PokedexGamePage";
+import PokedexListPage from "./pages/PokedexListPage";
+import PokedexPokemonPage from "./pages/PokedexPokemonPage";
 import PokemonPage from "./pages/PokemonPage";
 import ResultPage from "./pages/ResultPage";
 import RulesPage from "./pages/RulesPage";
@@ -26,6 +30,10 @@ export default function App() {
         <Route path="juego/:game/revision" element={<ReviewPage />} />
         <Route path="juego/:game/resultado" element={<ResultPage />} />
         <Route path="hall-of-fame" element={<HallOfFamePage />} />
+        <Route path="pokedex" element={<PokedexListPage />} />
+        <Route path="pokedex/:game" element={<PokedexGamePage />} />
+        <Route path="pokedex/:game/detalle" element={<PokedexDetailPage />} />
+        <Route path="pokedex/:game/pokemon/:species" element={<PokedexPokemonPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

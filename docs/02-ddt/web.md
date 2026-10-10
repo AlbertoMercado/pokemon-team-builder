@@ -18,6 +18,10 @@ flowchart LR
     RES -- "selector: elegir,<br/>comprobar y registrar" --> H["Hall of Fame"]
     RES -- "sugerencia a favoritos<br/>y regenerar" --> RES
     RES -- "409: datos pendientes" --> REV
+    I --> P["Pokédex:<br/>juegos superados"] --> PG["Pokédex de un juego:<br/>lista inicial u objetivo"]
+    PG --> PD["Detalle"]
+    PG -- "Cómo obtener…" --> PP["Ficha de la Pokédex"]
+    H -. "eliminar: borra su Pokédex" .-> P
 ```
 
 Qué hace cada pantalla, para quien la usa, está en el [manual](../04-manual-usuario/web.md); aquí, su ruta, qué
@@ -33,7 +37,11 @@ requisitos cubre y qué endpoints llama.
 | `/juego` | [Nuevo juego](../04-manual-usuario/web.md#elegir-el-juego) | RF-05 | `GET /api/games` |
 | `/juego/:game/revision` | [Revisión de datos](../04-manual-usuario/web.md#revisar-los-datos) | RF-15, RN-18 | `GET /review`, `PUT /review/{fact_key}`, `POST /review/accept-proposals` |
 | `/juego/:game/resultado` | [Resultado](../04-manual-usuario/web.md#ver-el-resultado) y [selector](../04-manual-usuario/web.md#elegir-el-equipo-y-registrarlo) | RF-08, RF-09, RF-10, RF-12, CA-53 | `POST /api/games/{game}/generations`, `POST /api/games/{game}/team-checks`, `POST /api/hall-of-fame` |
-| `/hall-of-fame` | [Hall of Fame](../04-manual-usuario/web.md#hall-of-fame) | RF-12, RF-13, RN-16 | `GET`, `POST`, `PATCH`, `DELETE /api/hall-of-fame`, `GET /api/games?all=true` |
+| `/hall-of-fame` | [Hall of Fame](../04-manual-usuario/web.md#hall-of-fame) | RF-12, RF-13, RN-16, CA-68 | `GET`, `POST`, `PATCH`, `DELETE /api/hall-of-fame`, `GET /api/games?all=true`, `GET /api/pokedex` (para avisar de la Pokédex que se borra) |
+| `/pokedex` | [Pokédex](../04-manual-usuario/web.md#pokedex) | RF-20 | `GET /api/pokedex` |
+| `/pokedex/:game` | [Lista inicial](../04-manual-usuario/web.md#la-primera-vez-los-que-ya-tienes) o [siguiente Pokémon](../04-manual-usuario/web.md#el-siguiente-pokemon) | RF-21, RF-22, RF-23, RN-23 | `GET /api/pokedex/{game}`, `PUT …/initial`, `GET …/objective`, `PUT`/`DELETE …/pokemon/{species}` |
+| `/pokedex/:game/detalle` | [Detalle](../04-manual-usuario/web.md#el-detalle-registrados-e-imposibles) | RF-24 | `GET /api/pokedex/{game}`, `DELETE …/pokemon/{species}` |
+| `/pokedex/:game/pokemon/:species` | [Ficha de la Pokédex](../04-manual-usuario/web.md#el-siguiente-pokemon) | RF-22, RF-23, CA-76 | `GET`, `PUT`, `DELETE …/pokemon/{species}` |
 
 Comportamiento común:
 
@@ -45,9 +53,14 @@ Comportamiento común:
   ([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)), lo dice en el resultado.
 - **Un juego, un registro**: el formulario del *Hall of Fame* no ofrece los juegos ya registrados
   (`completed` en `GET /api/games?all=true`), salvo el del propio registro al corregirlo.
+- **Los saltados de la Pokédex no se guardan**: viven en la pantalla del objetivo y se pasan en
+  `?skipped=`; al volver a entrar, el objetivo vuelve a ser el primero que falta
+  ([CA-77](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- **El texto de cada forma de obtención** lo escribe la web (`src/lib/obtention.ts`) a partir de
+  lo que da la API, como en el DDF; el orden y la recomendada los decide la API.
 
 En todas las pantallas, una barra de navegación lleva a Catálogo, Favoritos, Reglas, Nuevo
-juego y *Hall of Fame*.
+juego, *Hall of Fame* y Pokédex.
 
 ### Cómo se muestran los errores
 

@@ -54,7 +54,7 @@ Abre `http://127.0.0.1:8000` en el navegador. Para pararla, `Ctrl+C`.
 ## Navegar
 
 La barra de arriba lleva a cada sección: **Catálogo**, **Favoritos**, **Reglas**,
-**Nuevo juego** y **Hall of Fame**. La sección en la que estás aparece subrayada. El nombre
+**Nuevo juego**, **Hall of Fame** y **Pokédex**. La sección en la que estás aparece subrayada. El nombre
 de la aplicación, a la izquierda, vuelve al Inicio.
 
 Cada pantalla tiene su propia dirección, así que puedes recargar la página, volver atrás con
@@ -317,11 +317,66 @@ o eliminar un registro cambia los equipos que se generan a partir de ese momento
 |--------|------|
 | **Filtrar por juego** | Elige el juego en **Juego**. El filtro se guarda en la dirección de la página. |
 | **Registrar un equipo** | Además de hacerlo desde el resultado, puedes registrar a mano cualquier juego cargado, también los que no pueden ser juego objetivo (como Rojo, Oro o Rubí). Cada juego se registra una sola vez: los que ya están en tu *Hall of Fame* no aparecen. Elige el juego, la fecha y, si quieres, notas, y añade de 1 a 6 Pokémon con el buscador, en orden. **Guardar** lo registra. |
-| **Corregir** | Cambia el juego, la fecha, las notas o el equipo. Si cambias la fecha, el recorrido se reordena. |
-| **Eliminar** | Pide confirmación: **Sí, eliminar** borra el registro y su equipo. |
+| **Corregir** | Cambia el juego, la fecha, las notas o el equipo. Si cambias la fecha, el recorrido se reordena. Si cambias el juego, se borra la [Pokédex](#pokedex) del anterior: si ya la habías empezado, el formulario te avisa antes de guardar. |
+| **Eliminar** | Pide confirmación: **Sí, eliminar** borra el registro, su equipo y la [Pokédex](#pokedex) de ese juego. Si ya la habías empezado, la confirmación dice cuántos Pokémon tenía registrados. |
 
 Si la API rechaza un registro (por ejemplo, un Pokémon que no existía en la generación de ese
 juego), el mensaje aparece en el formulario y puedes corregirlo.
+
+## Pokédex
+
+Cada juego que has superado, es decir, que está en tu [Hall of Fame](#hall-of-fame), tiene su
+Pokédex, para completarla y conseguir el diploma
+([RF-20](../01-ddf/requisitos-funcionales.md#rf-20) a
+[RF-24](../01-ddf/requisitos-funcionales.md#rf-24)). **Pokédex** muestra esos juegos con su
+progreso: el porcentaje de registrados, cuántos llevas, si está **no iniciada**, **en curso** o
+**completada**, y cuántos son imposibles de obtener. Los imposibles cuentan en el total, así que
+el 100 % solo llega con la Pokédex completa
+([RN-22](../01-ddf/reglas-negocio.md#rn-22)).
+
+### La primera vez: los que ya tienes
+
+Al abrir la Pokédex de un juego por primera vez, aparece la lista de todos sus Pokémon, en el
+orden de su Pokédex. Marca los que ya tienes registrados (capturados u obtenidos, no solo
+vistos); **Buscar por nombre** filtra la lista. **Confirmar** los guarda. Esta lista solo
+aparece una vez: después, los errores se corrigen en el [detalle](#el-detalle-registrados-e-imposibles).
+
+### El siguiente Pokémon
+
+Después, la Pokédex te propone el **siguiente Pokémon que registrar**: el primero, en el orden
+de la Pokédex, que no tienes ni es imposible de obtener
+([RN-23](../01-ddf/reglas-negocio.md#rn-23)). Su ficha dice la forma más sencilla de
+obtenerlo ([RN-24](../01-ddf/reglas-negocio.md#rn-24) a
+[RN-26](../01-ddf/reglas-negocio.md#rn-26)), por ejemplo:
+
+- **Evolucionar Ivysaur: Nivel 32**, si es una fase posterior.
+- **Criarlo desde tu Pikachu**, si ya tienes una fase posterior de su línea (desde la
+  2.ª generación).
+- **Transferirlo desde Verde Hoja**, si lo tienes registrado en la Pokédex de otro juego superado
+  o se obtiene en otro juego compatible.
+- **Regalo en Ciudad Azulona**, **Aparece salvaje en la Ruta 29 (noche): 50 %** o
+  **Pokémon errante si elegiste a Squirtle**, si se obtiene en el propio juego.
+- **Pokémon obtenido por evento**.
+
+Si la forma parte de un Pokémon que no tienes (evolucionarlo o criarlo), **Cómo obtener…** lleva
+a la ficha de ese Pokémon.
+
+| Acción | Qué hace |
+|--------|----------|
+| **Registrado** | Lo marca como registrado y pasa al siguiente. |
+| **Imposible de obtener** | Lo marca como imposible: cuenta aparte y no vuelve a proponerse. |
+| **Otras formas de obtenerlo** | Muestra todas, de la más sencilla a la menos. **Elegir esta** guarda la que prefieres (por ejemplo, si ya no tienes el Pokémon del juego desde el que se propone transferirlo): desde entonces la ficha la muestra primero, como **Elegida por ti**. **Volver a la recomendada** lo deshace. |
+| **Saltar de momento** | Pasa al siguiente sin guardar nada. Al volver a entrar en la Pokédex, el siguiente vuelve a ser el primero que te falta. |
+
+Si no se conoce ninguna forma de obtenerlo en ese juego, la ficha lo dice: márcalo como
+imposible si no puedes conseguirlo. Los que solo se obtienen en spin-offs, como los discos de
+Colosseum, son imposibles por sí solos ([RN-25](../01-ddf/reglas-negocio.md#rn-25)).
+
+### El detalle: registrados e imposibles
+
+**Ver los registrados y los imposibles** lista los Pokémon que has registrado y los que son
+imposibles de obtener. **Desmarcar** corrige un error: el Pokémon vuelve a quedar pendiente.
+Los que solo se obtienen en spin-offs no se pueden desmarcar. Cada nombre lleva a su ficha.
 
 ## Avisos
 
