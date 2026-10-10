@@ -15,7 +15,7 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
 | `ingest/` | Carga, fuentes, imágenes y portadas, sobre extractos reales. |
 | `api/` | Endpoints con el `TestClient` de FastAPI sobre un directorio de datos temporal (`conftest.py`); `factories.py` crea los `reference.sqlite` de prueba y `scenario.py` escribe el escenario de Rojo Fuego. |
 | `docs/` | La referencia de la API generada para la documentación, y que el contrato OpenAPI esté completo (ADR-0012). |
-| `e2e/serve.py` | No es un test: arranca la API con la web compilada sobre el escenario de Rojo Fuego para las pruebas de Playwright de `web/e2e/` (`uv run python -m tests.e2e.serve [--port N]`). |
+| `e2e/serve.py` | No es un test: arranca la API con la web compilada sobre el escenario de Rojo Fuego, con su Pokédex y la de Verde Hoja, para las pruebas de Playwright de `web/e2e/` (`uv run python -m tests.e2e.serve [--port N]`). |
 | `test_architecture.py` | Guardián de pureza: `core/` solo importa la biblioteca estándar. |
 | `test_network_blocked.py` | Ningún cliente HTTP llega a la red. |
 | `conftest.py` | Hace fallar cualquier petición HTTP. |

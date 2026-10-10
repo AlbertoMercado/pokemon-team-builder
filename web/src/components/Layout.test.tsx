@@ -15,6 +15,7 @@ describe("Navegación", () => {
       ["Reglas", "/reglas"],
       ["Nuevo juego", "/juego"],
       ["Hall of Fame", "/hall-of-fame"],
+      ["Pokédex", "/pokedex"],
     ]);
 
     await userEvent.click(within(nav).getByRole("link", { name: "Reglas" }));

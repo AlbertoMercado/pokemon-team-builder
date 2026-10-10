@@ -21,10 +21,10 @@ con TanStack Query.
 | `src/api/queryClient.ts` | `QueryClient`: solo reintenta los fallos de conexión. |
 | `src/api/queries/` | Una consulta o mutación por recurso, con sus claves en `keys.ts`. La generación es una consulta (un cálculo sin estado): se repite al cambiar los favoritos o las confirmaciones. |
 | `src/api/types.ts` | Nombres cortos de los esquemas del contrato. |
-| `src/components/` | Componentes compartidos: navegación y pie, filas e imágenes de los Pokémon, portadas, la estrella de favorito, el buscador, el editor y el selector de equipos… |
+| `src/components/` | Componentes compartidos: navegación y pie, filas e imágenes de los Pokémon, portadas, la estrella de favorito, el buscador, el editor y el selector de equipos, el progreso y la ficha de la Pokédex… |
 | `src/pages/` | Una por pantalla. |
-| `src/lib/` | Funciones puras: formatos, textos del resultado, tipos, métodos de evolución, enlaces a la documentación y comandos. |
-| `src/test/` | Configuración de Vitest, `renderApp` y la API simulada con MSW. |
+| `src/lib/` | Funciones puras: formatos, textos del resultado, tipos, métodos de evolución, formas de obtención de la Pokédex, enlaces a la documentación y comandos. |
+| `src/test/` | Configuración de Vitest, `renderApp` y la API simulada con MSW (la Pokédex, en `pokedex.ts`). |
 
 Los tests están junto a lo que prueban (`*.test.ts(x)`). Las pruebas de extremo a extremo están
 en `e2e/` (Playwright, `playwright.config.ts`) y van contra la API real, que arranca

@@ -5,6 +5,11 @@ models of ``db/reference``, as the ingest would: the 140 forms that can arrive, 
 egg groups and evolution steps, the 3rd generation type chart and the 13 key battles. The
 origins are those of a real load: mechanics and arrival inferred, the rest automatic. A test
 changes them with a ``Load``, or edits ``firered_data()`` before writing it.
+
+It also writes the Pokédex of FireRed and LeafGreen for those forms, from the extract of the
+Pokédex scenario (``tests/core/fixtures/pokedex_firered.json``): their numbers, their
+encounters in both games (the places named by their identifier), the transfers between them,
+the event Pokémon and LeafGreen's starters.
 """
 
 import json
@@ -20,16 +25,23 @@ from sqlmodel import Session, create_engine
 
 from db.reference import (
     BattleCategory,
+    Encounter,
+    EventPokemon,
     EvolutionStep,
     Game,
     GameMechanic,
+    GamePokedex,
     GamePokemon,
     GameStarter,
+    GameTransfer,
     Generation,
     IngestRun,
     KeyBattle,
     KeyBattlePokemon,
+    Location,
     Origin,
+    Pokedex,
+    PokedexNumber,
     Pokemon,
     PokemonType,
     Species,
@@ -41,6 +53,7 @@ from db.reference import (
 )
 
 FIXTURE = Path(__file__).resolve().parents[1] / "core" / "fixtures" / "firered.json"
+POKEDEX_FIXTURE = FIXTURE.with_name("pokedex_firered.json")
 GAME = "firered"
 VERSION_GROUP = "firered-leafgreen"
 LOADED_AT = datetime(2026, 10, 4, 10, 0, 0, tzinfo=UTC)
@@ -169,6 +182,11 @@ def _write(session: Session, data: ScenarioData, load: Load) -> None:
         for a, d, f in data["type_efficacy"]
     )
     _write_pokemon(session, pokemon, generation, load)
+    _write_pokedex(session, {p["slug"] for p in pokemon if p["region"] is None})
+    # LeafGreen's starters too, so its Pokédex gives them as gifts that depend on the starter.
+    session.add_all(
+        GameStarter(game="leafgreen", pokemon=slug) for slug in data["game"]["starters"]
+    )
     for mechanic in MECHANICS:
         value = mechanic in data["game"]["mechanics"]
         session.add(
@@ -282,3 +300,47 @@ def _write_pokemon(
         )
         for a, b, trigger, conditions in steps
     )
+
+
+def _write_pokedex(session: Session, forms: set[str]) -> None:
+    """The Pokédex of FireRed and LeafGreen with the species of ``forms``, their base forms."""
+    data = json.loads(POKEDEX_FIXTURE.read_text(encoding="utf-8"))
+    species = [s for s in data["species"] if s["species"] in forms]
+    session.add(Pokedex(slug="national"))
+    session.add_all(GamePokedex(game=g, pokedex="national") for g in (GAME, "leafgreen"))
+    session.add_all(
+        PokedexNumber(pokedex="national", species=s["species"], number=s["number"]) for s in species
+    )
+    encounters = {GAME: {s["species"]: s["encounters"] for s in species}}
+    for source in data["sources"]:
+        if source["game"] == "leafgreen":
+            encounters["leafgreen"] = {k: v for k, v in source["encounters"].items() if k in forms}
+    places: dict[str, str | None] = {}
+    for game, by_species in encounters.items():
+        for slug, rows in by_species.items():
+            for location, area, method, rarity, conditions, event_item in rows:
+                places[location] = event_item
+                session.add(
+                    Encounter(
+                        game=game,
+                        location=location,
+                        area=area,
+                        pokemon=slug,
+                        method=method,
+                        conditions=conditions,
+                        rarity=rarity,
+                        min_level=5,
+                        max_level=5,
+                    )
+                )
+    session.add_all(
+        Location(slug=slug, name_en=slug.replace("-", " ").title(), event_item=item)
+        for slug, item in places.items()
+    )
+    session.add_all(
+        [
+            GameTransfer(from_game="leafgreen", to_game=GAME),
+            GameTransfer(from_game=GAME, to_game="leafgreen"),
+        ]
+    )
+    session.add_all(EventPokemon(game=GAME, pokemon=s["species"]) for s in species if s["is_event"])

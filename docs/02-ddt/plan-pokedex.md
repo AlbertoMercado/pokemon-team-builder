@@ -72,10 +72,8 @@ Implementados en la fase 4: las tablas, en el
 
 ### Web
 
-- **Pokédex** en el menú: la lista de juegos superados con su progreso y estado.
-- La lista inicial, la ficha del Pokémon objetivo con sus acciones y enlaces, las otras formas
-  de obtención y el detalle de registrados e imposibles.
-- En el *Hall of Fame*, el aviso al borrar un registro con Pokédex.
+Implementada en la fase 5: las pantallas y sus rutas, en el [diseño de la web](web.md#pantallas),
+y cómo se usan, en el [manual](../04-manual-usuario/web.md#pokedex).
 
 ## Fases
 
@@ -89,7 +87,7 @@ Cada fase es un PR desde `main`, con sus tests y su documentación
 | 2 ✅ | `feat/pokedex-datos` | Tablas y carga de las Pokédex, las apariciones y los datos curados nuevos; nombres en español que faltan. | Extracto sin red; casos conocidos en las comprobaciones de la carga. |
 | 3 ✅ | `feat/pokedex-motor` | `core/pokedex/` con RN-22 a RN-26. | Una prueba por regla (`@pytest.mark.rn`) y un escenario real de Rojo Fuego. |
 | 4 ✅ | `feat/pokedex-api` | Tablas de `user.sqlite`, migración y endpoints. | API con la base de prueba. |
-| 5 | `feat/pokedex-web` | Las pantallas, el aviso al borrar un registro con Pokédex, manual y CHANGELOG. | Vitest de cada pantalla y E2E. |
+| 5 ✅ | `feat/pokedex-web` | Las pantallas, el aviso al borrar un registro con Pokédex, manual y CHANGELOG. | Vitest de cada pantalla y E2E. |
 | 6 | `chore/release-X.Y.0` | Versión MENOR y cierre de #94. | — |
 
 ## Decisiones tomadas al planificar
@@ -176,6 +174,21 @@ historia, día de la semana, televisión, amistad y consola virtual) y los regal
 - **Caché de los datos de referencia** (`PokedexReferences`), como la de `GameReferences`: la
   Pokédex de un juego necesita también las apariciones de los que pueden enviarle Pokémon, y
   así se leen una sola vez.
+
+### Decisiones tomadas al implementar la fase 5
+
+- **El aviso al borrar un registro usa `GET /api/pokedex`**, que ya dice si la Pokédex de cada
+  registro está empezada y cuántos tiene registrados: la API no cambia. El mismo aviso aparece
+  al cambiar el juego de un registro.
+- **La web escribe el texto de cada forma** (`web/src/lib/obtention.ts`) con las frases del
+  DDF, a partir de los datos de la API, como ya hacía con los métodos de evolución. Un objeto o
+  una condición que no conoce se muestra con su identificador.
+- **Los saltados viven en la pantalla del objetivo**: salir de ella los olvida (CA-77). Si se
+  saltan todos los que quedan, **Volver al primero** empieza de nuevo.
+- **La lista inicial tiene un buscador**, porque la Pokédex Nacional tiene 386 Pokémon.
+- **El escenario del E2E incluye la Pokédex** de Rojo Fuego y Verde Hoja, sacada del extracto
+  de la fase 3. La prueba de la Pokédex registra Verde Hoja y lo borra al final, para no cambiar
+  el recorrido de la del juego nuevo.
 
 ## Riesgos
 

@@ -13,6 +13,7 @@ const SECTIONS = [
   { to: "/reglas", label: "Reglas" },
   { to: "/juego", label: "Nuevo juego" },
   { to: "/hall-of-fame", label: "Hall of Fame" },
+  { to: "/pokedex", label: "Pokédex" },
 ] as const;
 
 export default function Layout() {

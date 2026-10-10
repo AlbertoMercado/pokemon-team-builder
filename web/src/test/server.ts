@@ -4,7 +4,8 @@
  *
  * The favourites and the confirmations of the review are kept as state, so adding a favourite
  * with the star changes what the catalogue, the detail and the favourites answer next, and a
- * confirmation changes the review, as in the API. `resetData` restores them.
+ * confirmation changes the review, as in the API. `resetData` restores them. The Pokédex of
+ * each completed game is simulated in `pokedex.ts`.
  */
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
@@ -28,6 +29,7 @@ import type {
   RulePatch,
   TeamCheck,
 } from "../api/types";
+import { pokedexHandlers, removePokedex, resetPokedex } from "./pokedex";
 import { CATALOG } from "./rules";
 
 export const meta: Meta = {
@@ -211,6 +213,7 @@ export function resetData(): void {
   nextEntryId = 2;
   requests.checks = [];
   requests.entries = [];
+  resetPokedex();
 }
 
 function reviewOut(): Review {
@@ -769,6 +772,7 @@ export const handlers = [
       if (invalid) return invalid;
       const completed = change.game && change.game !== found.game && completedGame(change.game);
       if (completed) return completed;
+      if (change.game && change.game !== found.game) removePokedex(found.game);
       Object.assign(found, {
         ...(change.game ? { game: change.game } : {}),
         ...(change.completed_on ? { completed_on: change.completed_on } : {}),
@@ -780,6 +784,8 @@ export const handlers = [
   ),
   http.delete<{ id: string }>("/api/hall-of-fame/:id", ({ params }) => {
     const before = entries.length;
+    const removed = entries.find((entry) => entry.id === Number(params.id));
+    if (removed) removePokedex(removed.game);
     entries = entries.filter((entry) => entry.id !== Number(params.id));
     return entries.length < before
       ? new HttpResponse(null, { status: 204 })
@@ -851,6 +857,17 @@ export const handlers = [
     return HttpResponse.json(reviewOut());
   }),
 ];
+
+handlers.push(
+  ...pokedexHandlers(() =>
+    journey(null).map((entry) => ({
+      game: entry.game,
+      name: entry.game_name,
+      cover_url: entry.cover_url,
+      entry: entry.id,
+    })),
+  ),
+);
 
 export const server = setupServer(...handlers);
 

@@ -2,7 +2,7 @@
 
 Aplicación personal y sin ánimo de lucro que, a partir de una lista de Pokémon favoritos y un
 juego objetivo, genera un equipo de 6 según reglas configurables (duras = filtros, blandas =
-puntuación ponderada).
+puntuación ponderada), y ayuda a completar la Pokédex de los juegos superados.
 
 ## Documentación
 

@@ -22,4 +22,10 @@ export const queryKeys = {
   /** Prefix of the generations of every game: they depend on favourites, rules and data. */
   generations: ["generation"] as const,
   generation: (game: string) => ["generation", game] as const,
+  /** Prefix of every Pokédex query: a mark changes the progress, the list and the cards. */
+  pokedex: ["pokedex"] as const,
+  pokedexGame: (game: string) => ["pokedex", game] as const,
+  pokedexObjective: (game: string, skipped: readonly string[]) =>
+    ["pokedex", game, "objective", skipped] as const,
+  pokedexPokemon: (game: string, species: string) => ["pokedex", game, "pokemon", species] as const,
 };
