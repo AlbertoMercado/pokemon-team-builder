@@ -79,13 +79,11 @@ def test_firered_gives_the_engine_teams(client: TestClient) -> None:
     positions = [[[p["pokemon"] for p in a] for a in g["positions"]] for g in body["groups"]]
     assert positions[0][3] == ["cloyster", "lapras"]
     lapras = next(p for p in body["groups"][0]["positions"][3] if p["pokemon"] == "lapras")
-    assert lapras == {
-        "pokemon": "lapras",
-        "name": "Lapras",
-        "dex_number": 131,
-        "types": ["water", "ice"],
-        "image_url": None,
-    }
+    assert (lapras["name"], lapras["dex_number"], lapras["types"]) == (
+        "Lapras",
+        131,
+        ["water", "ice"],
+    )
 
 
 @pytest.mark.rn("RN-04")

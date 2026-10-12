@@ -37,14 +37,14 @@ def test_every_form_in_pokedex_order(client: TestClient) -> None:
     """RF-01: number, name and types of each one."""
     body = client.get(CATALOG).json()
     assert body["total"] == len(body["pokemon"]) == 145
-    assert body["pokemon"][0] == {
+    fields = ("pokemon", "name", "dex_number", "types", "region", "favorite")
+    assert {k: body["pokemon"][0][k] for k in fields} == {
         "pokemon": "bulbasaur",
         "name": "Bulbasaur",
         "dex_number": 1,
         "types": ["grass", "poison"],
         "region": None,
         "favorite": False,
-        "image_url": None,
     }
     numbers = [p["dex_number"] for p in body["pokemon"]]
     assert numbers == sorted(numbers)

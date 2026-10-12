@@ -68,15 +68,15 @@ def test_meta_gives_the_versions_of_the_app_and_the_data(
     reference_database(data_dir)
     response = make_client().get("/api/meta")
     assert response.status_code == 200
-    assert response.json() == {
-        "app_version": _version(),
-        "data": {
-            "pokeapi_commit": "bc92d3b",
-            "sprites_commit": None,
-            "ingested_at": "2026-10-04T10:00:00Z",
-            "games": ["firered", "leafgreen"],
-        },
-    }
+    body = response.json()
+    assert body["app_version"] == _version()
+    data = body["data"]
+    assert (data["pokeapi_commit"], data["sprites_commit"], data["ingested_at"]) == (
+        "bc92d3b",
+        None,
+        "2026-10-04T10:00:00Z",
+    )
+    assert data["games"] == ["firered", "leafgreen"]
 
 
 def test_reference_data_loaded_after_startup_is_found(

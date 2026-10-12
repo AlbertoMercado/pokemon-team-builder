@@ -40,6 +40,11 @@ automática ([estrategia de pruebas](../docs/02-ddt/arquitectura.md#estrategia-d
   `core/fixtures/pokedex_firered.json` (sus 386 especies con sus apariciones y evoluciones, y los
   juegos que pueden enviarle Pokémon). En la Pokédex, `core/pokedex/builders.py`
   (`pokedex(species("pichu"), species("pikachu", evolves_from="pichu"))`) hace de constructor.
+- **Cada test comprueba lo suyo** (#77): en la API, un test compara solo los campos de los que
+  trata (`{k: body[k] for k in (...)}` o tuplas), nunca la respuesta entera, para que añadir un
+  campo no rompa tests que no tienen que ver con él. La forma completa de cada esquema (sus
+  campos exactos) se fija en un solo sitio, `api/test_response_shapes.py`, que es el único que
+  se actualiza al añadir o quitar un campo.
 - **Nombres únicos**: los ficheros de test no tienen `__init__.py`, así que su nombre no se puede
   repetir en otro directorio (por eso `test_pokedex_scenario_firered.py`).
 - **Imports**: pytest añade la raíz del repositorio al `sys.path` (`pythonpath` en

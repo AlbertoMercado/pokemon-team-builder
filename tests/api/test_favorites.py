@@ -27,7 +27,8 @@ def _slugs(client: TestClient) -> list[str]:
 
 
 def test_no_favourites_at_first(client: TestClient) -> None:
-    assert client.get("/api/favorites").json() == {"total": 0, "favorites": []}
+    body = client.get("/api/favorites").json()
+    assert (body["total"], body["favorites"]) == (0, [])
 
 
 @pytest.mark.rn("RN-09")
