@@ -29,6 +29,7 @@ import type {
   RulePatch,
   TeamCheck,
 } from "../api/types";
+import { aFact, aGame, aGeneratedPokemon, withImage } from "./factories";
 import { pokedexHandlers, removePokedex, resetPokedex } from "./pokedex";
 import { CATALOG } from "./rules";
 
@@ -60,12 +61,6 @@ const form = (
   image_url: null,
   stage,
   generation: region ? 7 : 1,
-});
-
-/** The same form with its image, as the API gives it when the load obtained it (RF-17). */
-const withImage = <T extends { pokemon: string }>(found: T): T => ({
-  ...found,
-  image_url: `/api/pokemon/${found.pokemon}/image`,
 });
 
 /** The forms of the catalogue, in order of the National Pokédex. Some have an image. */
@@ -136,47 +131,14 @@ const INITIAL_FAVORITES = ["venusaur", "ninetales-alola"];
 const favoriteSet = new Set(INITIAL_FAVORITES);
 
 export const games: Game[] = [
-  {
-    game: "emerald",
-    name: "Esmeralda",
-    generation: 3,
-    version_group: "emerald",
-    target: true,
-    completed: false,
-    cover_url: null,
-    cover_source_url: null,
-  },
-  {
+  aGame({ game: "emerald", name: "Esmeralda", version_group: "emerald" }),
+  aGame({
     game: "firered",
     name: "Rojo Fuego",
-    generation: 3,
-    version_group: "firered-leafgreen",
-    target: true,
-    completed: false,
     cover_url: "/api/games/firered/cover",
     cover_source_url: "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Rojo_Fuego.png",
-  },
+  }),
 ];
-
-const fact = (
-  fact_key: string,
-  kind: ReviewFact["kind"],
-  subject: string,
-  name: string,
-  proposal: ReviewValue | null,
-): ReviewFact => ({
-  fact_key,
-  kind,
-  subject,
-  name,
-  origin: proposal === null ? "pending" : "inferred",
-  proposal,
-  status: "pending",
-  value: null,
-  confirmed_at: null,
-  outdated: false,
-  source_url: null,
-});
 
 /**
  * The review of Rojo Fuego, as RN-18 describes it: Raichu cannot arrive (its egg hatches
@@ -184,15 +146,15 @@ const fact = (
  */
 function initialFirered(): ReviewFact[] {
   return [
-    fact("mechanic:firered:contests", "mechanic", "contests", "Concursos", false),
+    aFact("mechanic:firered:contests", "mechanic", "contests", "Concursos", false),
     {
-      ...fact("battle:firered:brock", "key_battle", "brock", "Brock", ["geodude", "onix"]),
+      ...aFact("battle:firered:brock", "key_battle", "brock", "Brock", ["geodude", "onix"]),
       source_url: "https://www.wikidex.net/index.php?title=Brock&oldid=3562807",
     },
-    fact("battle:firered:misty", "key_battle", "misty", "Misty", null),
-    fact("pokemon:firered:raichu:arrival", "arrival", "raichu", "Raichu", false),
+    aFact("battle:firered:misty", "key_battle", "misty", "Misty", null),
+    aFact("pokemon:firered:raichu:arrival", "arrival", "raichu", "Raichu", false),
     {
-      ...fact("pokemon:firered:lapras:arrival", "arrival", "lapras", "Lapras", false),
+      ...aFact("pokemon:firered:lapras:arrival", "arrival", "lapras", "Lapras", false),
       value: true,
       confirmed_at: "2026-09-01T10:00:00Z",
       outdated: true,
@@ -289,27 +251,22 @@ function detail(found: Form): PokemonDetail {
 
 /** Every loaded game, for the Hall of Fame: also those that are not a target. */
 export const allGames: Game[] = [
-  {
+  aGame({
     game: "red",
     name: "Rojo",
     generation: 1,
     version_group: "red-blue",
     target: false,
-    completed: false,
     cover_url: "/api/games/red/cover",
     cover_source_url: "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Pok%C3%A9mon_Rojo.jpg",
-  },
+  }),
   ...games,
-  {
+  aGame({
     game: "leafgreen",
     name: "Verde Hoja",
-    generation: 3,
-    version_group: "firered-leafgreen",
-    target: true,
-    completed: false,
     cover_url: "/api/games/leafgreen/cover",
     cover_source_url: "https://www.wikidex.net/wiki/Archivo:Car%C3%A1tula_de_Verde_Hoja.png",
-  },
+  }),
 ];
 
 /** An entry as the simulated API keeps it; the order and the names are worked out on reading. */
@@ -435,21 +392,14 @@ export function confirmAll(): void {
   }
 }
 
-const generated = (
-  pokemon: string,
-  name: string,
-  dex_number: number,
-  types: string[],
-): GeneratedPokemon => ({ pokemon, name, dex_number, types, image_url: null });
-
-const MAGNETON = generated("magneton", "Magneton", 82, ["electric", "steel"]);
-const CLOYSTER = generated("cloyster", "Cloyster", 91, ["water", "ice"]);
-const LAPRAS = withImage(generated("lapras", "Lapras", 131, ["water", "ice"]));
-const EXEGGUTOR = generated("exeggutor", "Exeggutor", 103, ["grass", "psychic"]);
-const RHYDON = generated("rhydon", "Rhydon", 112, ["ground", "rock"]);
-const FLAREON = generated("flareon", "Flareon", 136, ["fire"]);
-const DRAGONITE = generated("dragonite", "Dragonite", 149, ["dragon", "flying"]);
-const GENGAR = generated("gengar", "Gengar", 94, ["ghost", "poison"]);
+const MAGNETON = aGeneratedPokemon("magneton", "Magneton", 82, ["electric", "steel"]);
+const CLOYSTER = aGeneratedPokemon("cloyster", "Cloyster", 91, ["water", "ice"]);
+const LAPRAS = withImage(aGeneratedPokemon("lapras", "Lapras", 131, ["water", "ice"]));
+const EXEGGUTOR = aGeneratedPokemon("exeggutor", "Exeggutor", 103, ["grass", "psychic"]);
+const RHYDON = aGeneratedPokemon("rhydon", "Rhydon", 112, ["ground", "rock"]);
+const FLAREON = aGeneratedPokemon("flareon", "Flareon", 136, ["fire"]);
+const DRAGONITE = aGeneratedPokemon("dragonite", "Dragonite", 149, ["dragon", "flying"]);
+const GENGAR = aGeneratedPokemon("gengar", "Gengar", 94, ["ghost", "poison"]);
 
 const breakdown = (tedious: number, penalized: string[] = []) => [
   {
@@ -564,7 +514,7 @@ export const incompleteGeneration: Generation = {
               rule_id: "RN-13",
               suggestions: [
                 suggestion(DRAGONITE, 1),
-                suggestion(generated("dratini", "Dratini", 147, ["dragon"]), 1),
+                suggestion(aGeneratedPokemon("dratini", "Dratini", 147, ["dragon"]), 1),
               ],
             },
             {
@@ -576,8 +526,8 @@ export const incompleteGeneration: Generation = {
                 suggestion(MAGNETON, 2),
                 suggestion(FLAREON, 2),
                 suggestion(CLOYSTER, 2),
-                suggestion(generated("sandslash", "Sandslash", 28, ["ground"]), 1),
-                suggestion(generated("kingler", "Kingler", 99, ["water"]), 1),
+                suggestion(aGeneratedPokemon("sandslash", "Sandslash", 28, ["ground"]), 1),
+                suggestion(aGeneratedPokemon("kingler", "Kingler", 99, ["water"]), 1),
               ],
             },
           ],
@@ -888,7 +838,7 @@ export function withoutApi(): void {
 
 /** Rojo Fuego without favourite starters: RN-21 puts Charizard in the team (CA-65). */
 export function withChosenStarter(): void {
-  const charizard = generated("charizard", "Charizard", 6, ["fire", "flying"]);
+  const charizard = aGeneratedPokemon("charizard", "Charizard", 6, ["fire", "flying"]);
   const generation: Generation = {
     ...incompleteGeneration,
     groups: incompleteGeneration.groups.map((group) => ({

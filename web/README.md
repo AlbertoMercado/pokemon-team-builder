@@ -24,7 +24,7 @@ con TanStack Query.
 | `src/components/` | Componentes compartidos: navegación y pie, filas e imágenes de los Pokémon, portadas, la estrella de favorito, el buscador, el editor y el selector de equipos, el progreso y la ficha de la Pokédex… |
 | `src/pages/` | Una por pantalla. |
 | `src/lib/` | Funciones puras: formatos, textos del resultado, tipos, métodos de evolución, formas de obtención de la Pokédex, enlaces a la documentación y comandos. |
-| `src/test/` | Configuración de Vitest, `renderApp` y la API simulada con MSW (la Pokédex, en `pokedex.ts`). |
+| `src/test/` | Configuración de Vitest, `renderApp`, la API simulada con MSW (la Pokédex, en `pokedex.ts`) y las factorías de sus objetos (`factories.ts`). |
 
 Los tests están junto a lo que prueban (`*.test.ts(x)`). Las pruebas de extremo a extremo están
 en `e2e/` (Playwright, `playwright.config.ts`): los flujos y la maquetación, contra la API real,

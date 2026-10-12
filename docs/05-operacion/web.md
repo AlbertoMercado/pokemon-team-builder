@@ -79,7 +79,10 @@ Si un cambio de la API rompe la web, `npm run typecheck` lo señala.
 Los comandos están en [Comandos y CI](comandos.md#web-en-web).
 
 Los tests de pantallas (Vitest, Testing Library) no usan la API real: `src/test/server.ts` la
-simula con MSW y falla si una pantalla hace una petición sin respuesta simulada.
+simula con MSW y falla si una pantalla hace una petición sin respuesta simulada. Los objetos
+completos de la API se construyen con las factorías de `src/test/factories.ts` (`aGame`,
+`aFact`, `aGeneratedPokemon`…), con valores por defecto, para que un campo nuevo de una
+respuesta se añada en un solo sitio (#77); los de la Pokédex, con las de `src/test/pokedex.ts`.
 
 ### Pruebas de extremo a extremo
 
