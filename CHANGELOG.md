@@ -8,6 +8,10 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ### Añadido
 
+- **Web: pantalla Juegos**, el catálogo de juegos: los 36 juegos de la saga principal y los
+  Leyendas, por generación, para elegir tus juegos objetivo. Al elegir uno se comprueba que pueda
+  recibir un Pokémon criado, que tenga todos sus datos y que puedas jugarlo en un sistema actual
+  de Nintendo (si no se sabe, te lo pregunta); si no, dice por qué (RF-25, CA-90 a CA-93, #119).
 - **API del catálogo de juegos** (`/api/game-catalog`): los juegos del catálogo, si se pueden
   elegir como juego objetivo y por qué no, y elegirlos o quitarlos indicando si se pueden jugar en
   un sistema actual de Nintendo (RF-25, CA-92, #119).
@@ -30,7 +34,7 @@ versión: [versiones](docs/05-operacion/versiones.md).
 - **Juegos objetivo**: ya no lo son automáticamente los juegos completos; lo son los que el
   usuario elige en el catálogo de juegos, si pueden recibir un Pokémon criado, están completos y
   se pueden jugar en un sistema actual (RF-05, CA-93). **Al actualizar no queda ninguno elegido**:
-  Nuevo juego está vacío hasta elegirlos (#119).
+  Nuevo juego está vacío hasta elegirlos en **Juegos** (#119).
 
 ### Corregido
 

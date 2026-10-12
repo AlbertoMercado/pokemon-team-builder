@@ -1,7 +1,8 @@
 /**
  * The flow of a new game from end to end, against the real API over the FireRed scenario
- * (tests/e2e/serve.py): favourites → rules → new game → review → result → choose the team and
- * record it → the next generation excludes what was used (RN-16).
+ * (tests/e2e/serve.py): choose the target games in the game catalogue → favourites → rules →
+ * new game → review → result → choose the team and record it → the next generation excludes
+ * what was used (RN-16).
  *
  * The scenario names the games by their identifier («Firered»): it is the extract of the tests,
  * not a real load.
@@ -18,19 +19,30 @@ const FAVORITES = [
 ]; // prettier-ignore
 
 test("a new game from the favourites to the Hall of Fame", async ({ page, request }) => {
-  // RF-25: Fire Red and Leaf Green are target games only once chosen in the game catalogue.
-  for (const game of ["firered", "leafgreen"]) {
-    const target = await request.put(`/api/game-catalog/${game}`, {
-      data: { selected: true, playable: true },
-    });
-    expect(target.ok()).toBe(true);
-  }
   for (const pokemon of FAVORITES) {
     expect((await request.put(`/api/favorites/${pokemon}`)).ok()).toBe(true);
   }
 
-  // Favourites: add Dragonite from the catalogue, with the search in the URL.
+  // RF-25: Fire Red and Leaf Green are target games only once chosen in the game catalogue;
+  // their playability is not known, so the screen asks (CA-92).
   await page.goto("/");
+  await page
+    .getByRole("navigation", { name: "Principal" })
+    .getByRole("link", { name: "Juegos", exact: true })
+    .click();
+  for (const name of ["Firered", "Leafgreen"]) {
+    const card = page.getByRole("listitem", { name });
+    // Another spec may have answered already (layout.spec.ts): then it does not ask again.
+    await expect(card.getByRole("button", { name: "Elegir como juego objetivo" })).toBeVisible();
+    const answered = (await card.getByText(/Has indicado que puedes jugarlo/).count()) > 0;
+    await card.getByRole("button", { name: "Elegir como juego objetivo" }).click();
+    if (!answered) {
+      await card.getByRole("button", { name: "Sí" }).click();
+    }
+    await expect(card.getByText("Juego objetivo")).toBeVisible();
+  }
+
+  // Favourites: add Dragonite from the catalogue, with the search in the URL.
   await page
     .getByRole("navigation", { name: "Principal" })
     .getByRole("link", { name: "Catálogo" })

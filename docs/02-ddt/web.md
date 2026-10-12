@@ -14,6 +14,7 @@ flowchart LR
     I["Inicio"] --> C["Catálogo"] --> F["Ficha"]
     I --> FAV["Favoritos"]
     I --> R["Reglas"]
+    I --> CJ["Juegos:<br/>catálogo de juegos"] --> J
     I --> J["Nuevo juego:<br/>elegir juego"] --> REV["Revisión<br/>de datos"] --> RES["Resultado"]
     RES -- "selector: elegir,<br/>comprobar y registrar" --> H["Hall of Fame"]
     RES -- "sugerencia a favoritos<br/>y regenerar" --> RES
@@ -34,7 +35,8 @@ requisitos cubre y qué endpoints llama.
 | `/pokemon/:pokemon` | [Ficha](../04-manual-usuario/web.md#ficha) | RF-02, RF-03, RN-09 | `GET /api/pokemon/{pokemon}` |
 | `/favoritos` | [Favoritos](../04-manual-usuario/web.md#favoritos) | RF-04 | `GET /api/favorites`, `DELETE` |
 | `/reglas` | [Reglas](../04-manual-usuario/web.md#configurar-las-reglas) | RF-06, RF-07 | `GET /api/rules`, `PATCH /api/rules/{rule_id}` |
-| `/juego` | [Nuevo juego](../04-manual-usuario/web.md#elegir-el-juego) | RF-05 | `GET /api/games` |
+| `/juegos` | [Juegos](../04-manual-usuario/web.md#elegir-tus-juegos-objetivo): el catálogo de juegos, por generación; pregunta si un juego es jugable antes de elegirlo y, si la API lo rechaza (`409`), muestra los motivos de `detail` | RF-25, CA-92, CA-93 | `GET /api/game-catalog`, `PUT /api/game-catalog/{game}` |
+| `/juego` | [Nuevo juego](../04-manual-usuario/web.md#elegir-el-juego); sin juegos objetivo, enlaza a Juegos | RF-05 | `GET /api/games` |
 | `/juego/:game/revision` | [Revisión de datos](../04-manual-usuario/web.md#revisar-los-datos) | RF-15, RN-18 | `GET /review`, `PUT /review/{fact_key}`, `POST /review/accept-proposals` |
 | `/juego/:game/resultado` | [Resultado](../04-manual-usuario/web.md#ver-el-resultado) y [selector](../04-manual-usuario/web.md#elegir-el-equipo-y-registrarlo) | RF-08, RF-09, RF-10, RF-12, CA-53 | `POST /api/games/{game}/generations`, `POST /api/games/{game}/team-checks`, `POST /api/hall-of-fame` |
 | `/hall-of-fame` | [Hall of Fame](../04-manual-usuario/web.md#hall-of-fame) | RF-12, RF-13, RN-16, CA-68 | `GET`, `POST`, `PATCH`, `DELETE /api/hall-of-fame`, `GET /api/games?all=true`, `GET /api/pokedex` (para avisar de la Pokédex que se borra) |

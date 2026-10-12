@@ -1,4 +1,7 @@
-/** Nuevo juego (RF-05): the target games to choose one; next comes the review of its data. */
+/**
+ * Nuevo juego (RF-05): the target games to choose one; next comes the review of its data.
+ * Without any, it leads to the game catalogue, where the user chooses them (RF-25).
+ */
 import { Link } from "react-router";
 
 import { useGames } from "../api/queries/games";
@@ -19,7 +22,13 @@ export default function GamesPage() {
       ) : games.data === undefined ? (
         <p className="text-slate-500">Cargando…</p>
       ) : games.data.length === 0 ? (
-        <p>No hay ningún juego objetivo en los datos cargados.</p>
+        <p>
+          Todavía no tienes ningún juego objetivo. Elige los juegos que quieres completar en{" "}
+          <Link to="/juegos" className="text-red-700 underline">
+            Juegos
+          </Link>
+          .
+        </p>
       ) : (
         <ul aria-label="Juegos" className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
           {games.data.map((game) => (

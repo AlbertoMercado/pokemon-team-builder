@@ -12,6 +12,7 @@ import PokedexDetailPage from "./pages/PokedexDetailPage";
 import PokedexGamePage from "./pages/PokedexGamePage";
 import PokedexListPage from "./pages/PokedexListPage";
 import PokedexPokemonPage from "./pages/PokedexPokemonPage";
+import GameCatalogPage from "./pages/GameCatalogPage";
 import PokemonPage from "./pages/PokemonPage";
 import ResultPage from "./pages/ResultPage";
 import RulesPage from "./pages/RulesPage";
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="pokemon/:pokemon" element={<PokemonPage />} />
         <Route path="favoritos" element={<FavoritesPage />} />
         <Route path="reglas" element={<RulesPage />} />
+        <Route path="juegos" element={<GameCatalogPage />} />
         <Route path="juego" element={<GamesPage />} />
         <Route path="juego/:game/revision" element={<ReviewPage />} />
         <Route path="juego/:game/resultado" element={<ResultPage />} />
