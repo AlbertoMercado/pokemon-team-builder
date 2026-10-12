@@ -52,7 +52,8 @@ def test_repository_curated_files_are_valid() -> None:
 
     assert curated.breeding.incense_babies == {"azurill": "sea-incense", "wynaut": "lax-incense"}
     assert set(curated.games.games) == {"firered", "leafgreen"}
-    assert set(curated.arrival.games) == {"firered", "leafgreen"}
+    # Every target game has its arrival rule (CA-28).
+    assert set(curated.arrival.games) == {"ruby", "sapphire", "emerald", "firered", "leafgreen"}
     assert len(curated.starters.games) == 11  # every loaded game, for the Pokédex (CA-87)
     [firered_leafgreen] = curated.key_battles
     assert firered_leafgreen.games == ["firered", "leafgreen"]

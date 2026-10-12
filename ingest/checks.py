@@ -92,6 +92,31 @@ ENCOUNTER_METHODS = frozenset(
         "pokemon-channel-pal",
     }
 )
+# Known arrivals before completing each game (CA-28).
+EXPECTED_ARRIVAL = (
+    # FireRed: only the Kanto Pokédex, and no evolution to a later species.
+    ("firered", "bulbasaur", True),
+    ("firered", "vaporeon", True),
+    ("firered", "golbat", True),
+    ("firered", "chansey", True),  # Happiny is not loaded: Chansey hatches as Chansey
+    ("firered", "raichu", False),  # hatches as Pichu, not in the Kanto Pokédex
+    ("firered", "pikachu", False),
+    ("firered", "clefairy", False),  # hatches as Cleffa
+    ("firered", "crobat", False),  # 2nd generation evolution
+    ("firered", "espeon", False),
+    ("firered", "blissey", False),
+    # Ruby: any species can be received, and evolutions are not restricted.
+    ("ruby", "bulbasaur", True),
+    ("ruby", "raichu", True),
+    ("ruby", "crobat", True),
+    ("ruby", "treecko", True),
+    # Emerald: only the Hoenn Pokédex.
+    ("emerald", "treecko", True),
+    ("emerald", "raichu", True),  # Pichu is in the Hoenn Pokédex
+    ("emerald", "crobat", True),
+    ("emerald", "bulbasaur", False),
+    ("emerald", "chikorita", False),
+)
 # 15 types in the 1st generation, 17 from the 2nd: one factor per pair.
 EFFICACY_PAIRS_BY_GENERATION = {1: 15 * 15, 2: 17 * 17, 3: 17 * 17}
 
@@ -231,33 +256,21 @@ def check_incense_babies(session: Session) -> list[str]:
 
 
 def check_arrival_proposals(session: Session) -> list[str]:
-    """Arrival proposals (CA-28): inferred where there is a rule, pending elsewhere."""
+    """Arrival proposals (CA-28): inferred in every target game, with known cases of the rule
+    of each one (docs/02-ddt/datos-requeridos.md, "Restricciones de llegada por juego")."""
     problems = []
     for game in TARGET_GAMES:
-        expected = Origin.INFERRED if game in CURATED_GAMES else Origin.PENDING
         query = select(func.count()).select_from(GamePokemon)
         wrong = session.exec(
-            query.where(GamePokemon.game == game, GamePokemon.arrival_origin != expected)
+            query.where(GamePokemon.game == game, GamePokemon.arrival_origin != Origin.INFERRED)
         ).one()
         if wrong:
-            problems.append(f"{game}: {wrong} propuestas de llegada no son {expected.value}")
-    expected_arrival = {
-        "bulbasaur": True,
-        "vaporeon": True,
-        "golbat": True,
-        "chansey": True,  # Happiny is not loaded: Chansey hatches as Chansey
-        "raichu": False,  # hatches as Pichu, not in the Kanto Pokédex
-        "pikachu": False,
-        "clefairy": False,  # hatches as Cleffa
-        "crobat": False,  # 2nd generation evolution
-        "espeon": False,
-        "blissey": False,
-    }
-    for pokemon, can_arrive in expected_arrival.items():
-        row = session.get(GamePokemon, ("firered", pokemon))
+            problems.append(f"{game}: {wrong} propuestas de llegada no son inferidas")
+    for game, pokemon, can_arrive in EXPECTED_ARRIVAL:
+        row = session.get(GamePokemon, (game, pokemon))
         if row is None or row.can_arrive is not can_arrive:
             found = None if row is None else row.can_arrive
-            problems.append(f"llegada de {pokemon} a firered: {found}, se esperaba {can_arrive}")
+            problems.append(f"llegada de {pokemon} a {game}: {found}, se esperaba {can_arrive}")
     return problems
 
 

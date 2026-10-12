@@ -34,6 +34,7 @@ from db.sqlite import create_sqlite_engine
 from ingest.blockers import BlockerKind
 from ingest.checks import (
     FIRST_LOAD_CHECKS,
+    check_arrival_proposals,
     check_counts,
     check_key_battles,
     check_starters,
@@ -78,6 +79,10 @@ CURATED = dataclasses.replace(
             for slug, entry in REPOSITORY_CURATED.locations.locations.items()
             if slug in EXTRACT_LOCATIONS
         }
+    ),
+    # Ruby without arrival rule, to check that a target game without one stays pending.
+    arrival=ArrivalFile(
+        games={g: rule for g, rule in REPOSITORY_CURATED.arrival.games.items() if g != "ruby"}
     ),
 )
 
@@ -398,6 +403,23 @@ def test_arrival_without_rule_stays_pending(loaded: Session) -> None:
     assert all(row.can_arrive is None and row.arrival_origin is Origin.PENDING for row in rows)
 
 
+@pytest.mark.rn("RN-03")
+def test_emerald_only_receives_the_hoenn_pokedex(loaded: Session) -> None:
+    """CA-28: before the National Pokédex, Emerald only trades Pokémon of the Hoenn Pokédex,
+    and every line with a species there has all of them there (Zubat to Crobat)."""
+    for pokemon in ("raichu", "crobat", "milotic", "shedinja"):
+        assert _arrival(loaded, "emerald", pokemon) == (True, Origin.INFERRED)
+    for pokemon in ("bulbasaur", "espeon", "snorlax"):
+        assert _arrival(loaded, "emerald", pokemon) == (False, Origin.INFERRED)
+
+
+@pytest.mark.rn("RN-03")
+def test_sapphire_receives_any_species(loaded: Session) -> None:
+    """CA-28: Ruby and Sapphire do not restrict trades nor evolutions before the League."""
+    for pokemon in ("bulbasaur", "raichu", "crobat", "espeon", "blissey"):
+        assert _arrival(loaded, "sapphire", pokemon) == (True, Origin.INFERRED)
+
+
 def _with_arrival(game: str, pokedex: str) -> CuratedData:
     rule = ArrivalRule(regional_pokedex=pokedex, origin="inferred")
     return dataclasses.replace(CURATED, arrival=ArrivalFile(games={game: rule}))
@@ -576,11 +598,17 @@ def test_first_load_checks_reject_an_incomplete_load(tmp_path: Path) -> None:
 
 def test_known_case_checks_pass_on_the_extract(loaded: Session) -> None:
     """Every problem of the extract is a count, a key battle (it has no WikiDex teams), a
-    missing starter (it only has Venusaur) or, for lack of key battles, a target game."""
+    missing starter (it only has Venusaur), for lack of key battles, a target game, or an arrival
+    of Ruby (without rule here) or of a known case that is not in the extract."""
     problems = [problem for check in FIRST_LOAD_CHECKS for problem in check(loaded)]
     assert problems
     expected = check_counts(loaded) + check_key_battles(loaded) + check_starters(loaded)
     expected += check_target_games(loaded)
+    expected += [
+        problem
+        for problem in check_arrival_proposals(loaded)
+        if problem.startswith("ruby:") or ": None, se esperaba" in problem
+    ]
     assert set(problems) <= set(expected)
 
 

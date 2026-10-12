@@ -6,6 +6,14 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+### Añadido
+
+- **Ingesta**: propuestas de qué Pokémon pueden llegar a Rubí, Zafiro y Esmeralda antes de
+  completarlos, comprobadas con el código de los juegos: en Esmeralda, solo los de la Pokédex
+  de Hoenn; en Rubí y Zafiro, todos. Antes quedaban pendientes. Se confirman en la revisión de
+  datos, como las de Rojo Fuego y Verde Hoja (CA-28, RN-03, #8). Hay que repetir la carga de
+  datos para tenerlas.
+
 ### Corregido
 
 - **Web**: entre 768 y 1023 px de ancho, las tarjetas de Pokémon de la lista inicial de la

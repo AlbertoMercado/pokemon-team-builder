@@ -20,3 +20,24 @@ games:
       Antes de la Pokédex Nacional solo se pueden recibir por intercambio Pokémon de la
       Pokédex de Kanto, y las evoluciones a especies de la 2.ª generación fallan (Golbat a
       Crobat). Comprobado en docs/02-ddt/datos-requeridos.md.
+  ruby:
+    regional_pokedex: national
+    origin: inferred
+    note: >-
+      Antes de la Liga se puede recibir cualquier especie, de otro Rubí o Zafiro o de un Rojo
+      Fuego o Verde Hoja que haya completado las Islas Sete, y las evoluciones no tienen
+      restricciones. Comprobado en docs/02-ddt/datos-requeridos.md.
+  sapphire:
+    regional_pokedex: national
+    origin: inferred
+    note: >-
+      Antes de la Liga se puede recibir cualquier especie, de otro Rubí o Zafiro o de un Rojo
+      Fuego o Verde Hoja que haya completado las Islas Sete, y las evoluciones no tienen
+      restricciones. Comprobado en docs/02-ddt/datos-requeridos.md.
+  emerald:
+    regional_pokedex: hoenn
+    origin: inferred
+    note: >-
+      Antes de la Pokédex Nacional, que se obtiene tras el Hall of Fame, solo se pueden
+      recibir Pokémon de la Pokédex de Hoenn, y solo de Rubí, Zafiro o Esmeralda; las
+      evoluciones no tienen restricciones. Comprobado en docs/02-ddt/datos-requeridos.md.
