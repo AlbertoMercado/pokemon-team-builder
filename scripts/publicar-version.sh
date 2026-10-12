@@ -29,7 +29,11 @@ tag="v$version"
 command -v gh >/dev/null || fail "falta la CLI de GitHub (gh)"
 
 step "PR #$pr"
-read -r state branch < <(gh pr view "$pr" --json state,headRefName -q '.state + " " + .headRefName')
+if ! found_pr="$(gh pr view "$pr" --json state,headRefName -q '.state + " " + .headRefName' 2>&1)"; then
+    fail "no se encuentra el PR #$pr en GitHub (${found_pr}). Usa el número del PR de la versión \
+(rama chore/release-$version), el que te da Claude al prepararla"
+fi
+read -r state branch <<<"$found_pr"
 [[ $branch == "chore/release-$version" ]] ||
     fail "el PR #$pr es de la rama $branch, no de chore/release-$version"
 case "$state" in

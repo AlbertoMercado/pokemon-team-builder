@@ -1,9 +1,20 @@
 # Plan del catálogo de juegos
 
+!!! warning "Histórico: no se mantiene"
+    Este plan ya se ejecutó y se conserva como historial de cómo y por qué se hizo. No se
+    actualiza: lo vigente sobre el catálogo de juegos está en el
+    [DDF](../01-ddf/requisitos-funcionales.md#rf-25), los
+    [datos curados](../02-ddt/datos-curados.md#catalogyaml), el
+    [diseño de la carga](../02-ddt/carga-datos.md#catalogo-de-juegos), el
+    [motor](../02-ddt/motor.md#catalogo-de-juegos-coregame_catalogpy), el
+    [modelo de datos](../02-ddt/modelo-datos.md), el [diseño de la web](../02-ddt/web.md#pantallas)
+    y el [manual](../04-manual-usuario/web.md#elegir-tus-juegos-objetivo); lo pendiente, en las
+    [issues](https://github.com/AlbertoMercado/pokemon-team-builder/issues).
+
 Plan para que el usuario elija en un **catálogo de juegos** cuáles pueden ser juego objetivo
 ([RF-25](../01-ddf/requisitos-funcionales.md#rf-25), [RF-05](../01-ddf/requisitos-funcionales.md#rf-05),
 [CA-90 a CA-93](../01-ddf/cuestiones-abiertas.md#resueltas)). Lo pendiente de cada fase está en
-su PR; al terminar, este plan se archiva en el [historial](../06-historial/index.md).
+su PR. Ejecutado en la versión 1.7.0, issue #119; su diseño vigente está en su fuente.
 
 ## Alcance
 
@@ -34,7 +45,7 @@ su PR; al terminar, este plan se archiva en el [historial](../06-historial/index
   juego es jugable en un sistema actual solo se sabe con certeza en los de Switch; del resto se
   pregunta al usuario y se guarda su respuesta ([CA-92](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - **Núcleo puro**: la decisión de si un juego puede ser juego objetivo, y por qué no, va en
-  `core/`, sin red ni base de datos ([arquitectura](arquitectura.md#reglas-de-dependencia)).
+  `core/`, sin red ni base de datos ([arquitectura](../02-ddt/arquitectura.md#reglas-de-dependencia)).
 - **Datos separados**: lo que es de todos (el catálogo) va en `reference.sqlite`; lo del usuario
   (selección y respuestas), en `user.sqlite`
   ([ADR-0003](../03-adr/0003-dos-bases-de-datos-sqlite.md)).

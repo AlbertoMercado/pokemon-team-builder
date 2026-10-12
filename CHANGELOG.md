@@ -6,46 +6,59 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+## [1.7.0] - 2026-10-12
+
+Ahora eliges tú tus juegos objetivo, en la nueva pantalla **Juegos**: el catálogo de los 36
+juegos de la saga principal y los Leyendas (RF-25, #119). Y Rubí, Zafiro y Esmeralda ya tienen
+todos sus datos, así que se pueden elegir.
+
+**Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`, o
+`scripts/start.sh`, que la hace): trae el catálogo de juegos y los combates clave y las
+mecánicas de Rubí, Zafiro y Esmeralda, y descarga de WikiDex las páginas de sus entrenadores.
+Hasta repetirla, la API pide hacerlo. **Después, elige tus juegos en Juegos**: al actualizar no
+queda ninguno elegido y Nuevo juego está vacío hasta entonces.
+
 ### Añadido
 
-- **Web: pantalla Juegos**, el catálogo de juegos: los 36 juegos de la saga principal y los
-  Leyendas, por generación, para elegir tus juegos objetivo. Al elegir uno se comprueba que pueda
-  recibir un Pokémon criado, que tenga todos sus datos y que puedas jugarlo en un sistema actual
-  de Nintendo (si no se sabe, te lo pregunta); si no, dice por qué (RF-25, CA-90 a CA-93, #119).
-- **API del catálogo de juegos** (`/api/game-catalog`): los juegos del catálogo, si se pueden
-  elegir como juego objetivo y por qué no, y elegirlos o quitarlos indicando si se pueden jugar en
-  un sistema actual de Nintendo (RF-25, CA-92, #119).
-- **Ingesta**: el catálogo de juegos (`data/curated/catalog.yaml`): los 36 juegos de la saga
-  principal y los Leyendas que pueden recibir un Pokémon criado, con lo que le falta a cada uno
-  para estar completo. Es la base para elegir los juegos objetivo (RF-25, CA-90, #119). Hay que
-  repetir la carga de datos para tenerlo.
+- **Web: pantalla Juegos**, el catálogo de juegos por generación, para elegir tus juegos
+  objetivo. Al elegir uno se comprueba que pueda recibir un Pokémon criado (los Leyendas, por
+  Pokémon HOME), que tenga todos sus datos y que puedas jugarlo en un sistema actual de Nintendo;
+  si no se sabe, te lo pregunta. Si no se puede elegir, dice por qué (RF-25, CA-90 a CA-93,
+  #120 a #123).
+- **API del catálogo de juegos** (`/api/game-catalog`): los juegos, si se pueden elegir como
+  juego objetivo y por qué no, y elegirlos o quitarlos indicando si se pueden jugar en un sistema
+  actual (RF-25, CA-92, #122).
 - **Rubí, Zafiro y Esmeralda se pueden elegir como juego objetivo**: con sus mecánicas (tienen
   ciclo de día y noche y concursos) y sus combates clave: los 8 líderes, el Alto Mando, el
-  Campeón, el jefe del equipo malvado de cada versión (los dos en Esmeralda) y Blasco
-  (RF-05, RN-17, CA-88, CA-89, #113). Hay que repetir la carga de datos para tenerlos.
+  Campeón, el jefe del equipo malvado de cada versión (los dos en Esmeralda) y Blasco (RF-05,
+  RN-17, CA-88, CA-89, #116).
 - **Ingesta**: propuestas de qué Pokémon pueden llegar a Rubí, Zafiro y Esmeralda antes de
-  completarlos, comprobadas con el código de los juegos: en Esmeralda, solo los de la Pokédex
-  de Hoenn; en Rubí y Zafiro, todos. Antes quedaban pendientes. Se confirman en la revisión de
-  datos, como las de Rojo Fuego y Verde Hoja (CA-28, RN-03, #8). Hay que repetir la carga de
-  datos para tenerlas.
+  completarlos, comprobadas con el código de los juegos: en Esmeralda, solo los de la Pokédex de
+  Hoenn; en Rubí y Zafiro, todos. Se confirman en la revisión de datos, como las de Rojo Fuego y
+  Verde Hoja (CA-28, RN-03, #115).
 
 ### Cambiado
 
-- **Juegos objetivo**: ya no lo son automáticamente los juegos completos; lo son los que el
-  usuario elige en el catálogo de juegos, si pueden recibir un Pokémon criado, están completos y
-  se pueden jugar en un sistema actual (RF-05, CA-93). **Al actualizar no queda ninguno elegido**:
-  Nuevo juego está vacío hasta elegirlos en **Juegos** (#119).
+- **Juegos objetivo**: ya no lo son automáticamente los juegos completos; lo son los que eliges
+  en Juegos, si pueden recibir un Pokémon criado, están completos y se pueden jugar en un sistema
+  actual (RF-05, CA-93, #122). `/api/games` devuelve solo esos.
 
 ### Corregido
 
 - **Generación**: si un mismo favorito cumplía dos reglas de presencia (por ejemplo, un inicial
   de tipo primario Dragón, para RN-13 y RN-21) y solo cabía solo en el equipo, el motor no lo
   veía y daba RN-21 por no cumplida. Con los iniciales de las generaciones 1 a 3 no ocurre; lo
-  encontraron las pruebas de propiedades (#117).
+  encontraron las pruebas de propiedades (#118).
 - **Web**: entre 768 y 1023 px de ancho, las tarjetas de Pokémon de la lista inicial de la
   Pokédex, del equipo del *Hall of Fame* y de las posiciones del resultado tenían distinta
   altura, porque dos tipos largos («Fantasma, Veneno») no cabían en una línea. Ahora la rejilla
-  pasa a tres columnas desde 1024 px (#77).
+  pasa a tres columnas desde 1024 px (#110).
+
+### Pendiente
+
+- Cargar la 4.ª generación en adelante: sus juegos ya están en el catálogo, pero no se pueden
+  elegir hasta cargar su generación; y sus restricciones de llegada (CA-28, #114).
+- Sin prioridad: puesta en producción (ADR-0009, #51) y protección del acceso (RF-19, #52).
 
 ## [1.6.0] - 2026-10-12
 
@@ -333,7 +346,8 @@ Hoja**.
   acceso (RF-19, #52).
 - Restricciones de llegada del resto de juegos (CA-28, #8).
 
-[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.6.0...HEAD
+[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.3.0...v1.4.0
