@@ -11,8 +11,11 @@ antes de empezar: es la única fuente del procedimiento.
 
 Reglas que no se saltan:
 
-- Si el usuario dice que ya ha ejecutado los comandos, ve directamente a la fase 3 (Comprobar).
+- Si el usuario dice que ya ha ejecutado el script o los comandos, ve directamente a la fase 3
+  (Comprobar).
 - Si el usuario no da el número de versión, propónlo con la numeración y **espera su
   confirmación**.
-- **No** ejecutes `gh pr merge`, `git tag`, `git push` de etiquetas ni `gh release create`: dale
-  los comandos de la fase 2 con el PR y la versión sustituidos y el prefijo `!`.
+- **No** ejecutes `scripts/publicar-version.sh`, `gh pr merge`, `git tag`, `git push` de
+  etiquetas ni `gh release create`: dale el comando de la fase 2,
+  `scripts/publicar-version.sh X.Y.Z <n>`, con la versión y el PR sustituidos. Nunca le des
+  cadenas de comandos con `&&`: con el `!` de zsh se rompen.
