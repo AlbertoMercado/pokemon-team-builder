@@ -104,7 +104,10 @@ function InitialList({ pokedex }: { pokedex: Pokedex }) {
         </button>
       </div>
       {start.error !== null && <ErrorMessage error={start.error} />}
-      <ul className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+      <ul
+        aria-label="Pokémon de la lista inicial"
+        className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {shown.map((species) => (
           <InitialRow
             key={species.species}

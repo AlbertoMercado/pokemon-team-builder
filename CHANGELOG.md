@@ -6,6 +6,13 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+### Corregido
+
+- **Web**: entre 768 y 1023 px de ancho, las tarjetas de Pokémon de la lista inicial de la
+  Pokédex, del equipo del *Hall of Fame* y de las posiciones del resultado tenían distinta
+  altura, porque dos tipos largos («Fantasma, Veneno») no cabían en una línea. Ahora la rejilla
+  pasa a tres columnas desde 1024 px (#77).
+
 ## [1.6.0] - 2026-10-12
 
 La carga de datos ya no se corta ante lo que la aplicación no sabe tratar: queda **bloqueada**,

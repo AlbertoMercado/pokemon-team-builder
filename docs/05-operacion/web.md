@@ -83,12 +83,27 @@ simula con MSW y falla si una pantalla hace una petición sin respuesta simulada
 
 ### Pruebas de extremo a extremo
 
-`e2e/new-game.spec.ts` recorre el flujo de un juego nuevo contra la **API real**: favoritos →
-reglas → nuevo juego en Rojo Fuego → revisión → resultado → elegir el equipo y registrarlo →
-la siguiente generación excluye lo usado (RN-16). Playwright arranca la API con
-`uv run python -m tests.e2e.serve` (`playwright.config.ts`), que escribe el escenario de Rojo
-Fuego de los tests en un directorio temporal y sirve la web compilada en el puerto 8765. No usa
-la red ni tus datos; los juegos aparecen como «Firered» porque el escenario no tiene sus
+Van contra la **API real**, en Chromium:
+
+- `e2e/new-game.spec.ts`: el flujo de un juego nuevo: favoritos → reglas → nuevo juego en Rojo
+  Fuego → revisión → resultado → elegir el equipo y registrarlo → la siguiente generación
+  excluye lo usado (RN-16).
+- `e2e/pokedex.spec.ts`: la Pokédex de un juego superado, de la lista inicial a corregir el
+  detalle.
+- `e2e/layout.spec.ts`: la **maquetación**, que los tests de pantallas no pueden ver porque
+  jsdom no calcula tamaños ni posiciones. A 360, 768 y 1280 px mide que todas las filas del
+  catálogo y de los favoritos tengan la misma altura y la estrella en el mismo sitio (#68), que
+  cada imagen y portada ocupe su caja (40, 64, 96 o 160 px) sea cual sea su forma (#65), y que
+  las tarjetas de la lista inicial de la Pokédex y del equipo del *Hall of Fame* tengan la
+  misma altura (#105). Admite 1 px de diferencia, por los bordes de las listas.
+
+Playwright arranca la API con `uv run python -m tests.e2e.serve` (`playwright.config.ts`), que
+escribe el escenario de Rojo Fuego de los tests en un directorio temporal, con imágenes y
+portadas generadas de formas distintas a propósito (altas, anchas y pequeñas), y sirve la web
+compilada en el puerto 8765. Los specs comparten esa API y se ejecutan en orden: cada uno deja
+los datos como los encontró. No usa tus datos ni la red: `e2e/test.ts` aborta en el navegador
+cualquier petición que no vaya a la API local (por ejemplo, un enlace a WikiDex), y los specs
+importan `test` de ahí. Los juegos aparecen como «Firered» porque el escenario no tiene sus
 nombres en español. Si falla, el informe queda en `web/playwright-report/`. En la CI es el job
 **E2E** ([CI](comandos.md#ci)).
 

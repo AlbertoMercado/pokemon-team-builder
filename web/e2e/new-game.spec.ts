@@ -6,7 +6,7 @@
  * The scenario names the games by their identifier («Firered»): it is the extract of the tests,
  * not a real load.
  */
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./test";
 
 // The favourites of the FireRed scenario of the engine (tests/core/scenario.py), but Dragonite,
 // which is added from the catalogue.
@@ -53,7 +53,9 @@ test("a new game from the favourites to the Hall of Fame", async ({ page, reques
     .getByRole("navigation", { name: "Principal" })
     .getByRole("link", { name: "Nuevo juego" })
     .click();
-  await page.getByRole("link", { name: /Firered/ }).click();
+  // In the list of games: the notice at the foot also links the cover of each game.
+  const games = page.getByRole("list", { name: "Juegos" });
+  await games.getByRole("link", { name: /Firered/ }).click();
   await expect(page.getByRole("heading", { name: "Revisión de datos: Firered" })).toBeVisible();
   await expect(page.getByText(/Faltan \d+ datos por confirmar/)).toBeVisible();
   await page.getByRole("button", { name: "Aceptar todas las propuestas" }).click();
@@ -90,6 +92,6 @@ test("a new game from the favourites to the Hall of Fame", async ({ page, reques
 
   // CA-68: «Nuevo juego» no longer offers Fire Red, only Leaf Green.
   await page.goto("/juego");
-  await expect(page.getByRole("link", { name: /Leafgreen/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Firered/ })).toHaveCount(0);
+  await expect(games.getByRole("link", { name: /Leafgreen/ })).toBeVisible();
+  await expect(games.getByRole("link", { name: /Firered/ })).toHaveCount(0);
 });

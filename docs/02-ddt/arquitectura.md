@@ -213,6 +213,6 @@ generación responde `409 Conflict` con la lista de datos pendientes ([RF-08](..
 | `core/` | pytest, hypothesis | Cada regla con `@pytest.mark.rn("RN-XX")`; propiedades del motor ([algoritmo](algoritmo-generacion.md#pureza-del-motor)). |
 | `ingest/` | pytest con extractos reales | Normalización de CSV y wikitexto reales guardados como datos de prueba; nunca red en los tests. |
 | `api/` | pytest con `TestClient` | Contratos de los endpoints con bases de datos SQLite temporales. |
-| `web/` | Vitest, Playwright | Pantallas con la API simulada y el flujo de nuevo juego de extremo a extremo contra la API real ([pruebas de la web](../05-operacion/web.md#pruebas)). |
+| `web/` | Vitest, Playwright | Pantallas con la API simulada; de extremo a extremo contra la API real, los flujos de nuevo juego y de la Pokédex y la maquetación medida en el navegador a 360, 768 y 1280 px ([pruebas de la web](../05-operacion/web.md#pruebas)). |
 
 Cómo se organizan los tests de Python y sus convenciones: [`tests/README.md`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/tests/README.md).

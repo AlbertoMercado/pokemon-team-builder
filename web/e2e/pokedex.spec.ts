@@ -8,7 +8,7 @@
  * new game flow (new-game.spec.ts). The scenario names the games and places by their
  * identifier («Leafgreen», «Pallet Town»).
  */
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./test";
 
 test.afterAll(async ({ request }) => {
   // In case the test failed before removing it.
@@ -82,5 +82,6 @@ test("completing the Pokédex of a completed game", async ({ page, request }) =>
     .getByRole("link", { name: "Pokédex" })
     .click();
   await expect(page.getByRole("heading", { name: "Pokédex" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Leafgreen" })).toHaveCount(0);
+  // In the main content: the notice at the foot links the cover of each game shown.
+  await expect(page.getByRole("main").getByRole("link", { name: "Leafgreen" })).toHaveCount(0);
 });
