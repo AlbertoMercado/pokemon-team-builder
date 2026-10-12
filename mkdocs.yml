@@ -82,6 +82,7 @@ nav:
       - Datos curados: 02-ddt/datos-curados.md
       - Diseño de la carga: 02-ddt/carga-datos.md
       - Diseño de la web: 02-ddt/web.md
+      - Plan del catálogo de juegos: 02-ddt/plan-catalogo-juegos.md
   - Decisiones (ADR):
       - 03-adr/index.md
       - Plantilla: 03-adr/0000-plantilla.md

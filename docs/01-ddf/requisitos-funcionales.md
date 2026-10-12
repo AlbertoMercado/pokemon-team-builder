@@ -42,6 +42,7 @@ Hay dos excepciones:
 | [RF-22](#rf-22) | Ficha del Pokémon objetivo | Pokédex | Must |
 | [RF-23](#rf-23) | Elegir otra forma de obtención | Pokédex | Must |
 | [RF-24](#rf-24) | Revisar los registrados y los imposibles | Pokédex | Must |
+| [RF-25](#rf-25) | Elegir los juegos objetivo en el catálogo de juegos | Juegos | Must |
 
 ## Catálogo
 
@@ -98,17 +99,22 @@ Hay dos excepciones:
 - **Prioridad**: Must
 - **Descripción**: el usuario elige el juego que quiere completar.
 - **Criterios de aceptación**:
-    - Solo se ofrecen los **juegos completos** ([CA-67](cuestiones-abiertas.md#resueltas)):
-      juegos de la saga principal que permiten la crianza y tienen cargado todo lo que
-      necesitan las reglas para operar:
-        - Que permitan la crianza deja fuera los de la 1.ª generación (Rojo, Azul y
-          Amarillo) ([forma de jugar](index.md#forma-de-jugar),
-          [CA-29](cuestiones-abiertas.md#resueltas)).
-        - Qué Pokémon (por forma) existen en el juego y pueden llegar a él
-          ([RN-03](reglas-negocio.md#rn-03)).
-        - Sus mecánicas, como el ciclo de día y noche ([RN-15](reglas-negocio.md#rn-15)).
-        - Sus combates clave, cada uno con su equipo ([RN-17](reglas-negocio.md#rn-17)).
-        - Sus iniciales ([RN-21](reglas-negocio.md#rn-21)).
+    - Solo se ofrecen los **juegos objetivo** ([CA-93](cuestiones-abiertas.md#resueltas)): los
+      que el usuario ha seleccionado en el catálogo de juegos ([RF-25](#rf-25)) y cumplen
+      todas estas condiciones:
+        - Pueden recibir un Pokémon criado, en el propio juego o por transferencia: quedan
+          fuera los de la 1.ª generación (Rojo, Azul y Amarillo) y entran los Leyendas, por
+          Pokémon HOME ([forma de jugar](index.md#forma-de-jugar),
+          [CA-29](cuestiones-abiertas.md#resueltas), [CA-91](cuestiones-abiertas.md#resueltas)).
+        - Son **completos** ([CA-67](cuestiones-abiertas.md#resueltas)): tienen cargado todo
+          lo que necesitan las reglas para operar:
+            - Qué Pokémon (por forma) existen en el juego y pueden llegar a él
+              ([RN-03](reglas-negocio.md#rn-03)).
+            - Sus mecánicas, como el ciclo de día y noche ([RN-15](reglas-negocio.md#rn-15)).
+            - Sus combates clave, cada uno con su equipo ([RN-17](reglas-negocio.md#rn-17)).
+            - Sus iniciales ([RN-21](reglas-negocio.md#rn-21)).
+        - Son jugables en un sistema actual de Nintendo
+          ([CA-92](cuestiones-abiertas.md#resueltas)).
     - Un juego que no está completo no se ofrece ni se puede revisar o generar, aunque se
       intente por su dirección. Sí se puede registrar en el *Hall of Fame*, porque forma parte
       del recorrido ([RF-12](#rf-12)).
@@ -489,3 +495,34 @@ independiente de la generación de equipos: solo comparte con ella el *Hall of F
       ([CA-71](cuestiones-abiertas.md#resueltas)). Vuelve a poder ser objetivo.
     - Los imposibles automáticos ([RN-25](reglas-negocio.md#rn-25)) aparecen con su motivo y
       no se pueden desmarcar.
+
+## Juegos
+
+### RF-25 · Elegir los juegos objetivo en el catálogo de juegos { #rf-25 }
+
+- **Prioridad**: Must
+- **Descripción**: una pantalla con el **catálogo de juegos**
+  ([CA-90](cuestiones-abiertas.md#resueltas)), en la que el usuario elige cuáles quiere que
+  puedan ser juego objetivo ([RF-05](#rf-05)).
+- **Criterios de aceptación**:
+    - Muestra todos los juegos del catálogo, en orden de lanzamiento y agrupados por
+      generación, con su plataforma, si están seleccionados y si son juego objetivo.
+    - Al seleccionar un juego se comprueba, en este orden, que:
+        1. Pueda recibir un Pokémon criado, en el propio juego o por transferencia
+           ([CA-29](cuestiones-abiertas.md#resueltas),
+           [CA-91](cuestiones-abiertas.md#resueltas)).
+        2. Tenga cargado todo lo que necesitan las reglas ([RF-05](#rf-05)). De un juego de una
+           generación que todavía no se carga, se dice así.
+        3. Sea jugable en un sistema actual de Nintendo
+           ([CA-92](cuestiones-abiertas.md#resueltas)). Si el dato no se conoce, se pregunta al
+           usuario.
+    - Si alguna comprobación falla, el juego no se selecciona y se dice por qué: qué le falta,
+      o que no es jugable en un sistema actual.
+    - El usuario puede quitar un juego de la selección y cambiar su respuesta sobre si es
+      jugable en cualquier momento.
+    - Un juego seleccionado que deja de cumplir una condición (por ejemplo, tras una carga en
+      la que le falta un dato) sigue seleccionado, pero no se ofrece como juego objetivo hasta
+      que vuelva a cumplirla, y el catálogo dice por qué
+      ([CA-93](cuestiones-abiertas.md#resueltas)).
+    - Un juego superado puede seguir seleccionado, pero no se ofrece mientras esté en el
+      *Hall of Fame* ([CA-68](cuestiones-abiertas.md#resueltas)).

@@ -24,6 +24,7 @@ las reglas de negocio (**RN-XX**).
 | 0.16 | 2026-10-10 | Casos de la Pokédex que salieron con los datos (CA-82 a CA-87): los lugares de evento y la consola virtual cuentan como evento, los premios del casino como regalo, Sudowoodo como estático y Feebas como salvaje; los enjambres van tras los salvajes y el avance de la historia no cuenta; qué se obtiene al criar y en otro juego; los iniciales cuentan como regalo que depende del inicial y el resto de regalos a elegir indican entre cuáles (RN-24, RN-26). |
 | 0.17 | 2026-10-12 | CA-28 resuelta: qué puede llegar a cada juego objetivo de la 3.ª generación y evolucionar antes de completarlo, comprobado con el código de los juegos (RN-03). |
 | 0.18 | 2026-10-12 | Combates clave de Hoenn (RN-17): de cada jefe del equipo malvado cuenta su último combate obligatorio (CA-88), y cuentan los dos rivales, Bruno o Aura y Blasco (CA-89). |
+| 0.19 | 2026-10-12 | Nueva función: el catálogo de juegos (RF-25, CA-90 a CA-93). El usuario elige en él qué juegos pueden ser juego objetivo; uno solo se puede elegir si puede recibir un Pokémon criado (también por transferencia, como los Leyendas por Pokémon HOME), está completo y es jugable en un sistema actual de Nintendo (RF-05; modifica CA-29). |
 
 ## Propósito
 
@@ -44,8 +45,10 @@ La aplicación está pensada para una forma de jugar concreta, de la que parten 
    que el juego permite acceder a las cajas.
 4. El juego se completa con ese equipo, que evoluciona dentro del juego objetivo.
 
-    Por eso solo pueden ser juego objetivo los juegos que permiten la crianza: quedan fuera
-    los de la 1.ª generación ([CA-29](cuestiones-abiertas.md#resueltas)).
+    Por eso solo pueden ser juego objetivo los juegos que pueden recibir un Pokémon criado, en
+    el propio juego o por transferencia, como los Leyendas por Pokémon HOME. Quedan fuera los
+    de la 1.ª generación ([CA-29](cuestiones-abiertas.md#resueltas),
+    [CA-91](cuestiones-abiertas.md#resueltas)).
 5. El equipo se registra en el *Hall of Fame*. Los juegos completados forman el **recorrido**,
    que determina qué Pokémon no se pueden repetir en los siguientes juegos.
 
@@ -62,7 +65,9 @@ Consecuencias:
 **Dentro del alcance**:
 
 - Mantener una lista de Pokémon favoritos, que son los candidatos a formar el equipo.
-- Configurar el juego objetivo y las reglas de elección.
+- Elegir en el catálogo de juegos cuáles pueden ser juego objetivo
+  ([RF-25](requisitos-funcionales.md#rf-25)), y configurar el juego objetivo y las reglas de
+  elección.
 - Generar un equipo de 6 a partir de los favoritos, el juego y las reglas. Si no es posible,
   mostrar un equipo incompleto con sugerencias para completarlo.
 - Consultar el catálogo de Pokémon y la ficha básica de cada uno.
@@ -81,7 +86,7 @@ Consecuencias:
 - Combate competitivo: equipos para formatos de Showdown, EV/IV, objetos o estrategias.
 - Varios usuarios o cuentas: la aplicación es personal y de un solo usuario. Proteger el acceso
   de ese único usuario sí entra, como mejora ([RF-19](requisitos-funcionales.md#rf-19)).
-- Juegos que no sean de la saga principal (spin-offs, Pokémon GO, TCG…).
+- Juegos que no sean de la saga principal ni Leyendas (spin-offs, Pokémon GO, TCG…).
 
 **Fuera del alcance de este documento**:
 
@@ -167,10 +172,17 @@ Generación
     que aparecen en alguno de sus juegos (p. ej., la 1.ª generación incluye Rojo, Azul y
     Amarillo, con 151 Pokémon).
 
+Catálogo de juegos
+:   Los juegos de la saga principal y los Leyendas que pueden recibir un Pokémon criado
+    ([CA-90](cuestiones-abiertas.md#resueltas)). En él, el usuario elige cuáles pueden ser
+    juego objetivo ([RF-25](requisitos-funcionales.md#rf-25)).
+
 Juego objetivo
-:   Juego de la saga principal que se quiere completar (p. ej., Pokémon Rojo Fuego). Pertenece a
-    una generación. Ambos determinan los candidatos ([RN-03](reglas-negocio.md#rn-03)). Solo
-    se puede elegir un juego completo ([RF-05](requisitos-funcionales.md#rf-05)).
+:   Juego del catálogo que se quiere completar (p. ej., Pokémon Rojo Fuego). Pertenece a una
+    generación. Ambos determinan los candidatos ([RN-03](reglas-negocio.md#rn-03)). Solo se
+    puede elegir uno que el usuario ha seleccionado en el catálogo de juegos y que puede
+    recibir un Pokémon criado, es completo, es jugable en un sistema actual y no está superado
+    ([RF-05](requisitos-funcionales.md#rf-05)).
 
 Completar un juego
 :   Vencer al Campeón de la Liga Pokémon y entrar en el *Hall of Fame* del juego.
