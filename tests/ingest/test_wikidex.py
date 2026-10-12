@@ -260,6 +260,33 @@ def test_rival_keeps_only_what_every_variant_shares() -> None:
     assert team == ["pidgeot", "alakazam", "rhydon"]
 
 
+@pytest.mark.rn("RN-17")
+def test_a_battle_of_some_games_is_numbered_in_each_game() -> None:
+    """CA-88: the villain boss of each version, like Maxie only in Ruby. Each game numbers its
+    own battles, without gaps."""
+    only_leafgreen = CHAMPION.model_copy(update={"id": "boss", "games": ["leafgreen"]})
+    rows = _rows(BROCK, only_leafgreen, CHAMPION)
+    battles = [(row.slug, row.order) for row in rows if isinstance(row, KeyBattle)]
+
+    assert battles == [
+        ("firered-brock", 1),
+        ("leafgreen-brock", 1),
+        ("leafgreen-boss", 2),
+        ("firered-champion", 2),
+        ("leafgreen-champion", 3),
+    ]
+
+
+def test_a_battle_can_give_its_own_section() -> None:
+    """Some pages title the section of the games differently (Erico, in Hoenn)."""
+    wrong = BROCK.model_copy(update={"wikidex_section": "Pokémon Rubí y Zafiro"})
+    source = WikidexSource(_curated_with(wrong), PageCache(FIXTURES, None), _index)
+
+    assert list(source.rows()) == []
+    [blocker] = source.blockers
+    assert blocker.occurrences[0].startswith("página «Brock», sección «Pokémon Rubí y Zafiro»")
+
+
 def test_variants_without_common_pokemon_fail(tmp_path: Path) -> None:
     wikitext = (
         f"== {SECTION} ==\n; Final\n<tabber>\nA=\n{{{{Equipo|P1=Onix|NvP1=10}}}}\n"

@@ -35,8 +35,7 @@ Decisiones de alcance:
   [CA-67](../01-ddf/cuestiones-abiertas.md#resueltas)). La fuente de PokeAPI propone como
   objetivo los 5 de la 3.ª generación y, con todo cargado, `ingest/targets.py` deja como tales
   solo los completos; el informe dice qué les falta a los demás, que se cargan igualmente. Hoy
-  son Rojo Fuego y Verde Hoja. A Rubí, Zafiro y Esmeralda les faltan sus mecánicas y sus
-  combates clave (#113); sus restricciones de llegada ya están comprobadas
+  son los 5: todos tienen sus mecánicas, sus combates clave y su regla de llegada
   ([CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - **Sin movimientos por nivel**. Ninguna evolución de las especies 1 a 386 exige conocer un
   movimiento (eso empieza en la 4.ª generación: Tangrowth, Mamoswine…). La tabla `level_move`
@@ -189,8 +188,7 @@ aparece ningún método sin clasificar ([comprobaciones](#comprobaciones-de-la-c
 ## WikiDex
 
 - Una petición por página de entrenador (`action=parse&prop=wikitext`): 13 para Rojo Fuego y
-  Verde Hoja y unas 18 para Rubí, Zafiro y
-  Esmeralda.
+  Verde Hoja y 17 para Rubí, Zafiro y Esmeralda.
 - Caché permanente en `data/cache/wikidex/`, como mucho una petición por segundo y un
   `User-Agent` descriptivo. Una segunda ejecución no hace peticiones
   ([ingesta](../05-operacion/ingesta.md#wikidex)).
@@ -224,9 +222,13 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
 - **Crianza**: Mewtwo es legendario y Ditto está en el grupo huevo `ditto`.
 
 
-- **Datos curados**: 4 mecánicas (2 por juego) y 13 combates clave en cada uno de Rojo Fuego y
-  Verde Hoja, de Brock a Azul (eran 15 hasta que CA-39 quitó los dos de Giovanni como jefe
-  del Team Rocket).
+- **Datos curados**: 10 mecánicas (2 por juego objetivo) y sus combates clave, con su número,
+  el primero y el último: 13 en Rojo Fuego y Verde Hoja, de Brock a Azul (eran 15 hasta que
+  CA-39 quitó los dos de Giovanni como jefe del Team Rocket); 15 en Rubí y Zafiro, de Petra a
+  Máximo, y 16 en Esmeralda, de Petra a Plubio. Numerados del 1 en adelante en cada juego, cada
+  uno con Pokémon, y equipos conocidos: Brock, el Campeón de Rojo Fuego, Petra, Magno, Aquiles
+  y Blasco. Cada versión de Rubí y Zafiro solo tiene su jefe
+  ([CA-88](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - **Iniciales**: 3 por juego objetivo: Venusaur, Charizard y Blastoise en Rojo Fuego, y
   Sceptile, Blaziken y Swampert en Esmeralda. Ninguno evoluciona en su juego: todos son la
   evolución final ([CA-59](../01-ddf/cuestiones-abiertas.md#resueltas)).

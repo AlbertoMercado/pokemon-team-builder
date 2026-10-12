@@ -8,6 +8,10 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ### Añadido
 
+- **Rubí, Zafiro y Esmeralda se pueden elegir como juego objetivo**: con sus mecánicas (tienen
+  ciclo de día y noche y concursos) y sus combates clave: los 8 líderes, el Alto Mando, el
+  Campeón, el jefe del equipo malvado de cada versión (los dos en Esmeralda) y Blasco
+  (RF-05, RN-17, CA-88, CA-89, #113). Hay que repetir la carga de datos para tenerlos.
 - **Ingesta**: propuestas de qué Pokémon pueden llegar a Rubí, Zafiro y Esmeralda antes de
   completarlos, comprobadas con el código de los juegos: en Esmeralda, solo los de la Pokédex
   de Hoenn; en Rubí y Zafiro, todos. Antes quedaban pendientes. Se confirman en la revisión de

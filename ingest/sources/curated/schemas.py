@@ -103,10 +103,12 @@ class ArrivalFile(CuratedModel):
 class BattleEntry(CuratedModel):
     """A key battle of the list and where its team is on WikiDex.
 
-    The team is in ``wikidex_page``, in the file's ``wikidex_section``. If that section has
-    several teams, ``wikidex_team`` is the label that precedes the right one (the text of a
-    ``;`` line, e.g. ``En Silph S.A.``). ``rival_starter_lines`` lists the starter lines of
-    the rival, whose Pokémon are left out of the team (CA-26).
+    The team is in ``wikidex_page``, in the file's ``wikidex_section`` or, if the page titles
+    it differently, in the battle's own ``wikidex_section``. If that section has several
+    teams, ``wikidex_team`` is the label that precedes the right one (the text of a ``;`` line,
+    e.g. ``En Silph S.A.``). ``rival_starter_lines`` lists the starter lines of the rival,
+    whose Pokémon are left out of the team (CA-26). ``games``, if given, restricts the battle
+    to some of the file's games, like the villain boss of each version.
     """
 
     id: Slug = Field(pattern=SLUG_PATTERN)
@@ -114,6 +116,8 @@ class BattleEntry(CuratedModel):
     trainer: str
     wikidex_page: str
     wikidex_team: str | None = None
+    wikidex_section: str | None = None
+    games: list[Slug] | None = Field(default=None, min_length=1)
     rival_starter_lines: list[Slug] = Field(default_factory=list)
     note: str | None = None
 
@@ -122,7 +126,8 @@ class KeyBattlesFile(CuratedModel):
     """``key_battles/<file>.yaml``: key battles shared by the games of a version group.
 
     The order of ``battles`` is the usual order in the game (RN-17). ``wikidex_section`` is
-    the title of the section with the games' teams on every trainer page.
+    the title of the section with the games' teams on the trainer pages; a battle can give its
+    own. A battle's ``games`` must be games of the file.
     """
 
     games: list[Slug] = Field(min_length=1)
@@ -135,6 +140,11 @@ class KeyBattlesFile(CuratedModel):
         duplicated = sorted({battle_id for battle_id in ids if ids.count(battle_id) > 1})
         if duplicated:
             raise ValueError(f"ids de combate repetidos: {duplicated}")
+        outside = sorted(
+            {game for battle in self.battles for game in battle.games or []} - set(self.games)
+        )
+        if outside:
+            raise ValueError(f"combates de juegos que no son del fichero: {outside}")
         return self
 
 

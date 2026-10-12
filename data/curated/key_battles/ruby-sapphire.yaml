@@ -1,0 +1,87 @@
+# Combates clave de Rubí y Zafiro (RN-17), en su orden habitual.
+# Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# Los equipos se leen de la sección wikidex_section de la página de WikiDex de cada
+# entrenador; algunas páginas la titulan de otra forma y el combate da la suya. El jefe malvado
+# depende de la versión: cuenta su último combate obligatorio (CA-88). De los rivales solo
+# cuenta Blasco: el último combate obligatorio de Bruno o Aura, en la Ruta 119, no tiene ningún
+# Pokémon común a sus tres variantes, que dependen del inicial (CA-38, CA-89).
+games: [ruby, sapphire]
+wikidex_section: Pokémon Rubí y Pokémon Zafiro
+battles:
+  - id: roxanne
+    category: gym_leader
+    trainer: Petra
+    wikidex_page: Petra
+  - id: brawly
+    category: gym_leader
+    trainer: Marcial
+    wikidex_page: Marcial
+  - id: wattson
+    category: gym_leader
+    trainer: Erico
+    wikidex_page: Erico
+    wikidex_section: Pokémon Rubí y Zafiro
+  - id: flannery
+    category: gym_leader
+    trainer: Candela
+    wikidex_page: Candela
+  - id: norman
+    category: gym_leader
+    trainer: Norman
+    wikidex_page: Norman
+  - id: winona
+    category: gym_leader
+    trainer: Alana
+    wikidex_page: Alana
+  - id: tate-and-liza
+    category: gym_leader
+    trainer: Vito y Leti
+    wikidex_page: Vito y Leti
+  - id: maxie
+    category: villain_boss
+    trainer: Magno
+    wikidex_page: Magno
+    wikidex_section: Pokémon Rubí
+    wikidex_team: Segundo combate
+    games: [ruby]
+    note: Jefe del Equipo Magma. Su último combate obligatorio, en la Caverna Abisal (CA-88).
+  - id: archie
+    category: villain_boss
+    trainer: Aquiles
+    wikidex_page: Aquiles
+    wikidex_section: Pokémon Zafiro
+    wikidex_team: Segundo combate ([[Caverna Abisal]])
+    games: [sapphire]
+    note: Jefe del Equipo Aqua. Su último combate obligatorio, en la Caverna Abisal (CA-88).
+  - id: wallace
+    category: gym_leader
+    trainer: Plubio
+    wikidex_page: Plubio
+  - id: wally
+    category: rival_final
+    trainer: Blasco
+    wikidex_page: Blasco
+    wikidex_section: Pokémon Rubí, Pokémon Zafiro y Pokémon Esmeralda
+    wikidex_team: Segundo combate
+    note: Rival. Su último combate obligatorio, en Calle Victoria (CA-89).
+  - id: sidney
+    category: elite_four
+    trainer: Sixto
+    wikidex_page: Sixto
+  - id: phoebe
+    category: elite_four
+    trainer: Fátima
+    wikidex_page: Fátima
+  - id: glacia
+    category: elite_four
+    trainer: Nívea
+    wikidex_page: Nívea
+  - id: drake
+    category: elite_four
+    trainer: Dracón
+    wikidex_page: Dracón
+  - id: champion
+    category: champion
+    trainer: Máximo
+    wikidex_page: Máximo

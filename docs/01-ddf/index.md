@@ -23,6 +23,7 @@ las reglas de negocio (**RN-XX**).
 | 0.15 | 2026-10-07 | Nueva función: la Pokédex de los juegos superados (RF-20 a RF-24, RN-22 a RN-26, CA-68 a CA-81). Cada juego se registra una sola vez en el *Hall of Fame* y deja de ser juego objetivo (RF-05, RF-12, RF-13). |
 | 0.16 | 2026-10-10 | Casos de la Pokédex que salieron con los datos (CA-82 a CA-87): los lugares de evento y la consola virtual cuentan como evento, los premios del casino como regalo, Sudowoodo como estático y Feebas como salvaje; los enjambres van tras los salvajes y el avance de la historia no cuenta; qué se obtiene al criar y en otro juego; los iniciales cuentan como regalo que depende del inicial y el resto de regalos a elegir indican entre cuáles (RN-24, RN-26). |
 | 0.17 | 2026-10-12 | CA-28 resuelta: qué puede llegar a cada juego objetivo de la 3.ª generación y evolucionar antes de completarlo, comprobado con el código de los juegos (RN-03). |
+| 0.18 | 2026-10-12 | Combates clave de Hoenn (RN-17): de cada jefe del equipo malvado cuenta su último combate obligatorio (CA-88), y cuentan los dos rivales, Bruno o Aura y Blasco (CA-89). |
 
 ## Propósito
 

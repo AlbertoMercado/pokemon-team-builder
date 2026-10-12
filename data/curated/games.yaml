@@ -3,8 +3,6 @@
 #
 # Cada mecánica es sí/no, con su origen (RN-18): automatic, inferred o pending. Un valor
 # inferido lo confirma el usuario antes de generar; uno pendiente no lleva value.
-#
-# Rubí, Zafiro y Esmeralda se completan en la fase 6 del plan de carga.
 games:
   firered:
     day_night_cycle:
@@ -32,3 +30,42 @@ games:
       note: >-
         No tiene concursos ni Pokécubos: no se puede subir la belleza, que necesita Feebas
         para evolucionar a Milotic.
+  ruby:
+    day_night_cycle:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene reloj interno: Eevee evoluciona a Espeon de día (de 12:00 a 23:59) y a Umbreon
+        de noche (de 0:00 a 11:59), con mucha amistad.
+    contests:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene concursos y Pokécubos: se puede subir la belleza que necesita Feebas para
+        evolucionar a Milotic.
+  sapphire:
+    day_night_cycle:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene reloj interno: Eevee evoluciona a Espeon de día (de 12:00 a 23:59) y a Umbreon
+        de noche (de 0:00 a 11:59), con mucha amistad.
+    contests:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene concursos y Pokécubos: se puede subir la belleza que necesita Feebas para
+        evolucionar a Milotic.
+  emerald:
+    day_night_cycle:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene reloj interno: Eevee evoluciona a Espeon de día (de 12:00 a 23:59) y a Umbreon
+        de noche (de 0:00 a 11:59), con mucha amistad.
+    contests:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene concursos y Pokécubos: se puede subir la belleza que necesita Feebas para
+        evolucionar a Milotic.
