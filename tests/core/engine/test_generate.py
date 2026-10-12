@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 import pytest
 
-from core.domain import KeyBattle, PokemonData
+from core.domain import GameInfo, KeyBattle, PokemonData
 from core.engine import GenerationResult, GenerationStatus, IncompleteReason, generate
 from core.rules.catalog import RuleSettings
 from core.rules.team import PresenceStatus
@@ -212,3 +212,26 @@ def test_discards_come_with_the_result() -> None:
     result = _generate([zapdos, *FILLERS[:6]])
     assert [(d.pokemon, d.rule_id) for d in result.discards] == [("zapdos", "RN-11")]
     assert "zapdos" not in result.valid_candidates
+
+
+@pytest.mark.rn("RN-13")
+@pytest.mark.rn("RN-21")
+def test_one_member_can_meet_two_presence_rules() -> None:
+    """A starter of primary type Dragon meets RN-13 and RN-21 at once, so the team needs one
+    member for both, not two (#117). Here it can only go alone: the other favourite is of its
+    line and RN-21 allows only one (CA-60)."""
+    starter = pokemon("starter", ("dragon",), line=("pre-starter",), chain=1, dex_number=1)
+    same_line = pokemon("same-line", ("normal",), chain=1, dex_number=2)
+    game = GameInfo("firered", 3, starters=frozenset({"starter"}))
+    settings = RuleSettings.defaults().with_changes(enabled={"RN-07": False})
+
+    result = generate(
+        context([candidate(starter), candidate(same_line)], game=game, settings=settings)
+    )
+
+    assert [(p.rule_id, p.status, p.options) for p in result.presence] == [
+        ("RN-13", PresenceStatus.CANDIDATES, ("starter",)),
+        ("RN-14", PresenceStatus.UNMET, ()),
+        ("RN-21", PresenceStatus.CANDIDATES, ("starter",)),
+    ]
+    assert [team.slugs for team in result.teams] == [("starter",)]

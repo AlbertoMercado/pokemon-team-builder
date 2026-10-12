@@ -69,7 +69,9 @@ flowchart TD
 5. **Puntuar** cada equipo y quedarse con todos los de puntuación máxima (RN-04). Los equipos
    se comparan por la clave `(puntuación, miembros con dos tipos)`, de modo que el desempate de
    RN-19 se aplica en la misma pasada.
-6. Si no hay ningún equipo de tamaño `k`, se prueba con `k − 1` y se añaden **sugerencias**
+6. Si no hay ningún equipo de tamaño `k`, se prueba con `k − 1`, hasta un solo miembro si
+   alguna regla de presencia lo exige: un mismo miembro puede cumplir varias, como un inicial de
+   tipo primario Dragón, que cumple RN-13 y RN-21 (#117). Se añaden **sugerencias**
    para los huecos: Pokémon del juego que no son favoritos, que no tienen aristas con el
    equipo y que cumplen la regla de presencia del hueco, si la hay. Se ordenan por la mejora de
    puntuación que aportan y, a igual mejora, primero los de dos tipos (RN-08, RN-19). Lo que
