@@ -1,6 +1,8 @@
 """Load phase of the ingest: build reference.sqlite, report it and replace the previous file
-only when everything is consistent (RF-11, docs/05-operacion/ingesta.md)."""
+only when everything is consistent (RF-11, docs/05-operacion/ingesta.md). A blocked load
+keeps the previous file too, and the CLI ends with exit code 2 (RF-16, ADR-0008)."""
 
+import json
 import shutil
 from collections.abc import Iterable
 from dataclasses import dataclass, field
@@ -10,6 +12,7 @@ import pytest
 from sqlmodel import Session, select
 
 from db.reference import (
+    EvolutionStep,
     Game,
     GamePokemon,
     Generation,
@@ -22,7 +25,9 @@ from db.reference import (
 )
 from db.sqlite import create_sqlite_engine
 from ingest import cli
+from ingest.blockers import Blocker, BlockerKind, wikidex_team_not_found
 from ingest.load import build_reference
+from ingest.report import LoadStatus
 
 POKEAPI_FIXTURES = Path(__file__).resolve().parent / "fixtures" / "pokeapi"
 REPOSITORY_CURATED = Path(__file__).resolve().parents[2] / "data" / "curated"
@@ -35,6 +40,7 @@ class FakeSource:
     row_list: list[ReferenceModel]
     name: str = "fake"
     pokeapi_commit: str | None = None
+    blockers: tuple[Blocker, ...] = ()
     error: Exception | None = field(default=None)
 
     def rows(self) -> Iterable[ReferenceModel]:
@@ -204,6 +210,8 @@ def test_cli_builds_reference_in_the_data_dir(
 
     assert exit_code == 0
     assert (data_dir / "reference.sqlite").exists()
+    [report] = (data_dir / "reports").glob("*-completada.json")
+    assert report.with_suffix(".md").exists()
     output = capsys.readouterr().out
     assert "Carga completada." in output
     # Offline with an empty sprite cache: the forms are loaded without image (ADR-0010).
@@ -222,6 +230,7 @@ def test_cli_fails_when_the_checks_fail(
 
     assert exit_code == 1
     assert not (data_dir / "reference.sqlite").exists()
+    assert not (data_dir / "reports").exists()  # a failed load has no report file
     assert "Comprobación fallida: species" in capsys.readouterr().out
 
 
@@ -232,3 +241,106 @@ def test_cli_offline_without_cache_fails(
 
     assert exit_code == 1
     assert "no está en la caché" in capsys.readouterr().out
+
+
+# --- Blocked loads (ADR-0008) --------------------------------------------------------------
+
+BROCK_NOT_FOUND = wikidex_team_not_found(
+    "brock", "Brock", "Pokémon Rojo Fuego y Pokémon Verde Hoja", "Revancha", "no hay un combate"
+)
+
+
+def _failing_check(session: Session) -> list[str]:
+    return ["no debería ejecutarse"]
+
+
+def test_a_blocked_load_keeps_the_previous_database(tmp_path: Path) -> None:
+    """RF-16: nothing replaces the data, and the checks, which would fail because of what is
+    left out, are not run."""
+    target = tmp_path / "reference.sqlite"
+    previous = _build_previous(target)
+    source = FakeSource(_firered_rows(), pokeapi_commit="bc92d3b", blockers=(BROCK_NOT_FOUND,))
+
+    report = build_reference([source], target, checks=[_failing_check])
+
+    assert report.status is LoadStatus.BLOCKED
+    assert report.errors == []
+    assert report.blockers == [BROCK_NOT_FOUND]
+    assert (report.pokeapi_commit, report.games) == ("bc92d3b", ["firered"])
+    assert target.read_bytes() == previous
+    assert not (tmp_path / "reference.sqlite.tmp").exists()
+    rendered = report.render()
+    assert "BLOQUEADA (1 bloqueo): hace falta una nueva versión" in rendered
+    assert "wikidex_team_not_found: brock (1 caso)" in rendered
+
+
+def test_every_source_adds_its_blockers(tmp_path: Path) -> None:
+    misty = wikidex_team_not_found("misty", "Misty", "Sección", None, "no hay ninguna plantilla")
+    sources = [
+        FakeSource(_firered_rows(), blockers=(BROCK_NOT_FOUND,)),
+        FakeSource([], blockers=(misty,)),
+    ]
+
+    report = build_reference(sources, tmp_path / "reference.sqlite")
+
+    assert [blocker.subject for blocker in report.blockers] == ["brock", "misty"]
+
+
+def test_an_error_fails_the_load_even_with_blockers(tmp_path: Path) -> None:
+    """The error is fixed first: the blockers will be found again in the next load."""
+    broken = FakeSource([], error=ValueError("CSV sin la columna identifier"))
+    blocked = FakeSource(_firered_rows(), blockers=(BROCK_NOT_FOUND,))
+
+    report = build_reference([blocked, broken], tmp_path / "reference.sqlite")
+
+    assert report.status is LoadStatus.FAILED
+
+
+def _evolution(to_pokemon: str, **conditions: str | int) -> EvolutionStep:
+    return EvolutionStep(
+        version_group="firered-leafgreen",
+        from_pokemon="bulbasaur",
+        to_pokemon=to_pokemon,
+        trigger="level-up",
+        conditions=conditions,
+    )
+
+
+@pytest.mark.rn("RN-15")
+def test_an_evolution_by_move_blocks_the_load_without_level_moves(tmp_path: Path) -> None:
+    """CA-45: whether the step is tedious depends on the moves learnt by level (CA-32), which
+    are not loaded."""
+    bulbasaur = Pokemon(
+        slug="bulbasaur", species="bulbasaur", name_es="Bulbasaur", is_default=True, pokeapi_id=1
+    )
+    rows = [
+        *_firered_rows(),
+        bulbasaur,
+        _evolution("ivysaur", minimum_level=16),
+        _evolution("ivysaur", known_move="vine-whip"),
+    ]
+
+    report = build_reference([FakeSource(rows)], tmp_path / "reference.sqlite")
+
+    [blocker] = report.blockers
+    assert (blocker.kind, blocker.subject) == (BlockerKind.MISSING_LEVEL_MOVES, "vine-whip")
+    assert blocker.occurrences == ("bulbasaur → ivysaur (firered-leafgreen)",)
+    assert blocker.rules == ("RN-15",)
+
+
+def test_cli_ends_a_blocked_load_with_code_2_and_its_report(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    data_dir = tmp_path / "data"
+    source = FakeSource(_firered_rows(), pokeapi_commit="bc92d3b", blockers=(BROCK_NOT_FOUND,))
+    monkeypatch.setattr(cli, "default_sources", lambda *_, **__: [source])
+
+    exit_code = cli.main(["--data-dir", str(data_dir), "--offline", "--no-covers"])
+
+    assert exit_code == 2
+    assert not (data_dir / "reference.sqlite").exists()
+    [report] = (data_dir / "reports").glob("*-bloqueada.json")
+    assert report.with_suffix(".md").exists()
+    content = json.loads(report.read_text(encoding="utf-8"))
+    assert (content["status"], content["blockers"][0]["subject"]) == ("blocked", "brock")
+    assert f"Informe: {report.with_suffix('.md')}" in capsys.readouterr().out

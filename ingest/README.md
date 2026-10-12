@@ -16,7 +16,8 @@ puntual, no en cada arranque ([RF-11](../docs/01-ddf/requisitos-funcionales.md#r
 | `targets.py` | Deja como juego objetivo solo los juegos completos y dice qué les falta a los demás. |
 | `checks.py` | Comprobaciones de la carga: cantidades y casos conocidos. |
 | `user_keys.py` | Que siga existiendo lo que usa `user.sqlite`. |
-| `report.py` | Informe de la carga. |
+| `blockers.py` | Bloqueos de la carga: lo que la aplicación no sabe tratar sin una nueva versión (ADR-0008). |
+| `report.py` | Informe de la carga: en la terminal y, en JSON y Markdown, en `data/reports/`. |
 | `sources/` | `Source`, la interfaz de una fuente. |
 | `sources/pokeapi/` | PokeAPI: CSV del commit fijado, validación de filas, transformación (también de las Pokédex y las apariciones) e imágenes de los Pokémon. |
 | `sources/wikidex/` | WikiDex: páginas de los combates clave y portadas de los juegos, con caché y límite de peticiones. |

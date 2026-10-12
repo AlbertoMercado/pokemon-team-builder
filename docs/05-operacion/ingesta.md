@@ -106,9 +106,11 @@ flowchart TD
     D["Descarga o caché<br/>CSV del commit fijado"] --> V["Validación<br/>columnas y tipos de cada fila"]
     V --> X["Transformación<br/>alcance de la carga, datos por generación"]
     X --> T["Fichero temporal<br/>reference.sqlite.tmp"]
-    T --> C{"¿Íntegra y<br/>comprobaciones superadas?"}
+    T --> B{"¿Íntegra y<br/>sin bloqueos?"}
+    B -- sí --> C{"¿Comprobaciones<br/>superadas?"}
+    B -- no --> E["Borra el temporal<br/>conserva la anterior"]
     C -- sí --> R["Registro de la carga<br/>tabla ingest_run"] --> M["Sustituye reference.sqlite<br/>(renombrado atómico)"]
-    C -- no --> E["Borra el temporal<br/>conserva la anterior"]
+    C -- no --> E
     M & E --> I["Informe"]
 ```
 
@@ -130,6 +132,9 @@ flowchart TD
    una fila que no existe se informa con su tabla, su columna y su valor, p. ej.
    `species.evolves_from → species: happiny`. Todas las fuentes tienen que venir del mismo
    commit de PokeAPI.
+   Después reúne los [bloqueos](#carga-bloqueada) de las fuentes y de las filas guardadas. Si
+   hay alguno, la carga queda **bloqueada**: no sigue con los pasos siguientes, borra el
+   temporal y pasa al informe.
    Después, cada forma recibe la ruta de su [imagen](#imagenes-de-los-pokemon), de la caché o
    descargándola. Las que no tienen imagen son avisos, no errores, como los lugares sin nombre
    en español.
@@ -147,13 +152,15 @@ flowchart TD
    commits de PokeAPI y de las imágenes, los juegos cargados y el número de filas por tabla.
 9. **Sustitución**: renombra el temporal sobre `reference.sqlite` en una sola operación
    atómica. No hay ningún momento en que el fichero esté a medio escribir.
-10. **Informe**: lo muestra en la terminal, con los avisos si los hay.
+10. **Informe**: lo muestra en la terminal, con los avisos si los hay, y, si la carga se
+    completa o queda bloqueada, lo guarda en `data/reports/` ([formato](#informe_1)).
 
-Si algo falla en los pasos 1 a 8, se borra el temporal y `reference.sqlite` queda como estaba.
+Si algo falla en los pasos 1 a 8, o la carga queda bloqueada, se borra el temporal y
+`reference.sqlite` queda como estaba.
 
 ## Informe
 
-Informe real de la carga del 2026-10-08, con el commit `bc92d3b` de PokeAPI, los datos
+Informe real de la carga del 2026-10-12, con el commit `bc92d3b` de PokeAPI, los datos
 curados y los equipos de WikiDex de Rojo Fuego y Verde Hoja:
 
 ```text
@@ -176,7 +183,7 @@ Filas cargadas por tabla:
   game_mechanic             4
   game_pokedex             11
   game_pokemon           1930
-  game_starter             15
+  game_starter             31
   game_transfer            50
   key_battle               26
   pokemon_type           1131
@@ -194,6 +201,7 @@ Juegos que no se pueden elegir como objetivo (datos incompletos):
   Esmeralda: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
 Comprobaciones superadas: 13
 Carga completada.
+Informe: data/reports/2026-10-12T111112-completada.md
 ```
 
 - **Filas cargadas por tabla**: en orden de dependencias. No incluye `ingest_run`.
@@ -236,15 +244,22 @@ ERROR: la carga ha fallado; se conserva la base de datos anterior.
 
 ## Carga bloqueada
 
-!!! note "Pendiente de implementar"
-    Diseño de [ADR-0008](../03-adr/0008-cargas-bloqueadas.md), pendiente en #78. Hasta
-    entonces, estos casos son errores que cortan la carga.
-
 Una carga queda **bloqueada** cuando encuentra algo que la aplicación no sabe tratar y que no
 se puede resolver sin decidir cómo lo interpretan las reglas
 ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)). A diferencia de un error, no se corta:
 sigue hasta el final para recoger **todos** los bloqueos, no sustituye `reference.sqlite` y
-termina con el código de salida **2**.
+termina con el código de salida **2**
+([ADR-0008](../03-adr/0008-cargas-bloqueadas.md)):
+
+```text
+Carga de data/reference.sqlite
+BLOQUEADA (1 bloqueo): hace falta una nueva versión; se conserva la base de datos anterior.
+  - wikidex_team_not_found: giovanni-gym (1 caso)
+Informe: data/reports/2026-10-12T110949-bloqueada.md
+```
+
+Si además hay un error, la carga **falla** (código 1): se corrige primero el error, y los
+bloqueos aparecerán en la siguiente carga.
 
 Los códigos de salida están en el [manual](../04-manual-usuario/cargar-datos.md#hacer-una-carga).
 
@@ -252,10 +267,10 @@ Los códigos de salida están en el [manual](../04-manual-usuario/cargar-datos.m
 
 | Bloqueo (`kind`) | Cuándo | Qué decide el arquitecto |
 |------------------|--------|--------------------------|
-| `unknown_evolution_trigger` | Un disparador de evolución que no está en [`evolution_methods.yaml`](../02-ddt/datos-curados.md#evolution_methodsyaml) ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)). | Su categoría para RN-15 y RN-20. |
-| `unknown_evolution_condition` | Una condición de evolución que no está en ese fichero. | Igual. |
-| `missing_level_moves` | Un paso exige conocer un movimiento y no se cargan los movimientos por nivel ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). | Activar la carga de `level_move`. |
-| `wikidex_team_not_found` | La lista curada de combates no encuentra un equipo en WikiDex. | Corregir la página, la sección o el rótulo en `key_battles/*.yaml`. |
+| `unknown_evolution_trigger` | Un disparador de evolución que no está en [`evolution_methods.yaml`](../02-ddt/datos-curados.md#evolution_methodsyaml) ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)). **Pendiente** con ese catálogo (#78). | Su categoría para RN-15 y RN-20. |
+| `unknown_evolution_condition` | Una condición de evolución que no está en ese fichero. **Pendiente**, igual. | Igual. |
+| `missing_level_moves` | Un paso exige conocer un movimiento (`known_move`) y no se cargan los movimientos por nivel ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). Un bloqueo por movimiento, con los pasos que lo exigen. | Activar la carga de `level_move`. |
+| `wikidex_team_not_found` | La lista curada de combates no encuentra en WikiDex la página, la sección o el combate. Un bloqueo por combate; el resto de combates se leen igual. Una página que no está en la caché sin red, o un fallo de WikiDex, sigue siendo un error. | Corregir la página, la sección o el rótulo en `key_battles/*.yaml`. |
 
 ### Informe
 
@@ -267,8 +282,8 @@ JSON es la fuente; el Markdown se genera a partir de él para leerlo o pegarlo e
 {
   "format": 1,
   "status": "blocked",
-  "started_at": "2026-11-02T10:15:00",
-  "finished_at": "2026-11-02T10:16:40",
+  "started_at": "2026-11-02T10:15:00+01:00",
+  "finished_at": "2026-11-02T10:16:40+01:00",
   "pokeapi_commit": "bc92d3b",
   "games": ["firered", "leafgreen", "ruby", "sapphire", "emerald"],
   "blockers": [
@@ -281,9 +296,15 @@ JSON es la fuente; el Markdown se genera a partir de él para leerlo o pegarlo e
       "template": "spin: {category: ???, reason: ???}"
     }
   ],
-  "summary": {"rows": {}, "origins": {}, "checks_passed": 9}
+  "warnings": [],
+  "summary": {"rows": {}, "origins": {}, "checks_passed": 0}
 }
 ```
+
+Las fechas van en la hora local del equipo, con su desfase, y el nombre de los ficheros usa
+la de inicio. `template` es `null` cuando no hay nada que copiar (en `missing_level_moves`, el
+cambio es de código). Una carga bloqueada no llega a las comprobaciones, así que su `summary`
+va vacío. Una carga fallida (código 1) no genera ficheros.
 
 El Markdown tiene una cabecera (fecha, estado, commit de PokeAPI y juegos), un resumen con
 el número de bloqueos de cada tipo y una sección por bloqueo con lo mismo que el JSON y la
@@ -459,5 +480,5 @@ cada módulo, en su *docstring*. Los tests, en `tests/ingest/`
 
 ## Pendiente
 
-Lo que falta de la ingesta está en las issues: juegos con datos incompletos (#75), cargas
-bloqueadas (#78) y restricciones de llegada del resto de juegos (#8).
+Lo que falta de la ingesta está en las issues: el catálogo de métodos de evolución y sus
+bloqueos (#78) y las restricciones de llegada del resto de juegos (#8).

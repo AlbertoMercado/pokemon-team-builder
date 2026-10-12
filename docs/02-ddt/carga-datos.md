@@ -252,6 +252,8 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
   aparece como líder de gimnasio (CA-39). El equipo de Brock en Rojo Fuego es Geodude y Onix,
   y el del Campeón, Pidgeot, Alakazam y Rhydon (CA-26 y CA-38).
 
-Los casos que la aplicación no sabe tratar (métodos de evolución sin catalogar, movimientos por
-nivel, equipos que no están en WikiDex) serán **bloqueos** de la carga, no errores
-([ADR-0008](../03-adr/0008-cargas-bloqueadas.md), pendiente en #78).
+Los casos que la aplicación no sabe tratar (movimientos por nivel, equipos que no están en
+WikiDex) son **bloqueos** de la carga, no errores
+([ADR-0008](../03-adr/0008-cargas-bloqueadas.md),
+[bloqueos](../05-operacion/ingesta.md#bloqueos)). Los métodos de evolución sin catalogar lo
+serán con su catálogo (#78).

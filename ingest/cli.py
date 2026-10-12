@@ -9,6 +9,7 @@ from pathlib import Path
 
 from ingest.checks import FIRST_LOAD_CHECKS
 from ingest.load import Images, build_reference
+from ingest.report import LoadStatus, write_report
 from ingest.sources import Source
 from ingest.sources.curated import (
     CuratedDataError,
@@ -28,6 +29,9 @@ DEFAULT_DATA_DIR = Path("data")
 REFERENCE_FILE_NAME = "reference.sqlite"
 # Written by the API in the same data directory; its keys are checked before replacing.
 USER_FILE_NAME = "user.sqlite"
+# Reports of the completed and blocked loads, out of git (ADR-0008).
+REPORTS_DIR_NAME = "reports"
+EXIT_CODES = {LoadStatus.COMPLETED: 0, LoadStatus.FAILED: 1, LoadStatus.BLOCKED: 2}
 # Curated data is versioned with the code, so it is found next to it, not in --data-dir.
 CURATED_DIR = Path(__file__).resolve().parent.parent / "data" / "curated"
 
@@ -58,7 +62,8 @@ def default_covers(data_dir: Path, *, offline: bool) -> CoverCache:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Run the ingest and return the process exit code (0 on success, 1 on failure)."""
+    """Run the ingest and return the process exit code: 0 if completed, 1 if it failed and
+    2 if it is blocked (ADR-0008)."""
     parser = argparse.ArgumentParser(
         prog="python -m ingest",
         description="Construye reference.sqlite a partir de las fuentes de datos.",
@@ -104,4 +109,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         Images(sprites, covers),
     )
     print(report.render())
-    return 0 if report.succeeded else 1
+    written = write_report(report, data_dir / REPORTS_DIR_NAME)
+    if written is not None:
+        print(f"Informe: {written}")
+    return EXIT_CODES[report.status]

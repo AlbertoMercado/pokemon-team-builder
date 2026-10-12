@@ -6,6 +6,13 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+### Añadido
+
+- **Ingesta**: cargas bloqueadas (RF-16, ADR-0008). Si un combate clave no se encuentra en
+  WikiDex o una evolución exige conocer un movimiento, la carga no se corta en el primero:
+  los recoge todos, conserva los datos anteriores y termina con el código de salida 2. Cada
+  carga completada o bloqueada deja su informe, en Markdown y JSON, en `data/reports/` (#78).
+
 ### Corregido
 
 - **Web**: en la lista inicial de la Pokédex y en el equipo de cada registro del *Hall of Fame*,

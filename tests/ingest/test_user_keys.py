@@ -23,6 +23,7 @@ from db.reference import (
 from db.sqlite import create_sqlite_engine
 from db.user import FactConfirmation, Favorite, HallOfFameEntry, HallOfFameMember, value_hash
 from ingest import cli
+from ingest.blockers import Blocker
 from ingest.load import build_reference
 
 NOW = datetime(2026, 10, 4, tzinfo=UTC)
@@ -33,6 +34,7 @@ class _Source:
     row_list: list[ReferenceModel]
     name: str = "reference"
     pokeapi_commit: str | None = None
+    blockers: tuple[Blocker, ...] = ()
 
     def rows(self) -> Iterable[ReferenceModel]:
         return list(self.row_list)

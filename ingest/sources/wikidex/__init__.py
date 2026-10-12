@@ -4,16 +4,20 @@ For each curated battle, reads its trainer page (cached, rate limited), finds th
 the games' section, translates the Spanish names to loaded forms, leaves out the rival's
 starter (CA-26) and, if the team has variants, keeps the Pokémon common to all of them
 (CA-38). See docs/02-ddt/carga-datos.md and docs/02-ddt/datos-curados.md.
+
+A battle whose page, section or team is not found blocks the load (ADR-0008): it is left
+out and reported in ``blockers``, so every wrong battle is listed in one load.
 """
 
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from dataclasses import dataclass
 
 from db.reference import KeyBattle, KeyBattlePokemon, Origin, ReferenceModel
+from ingest.blockers import Blocker, wikidex_team_not_found
 from ingest.sources.curated import CuratedData
 from ingest.sources.curated.schemas import BattleEntry
 from ingest.sources.pokeapi.index import PokemonIndex
-from ingest.sources.wikidex.fetch import PageCache
+from ingest.sources.wikidex.fetch import MissingPageError, PageCache
 from ingest.sources.wikidex.parse import TeamMember, TeamParseError, find_section, team_variants
 
 
@@ -37,19 +41,30 @@ class WikidexSource:
         self._curated = curated
         self._pages = pages
         self._index = index
+        self._blockers: list[Blocker] = []
+
+    @property
+    def blockers(self) -> Sequence[Blocker]:
+        return tuple(self._blockers)
 
     def rows(self) -> Iterable[ReferenceModel]:
         index = self._index()
+        self._blockers.clear()
         for battles_file in self._curated.key_battles:
             for order, battle in enumerate(battles_file.battles, start=1):
-                page = self._pages.page(battle.wikidex_page)
+                section = battles_file.wikidex_section
                 try:
-                    section = find_section(page.wikitext, battles_file.wikidex_section)
-                    variants = team_variants(section, battle.wikidex_team)
-                except TeamParseError as error:
-                    raise WikidexDataError(
-                        f"{battle.id} ({battle.wikidex_page}): {error}"
-                    ) from None
+                    page = self._pages.page(battle.wikidex_page)
+                    variants = team_variants(
+                        find_section(page.wikitext, section), battle.wikidex_team
+                    )
+                except (MissingPageError, TeamParseError) as error:
+                    self._blockers.append(
+                        wikidex_team_not_found(
+                            battle.id, battle.wikidex_page, section, battle.wikidex_team, str(error)
+                        )
+                    )
+                    continue
                 teams = [
                     _without_starter(_resolve(team, battle, index), battle, index)
                     for team in variants

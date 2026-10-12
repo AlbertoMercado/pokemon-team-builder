@@ -23,6 +23,7 @@ from db.reference import (
     Origin,
     ReferenceModel,
 )
+from ingest.blockers import Blocker
 from ingest.sources.curated.schemas import (
     ArrivalFile,
     ArrivalRule,
@@ -108,6 +109,7 @@ class CuratedSource:
 
     name = "curated"
     pokeapi_commit = None
+    blockers: tuple[Blocker, ...] = ()
 
     def __init__(self, curated: CuratedData) -> None:
         self._curated = curated
