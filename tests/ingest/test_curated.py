@@ -51,13 +51,18 @@ def test_repository_curated_files_are_valid() -> None:
     curated = read_curated(CURATED_DIR)
 
     assert curated.breeding.incense_babies == {"azurill": "sea-incense", "wynaut": "lax-incense"}
-    assert set(curated.games.games) == {"firered", "leafgreen"}
-    # Every target game has its arrival rule (CA-28).
-    assert set(curated.arrival.games) == {"ruby", "sapphire", "emerald", "firered", "leafgreen"}
+    # Every target game has its mechanics, its arrival rule (CA-28) and its key battles (RF-05).
+    targets = {"ruby", "sapphire", "emerald", "firered", "leafgreen"}
+    assert set(curated.games.games) == targets
+    assert set(curated.arrival.games) == targets
     assert len(curated.starters.games) == 11  # every loaded game, for the Pokédex (CA-87)
-    [firered_leafgreen] = curated.key_battles
+    emerald, firered_leafgreen, ruby_sapphire = curated.key_battles
     assert firered_leafgreen.games == ["firered", "leafgreen"]
     assert len(firered_leafgreen.battles) == 13  # Giovanni only as gym leader (CA-39)
+    assert ruby_sapphire.games == ["ruby", "sapphire"]
+    assert len(ruby_sapphire.battles) == 16  # a villain boss of each version (CA-88)
+    assert emerald.games == ["emerald"]
+    assert len(emerald.battles) == 16
     assert len(curated.pokedex.games) == 11  # RN-22: every loaded game
     assert curated.locations.locations["navel-rock"].event_item == "mysticticket"
 
@@ -176,7 +181,7 @@ def test_curated_source_rows() -> None:
     events = {(row.game, row.pokemon) for row in rows if isinstance(row, EventPokemon)}
     methods = {(row.kind, row.name): row for row in rows if isinstance(row, EvolutionMethod)}
 
-    assert len(mechanics) == 4
+    assert len(mechanics) == 10  # two per target game
     assert len(starters) == 31  # 3 per game, 1 in Yellow
     assert len(rows) == (
         len(mechanics) + len(starters) + len(pokedexes) + len(transfers) + len(events)
@@ -204,7 +209,7 @@ def test_curated_source_rows() -> None:
 
 
 def test_key_battles_point_to_their_wikidex_team() -> None:
-    [battles_file] = read_curated(CURATED_DIR).key_battles
+    battles_file = read_curated(CURATED_DIR).key_battles[1]
     battles = {battle.id: battle for battle in battles_file.battles}
 
     assert battles_file.wikidex_section == "Pokémon Rojo Fuego y Pokémon Verde Hoja"
@@ -213,6 +218,36 @@ def test_key_battles_point_to_their_wikidex_team() -> None:
     assert battles["bruno"].wikidex_page == "Bruno (Alto Mando)"  # «Bruno» is a disambiguation
     assert battles["champion"].category is BattleCategory.CHAMPION
     assert battles["champion"].rival_starter_lines == ["bulbasaur", "charmander", "squirtle"]
+
+
+@pytest.mark.rn("RN-17")
+def test_hoenn_key_battles_are_by_version() -> None:
+    """CA-88: each version has its own villain boss, and Emerald both, by their last mandatory
+    battle. CA-89: Wally counts as rival; May and Brendan do not (their variants share
+    nothing). Some pages title the section of the games differently."""
+    emerald, _, ruby_sapphire = read_curated(CURATED_DIR).key_battles
+    ruby = {battle.id: battle for battle in ruby_sapphire.battles}
+
+    assert (ruby["maxie"].games, ruby["archie"].games) == (["ruby"], ["sapphire"])
+    assert ruby["maxie"].wikidex_team == "Segundo combate"
+    assert ruby["wattson"].wikidex_section == "Pokémon Rubí y Zafiro"
+    assert ruby["wally"].category is BattleCategory.RIVAL_FINAL
+    emerald_bosses = [b.id for b in emerald.battles if b.category is BattleCategory.VILLAIN_BOSS]
+    assert emerald_bosses == ["maxie", "archie"]
+    assert not {"may", "brendan"} & {b.id for f in (emerald, ruby_sapphire) for b in f.battles}
+
+
+def test_a_battle_of_a_game_outside_its_file_is_rejected() -> None:
+    battle = {
+        "id": "maxie",
+        "category": "villain_boss",
+        "trainer": "Magno",
+        "wikidex_page": "Magno",
+        "games": ["emerald"],
+    }
+    content = {"games": ["ruby", "sapphire"], "wikidex_section": "S", "battles": [battle]}
+    with pytest.raises(ValidationError, match="emerald"):
+        KeyBattlesFile.model_validate(content)
 
 
 def test_cli_reports_invalid_curated_data(

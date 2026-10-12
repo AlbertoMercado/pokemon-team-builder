@@ -422,7 +422,13 @@ parámetros son fijos.
   inicial, solo cuentan los Pokémon que tiene en todas las variantes
   ([CA-38](cuestiones-abiertas.md#resueltas)).
 - **Giovanni en Kanto**: en Rojo Fuego y Verde Hoja solo cuenta su combate como líder de
-  gimnasio, no los de jefe del Team Rocket ([CA-39](cuestiones-abiertas.md#resueltas)). Si el rival es también el Campeón, como en Rojo
+  gimnasio, no los de jefe del Team Rocket ([CA-39](cuestiones-abiertas.md#resueltas)).
+- **Jefes con varios combates** ([CA-88](cuestiones-abiertas.md#resueltas)): solo cuenta el
+  último obligatorio de cada jefe. En Hoenn, Magno en Rubí, Aquiles en Zafiro y los dos en
+  Esmeralda.
+- **Dos rivales en Hoenn** ([CA-89](cuestiones-abiertas.md#resueltas)): cuentan Bruno o Aura
+  (Ruta 119) y Blasco (Calle Victoria). Bruno o Aura no aporta ningún Pokémon, porque sus tres
+  variantes solo comparten el inicial. Si el rival es también el Campeón, como en Rojo
   Fuego, ese combate cuenta una sola vez y también sin su inicial. Se usan solo los tipos de los miembros y de los Pokémon
   rivales, con la tabla de eficacias del juego objetivo ([RN-10](#rn-10)). No se tienen en
   cuenta movimientos, niveles ni estadísticas.

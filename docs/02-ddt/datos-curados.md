@@ -32,20 +32,20 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | Fichero | Qué contiene | Se carga en | Juegos con datos |
 |---------|--------------|-------------|------------------|
 | [`pokeapi.yaml`](#pokeapiyaml) | Commits fijados del volcado de PokeAPI y del repositorio de imágenes. | `ingest_run.pokeapi_commit`, `ingest_run.sprites_commit` | — |
-| [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Rojo Fuego, Verde Hoja |
+| [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Los 5 juegos objetivo |
 | [`starters.yaml`](#startersyaml) | Iniciales de cada juego (RN-21, CA-87). | `game_starter` | Los 11 juegos cargados |
 | [`breeding.yaml`](#breedingyaml) | Bebés que solo nacen con incienso. | `species.requires_incense` | — |
 | [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Los 5 juegos objetivo |
 | [`covers.yaml`](#coversyaml) | Título del fichero de la portada de cada juego en WikiDex (RF-18). | `game.cover`, `game.cover_source` | Los 11 juegos cargados |
-| [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Rojo Fuego, Verde Hoja |
+| [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Los 5 juegos objetivo, Verde Hoja |
 | [`pokedex.yaml`](#pokedexyaml) | Pokédex que completa cada juego (RN-22). | `game_pokedex` | Los 11 juegos cargados |
 | [`transfers.yaml`](#transfersyaml) | Juegos que pueden enviarse Pokémon (RN-25). | `game_transfer` | Los 11 juegos cargados |
 | [`events.yaml`](#eventsyaml) | Pokémon que solo se obtienen por evento (RN-24). | `event_pokemon` | Los 11 juegos cargados |
 | [`locations.yaml`](#locationsyaml) | Nombres en español de los lugares que PokeAPI no tiene y objetos de evento para llegar a algunos. | `location.name_es`, `location.event_item` | Kanto, Johto, Archi7 y Hoenn |
 | [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). | `evolution_method` | Todos los métodos de PokeAPI |
 
-Las mecánicas y los combates clave de Rubí, Zafiro y Esmeralda están pendientes (#113): hasta
-tenerlos, no se pueden elegir como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)).
+Los 5 juegos de la 3.ª generación tienen todos sus datos curados, así que todos se pueden
+elegir como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)).
 
 ### `pokeapi.yaml`
 
@@ -189,7 +189,7 @@ juego se mantiene a mano; los equipos se leen de WikiDex
 ([ingesta](../05-operacion/ingesta.md#wikidex)).
 
 Un fichero por grupo de versiones, porque sus juegos comparten los combates
-(`firered-leafgreen.yaml`):
+(`firered-leafgreen.yaml`, `ruby-sapphire.yaml` y `emerald.yaml`):
 
 ```yaml
 games: [firered, leafgreen]
@@ -200,12 +200,16 @@ battles:                      # en el orden habitual del juego
     trainer: Brock            # nombre que se muestra
     wikidex_page: Brock       # página de WikiDex del entrenador (no de desambiguación)
     wikidex_team: …           # opcional: rótulo del combate si la sección tiene varios
+    wikidex_section: …        # opcional: si esa página titula la sección de otra forma
+    games: […]                # opcional: solo en algunos juegos del fichero
     rival_starter_lines: […]  # opcional: líneas de los iniciales del rival, que se quitan
     note: …                   # opcional
 ```
 
 **Dónde está cada equipo en WikiDex**: en la página del entrenador, la sección cuyo título es
-exactamente `wikidex_section` tiene una plantilla `{{Equipo}}` por equipo. Si la sección
+exactamente `wikidex_section` (la del combate o, si no tiene, la del fichero) tiene una
+plantilla `{{Equipo}}` por equipo. En Hoenn las páginas no titulan igual la sección: «Pokémon
+Rubí y Zafiro» en Erico, «Pokémon Rubí» en Magno, «Pokémon Zafiro» en Aquiles… Si la sección
 tiene varios combates, cada uno va precedido de un rótulo (una línea `; En Silph S.A.`), y
 `wikidex_team` dice cuál usar. Los rótulos cambian de una página a otra: en Lorelei, Agatha y
 Lance el primer combate es «Primer combate», y en Bruno, «Primera vez». Varias plantillas
@@ -221,7 +225,7 @@ carga falla con un error que nombra el combate.
 Cada combate se carga, para cada juego, como una fila de `key_battle` con:
 
 - `slug`: `<juego>-<id>` (`firered-brock`).
-- `order`: su posición en la lista.
+- `order`: su posición entre los combates de ese juego.
 - `fact_key`: `battle:<juego>:<id>` (`battle:firered:brock`).
 - `origin`: `automatic`, porque el equipo se lee sin ambigüedad o la carga falla.
 - `source_page` y `source_revision`: la página y la revisión de WikiDex.
@@ -240,6 +244,18 @@ Los combates de Rojo Fuego y Verde Hoja son 13: los 8 líderes de gimnasio, el A
 Azul, que es el rival y el Campeón y cuenta una vez. Giovanni solo cuenta como líder del
 Gimnasio de Ciudad Verde; sus combates como jefe del Team Rocket (Casino Rocket y Silph S.A.)
 no son combates clave en Kanto ([CA-39](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+Los de Rubí y Zafiro son 15 en cada uno: los 8 líderes (Plubio es el octavo), el jefe malvado
+de la versión (`games`: Magno en Rubí y Aquiles en Zafiro, en su último combate obligatorio,
+el de la Caverna Abisal), Blasco en Calle Victoria, el Alto Mando y Máximo. Los de Esmeralda
+son 16: los 8 líderes (Galano es el octavo), Magno (combate múltiple del Centro Espacial),
+Aquiles (Caverna Abisal), Blasco, el Alto Mando y Plubio, que es el Campeón. En los gimnasios
+de Esmeralda se usa el rótulo «Combate por la medalla»: las revanchas son tras la Liga
+([CA-88](../01-ddf/cuestiones-abiertas.md#resueltas)). Bruno o Aura no está: en su último
+combate obligatorio, el de la Ruta 119, sus tres variantes no comparten ningún Pokémon aparte
+del inicial, así que no aportaría ninguno
+([CA-38](../01-ddf/cuestiones-abiertas.md#resueltas),
+[CA-89](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 Equipos cargados en Rojo Fuego (iguales en Verde Hoja):
 

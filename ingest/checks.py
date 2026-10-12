@@ -41,9 +41,17 @@ from db.reference import (
 type Check = Callable[[Session], list[str]]
 
 TARGET_GAMES = frozenset({"ruby", "sapphire", "emerald", "firered", "leafgreen"})
-# Games with curated data so far (phase 4): mechanics, arrival rule and key battles.
-CURATED_GAMES = frozenset({"firered", "leafgreen"})
-KEY_BATTLES_PER_GAME = 13
+# Games with curated data: mechanics, arrival rule and key battles (RF-05).
+CURATED_GAMES = TARGET_GAMES
+# Key battles of each game (RN-17): 8 gyms, the Elite Four and the Champion; in Hoenn, the
+# villain boss of the version (both in Emerald) and Wally (CA-88, CA-89). First and last.
+KEY_BATTLES = {
+    "firered": (13, "Brock", "Azul"),
+    "leafgreen": (13, "Brock", "Azul"),
+    "ruby": (15, "Petra", "Máximo"),
+    "sapphire": (15, "Petra", "Máximo"),
+    "emerald": (16, "Petra", "Plubio"),
+}
 SPECIES_COUNT = 386
 EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     Generation: 3,
@@ -54,7 +62,7 @@ EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     Pokemon: SPECIES_COUNT,
     GamePokemon: len(TARGET_GAMES) * SPECIES_COUNT,
     GameMechanic: len(CURATED_GAMES) * 2,  # day_night_cycle and contests
-    KeyBattle: len(CURATED_GAMES) * KEY_BATTLES_PER_GAME,
+    KeyBattle: sum(count for count, _first, _last in KEY_BATTLES.values()),
     GameStarter: len(TARGET_GAMES) * 3 + 5 * 3 + 1,  # and the 1st and 2nd gen. (Yellow, 1)
     Pokedex: 4,  # national, kanto, original-johto and hoenn
     GamePokedex: 11,
@@ -314,30 +322,50 @@ def _team(session: Session, battle: str) -> list[str]:
 
 
 def check_key_battles(session: Session) -> list[str]:
-    """Key battles and their teams (RN-17, CA-26, CA-38, CA-39)."""
+    """Key battles and their teams (RN-17, CA-26, CA-38, CA-39, CA-88, CA-89)."""
     problems = []
-    for game in CURATED_GAMES:
+    for game, (count, first, last) in KEY_BATTLES.items():
         battles = session.exec(
             select(KeyBattle).where(KeyBattle.game == game).order_by(col(KeyBattle.order))
         ).all()
-        first, last = (battles[0].trainer_name, battles[-1].trainer_name) if battles else ("", "")
-        if (first, last) != ("Brock", "Azul"):
-            problems.append(f"{game}: combates de {first!r} a {last!r}, se esperaba Brock y Azul")
+        found = (battles[0].trainer_name, battles[-1].trainer_name) if battles else ("", "")
+        if (len(battles), *found) != (count, first, last):
+            problems.append(
+                f"{game}: {len(battles)} combates, de {found[0]!r} a {found[1]!r}; se esperaban "
+                f"{count}, de {first!r} a {last!r}"
+            )
+        if [battle.order for battle in battles] != list(range(1, len(battles) + 1)):
+            problems.append(f"{game}: los combates no van numerados del 1 en adelante")
         for battle in battles:
             if not _team(session, battle.slug):
                 problems.append(f"{battle.slug}: no tiene Pokémon")
             if battle.origin is not Origin.AUTOMATIC:
                 problems.append(f"{battle.slug}: origen {battle.origin}, se esperaba automatic")
-        giovanni = [b.category for b in battles if b.trainer_name == "Giovanni"]
+    for game in ("firered", "leafgreen"):
+        query = select(KeyBattle.category).where(
+            KeyBattle.game == game, KeyBattle.trainer_name == "Giovanni"
+        )
+        giovanni = list(session.exec(query).all())
         if giovanni != ["gym_leader"]:
             problems.append(f"{game}: Giovanni {giovanni}, se esperaba solo como líder (CA-39)")
 
-    if _team(session, "firered-brock") != ["geodude", "onix"]:
-        problems.append(f"equipo de firered-brock: {_team(session, 'firered-brock')}")
-    # Without the starter (CA-26) and only what all three variants share (CA-38).
-    champion = _team(session, "firered-champion")
-    if champion != ["pidgeot", "alakazam", "rhydon"]:
-        problems.append(f"equipo de firered-champion: {champion}")
+    expected_teams = {
+        "firered-brock": ["geodude", "onix"],
+        # Without the starter (CA-26) and only what all three variants share (CA-38).
+        "firered-champion": ["pidgeot", "alakazam", "rhydon"],
+        "ruby-roxanne": ["geodude", "nosepass"],
+        "emerald-roxanne": ["geodude", "geodude", "nosepass"],
+        # The last mandatory battle of each villain boss (CA-88) and of Wally (CA-89).
+        "ruby-maxie": ["mightyena", "crobat", "camerupt"],
+        "sapphire-archie": ["mightyena", "crobat", "sharpedo"],
+        "emerald-wally": ["altaria", "delcatty", "magneton", "roselia", "gardevoir"],
+    }
+    for slug, team in expected_teams.items():
+        if _team(session, slug) != team:
+            problems.append(f"equipo de {slug}: {_team(session, slug)}, se esperaba {team}")
+    for slug in ("ruby-archie", "sapphire-maxie"):  # each version has its own boss
+        if session.get(KeyBattle, slug) is not None:
+            problems.append(f"{slug} no debería existir")
     return problems
 
 

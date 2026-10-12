@@ -51,8 +51,12 @@ class WikidexSource:
         index = self._index()
         self._blockers.clear()
         for battles_file in self._curated.key_battles:
-            for order, battle in enumerate(battles_file.battles, start=1):
-                section = battles_file.wikidex_section
+            orders = dict.fromkeys(battles_file.games, 0)
+            for battle in battles_file.battles:
+                games = battle.games or battles_file.games
+                for game in games:
+                    orders[game] += 1
+                section = battle.wikidex_section or battles_file.wikidex_section
                 try:
                     page = self._pages.page(battle.wikidex_page)
                     variants = team_variants(
@@ -69,9 +73,9 @@ class WikidexSource:
                     _without_starter(_resolve(team, battle, index), battle, index)
                     for team in variants
                 ]
-                read = _ReadBattle(order, battle, _common_members(teams, battle), page.revision)
-                for game in battles_file.games:
-                    yield from read.rows(game)
+                read = _ReadBattle(battle, _common_members(teams, battle), page.revision)
+                for game in games:
+                    yield from read.rows(game, orders[game])
 
 
 type ResolvedTeam = list[tuple[TeamMember, str, int]]  # member, form slug, evolution chain
@@ -128,19 +132,19 @@ def _common_members(teams: list[ResolvedTeam], battle: BattleEntry) -> ResolvedT
 class _ReadBattle:
     """A curated battle with its team already read from WikiDex."""
 
-    order: int
     battle: BattleEntry
     team: ResolvedTeam
     revision: int
 
-    def rows(self, game: str) -> Iterator[ReferenceModel]:
+    def rows(self, game: str, order: int) -> Iterator[ReferenceModel]:
+        """The battle in ``game``, at position ``order`` among the game's battles."""
         slug = f"{game}-{self.battle.id}"
         yield KeyBattle(
             slug=slug,
             game=game,
             category=self.battle.category,
             trainer_name=self.battle.trainer,
-            order=self.order,
+            order=order,
             origin=Origin.AUTOMATIC,
             fact_key=f"battle:{game}:{self.battle.id}",
             source_page=self.battle.wikidex_page,

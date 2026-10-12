@@ -162,7 +162,7 @@ Si algo falla en los pasos 1 a 8, o la carga queda bloqueada, se borra el tempor
 ## Informe
 
 Informe real de la carga del 2026-10-12, con el commit `bc92d3b` de PokeAPI, los datos
-curados y los equipos de WikiDex de Rojo Fuego y Verde Hoja:
+curados y los equipos de WikiDex de los 5 juegos objetivo:
 
 ```text
 Carga de data/reference.sqlite
@@ -182,28 +182,24 @@ Filas cargadas por tabla:
   encounter             11051
   event_pokemon            29
   evolution_step          940
-  game_mechanic             4
+  game_mechanic            10
   game_pokedex             11
   game_pokemon           1930
   game_starter             31
   game_transfer            50
-  key_battle               26
+  key_battle               72
   pokemon_type           1131
-  key_battle_pokemon      100
+  key_battle_pokemon      285
 Datos revisables por origen:
-  game_mechanic        inferred 4
+  game_mechanic        inferred 10
   game_pokemon         automatic 1930, inferred 1930
-  key_battle           automatic 26
+  key_battle           automatic 72
 Imágenes: 386 de 386 formas
 Ilustraciones: 386 de 386 formas
 Portadas: 11 de 11 juegos
-Juegos que no se pueden elegir como objetivo (datos incompletos):
-  Rubí: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
-  Zafiro: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
-  Esmeralda: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
 Comprobaciones superadas: 13
 Carga completada.
-Informe: data/reports/2026-10-12T155640-completada.md
+Informe: data/reports/2026-10-12T161448-completada.md
 ```
 
 - **Filas cargadas por tabla**: en orden de dependencias. No incluye `ingest_run`.
@@ -227,7 +223,8 @@ Informe: data/reports/2026-10-12T155640-completada.md
 - **Juegos que no se pueden elegir como objetivo**: los que no están completos y qué les falta
   ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Se cargan igualmente y se pueden
   registrar en el *Hall of Fame*, pero no aparecen al elegir el juego. No es un error: la
-  carga se completa.
+  carga se completa. Con los datos actuales los 5 juegos objetivo están completos y la línea no
+  aparece.
 - **Comprobaciones superadas**: número de comprobaciones de la carga que se han cumplido.
 
 Ejemplos de cargas fallidas:
@@ -482,5 +479,5 @@ cada módulo, en su *docstring*. Los tests, en `tests/ingest/`
 
 ## Pendiente
 
-Lo que falta de la ingesta está en las issues: las mecánicas y los combates clave de Rubí,
-Zafiro y Esmeralda (#113) y las restricciones de llegada de otras generaciones (#114).
+Lo que falta de la ingesta está en las issues: las restricciones de llegada de otras
+generaciones (#114).

@@ -196,9 +196,8 @@ En **Nuevo juego** aparecen los juegos que puedes elegir: los juegos completos, 
 crianza y tienen todos los datos que necesitan las reglas
 ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)), salvo los que ya están en tu *Hall of
 Fame*, porque cada juego se completa una sola vez
-([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). Hoy son Rojo Fuego y Verde Hoja; Rubí,
-Zafiro y Esmeralda no aparecen hasta tener sus combates clave, aunque sí puedes registrarlos en
-el **Hall of Fame**. Pulsa uno para revisar sus datos. Cambiar de juego no cambia tus favoritos.
+([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). Hoy son los 5 de la 3.ª generación: Rubí,
+Zafiro, Esmeralda, Rojo Fuego y Verde Hoja. Pulsa uno para revisar sus datos. Cambiar de juego no cambia tus favoritos.
 
 ### Revisar los datos
 
