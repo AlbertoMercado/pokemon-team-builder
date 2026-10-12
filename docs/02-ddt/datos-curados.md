@@ -35,7 +35,7 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Rojo Fuego, Verde Hoja |
 | [`starters.yaml`](#startersyaml) | Iniciales de cada juego (RN-21, CA-87). | `game_starter` | Los 11 juegos cargados |
 | [`breeding.yaml`](#breedingyaml) | Bebés que solo nacen con incienso. | `species.requires_incense` | — |
-| [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Rojo Fuego, Verde Hoja |
+| [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Los 5 juegos objetivo |
 | [`covers.yaml`](#coversyaml) | Título del fichero de la portada de cada juego en WikiDex (RF-18). | `game.cover`, `game.cover_source` | Los 11 juegos cargados |
 | [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Rojo Fuego, Verde Hoja |
 | [`pokedex.yaml`](#pokedexyaml) | Pokédex que completa cada juego (RN-22). | `game_pokedex` | Los 11 juegos cargados |
@@ -44,8 +44,8 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`locations.yaml`](#locationsyaml) | Nombres en español de los lugares que PokeAPI no tiene y objetos de evento para llegar a algunos. | `location.name_es`, `location.event_item` | Kanto, Johto, Archi7 y Hoenn |
 | [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). | `evolution_method` | Todos los métodos de PokeAPI |
 
-Los datos de Rubí, Zafiro y Esmeralda están pendientes (#8): hasta tenerlos, no se pueden elegir
-como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)).
+Las mecánicas y los combates clave de Rubí, Zafiro y Esmeralda están pendientes (#113): hasta
+tenerlos, no se pueden elegir como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)).
 
 ### `pokeapi.yaml`
 
@@ -129,7 +129,7 @@ cargado. La regla se aplica al proponer la llegada (abajo) y, más adelante, en
 **Por qué existe**: un Pokémon solo es candidato si la etapa que nace del huevo puede llegar
 al juego objetivo y evolucionar antes de completarlo
 ([RN-03](../01-ddf/reglas-negocio.md#rn-03),
-[CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Eso depende de restricciones de cada
+[CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)). Eso depende de restricciones de cada
 juego que no están en ninguna fuente, así que la ingesta propone el dato con una regla por
 juego.
 
@@ -151,6 +151,11 @@ Raichu (Pichu), Clefairy y Clefable (Cleffa), Jigglypuff y Wigglytuff (Igglybuff
 (Smoochum), Electabuzz (Elekid), Magmar (Magby), y Hitmonlee y Hitmonchan (Tyrogue). Tampoco
 las evoluciones de la 2.ª generación, como Crobat o Espeon
 ([restricciones comprobadas](datos-requeridos.md#rojo-fuego-y-verde-hoja-comprobado)).
+
+En Esmeralda, con la Pokédex de Hoenn, pueden llegar 202: exactamente los de esa Pokédex,
+porque hasta la 3.ª generación sus líneas evolutivas están enteras en ella. En Rubí y Zafiro,
+con la Nacional, pueden llegar los 386
+([restricciones comprobadas](datos-requeridos.md#restricciones-de-llegada-por-juego)).
 
 Las propuestas son **inferidas**: el usuario las confirma. Un juego objetivo sin regla queda
 con la llegada **pendiente**. Una regla para un juego que no es juego objetivo hace fallar la

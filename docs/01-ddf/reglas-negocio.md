@@ -134,7 +134,7 @@ Siempre están activas.
     3. **Llegada**: de ellos, solo pasan aquellos cuya etapa de entrada (la que nace del huevo,
        [CA-25](cuestiones-abiertas.md#resueltas)) puede llegar al juego objetivo y evolucionar
        hasta la evolución de favoritos **antes de completarlo**
-       ([CA-28](cuestiones-abiertas.md#abiertas)).
+       ([CA-28](cuestiones-abiertas.md#resueltas)).
 - **Ejemplos**:
     - Si el juego objetivo es Pokémon Rojo Fuego (3.ª generación), Vulpix es candidato. No se
       puede atrapar en Rojo Fuego, porque es exclusivo de Verde Hoja, pero existe en el juego.
@@ -149,8 +149,10 @@ Siempre están activas.
     - En Rojo Fuego, antes de la Pokédex Nacional, no se pueden recibir por intercambio
       Pokémon de fuera de la Pokédex de Kanto. Raichu no es candidato, porque de un huevo de
       su línea nace Pichu, que no puede llegar al juego. Crobat tampoco, porque Golbat no
-      puede evolucionar a Crobat antes de la Pokédex Nacional (pendiente de
-      [CA-28](cuestiones-abiertas.md#abiertas)).
+      puede evolucionar a Crobat antes de la Pokédex Nacional
+      ([CA-28](cuestiones-abiertas.md#resueltas)).
+    - En Esmeralda solo pueden llegar Pokémon de la Pokédex de Hoenn: Raichu y Crobat son
+      candidatos y Bulbasaur no. En Rubí y Zafiro puede llegar cualquiera.
 - **Nota**: el nivel de juego ya implica el de generación. Los niveles se mantienen separados
   porque permiten explicar mejor por qué se descarta un Pokémon
   ([RF-10](requisitos-funcionales.md#rf-10)).
@@ -300,7 +302,7 @@ parámetros son fijos.
       Leafeon, Glaceon y Sylveon no existen en Rojo Fuego. Espeon y Umbreon no pueden
       conseguirse antes de completarlo: Eevee no puede evolucionar a ellos antes de la
       Pokédex Nacional, y el juego no tiene ciclo de día y noche ([RN-03](#rn-03),
-      [CA-28](cuestiones-abiertas.md#abiertas)).
+      [CA-28](cuestiones-abiertas.md#resueltas)).
 - **Junto con [RN-13](#rn-13)** ([CA-48](cuestiones-abiertas.md#resueltas)): si ninguna
   evolución de Eevee candidata cabe en un equipo con los candidatos que cumplen RN-13, RN-13
   tiene prioridad. Esas evoluciones se descartan y la regla pasa al nivel 2: se reserva un

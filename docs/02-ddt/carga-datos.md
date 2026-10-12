@@ -35,9 +35,9 @@ Decisiones de alcance:
   [CA-67](../01-ddf/cuestiones-abiertas.md#resueltas)). La fuente de PokeAPI propone como
   objetivo los 5 de la 3.ª generación y, con todo cargado, `ingest/targets.py` deja como tales
   solo los completos; el informe dice qué les falta a los demás, que se cargan igualmente. Hoy
-  son Rojo Fuego y Verde Hoja, cuyas restricciones de llegada están investigadas
-  ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). A Rubí, Zafiro y Esmeralda les faltan
-  sus mecánicas y sus combates clave (#8).
+  son Rojo Fuego y Verde Hoja. A Rubí, Zafiro y Esmeralda les faltan sus mecánicas y sus
+  combates clave (#113); sus restricciones de llegada ya están comprobadas
+  ([CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - **Sin movimientos por nivel**. Ninguna evolución de las especies 1 a 386 exige conocer un
   movimiento (eso empieza en la 4.ª generación: Tangrowth, Mamoswine…). La tabla `level_move`
   y el fichero `pokemon_moves.csv` (10,7 MB) se dejan para cuando haga falta.
@@ -140,12 +140,12 @@ En PokeAPI, las evoluciones aleatorias se reconocen por `percentage_chance` o
   Nacional tiene las 386 especies y todas se pueden tener en cualquiera de los 5 juegos, al
   menos por intercambio. Se carga como dato automático.
 - **Llegada antes de completar el juego**
-  ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)):
-    - Rojo Fuego y Verde Hoja: dato **inferido**. Propuesta: la etapa que nace del huevo y la
-      evolución de favoritos están en la Pokédex de Kanto y ninguna evolución intermedia es de
-      la 2.ª generación ([restricciones comprobadas](datos-requeridos.md#rojo-fuego-y-verde-hoja-comprobado)).
-    - Rubí, Zafiro y Esmeralda: dato **pendiente** hasta investigarlo (issue #8). El usuario
-      lo confirmará antes de generar ([RN-18](../01-ddf/reglas-negocio.md#rn-18)).
+  ([CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)):
+    dato **inferido** en los 5 juegos objetivo, con la regla de cada uno en
+    [`arrival.yaml`](datos-curados.md#arrivalyaml): la Pokédex de Kanto en Rojo Fuego y Verde
+    Hoja, la de Hoenn en Esmeralda y la Nacional en Rubí y Zafiro
+    ([restricciones comprobadas](datos-requeridos.md#restricciones-de-llegada-por-juego)). El
+    usuario lo confirma antes de generar ([RN-18](../01-ddf/reglas-negocio.md#rn-18)).
 
 ### Pokédex y apariciones
 

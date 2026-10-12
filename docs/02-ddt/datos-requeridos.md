@@ -8,7 +8,7 @@ columnas concretas están en el [modelo de datos](modelo-datos.md).
 | Regla | Datos que necesita |
 |-------|--------------------|
 | RN-02, RN-09 | Favoritos del usuario (forma concreta). Cadena evolutiva para conocer las preevoluciones. |
-| RN-03 | Generación de cada juego. Pokémon (por forma) que pueden estar en cada juego, también por transferencia. Etapa que nace del huevo en cada línea. Restricciones de llegada y de evolución antes de completar cada juego ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). |
+| RN-03 | Generación de cada juego. Pokémon (por forma) que pueden estar en cada juego, también por transferencia. Etapa que nace del huevo en cada línea. Restricciones de llegada y de evolución antes de completar cada juego ([CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | RN-05, RN-06 | Especie de cada forma y si la forma es regional. |
 | RN-07 | Línea evolutiva de cada forma. |
 | RN-10 | Tipos de cada forma por generación, tabla de eficacias por generación y métodos de evolución por juego. |
@@ -114,41 +114,77 @@ vuelve a pedir. El motor (`core/`) recibe los datos ya resueltos y no conoce su 
 
 Para [RN-03](../01-ddf/reglas-negocio.md#rn-03) no basta con que un Pokémon exista en el juego:
 la etapa que nace del huevo tiene que poder llegar y evolucionar **antes de completarlo**
-([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Hay juegos con restricciones hasta que se
-obtiene la Pokédex Nacional, que suele darse tras la Liga. Hay que investigarlo juego a juego y
-guardarlo como dato de cada juego.
+([CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)). Varios juegos limitan qué se puede
+recibir o a qué se puede evolucionar hasta tener la Pokédex Nacional, que se obtiene tras la
+Liga. Se carga como propuesta inferida de cada juego, con la regla de
+[`arrival.yaml`](datos-curados.md#arrivalyaml).
+
+Está comprobado en el **código de los juegos**: las decompilaciones de
+[pret](https://github.com/pret) (`pokefirered`, `pokeemerald` y `pokeruby`), que reproducen el
+original byte a byte. Es más fiable que las guías, que se contradicen en esto.
+
+| Juego | Qué puede recibir antes de la Liga | Evoluciones antes de la Liga | Regla |
+|-------|------------------------------------|------------------------------|-------|
+| Rojo Fuego y Verde Hoja | Solo especies de la Pokédex de Kanto, de otro Rojo Fuego o Verde Hoja | Ninguna a una especie posterior a Mew | `kanto` (140 de 386) |
+| Esmeralda | Solo especies de la Pokédex de Hoenn, y ningún huevo, de Rubí, Zafiro o Esmeralda | Sin restricciones | `hoenn` (202 de 386) |
+| Rubí y Zafiro | Cualquier especie, de Rubí, Zafiro, Esmeralda o un Rojo Fuego o Verde Hoja terminado | Sin restricciones | `national` (386 de 386) |
 
 ### Rojo Fuego y Verde Hoja (comprobado)
 
-- Antes de la Pokédex Nacional solo se pueden intercambiar Pokémon de la Pokédex de Kanto
-  (los 151 de la 1.ª generación). Un Pichu no se puede enviar a Verde Hoja hasta tener la
-  Pokédex Nacional, aunque sí después de evolucionarlo a Pikachu.
-- No se puede intercambiar con Rubí, Zafiro o Esmeralda hasta tener la Pokédex Nacional y
-  completar la misión de Celio en Isla Prima. Antes de la Liga, el equipo solo puede venir de
-  otra copia de Rojo Fuego o Verde Hoja.
-- Antes de la Pokédex Nacional, los Pokémon intentan evolucionar a especies de la 2.ª
-  generación, pero fallan (p. ej., Golbat → Crobat). Por extensión, tampoco funcionan
-  Onix → Steelix, Chansey → Blissey, Scyther → Scizor, Seadra → Kingdra, Slowpoke → Slowking,
-  Poliwhirl → Politoed, Gloom → Bellossom, Porygon → Porygon2 ni Eevee → Espeon o Umbreon.
+- Sin la Pokédex Nacional solo se pueden intercambiar Pokémon de la Pokédex de Kanto. Un Pichu
+  no se puede enviar a Verde Hoja hasta tenerla, aunque sí después de evolucionarlo a Pikachu.
+- Con Rubí, Zafiro o Esmeralda solo se puede intercambiar tras completar las Islas Sete
+  (`GetGameProgressForLinkTrade` en
+  [`pokefirered/src/trade.c`](https://github.com/pret/pokefirered/blob/master/src/trade.c)).
+  Antes de la Liga, el equipo solo puede venir de otra copia de Rojo Fuego o Verde Hoja.
+- Sin la Pokédex Nacional, la escena de evolución se cancela sola si la especie de destino es
+  posterior a Mew (`tPostEvoSpecies > SPECIES_MEW` en
+  [`evolution_scene.c`](https://github.com/pret/pokefirered/blob/master/src/evolution_scene.c),
+  también en la de intercambio), y la evolución por intercambio con objeto no gasta el objeto
+  (*«Prevent cross-generational evolutions like Scizor and Steelix»*, en
+  [`pokemon.c`](https://github.com/pret/pokefirered/blob/master/src/pokemon.c)). Por eso fallan
+  Golbat → Crobat, Onix → Steelix, Chansey → Blissey, Scyther → Scizor, Seadra → Kingdra,
+  Slowpoke → Slowking, Poliwhirl → Politoed, Gloom → Bellossom, Porygon → Porygon2 y Eevee →
+  Espeon o Umbreon.
 - La guardería está en Isla Cuatro, a la que se llega tras la Liga. La crianza se hace en otra
   partida ya completada.
-- Conclusión: en Rojo Fuego y Verde Hoja solo pueden ser candidatos los Pokémon de la Pokédex
-  de Kanto cuya etapa que nace del huevo también está en ella, y con evoluciones solo dentro de
-  ella. Raichu queda fuera, porque su huevo da Pichu. La ingesta lo propone con la regla de
-  `arrival.yaml` ([datos curados](datos-curados.md#arrivalyaml)).
+- Conclusión: solo pueden llegar los Pokémon de la Pokédex de Kanto cuya etapa que nace del
+  huevo también está en ella, y con evoluciones solo dentro de ella. Raichu queda fuera, porque
+  su huevo da Pichu.
 
-Fuentes: [Thonky: intercambiar entre Rojo Fuego y Verde Hoja](https://www.thonky.com/pokemon/trade-from-firered-to-leafgreen),
-[Bulbapedia: discusión sobre Rojo Fuego y Verde Hoja](https://bulbapedia.bulbagarden.net/wiki/Talk:Pok%C3%A9mon_FireRed_and_LeafGreen_Versions)
-y [Bulbapedia: Pokédex Nacional](https://bulbapedia.bulbagarden.net/wiki/National_Pok%C3%A9dex).
+### Esmeralda (comprobado)
 
-### Pendiente de investigar
+- Sin la Pokédex Nacional no se pueden enviar ni recibir huevos ni Pokémon de fuera de la
+  Pokédex de Hoenn (`IsSpeciesInHoennDex` y `CANT_TRADE_EGG_YET` en
+  [`pokeemerald/src/trade.c`](https://github.com/pret/pokeemerald/blob/master/src/trade.c)).
+- Con Rojo Fuego o Verde Hoja solo se puede intercambiar siendo Campeón
+  (`GetGameProgressForLinkTrade`, en el mismo fichero).
+- La Pokédex Nacional la da el profesor Abedul después del *Hall of Fame*
+  (`ReadyDexUpgradeEvent` en
+  [`hall_of_fame.inc`](https://github.com/pret/pokeemerald/blob/master/data/scripts/hall_of_fame.inc));
+  intercambiar no la desbloquea, a diferencia de Rubí y Zafiro.
+- Las evoluciones no comprueban la Pokédex Nacional.
+- Conclusión: pueden llegar los Pokémon de la Pokédex de Hoenn. Hasta la 3.ª generación, toda
+  línea evolutiva con una especie en la Pokédex de Hoenn la tiene entera en ella (de Zubat a
+  Crobat, de Pichu a Raichu), así que basta con que la etapa que nace del huevo esté y la regla
+  de `arrival.yaml` da el mismo resultado.
 
-- Rubí, Zafiro y Esmeralda: si antes de la Pokédex Nacional se pueden recibir Pokémon de fuera
-  de la Pokédex de Hoenn y si pueden evolucionar.
-- Oro, Plata y Cristal: si hay alguna restricción parecida (en principio, no).
-- 4.ª generación en adelante: restricciones de intercambio o evolución antes de la Pokédex
-  Nacional, y canales de transferencia disponibles (Pal Park, Pokétransfer, Pokémon HOME), que
-  suelen exigir haber completado el juego de destino.
+### Rubí y Zafiro (comprobado)
+
+- El intercambio no comprueba la especie
+  ([`pokeruby/src/trade.c`](https://github.com/pret/pokeruby/blob/master/src/trade.c)), y Rojo
+  Fuego y Verde Hoja solo exigen a un compañero de Rubí o Zafiro haber completado sus propias
+  Islas Sete, no que el de Rubí o Zafiro sea Campeón, como sí piden a Esmeralda. Recibir un
+  Pokémon de fuera de Hoenn desbloquea la Pokédex Nacional
+  ([Serebii](https://www.serebii.net/fireredleafgreen/compatibility.shtml)).
+- Las evoluciones no comprueban la Pokédex Nacional.
+- Conclusión: puede llegar cualquier Pokémon de las generaciones 1 a 3, de otro Rubí o Zafiro o
+  de un Rojo Fuego o Verde Hoja ya terminado.
+
+### Otras generaciones
+
+Solo los juegos de la 3.ª generación pueden ser juego objetivo (`ingest/scope.py`). Oro, Plata,
+Cristal y la 4.ª generación en adelante se investigarán cuando puedan serlo (#114).
 
 ## Comprobación de las fuentes
 

@@ -167,6 +167,7 @@ curados y los equipos de WikiDex de Rojo Fuego y Verde Hoja:
 ```text
 Carga de data/reference.sqlite
 Filas cargadas por tabla:
+  evolution_method         45
   generation                3
   location                212
   pokedex                   4
@@ -191,7 +192,7 @@ Filas cargadas por tabla:
   key_battle_pokemon      100
 Datos revisables por origen:
   game_mechanic        inferred 4
-  game_pokemon         automatic 1930, inferred 772, pending 1158
+  game_pokemon         automatic 1930, inferred 1930
   key_battle           automatic 26
 Imágenes: 386 de 386 formas
 Ilustraciones: 386 de 386 formas
@@ -202,15 +203,15 @@ Juegos que no se pueden elegir como objetivo (datos incompletos):
   Esmeralda: faltan sus mecánicas (RN-15) y sus combates clave (RN-17)
 Comprobaciones superadas: 13
 Carga completada.
-Informe: data/reports/2026-10-12T111112-completada.md
+Informe: data/reports/2026-10-12T155640-completada.md
 ```
 
 - **Filas cargadas por tabla**: en orden de dependencias. No incluye `ingest_run`.
 - **Datos revisables por origen**: para cada tabla con columnas de origen, cuántos valores
   son automáticos, inferidos o pendientes. Los inferidos y los pendientes los tendrá que
   confirmar el usuario antes de generar ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). En
-  `game_pokemon` hay dos valores por fila: la existencia (automática) y la llegada (inferida
-  en Rojo Fuego y Verde Hoja, pendiente en Rubí, Zafiro y Esmeralda). Los combates clave
+  `game_pokemon` hay dos valores por fila: la existencia (automática) y la llegada (inferida,
+  con la regla de cada juego). Los combates clave
   son automáticos.
 - **Imágenes** e **Ilustraciones**: cuántas formas tienen su *sprite* y su ilustración. Las que
   no los tienen aparecen en **Avisos**, agrupadas por motivo, por ejemplo:
@@ -416,7 +417,7 @@ num  nombre     tipos
 ```
 
 Pokémon que, según la propuesta, no pueden llegar a Rojo Fuego antes de completarlo
-([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)). Son 246: los 11 de Kanto que nacen como
+([CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)). Son 246: los 11 de Kanto que nacen como
 bebé de la 2.ª generación y todos los de la 2.ª y la 3.ª:
 
 ```sql
@@ -481,5 +482,5 @@ cada módulo, en su *docstring*. Los tests, en `tests/ingest/`
 
 ## Pendiente
 
-Lo que falta de la ingesta está en las issues: las restricciones de llegada del resto de
-juegos (#8).
+Lo que falta de la ingesta está en las issues: las mecánicas y los combates clave de Rubí,
+Zafiro y Esmeralda (#113) y las restricciones de llegada de otras generaciones (#114).

@@ -12,7 +12,7 @@ Algunos datos no están en ninguna fuente o no se pueden deducir con certeza
 - La lista de combates clave de cada juego, con la página de WikiDex de cada entrenador.
 - Las mecánicas de cada juego, como el ciclo de día y noche.
 - Las restricciones de llegada antes de completar el juego
-  ([CA-28](../01-ddf/cuestiones-abiertas.md#abiertas)).
+  ([CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - Correcciones puntuales a datos de las fuentes.
 
 Estos datos los mantiene una persona y conviene poder revisarlos y saber cuándo cambiaron.
