@@ -18,11 +18,15 @@ from db.reference.evolution import (
     TediumReason,
 )
 from db.reference.games import (
+    CatalogGame,
     Game,
     GameMechanic,
     GamePokemon,
     GameStarter,
     Generation,
+    MissingData,
+    Platform,
+    Playability,
     VersionGroup,
 )
 from db.reference.meta import IngestRun
@@ -46,6 +50,7 @@ from db.reference.pokemon import (
 
 __all__ = [
     "BattleCategory",
+    "CatalogGame",
     "Encounter",
     "EventPokemon",
     "EvolutionMethod",
@@ -63,7 +68,10 @@ __all__ = [
     "Location",
     "MethodCategory",
     "MethodKind",
+    "MissingData",
     "Origin",
+    "Platform",
+    "Playability",
     "Pokedex",
     "PokedexNumber",
     "Pokemon",

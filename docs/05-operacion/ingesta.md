@@ -167,6 +167,7 @@ curados y los equipos de WikiDex de los 5 juegos objetivo:
 ```text
 Carga de data/reference.sqlite
 Filas cargadas por tabla:
+  catalog_game             36
   evolution_method         45
   generation                3
   location                212
@@ -197,9 +198,9 @@ Datos revisables por origen:
 Imágenes: 386 de 386 formas
 Ilustraciones: 386 de 386 formas
 Portadas: 11 de 11 juegos
-Comprobaciones superadas: 13
+Comprobaciones superadas: 14
 Carga completada.
-Informe: data/reports/2026-10-12T161448-completada.md
+Informe: data/reports/2026-10-12T171150-completada.md
 ```
 
 - **Filas cargadas por tabla**: en orden de dependencias. No incluye `ingest_run`.

@@ -14,13 +14,16 @@ import pytest
 from sqlmodel import Session, col, select
 
 from db.reference import (
+    CatalogGame,
     Encounter,
     EvolutionStep,
     Game,
     GamePokemon,
     GameStarter,
     Location,
+    MissingData,
     Origin,
+    Platform,
     Pokedex,
     PokedexNumber,
     Pokemon,
@@ -35,6 +38,7 @@ from ingest.blockers import BlockerKind
 from ingest.checks import (
     FIRST_LOAD_CHECKS,
     check_arrival_proposals,
+    check_catalog,
     check_counts,
     check_key_battles,
     check_starters,
@@ -53,6 +57,8 @@ from ingest.sources.curated import (
 from ingest.sources.curated.schemas import (
     ArrivalFile,
     ArrivalRule,
+    CatalogEntry,
+    CatalogFile,
     LocationEntry,
     LocationsFile,
     StartersFile,
@@ -598,12 +604,14 @@ def test_first_load_checks_reject_an_incomplete_load(tmp_path: Path) -> None:
 
 def test_known_case_checks_pass_on_the_extract(loaded: Session) -> None:
     """Every problem of the extract is a count, a key battle (it has no WikiDex teams), a
-    missing starter (it only has Venusaur), for lack of key battles, a target game, or an arrival
-    of Ruby (without rule here) or of a known case that is not in the extract."""
+    missing starter (it only has Venusaur), for lack of key battles, a target game or what a game
+    of the catalogue lacks, or an arrival of Ruby (without rule here) or of a known case that is
+    not in the extract."""
     problems = [problem for check in FIRST_LOAD_CHECKS for problem in check(loaded)]
     assert problems
     expected = check_counts(loaded) + check_key_battles(loaded) + check_starters(loaded)
     expected += check_target_games(loaded)
+    expected += [problem for problem in check_catalog(loaded) if " le falta " in problem]
     expected += [
         problem
         for problem in check_arrival_proposals(loaded)
@@ -624,3 +632,21 @@ def test_starters_check_requires_a_final_evolution(loaded: Session) -> None:
 
     assert "ivysaur no es una evolución final en firered: no puede ser inicial" in problems
     assert not any(problem.startswith("venusaur no es") for problem in problems)
+
+
+def test_the_catalogue_has_its_names_and_generations_from_pokeapi(loaded: Session) -> None:
+    """RF-25, CA-90: also of the games that are not loaded, in release order."""
+    catalog = loaded.exec(select(CatalogGame).order_by(col(CatalogGame.catalog_order))).all()
+
+    assert len(catalog) == 36
+    assert [entry.game for entry in catalog[8:11]] == ["firered", "leafgreen", "emerald"]
+    za = catalog[-1]
+    assert (za.game, za.name_es, za.generation) == ("legends-za", "Leyendas: Z-A", 9)
+    assert za.missing == [MissingData.GENERATION_NOT_LOADED]
+
+
+def test_a_catalogue_game_that_is_not_in_pokeapi_fails() -> None:
+    entry = CatalogEntry(game="pokemon-gris", platform=Platform.SWITCH, receives_bred=True)
+    curated = dataclasses.replace(CURATED, catalog=CatalogFile(games=[entry]))
+    with pytest.raises(TransformError, match="pokemon-gris"):
+        list(_offline_source(curated=curated).rows())

@@ -43,6 +43,7 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`events.yaml`](#eventsyaml) | Pokémon que solo se obtienen por evento (RN-24). | `event_pokemon` | Los 11 juegos cargados |
 | [`locations.yaml`](#locationsyaml) | Nombres en español de los lugares que PokeAPI no tiene y objetos de evento para llegar a algunos. | `location.name_es`, `location.event_item` | Kanto, Johto, Archi7 y Hoenn |
 | [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). | `evolution_method` | Todos los métodos de PokeAPI |
+| [`catalog.yaml`](#catalogyaml) | Juegos del catálogo de juegos, en orden de lanzamiento (RF-25, CA-90). | `catalog_game` | Los 36 juegos del catálogo |
 
 Los 5 juegos de la 3.ª generación tienen todos sus datos curados, así que todos se pueden
 elegir como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)).
@@ -405,13 +406,42 @@ añadirlo a este fichero ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16),
 [bloqueos](../05-operacion/ingesta.md#bloqueos)). El arquitecto lo completa mediante PR
 ([protocolo](../05-operacion/ingesta.md#carga-bloqueada)).
 
+### `catalog.yaml`
+
+**Qué es**: los juegos del **catálogo de juegos**, en el que el usuario elige sus juegos objetivo
+([RF-25](../01-ddf/requisitos-funcionales.md#rf-25)): los de la saga principal y los Leyendas
+que pueden recibir un Pokémon criado, en orden de lanzamiento
+([CA-90](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+**Por qué existe**: qué juegos entran, si pueden recibir un Pokémon criado y si son jugables en
+un sistema actual son decisiones y datos que PokeAPI no tiene. Su nombre en español y su
+generación sí, y salen de PokeAPI, también de los juegos que no se cargan.
+
+```yaml
+games:                      # en orden de lanzamiento
+  - game: legends-arceus    # identificador de PokeAPI (versions.csv)
+    platform: switch        # game_boy, game_boy_color, game_boy_advance, ds, 3ds o switch
+    receives_bred: true     # si puede recibir un Pokémon criado (CA-29, CA-91)
+    playable_now: "yes"     # opcional: "yes" o unknown (por defecto) (CA-92)
+    note: …                 # opcional
+```
+
+| Campo | Significado |
+|-------|-------------|
+| `receives_bred` | Si puede recibir un Pokémon criado, en el propio juego o por transferencia: falso en Rojo, Azul y Amarillo ([CA-29](../01-ddf/cuestiones-abiertas.md#resueltas)); verdadero en los Leyendas, que lo reciben por Pokémon HOME ([CA-91](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `playable_now` | `"yes"` si se sabe que es jugable en un sistema actual de Nintendo: los juegos de Switch, porque la Switch 2 los ejecuta. `unknown` en el resto: la aplicación pregunta al usuario ([CA-92](../01-ddf/cuestiones-abiertas.md#resueltas)). Va entre comillas porque en YAML `yes` sin ellas es un booleano. |
+
+Están los 36 juegos de CA-90; Let's Go Pikachu y Let's Go Eevee no. Un juego que no existe en
+PokeAPI hace fallar la carga. Lo que le falta a cada juego para estar completo lo calcula la
+carga ([diseño de la carga](carga-datos.md#catalogo-de-juegos)).
+
 ## Implementación
 
 | Fichero | Qué hace |
 |---------|----------|
 | `ingest/sources/curated/schemas.py` | Un modelo pydantic por fichero, con las validaciones de esta página. |
 | `ingest/sources/curated/__init__.py` | `read_curated(directorio)` lee y valida todos los ficheros (`CuratedData`). `CuratedSource` carga las mecánicas, los iniciales, la Pokédex de cada juego, las transferencias (`transfer_pairs`), los Pokémon de evento y el catálogo de métodos de evolución. |
-| `ingest/sources/pokeapi/transform.py` | Usa `CuratedData` para marcar los bebés de incienso, proponer la llegada y completar los lugares. |
+| `ingest/sources/pokeapi/transform.py` | Usa `CuratedData` para marcar los bebés de incienso, proponer la llegada, completar los lugares y construir el catálogo de juegos. |
 | `ingest/sources/wikidex/` | Usa la lista de combates de `CuratedData` para leer sus equipos de WikiDex y cargarlos ([ingesta](../05-operacion/ingesta.md#wikidex)). |
 
 Tests en `tests/ingest/test_curated.py` (los ficheros reales del repositorio, los esquemas y la

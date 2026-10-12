@@ -1,6 +1,9 @@
-"""Generations, version groups, games and per-game data (RN-03, RN-15, RN-21, RF-05)."""
+"""Generations, version groups, games, the game catalogue and per-game data (RN-03, RN-15,
+RN-21, RF-05, RF-25)."""
 
-from sqlalchemy import CheckConstraint
+from enum import StrEnum
+
+from sqlalchemy import JSON, CheckConstraint
 from sqlmodel import Field
 
 from db.reference.base import Origin, ReferenceModel, enum_column, origin_check
@@ -30,7 +33,8 @@ class VersionGroup(ReferenceModel, table=True):
 
 
 class Game(ReferenceModel, table=True):
-    """A main-series game. Only games with ``is_target`` can be chosen as target (RF-05).
+    """A main-series game loaded with its data. ``is_target`` marks the complete ones: they
+    have everything the rules need (RF-05, CA-67).
 
     ``cover`` is the path of its cover relative to the data directory and ``cover_source`` the
     title of its file in WikiDex, for the attribution; both null if it has no cover (RF-18,
@@ -48,6 +52,54 @@ class Game(ReferenceModel, table=True):
     is_target: bool
     cover: str | None = None
     cover_source: str | None = None
+
+
+class Platform(StrEnum):
+    GAME_BOY = "game_boy"
+    GAME_BOY_COLOR = "game_boy_color"
+    GAME_BOY_ADVANCE = "game_boy_advance"
+    DS = "ds"
+    THREE_DS = "3ds"
+    SWITCH = "switch"
+
+
+class Playability(StrEnum):
+    """Whether a game can be played on a current Nintendo system (CA-92)."""
+
+    YES = "yes"
+    UNKNOWN = "unknown"  # the user is asked
+
+
+class MissingData(StrEnum):
+    """What a game of the catalogue lacks to be complete (RF-05)."""
+
+    GENERATION_NOT_LOADED = "generation_not_loaded"
+    POKEMON = "pokemon"  # which Pokémon exist and can arrive (RN-03)
+    MECHANICS = "mechanics"  # RN-15
+    KEY_BATTLES = "key_battles"  # RN-17
+    STARTERS = "starters"  # RN-21
+
+
+class CatalogGame(ReferenceModel, table=True):
+    """A game of the game catalogue (RF-25, CA-90), loaded or not.
+
+    ``game`` is PokeAPI's version identifier; the games of a generation that is not loaded have
+    no ``game`` row. ``catalog_order`` is the release order. ``receives_bred`` says whether a
+    Pokémon bred in another game can reach it (CA-29, CA-91), and ``playable_now`` whether it
+    is known to be playable on a current Nintendo system (CA-92). ``missing`` is what it lacks
+    to be complete, empty if it is.
+    """
+
+    __tablename__ = "catalog_game"
+
+    game: str = Field(primary_key=True)
+    name_es: str
+    generation: int
+    platform: Platform = Field(sa_type=enum_column(Platform))
+    catalog_order: int = Field(unique=True)
+    receives_bred: bool
+    playable_now: Playability = Field(sa_type=enum_column(Playability))
+    missing: list[MissingData] = Field(default_factory=list, sa_type=JSON)
 
 
 class GameMechanic(ReferenceModel, table=True):

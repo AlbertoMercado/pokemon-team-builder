@@ -8,13 +8,17 @@ from sqlmodel import Session, select
 
 from db.reference import (
     BattleCategory,
+    CatalogGame,
     Game,
     GameMechanic,
     GamePokemon,
     GameStarter,
     Generation,
     KeyBattle,
+    MissingData,
     Origin,
+    Platform,
+    Playability,
     Pokemon,
     ReferenceModel,
     Species,
@@ -24,7 +28,7 @@ from db.reference import (
 from db.sqlite import create_sqlite_engine
 from ingest.report import LoadReport
 from ingest.sources.curated.schemas import MECHANICS
-from ingest.targets import mark_incomplete_games, missing_data
+from ingest.targets import fill_catalog, mark_incomplete_games, missing_data
 
 
 def _game(slug: str, name: str, order: int, *, target: bool = True) -> Game:
@@ -120,16 +124,16 @@ def test_a_complete_game_lacks_nothing(session: Session) -> None:
 
 def test_an_incomplete_game_says_what_it_lacks_in_the_order_of_rf05(session: Session) -> None:
     assert missing_data(session, "ruby") == [
-        "sus mecánicas (RN-15)",
-        "sus combates clave (RN-17)",
-        "sus iniciales (RN-21)",
+        MissingData.MECHANICS,
+        MissingData.KEY_BATTLES,
+        MissingData.STARTERS,
     ]
 
 
 def test_a_game_with_some_mechanics_is_not_complete(session: Session) -> None:
     session.delete(session.exec(select(GameMechanic)).first())
     session.flush()
-    assert missing_data(session, "firered") == ["sus mecánicas (RN-15)"]
+    assert missing_data(session, "firered") == [MissingData.MECHANICS]
 
 
 def test_only_the_complete_games_stay_as_target(session: Session) -> None:
@@ -146,3 +150,30 @@ def test_the_report_lists_the_incomplete_games() -> None:
     report = LoadReport(target=Path("reference.sqlite"))
     report.incomplete_games = {"Rubí": ["sus combates clave (RN-17)", "sus iniciales (RN-21)"]}
     assert "  Rubí: faltan sus combates clave (RN-17) y sus iniciales (RN-21)" in report.render()
+
+
+def _catalog(game: str, order: int) -> CatalogGame:
+    return CatalogGame(
+        game=game,
+        name_es=game.title(),
+        generation=3 if game != "diamond" else 4,
+        platform=Platform.GAME_BOY_ADVANCE,
+        catalog_order=order,
+        receives_bred=True,
+        playable_now=Playability.UNKNOWN,
+    )
+
+
+def test_the_catalogue_says_what_each_game_lacks(session: Session) -> None:
+    """RF-25: a loaded game, what it lacks; a game that is not loaded, its generation."""
+    session.add_all([_catalog("firered", 1), _catalog("ruby", 2), _catalog("diamond", 3)])
+    session.flush()
+
+    fill_catalog(session)
+
+    missing = {e.game: list(e.missing) for e in session.exec(select(CatalogGame)).all()}
+    assert missing == {
+        "firered": [],
+        "ruby": [MissingData.MECHANICS, MissingData.KEY_BATTLES, MissingData.STARTERS],
+        "diamond": [MissingData.GENERATION_NOT_LOADED],
+    }

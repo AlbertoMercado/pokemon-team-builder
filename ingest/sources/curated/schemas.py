@@ -10,7 +10,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from db.reference import BattleCategory, MethodCategory, TediumReason
+from db.reference import BattleCategory, MethodCategory, Platform, Playability, TediumReason
 
 SLUG_PATTERN = r"^[a-z0-9]+(-[a-z0-9]+)*$"
 COMMIT_PATTERN = r"^[0-9a-f]{40}$"
@@ -268,6 +268,34 @@ class EvolutionMethodsFile(CuratedModel):
 
     triggers: dict[str, EvolutionMethodEntry]
     conditions: dict[str, EvolutionMethodEntry]
+
+
+class CatalogEntry(CuratedModel):
+    """A game of the game catalogue (RF-25, CA-90). Its name and generation come from PokeAPI.
+
+    ``receives_bred`` says whether a Pokémon bred in another game can reach it (CA-29, CA-91);
+    ``playable_now``, whether it is known to be playable on a current Nintendo system (CA-92).
+    """
+
+    game: Slug = Field(pattern=SLUG_PATTERN)
+    platform: Platform
+    receives_bred: bool
+    playable_now: Playability = Playability.UNKNOWN
+    note: str | None = None
+
+
+class CatalogFile(CuratedModel):
+    """``catalog.yaml``: the games of the game catalogue, in release order (CA-90)."""
+
+    games: list[CatalogEntry] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _unique_games(self) -> Self:
+        slugs = [entry.game for entry in self.games]
+        repeated = sorted({slug for slug in slugs if slugs.count(slug) > 1})
+        if repeated:
+            raise ValueError(f"juegos repetidos: {repeated}")
+        return self
 
 
 class PinnedCommitFile(CuratedModel):

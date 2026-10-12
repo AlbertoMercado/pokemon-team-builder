@@ -49,6 +49,7 @@ DOCUMENTED_TABLES = {
     "generation",
     "version_group",
     "game",
+    "catalog_game",
     "game_mechanic",
     "game_pokemon",
     "game_starter",

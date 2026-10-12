@@ -9,6 +9,7 @@ from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 
 from db.reference import (
+    CatalogGame,
     Encounter,
     EvolutionStep,
     Game,
@@ -197,6 +198,7 @@ class _Builder:
         self._check_incense_babies()
         yield from self._generations()
         yield from self._version_groups_and_games()
+        yield from self._catalog()
         yield from self._types()
         yield from self._type_efficacy()
         yield from self._species()
@@ -236,6 +238,33 @@ class _Builder:
                 release_order=version.id,
                 has_breeding=generation >= scope.FIRST_BREEDING_GENERATION,
                 is_target=generation in scope.TARGET_GENERATIONS,
+            )
+
+    def _catalog(self) -> Iterator[CatalogGame]:
+        """The game catalogue of ``catalog.yaml``, with each game's Spanish name and generation
+        from PokeAPI, also of the games that are not loaded (RF-25, CA-90). What each one lacks
+        to be complete is filled in once every row is stored (``ingest/targets.py``)."""
+        versions = {v.identifier: v for v in self.t.versions}
+        names = {n.version_id: n.name for n in self.t.version_names}
+        spanish = {
+            n.version_id: n.name
+            for n in self.t.version_names
+            if n.local_language_id == SPANISH_LANGUAGE_ID
+        }
+        unknown = sorted(e.game for e in self.curated.catalog.games if e.game not in versions)
+        if unknown:
+            raise TransformError(f"catalog.yaml: {unknown} no son juegos de PokeAPI")
+        for order, entry in enumerate(self.curated.catalog.games, start=1):
+            version = versions[entry.game]
+            group = _lookup(self.all_version_groups, version.version_group_id, "Grupo de versiones")
+            yield CatalogGame(
+                game=entry.game,
+                name_es=spanish.get(version.id) or _lookup(names, version.id, "Nombre del juego"),
+                generation=group.generation_id,
+                platform=entry.platform,
+                catalog_order=order,
+                receives_bred=entry.receives_bred,
+                playable_now=entry.playable_now,
             )
 
     # --- Types -----------------------------------------------------------------------------

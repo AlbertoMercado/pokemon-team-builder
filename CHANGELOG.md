@@ -8,6 +8,10 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ### Añadido
 
+- **Ingesta**: el catálogo de juegos (`data/curated/catalog.yaml`): los 36 juegos de la saga
+  principal y los Leyendas que pueden recibir un Pokémon criado, con lo que le falta a cada uno
+  para estar completo. Es la base para elegir los juegos objetivo (RF-25, CA-90, #119). Hay que
+  repetir la carga de datos para tenerlo.
 - **Rubí, Zafiro y Esmeralda se pueden elegir como juego objetivo**: con sus mecánicas (tienen
   ciclo de día y noche y concursos) y sus combates clave: los 8 líderes, el Alto Mando, el
   Campeón, el jefe del equipo malvado de cada versión (los dos en Esmeralda) y Blasco

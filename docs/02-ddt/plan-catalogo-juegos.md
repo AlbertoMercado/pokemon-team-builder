@@ -72,7 +72,8 @@ games:
   las generaciones que no se cargan no tienen grupo de versiones ni generación en
   `reference.sqlite`. Guarda también qué le falta a cada uno para estar completo: la lista de
   `ingest/targets.py` o «su generación todavía no se carga».
-- `game.is_target` pasa a significar «completo»; se valorará renombrarlo en esa fase.
+- `game.is_target` sigue marcando los juegos completos; no se renombra, para no tocar la API antes
+  de la fase 3, que deja de usarlo como juego objetivo.
 - Comprobaciones de la carga: que estén los 36, que existan en PokeAPI y que todo juego cargado
   esté en el catálogo.
 
@@ -112,8 +113,8 @@ jugable; está superado.
 
 | Fase | Rama | Qué | Documentación |
 |------|------|-----|---------------|
-| 1 | `docs/catalogo-juegos` | RF-25, RF-05, CA-29 y CA-90 a CA-93 en el DDF, y este plan. | DDF y este plan |
-| 2 | `feat/catalogo-juegos-datos` | `catalog.yaml`, la tabla `catalog_game`, qué le falta a cada juego y las comprobaciones de la carga. | Datos curados, modelo de datos, diseño de la carga, Operación de la ingesta |
+| 1 ✅ | `docs/catalogo-juegos` | RF-25, RF-05, CA-29 y CA-90 a CA-93 en el DDF, y este plan. | DDF y este plan |
+| 2 ✅ | `feat/catalogo-juegos-datos` | `catalog.yaml`, la tabla `catalog_game`, qué le falta a cada juego y las comprobaciones de la carga. | Datos curados, modelo de datos, diseño de la carga, Operación de la ingesta |
 | 3 | `feat/catalogo-juegos-api` | La decisión en `core/`, la migración de `user.sqlite` y la API; `/api/games`, la revisión y la generación con la nueva definición. | Motor, modelo de datos, referencia y DDT de la API, manual de la API |
 | 4 | `feat/catalogo-juegos-web` | La pantalla Juegos, Nuevo juego sin juegos objetivo y las pruebas. | Diseño de la web, manual de la web, CHANGELOG |
 
