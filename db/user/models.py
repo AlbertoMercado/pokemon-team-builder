@@ -1,5 +1,5 @@
-"""SQLModel models of user.sqlite: the user's favourites, settings, journey, confirmations and
-the Pokédex of each completed game.
+"""SQLModel models of user.sqlite: the user's favourites, settings, journey, confirmations, the
+Pokédex of each completed game and their choices in the game catalogue.
 
 Columns that point to reference.sqlite (``pokemon``, ``game``, ``fact_key``) hold natural keys
 and cannot be foreign keys, because they live in another file (ADR-0003). Tables and columns
@@ -164,3 +164,19 @@ class FactConfirmation(UserModel, table=True):
     confirmed_value: ConfirmedValue = Field(sa_type=JSON)
     proposed_value_hash: str
     confirmed_at: datetime
+
+
+class GameChoice(UserModel, table=True):
+    """The user's choice about a game of the game catalogue (RF-25, CA-92, CA-93).
+
+    ``selected``: whether they want it as a target game. ``playable``: their answer about
+    whether they can play it on a current Nintendo system, null if they did not answer. A game
+    without a row is not selected and has no answer.
+    """
+
+    __tablename__ = "game_choice"
+
+    game: str = Field(primary_key=True)
+    selected: bool = False
+    playable: bool | None = None
+    updated_at: datetime

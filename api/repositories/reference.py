@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from sqlmodel import Session, col, func, select
 
 from db.reference import (
+    CatalogGame,
     Encounter,
     EventPokemon,
     EvolutionMethod,
@@ -155,6 +156,15 @@ def latest_evolution_steps(
         for step, group in rows
         if latest[(step.from_pokemon, step.to_pokemon)] == group.order
     ]
+
+
+def catalog_games(reference: Session) -> list[CatalogGame]:
+    """The game catalogue, in release order (RF-25)."""
+    return list(reference.exec(select(CatalogGame).order_by(col(CatalogGame.catalog_order))))
+
+
+def catalog_game(reference: Session, slug: str) -> CatalogGame | None:
+    return reference.get(CatalogGame, slug)
 
 
 def target_games(reference: Session) -> list[Game]:

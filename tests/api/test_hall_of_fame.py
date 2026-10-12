@@ -8,7 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from tests.api.conftest import ClientFactory
-from tests.api.factories import DEFAULT_GAMES, GameRow, form, reference_database
+from tests.api.factories import DEFAULT_GAMES, GameRow, choose_games, form, reference_database
 
 HALL_OF_FAME = "/api/hall-of-fame"
 GAMES = (*DEFAULT_GAMES, GameRow("red", 1, "red-blue", is_target=False, has_breeding=False))
@@ -23,7 +23,9 @@ POKEMON = [
 @pytest.fixture
 def client(make_client: ClientFactory, data_dir: Path) -> TestClient:
     reference_database(data_dir, pokemon=POKEMON, games=GAMES)
-    return make_client()
+    client = make_client()
+    choose_games(client, "firered", "leafgreen")
+    return client
 
 
 def _register(

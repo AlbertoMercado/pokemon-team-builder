@@ -1,6 +1,7 @@
 """Games that can be chosen as the target game (RF-05), or every loaded game (RF-12).
 
-A game already recorded in the Hall of Fame is completed: it is no longer a target game (CA-68).
+The target games are those the user selected in the game catalogue that meet the conditions of
+RF-05 and are not completed (``api.services.game_catalog``, CA-68, CA-93).
 """
 
 from sqlmodel import Session
@@ -8,7 +9,7 @@ from sqlmodel import Session
 from api.repositories import reference as reference_repo
 from api.repositories import user as user_repo
 from api.schemas.games import GameOut
-from api.services import wikidex
+from api.services import game_catalog, wikidex
 from api.services.images import cover_url
 from db.reference import Game
 
@@ -20,9 +21,7 @@ def list_games(reference: Session, user: Session, *, every: bool = False) -> lis
     are not a target.
     """
     completed = user_repo.completed_games(user)
-    targets = {
-        game.slug for game in reference_repo.target_games(reference) if game.slug not in completed
-    }
+    targets = game_catalog.target_games(reference, user)
     games = sorted(reference_repo.all_games(reference).values(), key=lambda g: g.release_order)
     if not every:
         games = [game for game in games if game.slug in targets]

@@ -18,6 +18,7 @@ from fastapi.testclient import TestClient
 
 from api.config import Settings
 from api.main import create_app
+from tests.api.factories import choose_games
 from tests.api.scenario import write_firered
 from tests.core.scenario import FAVORITES
 
@@ -29,6 +30,7 @@ def client(tmp_path_factory: pytest.TempPathFactory) -> Iterator[TestClient]:
     data_dir: Path = tmp_path_factory.mktemp("data")
     write_firered(data_dir)
     with TestClient(create_app(Settings(data_dir))) as client:
+        choose_games(client, "firered")
         for pokemon in FAVORITES:
             assert client.put(f"/api/favorites/{pokemon}").status_code == 200
         entry = {"game": "leafgreen", "completed_on": "2026-01-10", "members": ["gengar"]}
@@ -119,3 +121,22 @@ def test_pokedex_summary(client: TestClient) -> None:
     [pokedex] = _get(client, "/api/pokedex")
     assert set(pokedex) == {"game", "game_name", "cover_url", "hall_of_fame_entry", "progress"}
     assert set(pokedex["progress"]) == {"registered", "total", "impossible", "percent", "status"}
+
+
+def test_catalog_game(client: TestClient) -> None:
+    [game, *_] = _get(client, "/api/game-catalog")
+    assert set(game) == {
+        "game",
+        "name",
+        "generation",
+        "platform",
+        "receives_bred",
+        "known_playable",
+        "playable",
+        "selected",
+        "target",
+        "completed",
+        "obstacles",
+        "missing",
+        "cover_url",
+    }

@@ -130,9 +130,10 @@ la respuesta es `409` con el motivo. Tus cambios se guardan y se mantienen entre
 curl http://127.0.0.1:8000/api/games
 ```
 
-Los juegos que puedes elegir para generar un equipo, en orden de lanzamiento. Solo aparecen los
-juegos completos: los que permiten la crianza y tienen todos los datos que necesitan las reglas
-([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Hoy, los 5 de la 3.ª generación.
+Los juegos que puedes elegir para generar un equipo, en orden de lanzamiento: tus **juegos
+objetivo**, los que has seleccionado en el [catálogo de juegos](#catalogo-de-juegos) y que
+siguen cumpliendo sus condiciones ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Al
+principio no hay ninguno.
 
 Con `?all=true` aparecen todos los juegos cargados, también los que no pueden ser juego objetivo
 (como Rojo u Oro) o que aún no están completos, que sí se pueden registrar en el
@@ -149,6 +150,37 @@ curl -o rojo-fuego.png http://127.0.0.1:8000/api/games/firered/cover
 
 Las portadas son **solo para tu uso privado** y se pueden quitar con `--no-covers`
 ([de quién son y cómo se usan](index.md#imagenes-y-portadas-de-quien-son-y-como-se-usan)).
+
+## Catálogo de juegos
+
+```bash
+curl http://127.0.0.1:8000/api/game-catalog
+```
+
+Los juegos de la saga principal y los Leyendas que pueden recibir un Pokémon criado, en orden de
+lanzamiento, también los de las generaciones que todavía no se cargan
+([RF-25](../01-ddf/requisitos-funcionales.md#rf-25)). De cada uno: si lo has seleccionado
+(`selected`), si es juego objetivo (`target`) y, si no se puede seleccionar, por qué
+(`obstacles`) y qué datos le faltan (`missing`), con su texto.
+
+Para elegir un juego como objetivo, selecciónalo e indica si puedes jugarlo en un sistema actual
+de Nintendo (la Switch 2):
+
+```bash
+curl -X PUT http://127.0.0.1:8000/api/game-catalog/firered \
+  -H 'Content-Type: application/json' -d '{"selected": true, "playable": true}'
+```
+
+Se comprueba que pueda recibir un Pokémon criado, que tenga todos sus datos y que sea jugable,
+en ese orden. De los juegos de Switch ya se sabe que son jugables y tu respuesta no hace falta;
+del resto, si no la das, el juego no se selecciona y `detail.obstacles` lo dice
+(`playability_unknown`). Si no se puede seleccionar, la respuesta es `409` con los motivos, pero
+tu respuesta sobre si es jugable se guarda igualmente
+([CA-92](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+Para quitarlo, `{"selected": false}`; para cambiar solo tu respuesta, `{"playable": false}`. Un
+juego seleccionado que deja de cumplir una condición sigue seleccionado, pero no es juego
+objetivo hasta que vuelva a cumplirla ([CA-93](../01-ddf/cuestiones-abiertas.md#resueltas)).
 
 ## Revisar los datos de un juego
 

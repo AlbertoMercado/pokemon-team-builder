@@ -115,7 +115,7 @@ jugable; está superado.
 |------|------|-----|---------------|
 | 1 ✅ | `docs/catalogo-juegos` | RF-25, RF-05, CA-29 y CA-90 a CA-93 en el DDF, y este plan. | DDF y este plan |
 | 2 ✅ | `feat/catalogo-juegos-datos` | `catalog.yaml`, la tabla `catalog_game`, qué le falta a cada juego y las comprobaciones de la carga. | Datos curados, modelo de datos, diseño de la carga, Operación de la ingesta |
-| 3 | `feat/catalogo-juegos-api` | La decisión en `core/`, la migración de `user.sqlite` y la API; `/api/games`, la revisión y la generación con la nueva definición. | Motor, modelo de datos, referencia y DDT de la API, manual de la API |
+| 3 ✅ | `feat/catalogo-juegos-api` | La decisión en `core/`, la migración de `user.sqlite` y la API; `/api/games`, la revisión y la generación con la nueva definición. | Motor, modelo de datos, referencia y DDT de la API, manual de la API |
 | 4 | `feat/catalogo-juegos-web` | La pantalla Juegos, Nuevo juego sin juegos objetivo y las pruebas. | Diseño de la web, manual de la web, CHANGELOG |
 
 Al terminar la fase 4, el CHANGELOG avisa de que hay que repetir la carga y elegir los juegos en

@@ -14,7 +14,7 @@ from sqlalchemy import text
 
 from db.sqlite import create_sqlite_engine
 from tests.api.conftest import ClientFactory
-from tests.api.factories import form, reference_database
+from tests.api.factories import choose_games, form, reference_database
 from tests.api.scenario import write_firered
 from tests.core.scenario import FAVORITES
 from tests.ingest.test_sprites import PNG
@@ -56,7 +56,9 @@ def client(make_client: ClientFactory, data_dir: Path) -> TestClient:
         ],
         sprites_commit="8491ffd",
     )
-    return make_client()
+    client = make_client()
+    choose_games(client, "firered")
+    return client
 
 
 # --- The image ---------------------------------------------------------------------------------
@@ -171,6 +173,7 @@ def test_the_generation_gives_the_images_of_positions_and_suggestions(
         )
     engine.dispose()
     client = make_client()
+    choose_games(client, "firered")
     for slug in FAVORITES:
         client.put(f"/api/favorites/{slug}")
     client.post("/api/games/firered/review/accept-proposals")

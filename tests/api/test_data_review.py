@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 from db.reference import Origin
 from tests.api.conftest import ClientFactory
+from tests.api.factories import choose_games
 from tests.api.scenario import Load, write_firered
 
 REVIEW = "/api/games/firered/review"
@@ -21,7 +22,9 @@ STARTER_ARRIVALS = [f"pokemon:firered:{slug}:arrival" for slug in STARTERS]
 @pytest.fixture
 def client(make_client: ClientFactory, data_dir: Path) -> TestClient:
     write_firered(data_dir)
-    return make_client()
+    client = make_client()
+    choose_games(client, "firered")
+    return client
 
 
 def _review(client: TestClient) -> dict[str, Any]:
@@ -125,6 +128,7 @@ def test_an_unverified_key_battle_is_asked_only_with_rn17(
 ) -> None:
     write_firered(data_dir, load=Load(battle_origins={"firered-misty": Origin.INFERRED}))
     client = make_client()
+    choose_games(client, "firered")
     misty = _facts(client)["battle:firered:misty"]
     assert (misty["kind"], misty["name"], misty["proposal"]) == (
         "key_battle",
@@ -142,6 +146,7 @@ def test_a_pending_key_battle_gets_its_team_from_the_user(
 ) -> None:
     write_firered(data_dir, load=Load(battle_origins={"firered-misty": Origin.PENDING}))
     client = make_client()
+    choose_games(client, "firered")
     key = "battle:firered:misty"
     assert _facts(client)[key]["proposal"] is None
     team = ["staryu", "starmie"]
@@ -157,6 +162,7 @@ def test_accepting_the_proposals_leaves_the_pending_values(
     """Inferred values are accepted at once; a pending one, without proposal, is not."""
     write_firered(data_dir, load=Load(battle_origins={"firered-misty": Origin.PENDING}))
     client = make_client()
+    choose_games(client, "firered")
     _favorites(client, "raichu", "gengar")
     client.put(f"{REVIEW}/{RAICHU_ARRIVAL}", json={"value": True})
 
@@ -181,6 +187,7 @@ def test_a_confirmation_stops_applying_when_a_load_changes_the_proposal(
 ) -> None:
     write_firered(data_dir)
     client = make_client()
+    choose_games(client, "firered")
     _favorites(client, "raichu", "gengar")
     client.post(f"{REVIEW}/accept-proposals")
 
@@ -214,6 +221,7 @@ def test_invalid_values_are_rejected(
 ) -> None:
     write_firered(data_dir, load=Load(battle_origins={"firered-misty": Origin.INFERRED}))
     client = make_client()
+    choose_games(client, "firered")
     response = client.put(f"{REVIEW}/{fact_key}", json={"value": value})
     assert response.status_code == 422
 

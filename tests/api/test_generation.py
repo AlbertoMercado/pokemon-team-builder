@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 from core.engine import generate
 from db.reference import Origin
 from tests.api.conftest import ClientFactory
+from tests.api.factories import choose_games
 from tests.api.scenario import Load, write_firered
 from tests.core.scenario import FAVORITES, firered_context
 
@@ -20,7 +21,9 @@ STARTERS = ["venusaur", "charizard", "blastoise"]
 @pytest.fixture
 def client(make_client: ClientFactory, data_dir: Path) -> TestClient:
     write_firered(data_dir)
-    return make_client()
+    client = make_client()
+    choose_games(client, "firered")
+    return client
 
 
 def _favorites(client: TestClient, *pokemon: str) -> None:
@@ -201,6 +204,7 @@ def test_a_pending_key_battle_does_not_block_without_rn17(
 ) -> None:
     write_firered(data_dir, load=Load(battle_origins={"firered-misty": Origin.PENDING}))
     client = make_client()
+    choose_games(client, "firered")
     _favorites(client, *FAVORITES)
     client.post(f"{REVIEW}/accept-proposals")
     assert client.post(GENERATIONS).status_code == 409

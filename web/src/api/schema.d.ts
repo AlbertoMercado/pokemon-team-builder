@@ -225,6 +225,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/game-catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Catálogo de juegos
+         * @description Los juegos de la saga principal y los Leyendas que pueden recibir un Pokémon criado, en
+         *     orden de lanzamiento (CA-90), también los de las generaciones que no se cargan. De cada uno:
+         *     si está seleccionado, si es juego objetivo y, si no se puede seleccionar, por qué
+         *     (`obstacles`) y qué datos le faltan (`missing`) (RF-25, RF-05).
+         */
+        get: operations["list_catalog_api_game_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/game-catalog/{game}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Elegir un juego del catálogo
+         * @description Selecciona el juego como juego objetivo o lo quita (`selected`) y guarda la respuesta del
+         *     usuario sobre si puede jugarlo en un sistema actual de Nintendo (`playable`, CA-92). Se
+         *     comprueba que pueda recibir un Pokémon criado, que esté completo y que sea jugable, en ese
+         *     orden (RF-25). `404` si el juego no está en el catálogo. `409` si se selecciona y no
+         *     cumple alguna condición: `detail.obstacles` dice por qué y `detail.missing`, qué datos le
+         *     faltan; la respuesta sobre si es jugable se guarda igualmente. `422` si no se indica
+         *     ninguno de los dos campos.
+         */
+        put: operations["update_choice_api_game_catalog__game__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/games/{game}/review": {
         parameters: {
             query?: never;
@@ -543,6 +592,74 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CatalogGameOut */
+        CatalogGameOut: {
+            /**
+             * Game
+             * @description Identificador del juego, el de PokeAPI, p. ej. `firered`.
+             */
+            game: string;
+            /**
+             * Name
+             * @description Nombre en español.
+             */
+            name: string;
+            /**
+             * Generation
+             * @description Generación del juego.
+             */
+            generation: number;
+            /**
+             * Platform
+             * @description Plataforma: `game_boy`, `game_boy_color`, `game_boy_advance`, `ds`, `3ds` o `switch`.
+             */
+            platform: string;
+            /**
+             * Receives Bred
+             * @description Si puede recibir un Pokémon criado, en el propio juego o por transferencia (CA-29, CA-91).
+             */
+            receives_bred: boolean;
+            /**
+             * Known Playable
+             * @description Si se sabe que es jugable en un sistema actual de Nintendo (los de Switch). Si no, se pregunta al usuario (CA-92).
+             */
+            known_playable: boolean;
+            /**
+             * Playable
+             * @description Si es jugable en un sistema actual: verdadero si se sabe; si no, la respuesta del usuario, o nulo si no ha respondido (CA-92).
+             */
+            playable: boolean | null;
+            /**
+             * Selected
+             * @description Si el usuario lo ha seleccionado como juego objetivo.
+             */
+            selected: boolean;
+            /**
+             * Target
+             * @description Si es juego objetivo: seleccionado, sin ningún motivo en `obstacles` y no registrado en el *Hall of Fame* (RF-05, CA-93).
+             */
+            target: boolean;
+            /**
+             * Completed
+             * @description Si ya está registrado en el *Hall of Fame* (CA-68): seleccionado o no, no es juego objetivo mientras lo esté.
+             */
+            completed: boolean;
+            /**
+             * Obstacles
+             * @description Por qué no se puede seleccionar, en el orden en que se comprueba (RF-25): `cannot_receive_bred`, `missing_data` (el detalle, en `missing`), `playability_unknown` (hay que preguntar al usuario) y `not_playable`. Vacío si se puede.
+             */
+            obstacles: components["schemas"]["ReasonOut"][];
+            /**
+             * Missing
+             * @description Lo que le falta para estar completo (RF-05): `generation_not_loaded`, `pokemon`, `mechanics`, `key_battles` o `starters`. Vacío si está completo.
+             */
+            missing: components["schemas"]["ReasonOut"][];
+            /**
+             * Cover Url
+             * @description URL de su portada en esta API; nula si el juego no está cargado o no tiene portada (RF-18).
+             */
+            cover_url: string | null;
+        };
         /** CatalogOut */
         CatalogOut: {
             /**
@@ -816,6 +933,19 @@ export interface components {
              * @description En orden de la Pokédex Nacional.
              */
             favorites: components["schemas"]["FavoriteOut"][];
+        };
+        /** GameChoiceIn */
+        GameChoiceIn: {
+            /**
+             * Selected
+             * @description Seleccionarlo como juego objetivo (`true`) o quitarlo (`false`); si falta, no cambia.
+             */
+            selected?: boolean | null;
+            /**
+             * Playable
+             * @description Respuesta del usuario: si puede jugarlo en un sistema actual de Nintendo; si falta, no cambia (CA-92).
+             */
+            playable?: boolean | null;
         };
         /** GameOut */
         GameOut: {
@@ -1562,6 +1692,19 @@ export interface components {
          * @enum {string}
          */
         PresenceStatus: "candidates" | "chosen" | "reserved" | "unmet";
+        /** ReasonOut */
+        ReasonOut: {
+            /**
+             * Code
+             * @description Código estable, p. ej. `not_playable` o `key_battles`.
+             */
+            code: string;
+            /**
+             * Text
+             * @description El motivo en español, para mostrarlo.
+             */
+            text: string;
+        };
         /** ReviewFactOut */
         ReviewFactOut: {
             /**
@@ -2227,6 +2370,62 @@ export interface operations {
                 };
                 content: {
                     "image/png": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_catalog_api_game_catalog_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogGameOut"][];
+                };
+            };
+        };
+    };
+    update_choice_api_game_catalog__game__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Identificador del juego, p. ej. `firered`. */
+                game: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GameChoiceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogGameOut"];
                 };
             };
             /** @description Validation Error */
