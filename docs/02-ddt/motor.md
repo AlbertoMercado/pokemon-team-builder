@@ -175,10 +175,16 @@ los juegos; la interfaz los mostrará con su nombre en español.
 Decide si un paso de evolución es tedioso ([RN-15](../01-ddf/reglas-negocio.md#rn-15)),
 aleatorio ([RN-20](../01-ddf/reglas-negocio.md#rn-20)) o imposible en el juego objetivo, a
 partir del disparador y las condiciones de PokeAPI tal como los guarda la ingesta
-([modelo de datos](modelo-datos.md#evoluciones)).
+([modelo de datos](modelo-datos.md#evoluciones)) y del **catálogo de métodos de evolución**
+(`EvolutionCatalog`, en `core/domain/evolution.py`), que llega en el contexto
+(`GameContext.evolution_methods` y `PokedexContext.evolution_methods`). El catálogo es un dato
+curado ([`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml),
+[CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)): el código no clasifica nada.
 
-`step_tedium(paso, juego)` devuelve los motivos (`Tedium`) por los que un paso es tedioso, o
-ninguno si es fácil:
+`step_tedium(paso, juego, catálogo)` devuelve los motivos (`Tedium`) por los que un paso es
+tedioso, o ninguno si es fácil: el motivo de cada método tedioso, `random` por cada método
+aleatorio e `impossible` si un método exige una mecánica (`requires_mechanic`) que el juego no
+tiene. Con el catálogo actual:
 
 | Motivo | Disparador o condición de PokeAPI | Ejemplo |
 |--------|-----------------------------------|---------|
@@ -191,25 +197,19 @@ ninguno si es fácil:
 | `location` | `location`, `region` | Magneton → Magnezone (4.ª generación) |
 | `party` | `party_species`, `party_type` | Mantyke → Mantine (4.ª generación) |
 | `move` | `known_move`, `known_move_type` | Piloswine → Mamoswine (4.ª generación) |
-| `other` | Cualquier otro disparador o condición, también los desconocidos | Lluvia, girar la consola, golpes críticos |
+| `other` | El resto de disparadores y condiciones raros | Lluvia, girar la consola, golpes críticos |
 | `impossible` | `time_of_day` sin `day_night_cycle` o `minimum_beauty` sin `contests` en el juego | Espeon y Milotic en Rojo Fuego |
 
-No son tediosos `level-up` y `use-item` con nivel, amistad, cariño, objeto o un objeto
-equipado sin más condiciones. Todo lo que el módulo no conoce cuenta como tedioso, para que
-una condición nueva de PokeAPI nunca haga parecer fácil una evolución.
+No son tediosos `level-up` y `use-item` con nivel, amistad, cariño, objeto, un objeto
+equipado o el sexo ([CA-43](../01-ddf/cuestiones-abiertas.md#resueltas)) sin más condiciones.
 
-!!! warning "Provisional hasta el catálogo de métodos de evolución (#78)"
-    Se decidió que la clasificación sea un dato
-    ([`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml)) y que lo que no esté
-    catalogado bloquee la carga para que lo catalogue el arquitecto en una nueva versión
-    ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas),
-    [CA-47](../01-ddf/cuestiones-abiertas.md#resueltas)). Entonces el motor recibirá la
-    clasificación en el contexto y un método sin catalogar será un error. También cambia el
-    sexo (`gender_id`), que pasa a no ser tedioso
-    ([CA-43](../01-ddf/cuestiones-abiertas.md#resueltas)); hoy cuenta como `other`. Ninguno
-    de los dos cambios afecta a las generaciones 1 a 3.
+Un disparador o una condición que no está en el catálogo es un error
+(`EvolutionCatalogError`): el motor nunca adivina su categoría. No llega a pasar, porque la
+carga queda bloqueada antes de guardarlo
+([CA-47](../01-ddf/cuestiones-abiertas.md#resueltas),
+[bloqueos](../05-operacion/ingesta.md#bloqueos)).
 
-`assess(pokemon, juego)` revisa los pasos desde la etapa que nace del huevo
+`assess(pokemon, juego, catálogo)` revisa los pasos desde la etapa que nace del huevo
 ([CA-25](../01-ddf/cuestiones-abiertas.md#resueltas)) hasta el favorito y devuelve una
 `EvolutionAssessment` con los pasos tediosos, en el orden de la línea, y sus motivos:
 

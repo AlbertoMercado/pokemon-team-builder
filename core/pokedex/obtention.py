@@ -133,7 +133,9 @@ def _breeding_parents(ctx: PokedexContext, entry: DexSpecies) -> list[DexSpecies
 
 def _evolutions(ctx: PokedexContext, entry: DexSpecies) -> list[ObtentionMethod]:
     """Evolving the previous stage, least tedious first, without the impossible ones."""
-    assessed = [(step, step_tedium(step, ctx.game)) for step in entry.evolutions]
+    assessed = [
+        (step, step_tedium(step, ctx.game, ctx.evolution_methods)) for step in entry.evolutions
+    ]
     possible = [(step, r) for step, r in assessed if Tedium.IMPOSSIBLE not in r]
     possible.sort(key=lambda item: (Tedium.RANDOM in item[1], len(item[1]), sorted(item[1])))
     return [

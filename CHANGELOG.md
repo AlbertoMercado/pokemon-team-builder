@@ -12,6 +12,19 @@ versión: [versiones](docs/05-operacion/versiones.md).
   WikiDex o una evolución exige conocer un movimiento, la carga no se corta en el primero:
   los recoge todos, conserva los datos anteriores y termina con el código de salida 2. Cada
   carga completada o bloqueada deja su informe, en Markdown y JSON, en `data/reports/` (#78).
+- **Ingesta**: catálogo de métodos de evolución (`data/curated/evolution_methods.yaml`): qué
+  disparadores y condiciones de evolución son tediosos, aleatorios o no, como dato y no en el
+  código. Un método que no está en el catálogo, por ejemplo con un commit de PokeAPI nuevo,
+  bloquea la carga en lugar de contar como tedioso (CA-42, #78).
+
+### Cambiado
+
+- **Generación**: una evolución que depende del sexo, como Kirlia → Gallade, ya no es tediosa:
+  se cría hasta que sale el sexo necesario (RN-15, CA-43). No cambia nada hasta la
+  4.ª generación.
+- **Datos**: al actualizar hay que repetir la carga de datos (`uv run python -m ingest`, o
+  `scripts/start.sh`), que añade el catálogo de métodos de evolución a `reference.sqlite`.
+  Hasta repetirla, la API pide hacerlo.
 
 ### Corregido
 

@@ -19,7 +19,7 @@ para probarlas a fondo con hypothesis ([ADR-0002](../docs/03-adr/0002-monolito-m
 | `rules/check.py` | Comprobación de un equipo elegido en el resultado. |
 | `engine/` | `generate(ctx)`: búsqueda, resultado, sugerencias y agrupación de empates. |
 | `scoring.py` | Puntuación ponderada, desglose y desempate. |
-| `evolution.py` | Si un paso de evolución es tedioso, aleatorio o imposible en el juego. |
+| `evolution.py` | Si un paso de evolución es tedioso, aleatorio o imposible en el juego, según el catálogo de métodos de evolución que llega en el contexto. |
 | `breeding.py` | Crianza: si una línea se puede criar y qué etapa nace del huevo. |
 | `review.py` | Qué datos sin verificar intervienen en una generación. |
 | `journey.py` | Qué excluye el recorrido del *Hall of Fame*. |

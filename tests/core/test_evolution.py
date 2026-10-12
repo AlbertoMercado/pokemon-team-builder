@@ -1,10 +1,20 @@
-"""Tedious (RN-15), random (RN-20) and impossible evolutions in the target game."""
+"""Tedious (RN-15), random (RN-20) and impossible evolutions in the target game, with the
+real catalog of evolution methods (data/curated/evolution_methods.yaml)."""
 
 import pytest
 
-from core.domain import CONTESTS, DAY_NIGHT_CYCLE, EvolutionStep, GameInfo
-from core.evolution import Tedium, assess, step_tedium
-from tests.core.builders import pokemon, stage, step
+from core.domain import (
+    CONTESTS,
+    DAY_NIGHT_CYCLE,
+    EvolutionCatalogError,
+    EvolutionMethod,
+    EvolutionStep,
+    GameInfo,
+    MethodCategory,
+    Tedium,
+)
+from core.evolution import assess, step_tedium
+from tests.core.builders import EVOLUTION_METHODS, pokemon, stage, step
 
 FIRERED = GameInfo("firered", 3)
 EMERALD = GameInfo("emerald", 3, frozenset({DAY_NIGHT_CYCLE, CONTESTS}))
@@ -52,7 +62,7 @@ BEAUTIFLY = pokemon(
 
 @pytest.mark.rn("RN-15")
 def test_gengar_is_tedious_because_haunter_evolves_by_trade() -> None:
-    result = assess(GENGAR, FIRERED)
+    result = assess(GENGAR, FIRERED, EVOLUTION_METHODS)
     assert result.tedious_steps == (("haunter", "gengar", frozenset({Tedium.TRADE})),)
     assert result.is_tedious
 
@@ -60,32 +70,32 @@ def test_gengar_is_tedious_because_haunter_evolves_by_trade() -> None:
 @pytest.mark.rn("RN-20")
 def test_gengar_is_not_random() -> None:
     """Trade is tedious, not random: RN-20 does not penalise it."""
-    assert not assess(GENGAR, FIRERED).is_random
+    assert not assess(GENGAR, FIRERED, EVOLUTION_METHODS).is_random
 
 
 @pytest.mark.rn("RN-15")
 def test_raichu_is_not_tedious_friendship_and_stone() -> None:
-    assert not assess(RAICHU, FIRERED).is_tedious
+    assert not assess(RAICHU, FIRERED, EVOLUTION_METHODS).is_tedious
 
 
 @pytest.mark.rn("RN-15")
 def test_milotic_is_tedious_by_beauty_in_emerald() -> None:
     """Emerald has contests: beauty is tedious but possible."""
-    [(_, _, reasons)] = assess(MILOTIC, EMERALD).tedious_steps
+    [(_, _, reasons)] = assess(MILOTIC, EMERALD, EVOLUTION_METHODS).tedious_steps
     assert reasons == {Tedium.BEAUTY}
 
 
 @pytest.mark.rn("RN-15")
 def test_milotic_is_impossible_in_firered_without_contests() -> None:
     """Without contests it has to evolve in another game: also tedious."""
-    [(_, _, reasons)] = assess(MILOTIC, FIRERED).tedious_steps
+    [(_, _, reasons)] = assess(MILOTIC, FIRERED, EVOLUTION_METHODS).tedious_steps
     assert reasons == {Tedium.BEAUTY, Tedium.IMPOSSIBLE}
 
 
 @pytest.mark.rn("RN-15")
 def test_espeon_needs_time_of_day_which_firered_has_not() -> None:
-    [(_, _, in_firered)] = assess(ESPEON, FIRERED).tedious_steps
-    [(_, _, in_emerald)] = assess(ESPEON, EMERALD).tedious_steps
+    [(_, _, in_firered)] = assess(ESPEON, FIRERED, EVOLUTION_METHODS).tedious_steps
+    [(_, _, in_emerald)] = assess(ESPEON, EMERALD, EVOLUTION_METHODS).tedious_steps
     assert in_firered == {Tedium.TIME_OF_DAY, Tedium.IMPOSSIBLE}
     assert in_emerald == {Tedium.TIME_OF_DAY}
 
@@ -94,7 +104,7 @@ def test_espeon_needs_time_of_day_which_firered_has_not() -> None:
 @pytest.mark.rn("RN-20")
 def test_beautifly_is_random_and_therefore_tedious() -> None:
     """Wurmple evolves at random into Silcoon or Cascoon (CA-35): both rules count it."""
-    result = assess(BEAUTIFLY, EMERALD)
+    result = assess(BEAUTIFLY, EMERALD, EVOLUTION_METHODS)
     assert result.tedious_steps == (("wurmple", "silcoon", frozenset({Tedium.RANDOM})),)
     assert result.is_tedious
     assert result.is_random
@@ -116,16 +126,21 @@ def test_beautifly_is_random_and_therefore_tedious() -> None:
         (step("golbat", "crobat", minimum_happiness=220), set()),
         (step("happiny", "chansey", held_item="oval-stone"), set()),
         (step("bulbasaur", "ivysaur", minimum_level=16), set()),
+        # CA-43: it is bred until it has the right gender.
+        (step("kirlia", "gallade", "use-item", trigger_item="dawn-stone", gender_id=2), set()),
     ],
 )
 def test_each_method_of_ca_20(evolution_step: EvolutionStep, expected: set[Tedium]) -> None:
-    assert step_tedium(evolution_step, EMERALD) == expected
+    assert step_tedium(evolution_step, EMERALD, EVOLUTION_METHODS) == expected
 
 
 @pytest.mark.rn("RN-15")
-def test_an_unknown_condition_is_tedious() -> None:
-    """A condition this module does not know never makes a step look easy."""
-    assert step_tedium(step("a", "b", some_new_condition=1), EMERALD) == {Tedium.OTHER}
+def test_an_uncatalogued_method_is_an_error() -> None:
+    """CA-42: the load blocks before storing one, so the engine never guesses its category."""
+    with pytest.raises(EvolutionCatalogError, match="some_new_condition"):
+        step_tedium(step("a", "b", some_new_condition=1), EMERALD, EVOLUTION_METHODS)
+    with pytest.raises(EvolutionCatalogError, match="new-trigger"):
+        step_tedium(step("a", "b", "new-trigger"), EMERALD, EVOLUTION_METHODS)
 
 
 @pytest.mark.rn("RN-15")
@@ -140,7 +155,7 @@ def test_the_easiest_alternative_method_counts() -> None:
             step("slowpoke", "slowking", "use-item", trigger_item="galarica-wreath"),
         ],
     )
-    assert not assess(slowking, EMERALD).is_tedious
+    assert not assess(slowking, EMERALD, EVOLUTION_METHODS).is_tedious
 
 
 @pytest.mark.rn("RN-15")
@@ -156,11 +171,35 @@ def test_steps_before_the_stage_that_hatches_do_not_count() -> None:
         ],
         steps=[step("azurill", "marill", "trade"), step("marill", "azumarill", minimum_level=18)],
     )
-    assert not assess(azumarill, EMERALD).is_tedious
+    assert not assess(azumarill, EMERALD, EVOLUTION_METHODS).is_tedious
 
 
 @pytest.mark.rn("RN-15")
 def test_tedious_steps_follow_the_line_order() -> None:
     line = ("a", "b", "c")
     data = pokemon("c", line=line[:-1], steps=[step("b", "c", "trade"), step("a", "b", "shed")])
-    assert [s[:2] for s in assess(data, EMERALD).tedious_steps] == [("a", "b"), ("b", "c")]
+    assert [s[:2] for s in assess(data, EMERALD, EVOLUTION_METHODS).tedious_steps] == [
+        ("a", "b"),
+        ("b", "c"),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("category", "reason"),
+    [
+        (MethodCategory.TEDIOUS, None),
+        (MethodCategory.EASY, Tedium.TRADE),
+        (MethodCategory.TEDIOUS, Tedium.IMPOSSIBLE),
+        (MethodCategory.TEDIOUS, Tedium.RANDOM),
+    ],
+)
+def test_a_catalogued_method_is_consistent(category: MethodCategory, reason: Tedium | None) -> None:
+    """Only a tedious method has a reason; random and impossible come from the category and
+    from the game's mechanics."""
+    with pytest.raises(EvolutionCatalogError):
+        EvolutionMethod(category, reason)
+
+
+def test_a_random_method_is_tedious_by_chance() -> None:
+    assert EvolutionMethod(MethodCategory.RANDOM).tedium is Tedium.RANDOM
+    assert EvolutionMethod(MethodCategory.EASY).tedium is None

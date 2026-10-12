@@ -77,6 +77,26 @@ FLAG_CONDITIONS = frozenset(
 )
 # Form columns: they only say which form evolves, which is the default one for loaded rows.
 FORM_COLUMNS = frozenset({"required_pokemon_form_id", "evolved_pokemon_form_id"})
+# Condition columns with a PokeAPI id, stored with the identifier under another key.
+REFERENCE_CONDITIONS = {
+    "trigger_item_id": "trigger_item",
+    "held_item_id": "held_item",
+    "location_id": "location",
+    "known_move_id": "known_move",
+    "used_move_id": "used_move",
+    "known_move_type_id": "known_move_type",
+    "party_type_id": "party_type",
+    "party_species_id": "party_species",
+    "trade_species_id": "trade_species",
+    "region_id": "region",
+}
+
+
+def condition_keys() -> list[str]:
+    """Keys of every known condition in ``EvolutionStep.conditions``, as the catalog of
+    evolution methods names them (``evolution_methods.yaml``)."""
+    columns = set(EvolutionRow.model_fields) - EVOLUTION_ROW_KEYS - FORM_COLUMNS
+    return sorted(REFERENCE_CONDITIONS.get(column, column) for column in columns)
 
 
 # Game, location id, area, form, method and condition values of a joined encounter.
@@ -394,26 +414,27 @@ class _Builder:
 
     def _conditions(self, row: EvolutionRow) -> dict[str, ConditionValue]:
         """Non-empty conditions, with ids replaced by PokeAPI identifiers."""
-        references: dict[str, tuple[str, Mapping[int, str]]] = {
-            "trigger_item_id": ("trigger_item", {i.id: i.identifier for i in self.t.items}),
-            "held_item_id": ("held_item", {i.id: i.identifier for i in self.t.items}),
-            "location_id": ("location", {i.id: i.identifier for i in self.t.locations}),
-            "known_move_id": ("known_move", {m.id: m.identifier for m in self.t.moves}),
-            "used_move_id": ("used_move", {m.id: m.identifier for m in self.t.moves}),
-            "known_move_type_id": ("known_move_type", self.type_slugs),
-            "party_type_id": ("party_type", self.type_slugs),
-            "party_species_id": ("party_species", self.all_species_slugs),
-            "trade_species_id": ("trade_species", self.all_species_slugs),
-            "region_id": ("region", {r.id: r.identifier for r in self.t.regions}),
+        items = {i.id: i.identifier for i in self.t.items}
+        moves = {m.id: m.identifier for m in self.t.moves}
+        names: dict[str, Mapping[int, str]] = {
+            "trigger_item_id": items,
+            "held_item_id": items,
+            "location_id": {i.id: i.identifier for i in self.t.locations},
+            "known_move_id": moves,
+            "used_move_id": moves,
+            "known_move_type_id": self.type_slugs,
+            "party_type_id": self.type_slugs,
+            "party_species_id": self.all_species_slugs,
+            "trade_species_id": self.all_species_slugs,
+            "region_id": {r.id: r.identifier for r in self.t.regions},
         }
         conditions: dict[str, ConditionValue] = {}
         values = row.model_dump(exclude=set(EVOLUTION_ROW_KEYS | FORM_COLUMNS), exclude_none=True)
         for column, value in values.items():
             if column in FLAG_CONDITIONS and value is False:
                 continue
-            if column in references:
-                key, names = references[column]
-                conditions[key] = _lookup(names, value, column)
+            if column in REFERENCE_CONDITIONS:
+                conditions[REFERENCE_CONDITIONS[column]] = _lookup(names[column], value, column)
             else:
                 conditions[column] = value
         return conditions

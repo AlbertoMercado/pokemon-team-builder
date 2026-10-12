@@ -14,6 +14,7 @@ from typing import TypedDict
 
 from core.domain import EvolutionStep, GameInfo
 from core.pokedex import DexSpecies, Encounter, PokedexContext, TransferSource
+from tests.core.builders import EVOLUTION_METHODS
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "pokedex_firered.json"
 
@@ -127,6 +128,7 @@ def firered_pokedex(
         game=GameInfo(game["slug"], game["generation"], frozenset(game["mechanics"])),
         has_breeding=game["has_breeding"],
         species=_all_species(),
+        evolution_methods=EVOLUTION_METHODS,
         registered=frozenset(registered),
         impossible=frozenset(impossible),
         started=started,

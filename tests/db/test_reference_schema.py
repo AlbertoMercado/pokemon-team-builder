@@ -14,6 +14,7 @@ from db.reference import (
     BattleCategory,
     Encounter,
     EventPokemon,
+    EvolutionMethod,
     EvolutionStep,
     Game,
     GameMechanic,
@@ -25,6 +26,8 @@ from db.reference import (
     KeyBattle,
     KeyBattlePokemon,
     Location,
+    MethodCategory,
+    MethodKind,
     Origin,
     Pokedex,
     PokedexNumber,
@@ -33,6 +36,7 @@ from db.reference import (
     ReferenceModel,
     Species,
     SpeciesEggGroup,
+    TediumReason,
     Type,
     TypeEfficacy,
     VersionGroup,
@@ -55,6 +59,7 @@ DOCUMENTED_TABLES = {
     "pokemon",
     "pokemon_type",
     "evolution_step",
+    "evolution_method",
     "key_battle",
     "key_battle_pokemon",
     "pokedex",
@@ -342,3 +347,32 @@ def test_pokedex_numbers_are_unique_in_a_pokedex(session: Session) -> None:
     session.add(PokedexNumber(pokedex="kanto", species="ivysaur", number=1))
     with pytest.raises(IntegrityError):
         session.flush()
+
+
+@pytest.mark.parametrize(
+    ("category", "reason"),
+    [(MethodCategory.TEDIOUS, None), (MethodCategory.EASY, TediumReason.TRADE)],
+)
+def test_only_a_tedious_evolution_method_has_a_reason(
+    session: Session, category: MethodCategory, reason: TediumReason | None
+) -> None:
+    session.add(
+        EvolutionMethod(kind=MethodKind.TRIGGER, name="trade", category=category, reason=reason)
+    )
+    with pytest.raises(IntegrityError):
+        session.flush()
+
+
+def test_evolution_methods_round_trip(session: Session) -> None:
+    method = EvolutionMethod(
+        kind=MethodKind.CONDITION,
+        name="time_of_day",
+        category=MethodCategory.TEDIOUS,
+        reason=TediumReason.TIME_OF_DAY,
+        requires_mechanic="day_night_cycle",
+    )
+    _insert(session, method)
+
+    stored = session.get(EvolutionMethod, (MethodKind.CONDITION, "time_of_day"))
+    assert stored is not None
+    assert (stored.reason, stored.unless_learnt_by_level) == (TediumReason.TIME_OF_DAY, False)

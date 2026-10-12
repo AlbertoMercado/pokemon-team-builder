@@ -1,0 +1,55 @@
+# Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20, CA-42).
+# Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# category: easy (no tedioso), tedious (con su motivo, reason) o random. Están todos los del
+# volcado de PokeAPI, también los que aún no aparecen en los juegos cargados. Uno que no esté
+# aquí bloquea la carga (ADR-0008).
+
+triggers:
+  level-up: {category: easy}
+  use-item: {category: easy}
+  trade: {category: tedious, reason: trade}
+  shed: {category: tedious, reason: shed, note: "Nincada → Shedinja: hueco libre y Poké Ball."}
+  spin: {category: tedious, reason: other, note: "Girar con el personaje (Alcremie)."}
+  tower-of-darkness: {category: tedious, reason: other, note: "Torre de la Oscuridad (Urshifu)."}
+  tower-of-waters: {category: tedious, reason: other, note: "Torre del Agua (Urshifu)."}
+  three-critical-hits: {category: tedious, reason: other, note: "Tres golpes críticos en un combate (Sirfetch'd)."}
+  take-damage: {category: tedious, reason: other, note: "Recibir daño y pasar bajo un arco (Runerigus)."}
+  in-battle-level-up: {category: tedious, reason: other, note: "Subir de nivel en combate (Lokix, Annihilape…)."}
+  agile-style-move: {category: tedious, reason: other, note: "Usar un movimiento con estilo rápido (Leyendas: Arceus)."}
+  strong-style-move: {category: tedious, reason: other, note: "Usar un movimiento con estilo fuerte (Leyendas: Arceus)."}
+  recoil-damage: {category: tedious, reason: other, note: "Recibir daño de retroceso (Basculegion)."}
+  use-move: {category: tedious, reason: other, note: "Usar un movimiento varias veces (Annihilape, Wyrdeer…)."}
+  three-defeated-bisharp: {category: tedious, reason: other, note: "Derrotar a tres Bisharp (Kingambit)."}
+  gimmighoul-coins: {category: tedious, reason: other, note: "Reunir 999 monedas (Gholdengo)."}
+  meltan-candies: {category: tedious, reason: other, note: "Caramelos en Pokémon GO (Melmetal)."}
+  unclassified: {category: tedious, reason: other, note: "Sin clasificar en PokeAPI."}
+
+conditions:
+  minimum_level: {category: easy}
+  minimum_happiness: {category: easy}
+  minimum_affection: {category: easy}
+  trigger_item: {category: easy}
+  held_item: {category: easy, note: "Como usar un objeto (CA-43)."}
+  gender_id: {category: easy, note: "Se cría hasta que sale el sexo necesario (CA-43)."}
+  percentage_chance: {category: random, note: "El resultado no se elige (Wurmple, CA-35)."}
+  condition_expression: {category: random, note: "Depende de un valor oculto del Pokémon (Wurmple)."}
+  relative_physical_stats: {category: tedious, reason: stats}
+  time_of_day: {category: tedious, reason: time_of_day, requires_mechanic: day_night_cycle}
+  minimum_beauty: {category: tedious, reason: beauty, requires_mechanic: contests}
+  location: {category: tedious, reason: location}
+  region: {category: tedious, reason: location}
+  party_species: {category: tedious, reason: party}
+  party_type: {category: tedious, reason: party}
+  known_move: {category: tedious, reason: move, unless_learnt_by_level: true}
+  known_move_type: {category: tedious, reason: move}
+  trade_species: {category: tedious, reason: trade, note: "Parte de un intercambio."}
+  needs_overworld_rain: {category: tedious, reason: other}
+  turn_upside_down: {category: tedious, reason: other}
+  needs_multiplayer: {category: tedious, reason: other}
+  near_special_rock: {category: tedious, reason: other}
+  used_move: {category: tedious, reason: other}
+  minimum_move_count: {category: tedious, reason: other}
+  minimum_steps: {category: tedious, reason: other}
+  minimum_damage_taken: {category: tedious, reason: other}
+  nature_bitmask: {category: tedious, reason: other}

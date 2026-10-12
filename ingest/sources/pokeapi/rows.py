@@ -225,12 +225,13 @@ class IdentifierRow(CsvRow):
 class EvolutionRow(BaseModel):
     """A row of ``pokemon_evolution.csv``.
 
-    Unlike other rows, unknown columns are rejected when they have a value: a new kind of
-    evolution condition upstream must be reviewed (and classified for RN-15 and RN-20)
-    before it is loaded. ``is_default`` marks PokeAPI's canonical method and is not used.
+    Unlike other rows, unknown columns are kept, as text: they are new kinds of evolution
+    condition upstream, loaded as conditions so that the load blocks until they are
+    classified for RN-15 and RN-20 (CA-42, ``ingest/blockers.py``). ``is_default`` marks
+    PokeAPI's canonical method and is not used.
     """
 
-    model_config = ConfigDict(frozen=True, extra="forbid")
+    model_config = ConfigDict(frozen=True, extra="allow")
 
     id: int
     evolved_species_id: int

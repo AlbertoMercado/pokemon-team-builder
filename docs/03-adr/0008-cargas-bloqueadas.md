@@ -96,7 +96,7 @@ guardar decisiones del modelo en `user.sqlite`, fuera de git.
 
 - [x] Bloqueos de equipos no encontrados en WikiDex y de movimientos por nivel, informe en JSON
   y Markdown y código de salida 2 (#78).
-- [ ] Bloqueos de métodos de evolución sin catalogar, con el catálogo
+- [x] Bloqueos de métodos de evolución sin catalogar, con el catálogo
   [`evolution_methods.yaml`](../02-ddt/datos-curados.md#evolution_methodsyaml): resto de la
   fase 7 del [plan de carga](../06-historial/plan-carga-datos.md#fases) (#78).
 - [ ] Registrar en git el informe de la primera carga que siga el protocolo.

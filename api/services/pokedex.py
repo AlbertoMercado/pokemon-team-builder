@@ -205,6 +205,7 @@ def _load(data: PokedexData, game: str) -> _Pokedex:
         game=own.game(user_repo.confirmations(data.user, game)),
         has_breeding=own.has_breeding,
         species=own.species,
+        evolution_methods=own.evolution_methods,
         registered=_with(mine, DexStatus.REGISTERED),
         impossible=_with(mine, DexStatus.IMPOSSIBLE),
         started=entry in started,

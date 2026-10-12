@@ -9,6 +9,7 @@ from sqlmodel import Session, col, func, select
 from db.reference import (
     Encounter,
     EventPokemon,
+    EvolutionMethod,
     EvolutionStep,
     Game,
     GameMechanic,
@@ -210,6 +211,11 @@ def evolution_steps(reference: Session, version_group: str) -> Sequence[Evolutio
         .where(EvolutionStep.version_group == version_group)
         .order_by(col(EvolutionStep.id))
     ).all()
+
+
+def evolution_methods(reference: Session) -> Sequence[EvolutionMethod]:
+    """The category of every evolution trigger and condition (RN-15, RN-20)."""
+    return reference.exec(select(EvolutionMethod)).all()
 
 
 def game_pokemon(reference: Session, game: str) -> Sequence[GamePokemon]:

@@ -25,6 +25,7 @@ from core.domain import (
     TypeChart,
 )
 from core.rules.catalog import RuleSettings
+from tests.core.builders import EVOLUTION_METHODS
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "firered.json"
 
@@ -181,4 +182,5 @@ def firered_context(
         pool=tuple(PoolEntry(*known[slug], True) for slug in known if slug not in chosen),
         key_battles=_key_battles(),
         settings=settings or RuleSettings.defaults(),
+        evolution_methods=EVOLUTION_METHODS,
     )

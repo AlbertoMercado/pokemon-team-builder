@@ -10,7 +10,13 @@ from sqlalchemy import Engine, inspect
 
 from db.reference.base import BattleCategory, Origin, ReferenceModel
 from db.reference.battles import KeyBattle, KeyBattlePokemon
-from db.reference.evolution import EvolutionStep
+from db.reference.evolution import (
+    EvolutionMethod,
+    EvolutionStep,
+    MethodCategory,
+    MethodKind,
+    TediumReason,
+)
 from db.reference.games import (
     Game,
     GameMechanic,
@@ -42,6 +48,7 @@ __all__ = [
     "BattleCategory",
     "Encounter",
     "EventPokemon",
+    "EvolutionMethod",
     "EvolutionStep",
     "Game",
     "GameMechanic",
@@ -54,6 +61,8 @@ __all__ = [
     "KeyBattle",
     "KeyBattlePokemon",
     "Location",
+    "MethodCategory",
+    "MethodKind",
     "Origin",
     "Pokedex",
     "PokedexNumber",
@@ -62,6 +71,7 @@ __all__ = [
     "ReferenceModel",
     "Species",
     "SpeciesEggGroup",
+    "TediumReason",
     "Type",
     "TypeEfficacy",
     "VersionGroup",

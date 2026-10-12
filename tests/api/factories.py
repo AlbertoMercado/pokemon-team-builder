@@ -3,6 +3,7 @@
 Each test creates the reference data it needs in a temporary data directory, with the models of
 ``db/reference``, as ``tests/core/builders.py`` does for the engine:
 ``reference_database(data_dir, pokemon=[form("vulpix-alola", ("ice",), dex=37)])``.
+Every reference.sqlite has the real catalog of evolution methods (``evolution_methods``).
 """
 
 from collections.abc import Sequence
@@ -13,6 +14,7 @@ from pathlib import Path
 from sqlmodel import Session
 
 from db.reference import (
+    EvolutionMethod,
     Game,
     Generation,
     IngestRun,
@@ -24,6 +26,9 @@ from db.reference import (
     create_reference_schema,
 )
 from db.sqlite import create_sqlite_engine
+from ingest.sources.curated import CuratedSource, read_curated
+
+CURATED_DIR = Path(__file__).resolve().parents[2] / "data" / "curated"
 
 LOADED_AT = datetime(2026, 10, 4, 10, 0, 0, tzinfo=UTC)
 TYPES = (
@@ -89,6 +94,12 @@ DEFAULT_GAMES = (
 )
 
 
+def evolution_methods() -> list[EvolutionMethod]:
+    """The rows of ``data/curated/evolution_methods.yaml``, as the ingest loads them."""
+    rows = CuratedSource(read_curated(CURATED_DIR)).rows()
+    return [row for row in rows if isinstance(row, EvolutionMethod)]
+
+
 def reference_database(
     data_dir: Path,
     *,
@@ -106,6 +117,7 @@ def reference_database(
     with Session(engine) as session:
         session.add_all(Generation(number=n, slug=f"generation-{n}") for n in (1, 2, 3))
         session.add_all(Type(slug=t, name_es=t.title(), generation=1) for t in TYPES)
+        session.add_all(evolution_methods())
         groups = {(g.version_group, g.generation) for g in games}
         session.add_all(
             VersionGroup(slug=slug, generation=gen, order=i)

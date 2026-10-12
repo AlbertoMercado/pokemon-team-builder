@@ -115,8 +115,9 @@ flowchart TD
 ```
 
 1. **Lectura**: cada fuente lee sus datos. La de PokeAPI descarga los CSV que falten en la
-   caché y valida cada fila con pydantic: si falta una columna, un valor no tiene el tipo
-   esperado o aparece una condición de evolución desconocida, la carga falla
+   caché y valida cada fila con pydantic: si falta una columna o un valor no tiene el tipo
+   esperado, la carga falla. Una columna de condición de evolución desconocida no falla: se
+   carga como condición y bloquea la carga
    ([validación](../02-ddt/carga-datos.md#ficheros-que-se-usan)).
 2. **Transformación**: aplica el alcance de la carga (`ingest/scope.py`,
    [CA-11](../01-ddf/cuestiones-abiertas.md#resueltas)) y resuelve los datos de cada
@@ -267,9 +268,9 @@ Los códigos de salida están en el [manual](../04-manual-usuario/cargar-datos.m
 
 | Bloqueo (`kind`) | Cuándo | Qué decide el arquitecto |
 |------------------|--------|--------------------------|
-| `unknown_evolution_trigger` | Un disparador de evolución que no está en [`evolution_methods.yaml`](../02-ddt/datos-curados.md#evolution_methodsyaml) ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)). **Pendiente** con ese catálogo (#78). | Su categoría para RN-15 y RN-20. |
-| `unknown_evolution_condition` | Una condición de evolución que no está en ese fichero. **Pendiente**, igual. | Igual. |
-| `missing_level_moves` | Un paso exige conocer un movimiento (`known_move`) y no se cargan los movimientos por nivel ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). Un bloqueo por movimiento, con los pasos que lo exigen. | Activar la carga de `level_move`. |
+| `unknown_evolution_trigger` | Un disparador de evolución que no está en [`evolution_methods.yaml`](../02-ddt/datos-curados.md#evolution_methodsyaml) ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)). | Su categoría para RN-15 y RN-20, con la plantilla para el fichero. |
+| `unknown_evolution_condition` | Una condición de evolución que no está en ese fichero; también una columna nueva de `pokemon_evolution.csv`. | Igual. |
+| `missing_level_moves` | Un paso tiene una condición marcada con `unless_learnt_by_level` en el catálogo (`known_move`) y no se cargan los movimientos por nivel ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). Un bloqueo por movimiento, con los pasos que lo exigen. | Activar la carga de `level_move`. |
 | `wikidex_team_not_found` | La lista curada de combates no encuentra en WikiDex la página, la sección o el combate. Un bloqueo por combate; el resto de combates se leen igual. Una página que no está en la caché sin red, o un fallo de WikiDex, sigue siendo un error. | Corregir la página, la sección o el rótulo en `key_battles/*.yaml`. |
 
 ### Informe
@@ -292,8 +293,8 @@ JSON es la fuente; el Markdown se genera a partir de él para leerlo o pegarlo e
       "subject": "spin",
       "occurrences": ["milcery → alcremie (sword-shield)"],
       "rules": ["RN-15", "RN-20"],
-      "action": "Catalogar el disparador en data/curated/evolution_methods.yaml",
-      "template": "spin: {category: ???, reason: ???}"
+      "action": "Catalogar el disparador en data/curated/evolution_methods.yaml: no tedioso (easy), tedioso con su motivo (tedious) o aleatorio (random)",
+      "template": "triggers:\n  spin: {category: ???, reason: ???}"
     }
   ],
   "warnings": [],
@@ -480,5 +481,5 @@ cada módulo, en su *docstring*. Los tests, en `tests/ingest/`
 
 ## Pendiente
 
-Lo que falta de la ingesta está en las issues: el catálogo de métodos de evolución y sus
-bloqueos (#78) y las restricciones de llegada del resto de juegos (#8).
+Lo que falta de la ingesta está en las issues: las restricciones de llegada del resto de
+juegos (#8).

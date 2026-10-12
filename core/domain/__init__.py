@@ -1,6 +1,13 @@
 """Immutable domain models of the engine (docs/02-ddt/motor.md)."""
 
 from core.domain.context import GameContext, GameContextError
+from core.domain.evolution import (
+    EvolutionCatalog,
+    EvolutionCatalogError,
+    EvolutionMethod,
+    MethodCategory,
+    Tedium,
+)
 from core.domain.game import CONTESTS, DAY_NIGHT_CYCLE, GameInfo, KeyBattle, Rival
 from core.domain.journey import HallOfFameEntry, JourneyMember
 from core.domain.pokemon import (
@@ -21,6 +28,9 @@ __all__ = [
     "Availability",
     "Candidate",
     "ConditionValue",
+    "EvolutionCatalog",
+    "EvolutionCatalogError",
+    "EvolutionMethod",
     "EvolutionStep",
     "GameContext",
     "GameContextError",
@@ -28,11 +38,13 @@ __all__ = [
     "HallOfFameEntry",
     "JourneyMember",
     "KeyBattle",
+    "MethodCategory",
     "PokemonData",
     "PokemonDataError",
     "PoolEntry",
     "Rival",
     "Stage",
+    "Tedium",
     "TypeChart",
     "TypeChartError",
 ]

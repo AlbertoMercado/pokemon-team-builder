@@ -31,6 +31,7 @@ from db.reference import (
     TypeEfficacy,
 )
 from db.sqlite import create_sqlite_engine
+from ingest.blockers import BlockerKind
 from ingest.checks import (
     FIRST_LOAD_CHECKS,
     check_counts,
@@ -39,6 +40,8 @@ from ingest.checks import (
     check_target_games,
 )
 from ingest.load import build_reference
+from ingest.report import LoadStatus
+from ingest.sources import Source
 from ingest.sources.curated import (
     CuratedData,
     CuratedDataError,
@@ -185,15 +188,26 @@ def test_missing_column_fails_the_load(tmp_path: Path) -> None:
         _offline_source(tmp_path).read_tables()
 
 
-def test_unknown_evolution_condition_fails_the_load(tmp_path: Path) -> None:
-    """A new kind of condition must be reviewed for RN-15 and RN-20 before loading it."""
+@pytest.mark.rn("RN-15")
+def test_an_unknown_evolution_condition_blocks_the_load(tmp_path: Path) -> None:
+    """CA-42: a new kind of condition upstream is loaded as a condition, so the load blocks
+    until it is classified for RN-15 and RN-20, instead of making the step look easy."""
     evolution = _copy_fixtures(tmp_path) / "pokemon_evolution.csv"
     lines = evolution.read_text(encoding="utf-8").splitlines()
-    lines = [lines[0] + ",needs_full_moon", *(line + ",1" for line in lines[1:])]
+    lines = [lines[0] + ",needs_full_moon", lines[1] + ",1", *(line + "," for line in lines[2:])]
     evolution.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    sources: list[Source] = [_offline_source(tmp_path), CuratedSource(CURATED)]
 
-    with pytest.raises(CsvSchemaError, match="needs_full_moon"):
-        _offline_source(tmp_path).read_tables()
+    report = build_reference(sources, tmp_path / "reference.sqlite")
+
+    assert report.status is LoadStatus.BLOCKED
+    [blocker] = report.blockers
+    assert (blocker.kind, blocker.subject) == (
+        BlockerKind.UNKNOWN_EVOLUTION_CONDITION,
+        "needs_full_moon",
+    )
+    assert blocker.occurrences
+    assert blocker.template == "conditions:\n  needs_full_moon: {category: ???, reason: ???}"
 
 
 # --- Games ---------------------------------------------------------------------------------
@@ -397,8 +411,9 @@ def test_incense_babies_are_skipped_as_egg_stage(tmp_path: Path) -> None:
     can arrive, while Azurill itself cannot.
     """
     target = tmp_path / "reference.sqlite"
-    source = _offline_source(curated=_with_arrival("ruby", "original-johto"))
-    assert build_reference([source], target).succeeded
+    curated = _with_arrival("ruby", "original-johto")
+    source = _offline_source(curated=curated)
+    assert build_reference([source, CuratedSource(curated)], target).succeeded
     engine = create_sqlite_engine(target)
     with Session(engine) as session:
         assert _arrival(session, "ruby", "azumarill") == (True, Origin.INFERRED)
@@ -552,7 +567,7 @@ def test_first_load_checks_reject_an_incomplete_load(tmp_path: Path) -> None:
     """The extract has ~70 species, not 386: the counts check rejects it."""
     target = tmp_path / "reference.sqlite"
 
-    report = build_reference([_offline_source()], target, FIRST_LOAD_CHECKS)
+    report = build_reference([_offline_source(), CuratedSource(CURATED)], target, FIRST_LOAD_CHECKS)
 
     assert not report.succeeded
     assert any("species" in error and "386" in error for error in report.errors)

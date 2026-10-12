@@ -61,7 +61,7 @@ El volcado CSV de `PokeAPI/pokeapi` se carga del commit fijado en `data/curated/
 | `types.csv`, `type_names.csv` | `type` | `generation_id` ≤ 3. Se excluyen los tipos especiales `unknown` y `shadow`. |
 | `type_efficacy.csv`, `type_efficacy_past.csv` | `type_efficacy` | Resueltas por generación (ver abajo). |
 | `pokemon_egg_groups.csv`, `egg_groups.csv` | `species_egg_group` | Sin filtro adicional. |
-| `pokemon_evolution.csv`, `evolution_triggers.csv` | `evolution_step` | Ver [evoluciones](#evoluciones). Cualquier columna de condición desconocida con valor hace fallar la carga: hay que revisarla para RN-15 y RN-20 antes de cargarla. |
+| `pokemon_evolution.csv`, `evolution_triggers.csv` | `evolution_step` | Ver [evoluciones](#evoluciones). Una columna de condición desconocida se carga como condición, con su texto, y la carga queda bloqueada hasta catalogarla para RN-15 y RN-20 ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `items.csv`, `locations.csv`, `moves.csv`, `regions.csv` | Identificadores en `conditions` | Los ids de objetos, lugares, movimientos y regiones de las condiciones se sustituyen por su identificador (`thunder-stone`, `kings-rock`…). |
 | `pokedexes.csv`, `pokemon_dex_numbers.csv`, `pokedex_version_groups.csv` | `pokedex`, `pokedex_number`; propuestas de llegada | Ver [Pokédex y apariciones](#pokedex-y-apariciones). La Pokédex regional de la regla de cada juego en `arrival.yaml`: Kanto (151) para Rojo Fuego y Verde Hoja ([datos curados](datos-curados.md#arrivalyaml)). |
 | `encounters.csv`, `encounter_slots.csv`, `encounter_methods.csv`, `encounter_condition_values.csv`, `encounter_condition_value_map.csv`, `location_areas.csv`, `location_names.csv` | `encounter`, `location` | Ver [Pokédex y apariciones](#pokedex-y-apariciones). |
@@ -252,8 +252,7 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
   aparece como líder de gimnasio (CA-39). El equipo de Brock en Rojo Fuego es Geodude y Onix,
   y el del Campeón, Pidgeot, Alakazam y Rhydon (CA-26 y CA-38).
 
-Los casos que la aplicación no sabe tratar (movimientos por nivel, equipos que no están en
-WikiDex) son **bloqueos** de la carga, no errores
+Los casos que la aplicación no sabe tratar (métodos de evolución sin catalogar, movimientos
+por nivel, equipos que no están en WikiDex) son **bloqueos** de la carga, no errores
 ([ADR-0008](../03-adr/0008-cargas-bloqueadas.md),
-[bloqueos](../05-operacion/ingesta.md#bloqueos)). Los métodos de evolución sin catalogar lo
-serán con su catálogo (#78).
+[bloqueos](../05-operacion/ingesta.md#bloqueos)).

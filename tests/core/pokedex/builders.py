@@ -10,6 +10,7 @@ from dataclasses import replace
 
 from core.domain import ConditionValue, EvolutionStep, GameInfo
 from core.pokedex import DexSpecies, Encounter, PokedexContext, TransferSource
+from tests.core.builders import EVOLUTION_METHODS
 
 
 def encounter(
@@ -92,6 +93,7 @@ def pokedex(
         game=GameInfo(game, generation, frozenset(mechanics)),
         has_breeding=has_breeding,
         species=numbered,
+        evolution_methods=EVOLUTION_METHODS,
         registered=frozenset(registered),
         impossible=frozenset(impossible),
         started=started,
