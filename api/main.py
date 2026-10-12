@@ -18,6 +18,7 @@ from api.database import Databases
 from api.routers import (
     catalog,
     favorites,
+    game_catalog,
     games,
     generations,
     hall_of_fame,
@@ -61,6 +62,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         favorites.router,
         rules.router,
         games.router,
+        game_catalog.router,
         review.router,
         generations.router,
         team_checks.router,

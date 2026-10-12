@@ -1,9 +1,9 @@
-"""/api/games: the games that can be the target (RF-05, CA-29)."""
+"""/api/games: the games that can be the target (RF-05, CA-29, CA-93)."""
 
 from pathlib import Path
 
 from tests.api.conftest import ClientFactory
-from tests.api.factories import GameRow, reference_database
+from tests.api.factories import GameRow, choose_games, reference_database
 
 
 def test_target_games_or_every_loaded_game_in_release_order(
@@ -25,13 +25,17 @@ def test_target_games_or_every_loaded_game_in_release_order(
         GameRow("firered", release_order=10),
     ]
     reference_database(data_dir, games=games)
-    body = make_client().get("/api/games").json()
+    client = make_client()
+    # CA-93: nothing is a target until the user chooses it in the game catalogue.
+    assert client.get("/api/games").json() == []
+    choose_games(client, "firered", "leafgreen")
+    body = client.get("/api/games").json()
     fields = ("game", "name", "generation", "version_group", "target", "completed")
     assert [tuple(game[k] for k in fields) for game in body] == [
         ("firered", "Firered", 3, "firered-leafgreen", True, False),
         ("leafgreen", "Leafgreen", 3, "firered-leafgreen", True, False),
     ]
-    every = make_client().get("/api/games", params={"all": "true"}).json()
+    every = client.get("/api/games", params={"all": "true"}).json()
     assert [(g["game"], g["target"]) for g in every] == [
         ("red", False),
         ("gold", False),
@@ -51,6 +55,9 @@ def test_an_incomplete_game_cannot_be_chosen(make_client: ClientFactory, data_di
     ruby = GameRow("ruby", version_group="ruby-sapphire", is_target=False, release_order=7)
     reference_database(data_dir, games=[ruby, GameRow("firered", release_order=10)])
     client = make_client()
+    choose_games(client, "firered")
+    response = client.put("/api/game-catalog/ruby", json={"selected": True, "playable": True})
+    assert response.status_code == 409  # RF-25: it cannot even be selected
 
     assert [g["game"] for g in client.get("/api/games").json()] == ["firered"]
     every = client.get("/api/games", params={"all": "true"}).json()

@@ -192,12 +192,14 @@ mensaje aparece junto a la regla.
 
 ### Elegir el juego
 
-En **Nuevo juego** aparecen los juegos que puedes elegir: los juegos completos, que permiten la
-crianza y tienen todos los datos que necesitan las reglas
-([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)), salvo los que ya están en tu *Hall of
-Fame*, porque cada juego se completa una sola vez
-([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). Hoy son los 5 de la 3.ª generación: Rubí,
-Zafiro, Esmeralda, Rojo Fuego y Verde Hoja. Pulsa uno para revisar sus datos. Cambiar de juego no cambia tus favoritos.
+En **Nuevo juego** aparecen tus **juegos objetivo**: los que has elegido en el catálogo de
+juegos y siguen cumpliendo sus condiciones (pueden recibir un Pokémon criado, tienen todos los
+datos que necesitan las reglas y puedes jugarlos en un sistema actual), salvo los que ya están en
+tu *Hall of Fame*, porque cada juego se completa una sola vez
+([RF-05](../01-ddf/requisitos-funcionales.md#rf-05),
+[CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). Al principio no hay ninguno: elígelos en
+el catálogo de juegos ([en la API](api.md#catalogo-de-juegos)). Pulsa uno para revisar sus
+datos. Cambiar de juego no cambia tus favoritos.
 
 ### Revisar los datos
 

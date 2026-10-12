@@ -10,9 +10,10 @@ from fastapi import Path as PathParam
 from sqlmodel import Session
 
 from api.database import databases, reference_session, user_session
-from api.errors import ConflictError
+from api.errors import ConflictError, NotFoundError
 from api.repositories import reference as reference_repo
 from api.repositories import user as user_repo
+from api.services import game_catalog
 from api.services.context import GameReference, GameReferences
 
 UserDb = Annotated[Session, Depends(user_session)]
@@ -37,6 +38,9 @@ def game_references(request: Request) -> GameReferences:
     return found
 
 
+NOT_TARGET_MESSAGE = (
+    "{name} no está entre tus juegos objetivo: selecciónalo en el catálogo de juegos (RF-25)"
+)
 COMPLETED_GAME_MESSAGE = (
     "{name} ya está registrado en el Hall of Fame: cada juego se completa una sola vez. Para "
     "volver a jugarlo, elimina antes su registro"
@@ -49,14 +53,17 @@ def target_game(
     user: UserDb,
     references: Annotated[GameReferences, Depends(game_references)],
 ) -> GameReference:
-    """The reference data of the path's ``{game}``: ``404`` if it is not a target game and
-    ``409`` if it is already recorded in the Hall of Fame (CA-68)."""
+    """The reference data of the path's ``{game}``: ``409`` if it is already recorded in the
+    Hall of Fame (CA-68) and ``404`` if it is not a target game: not a complete game, or not
+    selected by the user in the game catalogue, or with an obstacle (RF-05, CA-93)."""
     target = reference_repo.target_game(reference, game)
     entry = user_repo.completed_games(user).get(game)
     if target is not None and entry is not None:
         raise ConflictError(
             COMPLETED_GAME_MESSAGE.format(name=target.name_es), {"hall_of_fame_entry": entry}
         )
+    if target is not None and game not in game_catalog.target_games(reference, user):
+        raise NotFoundError(NOT_TARGET_MESSAGE.format(name=target.name_es))
     return references.get(reference, game)
 
 

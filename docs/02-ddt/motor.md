@@ -635,6 +635,26 @@ calculan una vez (`gift_choices`).
 Con los datos reales de Rojo Fuego, el progreso, el objetivo y las formas de las 386 especies se
 calculan en menos de 0,2 s.
 
+## Catálogo de juegos (`core/game_catalog.py`)
+
+Decide si un juego del catálogo de juegos puede ser juego objetivo
+([RF-05](../01-ddf/requisitos-funcionales.md#rf-05),
+[RF-25](../01-ddf/requisitos-funcionales.md#rf-25)). Recibe el juego (`CatalogEntry`: si puede
+recibir un Pokémon criado, lo que le falta y si se sabe que es jugable) y lo que eligió el usuario
+(`GameChoice`: si lo seleccionó y su respuesta sobre si es jugable).
+
+- `obstacles(juego, elección)`: por qué no se puede seleccionar, en el orden de RF-25:
+  `cannot_receive_bred` ([CA-29](../01-ddf/cuestiones-abiertas.md#resueltas),
+  [CA-91](../01-ddf/cuestiones-abiertas.md#resueltas)), `missing_data`, `playability_unknown`
+  (hay que preguntar al usuario) y `not_playable`
+  ([CA-92](../01-ddf/cuestiones-abiertas.md#resueltas)). Si el catálogo sabe que es jugable, la
+  respuesta del usuario no cuenta.
+- `is_target(juego, elección, completed=…)`: es juego objetivo si está seleccionado, no tiene
+  ningún obstáculo y no está superado ([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas),
+  [CA-93](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
+Tests en `tests/core/test_game_catalog_rules.py`.
+
 ## Pruebas
 
 Los tests del motor están en `tests/core/`: qué comprueba cada fichero, en su *docstring*, y sus

@@ -3,7 +3,9 @@
 Each test creates the reference data it needs in a temporary data directory, with the models of
 ``db/reference``, as ``tests/core/builders.py`` does for the engine:
 ``reference_database(data_dir, pokemon=[form("vulpix-alola", ("ice",), dex=37)])``.
-Every reference.sqlite has the real catalog of evolution methods (``evolution_methods``).
+Every reference.sqlite has the real catalog of evolution methods (``evolution_methods``) and
+its games in the game catalogue (``catalog_game``). ``choose_games`` selects some of them as
+target games, as the user does in the game catalogue (RF-25).
 """
 
 from collections.abc import Sequence
@@ -11,13 +13,18 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from db.reference import (
+    CatalogGame,
     EvolutionMethod,
     Game,
     Generation,
     IngestRun,
+    MissingData,
+    Platform,
+    Playability,
     Pokemon,
     PokemonType,
     Species,
@@ -94,6 +101,29 @@ DEFAULT_GAMES = (
 )
 
 
+def catalog_game(game: str, generation: int, order: int, complete: bool = True) -> CatalogGame:
+    """``game`` in the game catalogue: complete or lacking its key battles, and of unknown
+    playability, so the user has to answer (CA-92)."""
+    return CatalogGame(
+        game=game,
+        name_es=game.title(),
+        generation=generation,
+        platform=Platform.GAME_BOY_ADVANCE,
+        catalog_order=order,
+        receives_bred=generation > 1,
+        playable_now=Playability.UNKNOWN,
+        missing=[] if complete else [MissingData.KEY_BATTLES],
+    )
+
+
+def choose_games(client: TestClient, *games: str) -> None:
+    """Select ``games`` as target games, answering that they are playable (RF-25, CA-92)."""
+    for game in games:
+        body = {"selected": True, "playable": True}
+        response = client.put(f"/api/game-catalog/{game}", json=body)
+        assert response.status_code == 200, response.json()
+
+
 def evolution_methods() -> list[EvolutionMethod]:
     """The rows of ``data/curated/evolution_methods.yaml``, as the ingest loads them."""
     rows = CuratedSource(read_curated(CURATED_DIR)).rows()
@@ -137,6 +167,9 @@ def reference_database(
                 cover_source=g.cover_source,
             )
             for g in games
+        )
+        session.add_all(
+            catalog_game(g.slug, g.generation, i, g.is_target) for i, g in enumerate(games)
         )
         for pokeapi_id, f in enumerate(pokemon, start=1):
             if session.get(Species, f.species) is None:

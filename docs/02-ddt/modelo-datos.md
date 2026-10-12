@@ -186,6 +186,7 @@ erDiagram
     FAVORITE
     RULE_SETTING
     FACT_CONFIRMATION
+    GAME_CHOICE
 ```
 
 | Tabla | Columnas | Notas |
@@ -197,6 +198,7 @@ erDiagram
 | `pokedex` | `entry` PK FK → `hall_of_fame_entry`, `started_at` | La Pokédex del juego de ese registro, desde que se confirma su lista inicial ([RF-21](../01-ddf/requisitos-funcionales.md#rf-21)): sin fila, está «no iniciada». Borrar el registro, o cambiarle el juego, la borra con sus marcas ([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | `pokedex_entry` | `pokedex` FK → `pokedex` y `species` PK, `status`?, `chosen_method`? | Una especie que el usuario ha marcado: `status` es `registered` o `impossible` ([RF-22](../01-ddf/requisitos-funcionales.md#rf-22), [RF-24](../01-ddf/requisitos-funcionales.md#rf-24)), y `chosen_method`, la clave (`key`) de la forma de obtención que eligió ([RF-23](../01-ddf/requisitos-funcionales.md#rf-23), [motor](motor.md#pokedex-corepokedex)). Una especie sin marca ni forma elegida no tiene fila. |
 | `fact_confirmation` | `fact_key` PK, `game`, `confirmed_value`, `proposed_value_hash`, `confirmed_at` | Si una nueva carga propone un valor con otro hash, la confirmación deja de valer ([RN-18](../01-ddf/reglas-negocio.md#rn-18)). |
+| `game_choice` | `game` PK, `selected`, `playable`?, `updated_at` | Lo que el usuario eligió de un juego del catálogo de juegos ([RF-25](../01-ddf/requisitos-funcionales.md#rf-25)): si lo quiere como juego objetivo y su respuesta sobre si puede jugarlo en un sistema actual (nula si no ha respondido, [CA-92](../01-ddf/cuestiones-abiertas.md#resueltas)). Sin fila, ni está seleccionado ni tiene respuesta: la migración `0004` crea la tabla vacía, así que al actualizar no queda ningún juego seleccionado ([CA-93](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 
 Las columnas que apuntan a `reference.sqlite` (`pokemon`, `game`, `fact_key`, `species`) no pueden ser
 claves foráneas, porque están en otro fichero. Las comprueba la ingesta antes de sustituir la
@@ -209,7 +211,7 @@ juego no se comprueba: la API la ignora.
 
 | Fichero | Qué hace |
 |---------|----------|
-| `db/user/models.py` | `UserModel`, la clase base, con su propio `MetaData` y una convención de nombres para las restricciones (Alembic las necesita con nombre para alterarlas en SQLite), y los modelos de las siete tablas. |
+| `db/user/models.py` | `UserModel`, la clase base, con su propio `MetaData` y una convención de nombres para las restricciones (Alembic las necesita con nombre para alterarlas en SQLite), y los modelos de las ocho tablas. |
 | `db/user/values.py` | `ConfirmedValue`, el tipo del valor de una confirmación, y `value_hash(propuesta)`, el hash estable (SHA-256 del JSON) de un valor propuesto. |
 | `db/user/__init__.py` | `upgrade(path)`: crea el fichero si no existe y aplica las migraciones pendientes. La llama la API al arrancar. Migra con las claves foráneas desactivadas, porque el *batch mode* reconstruye la tabla y borrar la antigua arrastraría en cascada a sus hijas (los miembros del *Hall of Fame*), y antes de confirmar las comprueba con `PRAGMA foreign_key_check`. |
 | `db/user/migrations/` | Entorno de Alembic (`env.py`, en *batch mode*), plantilla y migraciones (`versions/`). `db/user/alembic.ini` sirve para ejecutarlas a mano ([Operación](../05-operacion/api.md#migraciones)). |
@@ -233,6 +235,7 @@ Decisiones de implementación:
 | `0001_initial_tables` | Crea las cinco tablas. |
 | `0002_unique_hall_of_fame_game` | Cada juego, una vez en el *Hall of Fame* ([CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)); se detiene si hay juegos repetidos. |
 | `0003_pokedex` | Crea `pokedex` y `pokedex_entry`. |
+| `0004_game_choice` | Crea `game_choice`, vacía ([CA-93](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 
 ## Datos revisables (`fact_key`)
 

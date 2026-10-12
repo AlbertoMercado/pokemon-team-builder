@@ -47,6 +47,11 @@ async function removeLeafGreen(request: APIRequestContext) {
 }
 
 test.beforeAll(async ({ request }) => {
+  // RF-25: Fire Red is a target game, for the covers of «Nuevo juego».
+  const chosen = await request.put("/api/game-catalog/firered", {
+    data: { selected: true, playable: true },
+  });
+  expect(chosen.ok()).toBe(true);
   for (const pokemon of FAVORITES) {
     expect((await request.put(`/api/favorites/${pokemon}`)).ok()).toBe(true);
   }

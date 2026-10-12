@@ -8,6 +8,9 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ### Añadido
 
+- **API del catálogo de juegos** (`/api/game-catalog`): los juegos del catálogo, si se pueden
+  elegir como juego objetivo y por qué no, y elegirlos o quitarlos indicando si se pueden jugar en
+  un sistema actual de Nintendo (RF-25, CA-92, #119).
 - **Ingesta**: el catálogo de juegos (`data/curated/catalog.yaml`): los 36 juegos de la saga
   principal y los Leyendas que pueden recibir un Pokémon criado, con lo que le falta a cada uno
   para estar completo. Es la base para elegir los juegos objetivo (RF-25, CA-90, #119). Hay que
@@ -21,6 +24,13 @@ versión: [versiones](docs/05-operacion/versiones.md).
   de Hoenn; en Rubí y Zafiro, todos. Antes quedaban pendientes. Se confirman en la revisión de
   datos, como las de Rojo Fuego y Verde Hoja (CA-28, RN-03, #8). Hay que repetir la carga de
   datos para tenerlas.
+
+### Cambiado
+
+- **Juegos objetivo**: ya no lo son automáticamente los juegos completos; lo son los que el
+  usuario elige en el catálogo de juegos, si pueden recibir un Pokémon criado, están completos y
+  se pueden jugar en un sistema actual (RF-05, CA-93). **Al actualizar no queda ninguno elegido**:
+  Nuevo juego está vacío hasta elegirlos (#119).
 
 ### Corregido
 

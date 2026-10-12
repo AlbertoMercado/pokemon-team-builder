@@ -7,6 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from tests.api.conftest import ClientFactory
+from tests.api.factories import choose_games
 from tests.api.scenario import write_firered
 from tests.core.scenario import FAVORITES
 
@@ -18,7 +19,9 @@ REVIEW = "/api/games/firered/review"
 @pytest.fixture
 def client(make_client: ClientFactory, data_dir: Path) -> TestClient:
     write_firered(data_dir)
-    return make_client()
+    client = make_client()
+    choose_games(client, "firered")
+    return client
 
 
 def _ready(client: TestClient, *pokemon: str) -> dict[str, Any]:

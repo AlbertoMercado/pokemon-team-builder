@@ -18,6 +18,13 @@ const FAVORITES = [
 ]; // prettier-ignore
 
 test("a new game from the favourites to the Hall of Fame", async ({ page, request }) => {
+  // RF-25: Fire Red and Leaf Green are target games only once chosen in the game catalogue.
+  for (const game of ["firered", "leafgreen"]) {
+    const target = await request.put(`/api/game-catalog/${game}`, {
+      data: { selected: true, playable: true },
+    });
+    expect(target.ok()).toBe(true);
+  }
   for (const pokemon of FAVORITES) {
     expect((await request.put(`/api/favorites/${pokemon}`)).ok()).toBe(true);
   }

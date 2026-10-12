@@ -1,5 +1,5 @@
 """Reads and writes of user.sqlite: favourites, rule settings, confirmations, the Hall of
-Fame and the Pokédex of each completed game."""
+Fame, the Pokédex of each completed game and the choices in the game catalogue."""
 
 from collections.abc import Iterable, Sequence
 from datetime import UTC, date, datetime
@@ -11,6 +11,7 @@ from db.user import (
     DexStatus,
     FactConfirmation,
     Favorite,
+    GameChoice,
     HallOfFameEntry,
     HallOfFameMember,
     Pokedex,
@@ -203,3 +204,24 @@ def remove_pokedex(user: Session, entry: int) -> None:
     if found is not None:
         user.delete(found)
         user.commit()
+
+
+def game_choices(user: Session) -> dict[str, GameChoice]:
+    """The user's choices in the game catalogue, by game (RF-25)."""
+    return {choice.game: choice for choice in user.exec(select(GameChoice))}
+
+
+def save_game_choice(
+    user: Session, game: str, *, selected: bool | None, playable: bool | None
+) -> GameChoice:
+    """Change what is given (``None`` keeps it) and commit."""
+    choice = user.get(GameChoice, game) or GameChoice(game=game, updated_at=datetime.now(UTC))
+    if selected is not None:
+        choice.selected = selected
+    if playable is not None:
+        choice.playable = playable
+    choice.updated_at = datetime.now(UTC)
+    user.add(choice)
+    user.commit()
+    user.refresh(choice)
+    return choice

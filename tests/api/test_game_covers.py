@@ -14,7 +14,7 @@ from sqlalchemy import text
 from db.reference import Origin
 from db.sqlite import create_sqlite_engine
 from tests.api.conftest import ClientFactory
-from tests.api.factories import GameRow, form, reference_database
+from tests.api.factories import GameRow, choose_games, form, reference_database
 from tests.api.scenario import Load, write_firered
 from tests.ingest.test_sprites import PNG
 
@@ -56,7 +56,9 @@ def client(make_client: ClientFactory, data_dir: Path) -> TestClient:
             GameRow("leafgreen", release_order=11),
         ],
     )
-    return make_client()
+    client = make_client()
+    choose_games(client, "firered")
+    return client
 
 
 # --- The cover ---------------------------------------------------------------------------------
@@ -164,6 +166,7 @@ def test_the_review_links_each_key_battle_to_its_wikidex_revision(
         )
     engine.dispose()
     client = make_client()
+    choose_games(client, "firered")
     client.put("/api/favorites/vulpix")
 
     facts = {f["fact_key"]: f for f in client.get("/api/games/firered/review").json()["facts"]}

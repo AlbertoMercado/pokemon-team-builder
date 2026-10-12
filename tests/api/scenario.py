@@ -51,7 +51,7 @@ from db.reference import (
     VersionGroup,
     create_reference_schema,
 )
-from tests.api.factories import evolution_methods
+from tests.api.factories import catalog_game, evolution_methods
 
 FIXTURE = Path(__file__).resolve().parents[1] / "core" / "fixtures" / "firered.json"
 POKEDEX_FIXTURE = FIXTURE.with_name("pokedex_firered.json")
@@ -167,6 +167,7 @@ def _write(session: Session, data: ScenarioData, load: Load) -> None:
         for t in data["types"]
     )
     session.add(VersionGroup(slug=VERSION_GROUP, generation=generation, order=11))
+    session.add_all(catalog_game(slug, generation, i) for i, slug in enumerate((GAME, "leafgreen")))
     for slug, order in ((GAME, 10), ("leafgreen", 11)):
         session.add(
             Game(
