@@ -13,6 +13,7 @@ describe("Navegación", () => {
       ["Catálogo", "/pokemon"],
       ["Favoritos", "/favoritos"],
       ["Reglas", "/reglas"],
+      ["Juegos", "/juegos"],
       ["Nuevo juego", "/juego"],
       ["Hall of Fame", "/hall-of-fame"],
       ["Pokédex", "/pokedex"],

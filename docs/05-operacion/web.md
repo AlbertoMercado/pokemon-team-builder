@@ -88,8 +88,8 @@ respuesta se añada en un solo sitio (#77); los de la Pokédex, con las de `src/
 
 Van contra la **API real**, en Chromium:
 
-- `e2e/new-game.spec.ts`: el flujo de un juego nuevo: favoritos → reglas → nuevo juego en Rojo
-  Fuego → revisión → resultado → elegir el equipo y registrarlo → la siguiente generación
+- `e2e/new-game.spec.ts`: el flujo de un juego nuevo: elegir Rojo Fuego y Verde Hoja en Juegos
+  → favoritos → reglas → nuevo juego en Rojo Fuego → revisión → resultado → elegir el equipo y registrarlo → la siguiente generación
   excluye lo usado (RN-16).
 - `e2e/pokedex.spec.ts`: la Pokédex de un juego superado, de la lista inicial a corregir el
   detalle.

@@ -11,6 +11,7 @@ const SECTIONS = [
   { to: "/pokemon", label: "Catálogo" },
   { to: "/favoritos", label: "Favoritos" },
   { to: "/reglas", label: "Reglas" },
+  { to: "/juegos", label: "Juegos" },
   { to: "/juego", label: "Nuevo juego" },
   { to: "/hall-of-fame", label: "Hall of Fame" },
   { to: "/pokedex", label: "Pokédex" },

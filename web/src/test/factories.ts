@@ -4,7 +4,7 @@
  * A new field of a response is added here once, not in every object (#77). The answers are typed
  * with the generated contract, so a field the API adds or removes fails the compilation here.
  */
-import type { Game, GeneratedPokemon, ReviewFact, ReviewValue } from "../api/types";
+import type { CatalogGame, Game, GeneratedPokemon, ReviewFact, ReviewValue } from "../api/types";
 
 /** A target game of the 3rd generation, not completed and without cover. */
 export const aGame = (game: Partial<Game> & Pick<Game, "game" | "name">): Game => ({
@@ -50,4 +50,22 @@ export const aGeneratedPokemon = (
 export const withImage = <T extends { pokemon: string }>(found: T): T => ({
   ...found,
   image_url: `/api/pokemon/${found.pokemon}/image`,
+});
+
+/** A complete game of the game catalogue, not chosen, of unknown playability (RF-25, CA-92). */
+export const aCatalogGame = (
+  game: Partial<CatalogGame> & Pick<CatalogGame, "game" | "name">,
+): CatalogGame => ({
+  generation: 3,
+  platform: "game_boy_advance",
+  receives_bred: true,
+  known_playable: false,
+  playable: null,
+  selected: false,
+  target: false,
+  completed: false,
+  obstacles: [],
+  missing: [],
+  cover_url: null,
+  ...game,
 });

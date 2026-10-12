@@ -11,6 +11,7 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
 import type {
+  CatalogGame,
   CatalogPokemon,
   Evolution,
   FavoritesOut,
@@ -29,7 +30,7 @@ import type {
   RulePatch,
   TeamCheck,
 } from "../api/types";
-import { aFact, aGame, aGeneratedPokemon, withImage } from "./factories";
+import { aCatalogGame, aFact, aGame, aGeneratedPokemon, withImage } from "./factories";
 import { pokedexHandlers, removePokedex, resetPokedex } from "./pokedex";
 import { CATALOG } from "./rules";
 
@@ -166,6 +167,7 @@ let fireredFacts = initialFirered();
 
 /** Restores the favourites and the review of the simulated API. */
 export function resetData(): void {
+  gameChoices.clear();
   favoriteSet.clear();
   INITIAL_FAVORITES.forEach((pokemon) => favoriteSet.add(pokemon));
   fireredFacts = initialFirered();
@@ -655,7 +657,110 @@ const notFound = (pokemon: string) =>
   );
 
 /** Answers of a working API with data loaded. */
+/** The game catalogue (RF-25): the games, without the user's choices. */
+const MISSING = {
+  generation_not_loaded: "Su generación todavía no se carga",
+  pokemon: "Qué Pokémon existen en el juego y pueden llegar a él (RN-03)",
+  mechanics: "Sus mecánicas, como el ciclo de día y noche (RN-15)",
+  key_battles: "Sus combates clave (RN-17)",
+};
+const OBSTACLES = {
+  cannot_receive_bred: "No puede recibir un Pokémon criado en otro juego (CA-29)",
+  missing_data: "Le faltan datos que necesitan las reglas (RF-05)",
+  playability_unknown:
+    "No se sabe si se puede jugar en un sistema actual de Nintendo: indica si puedes jugarlo (CA-92)",
+  not_playable: "No se puede jugar en un sistema actual de Nintendo (CA-92)",
+};
+const reason = <T extends Record<string, string>>(texts: T, code: keyof T & string) => ({
+  code,
+  text: texts[code] ?? code,
+});
+export const CATALOG_GAMES: CatalogGame[] = [
+  aCatalogGame({
+    game: "red",
+    name: "Rojo",
+    generation: 1,
+    platform: "game_boy",
+    receives_bred: false,
+    missing: [reason(MISSING, "pokemon"), reason(MISSING, "mechanics")],
+  }),
+  aCatalogGame({ game: "firered", name: "Rojo Fuego", cover_url: "/api/games/firered/cover" }),
+  aCatalogGame({ game: "emerald", name: "Esmeralda" }),
+  aCatalogGame({
+    game: "diamond",
+    name: "Diamante",
+    generation: 4,
+    platform: "ds",
+    missing: [reason(MISSING, "generation_not_loaded")],
+  }),
+  aCatalogGame({
+    game: "sword",
+    name: "Espada",
+    generation: 8,
+    platform: "switch",
+    known_playable: true,
+    missing: [reason(MISSING, "generation_not_loaded")],
+  }),
+];
+const gameChoices = new Map<string, { selected: boolean; playable: boolean | null }>();
+
+/** A game of the catalogue with the user's choices, decided as the API does (RF-05, CA-93). */
+function catalogGame(base: CatalogGame): CatalogGame {
+  const choice = gameChoices.get(base.game) ?? { selected: false, playable: null };
+  const playable = base.known_playable ? true : choice.playable;
+  const obstacles = [
+    ...(base.receives_bred ? [] : [reason(OBSTACLES, "cannot_receive_bred")]),
+    ...(base.missing.length > 0 ? [reason(OBSTACLES, "missing_data")] : []),
+    ...(playable === null ? [reason(OBSTACLES, "playability_unknown")] : []),
+    ...(playable === false ? [reason(OBSTACLES, "not_playable")] : []),
+  ];
+  const completed = completedGames().has(base.game);
+  return {
+    ...base,
+    playable,
+    selected: choice.selected,
+    completed,
+    obstacles,
+    target: choice.selected && obstacles.length === 0 && !completed,
+  };
+}
+
 export const handlers = [
+  http.get("/api/game-catalog", () => HttpResponse.json(CATALOG_GAMES.map(catalogGame))),
+  http.put<{ game: string }, { selected?: boolean | null; playable?: boolean | null }>(
+    "/api/game-catalog/:game",
+    async ({ params, request }) => {
+      const base = CATALOG_GAMES.find((game) => game.game === params.game);
+      if (base === undefined) {
+        return HttpResponse.json({ detail: "No está en el catálogo" }, { status: 404 });
+      }
+      const change = await request.json();
+      const choice = gameChoices.get(base.game) ?? { selected: false, playable: null };
+      if (typeof change.playable === "boolean") {
+        choice.playable = change.playable;
+      }
+      gameChoices.set(base.game, choice);
+      if (change.selected === true) {
+        const { obstacles } = catalogGame({ ...base });
+        if (obstacles.length > 0) {
+          return HttpResponse.json(
+            {
+              detail: {
+                message: `${base.name} no se puede seleccionar como juego objetivo`,
+                obstacles,
+                missing: base.missing,
+              },
+            },
+            { status: 409 },
+          );
+        }
+      }
+      if (typeof change.selected === "boolean") {
+        choice.selected = change.selected;
+      }
+      return HttpResponse.json(catalogGame(base));
+    },
+  ),
   http.get("/api/meta", () => HttpResponse.json(meta)),
   http.get("/api/pokemon", ({ request }) => {
     const params = new URL(request.url).searchParams;

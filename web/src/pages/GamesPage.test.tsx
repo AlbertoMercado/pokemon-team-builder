@@ -2,7 +2,8 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { renderApp } from "../test/render";
-import { withoutCovers } from "../test/server";
+import { server, withoutCovers } from "../test/server";
+import { http, HttpResponse } from "msw";
 
 /** The cover of each game card, in order; `null` for a game without cover. */
 async function covers(): Promise<(string | null)[]> {
@@ -27,6 +28,17 @@ describe("Nuevo juego", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: "Revisión de datos: Rojo Fuego" }),
     ).toBeInTheDocument();
+  });
+});
+
+describe("Nuevo juego sin juegos objetivo (RF-25)", () => {
+  it("leads to the game catalogue to choose them", async () => {
+    server.use(http.get("/api/games", () => HttpResponse.json([])));
+    renderApp("/juego");
+
+    expect(await screen.findByText(/Todavía no tienes ningún juego objetivo/)).toBeVisible();
+    await userEvent.click(within(screen.getByRole("main")).getByRole("link", { name: "Juegos" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Juegos" })).toBeVisible();
   });
 });
 

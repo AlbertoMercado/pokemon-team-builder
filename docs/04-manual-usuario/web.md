@@ -54,7 +54,7 @@ Abre `http://127.0.0.1:8000` en el navegador. Para pararla, `Ctrl+C`.
 ## Navegar
 
 La barra de arriba lleva a cada sección: **Catálogo**, **Favoritos**, **Reglas**,
-**Nuevo juego**, **Hall of Fame** y **Pokédex**. La sección en la que estás aparece subrayada. El nombre
+**Juegos**, **Nuevo juego**, **Hall of Fame** y **Pokédex**. La sección en la que estás aparece subrayada. El nombre
 de la aplicación, a la izquierda, vuelve al Inicio.
 
 Cada pantalla tiene su propia dirección, así que puedes recargar la página, volver atrás con
@@ -188,6 +188,29 @@ El próximo resultado ya se genera con ellos, y la revisión de datos puede pedi
 ejemplo, al activar RN-17, los combates clave del juego. Si la API rechaza un cambio, el
 mensaje aparece junto a la regla.
 
+## Elegir tus juegos objetivo
+
+En **Juegos** está el catálogo de juegos: los de la saga principal y los Leyendas que pueden
+recibir un Pokémon criado en otro juego, agrupados por generación, con su plataforma
+([RF-25](../01-ddf/requisitos-funcionales.md#rf-25)). Ahí eliges los que quieres completar:
+serán tus **juegos objetivo** en Nuevo juego. Al principio no hay ninguno elegido.
+
+Pulsa **Elegir como juego objetivo**. Si no se sabe si el juego se puede jugar en un sistema
+actual de Nintendo (la Switch 2), la pantalla te lo pregunta antes; de los juegos de Switch ya se
+sabe que sí ([CA-92](../01-ddf/cuestiones-abiertas.md#resueltas)). Si el juego se puede elegir,
+queda marcado como **Juego objetivo**. Si no, la tarjeta dice por qué:
+
+- No puede recibir un Pokémon criado en otro juego, como Rojo, Azul y Amarillo
+  ([CA-29](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- Le faltan datos, y cuáles: por ejemplo, que su generación todavía no se carga.
+- No se puede jugar en un sistema actual, si has respondido que no.
+
+Tu respuesta sobre si puedes jugarlo se guarda aunque el juego no se pueda elegir, y la puedes
+cambiar con **Cambiar**. **Quitar** lo saca de tus juegos objetivo. Un juego elegido que deja de
+cumplir alguna condición (por ejemplo, tras una carga de datos en la que le falta un dato) sigue
+elegido, pero no aparece en Nuevo juego, y su tarjeta dice por qué
+([CA-93](../01-ddf/cuestiones-abiertas.md#resueltas)).
+
 ## Empezar un juego nuevo
 
 ### Elegir el juego
@@ -197,8 +220,8 @@ juegos y siguen cumpliendo sus condiciones (pueden recibir un Pokémon criado, t
 datos que necesitan las reglas y puedes jugarlos en un sistema actual), salvo los que ya están en
 tu *Hall of Fame*, porque cada juego se completa una sola vez
 ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05),
-[CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). Al principio no hay ninguno: elígelos en
-el catálogo de juegos ([en la API](api.md#catalogo-de-juegos)). Pulsa uno para revisar sus
+[CA-68](../01-ddf/cuestiones-abiertas.md#resueltas)). Si no tienes ninguno, la pantalla te
+lleva a [Juegos](#elegir-tus-juegos-objetivo) para elegirlos. Pulsa uno para revisar sus
 datos. Cambiar de juego no cambia tus favoritos.
 
 ### Revisar los datos

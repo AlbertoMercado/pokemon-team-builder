@@ -14,7 +14,10 @@ export const queryKeys = {
   pokemon: ["pokemon"] as const,
   catalog: (filters: CatalogFilters) => ["pokemon", "list", filters] as const,
   pokemonDetail: (pokemon: string) => ["pokemon", "detail", pokemon] as const,
+  /** Prefix of every list of games: the catalogue decides which ones are a target. */
+  gamesPrefix: ["games"] as const,
   games: (all: boolean) => ["games", all] as const,
+  gameCatalog: ["game-catalog"] as const,
   /** Prefix of the reviews of every game: they depend on the favourites and the rules. */
   reviews: ["review"] as const,
   review: (game: string) => ["review", game] as const,

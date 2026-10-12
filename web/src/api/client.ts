@@ -60,6 +60,27 @@ export function completedGameEntry(error: unknown): number | undefined {
   return typeof entry === "number" ? entry : undefined;
 }
 
+/** Why a game of the catalogue cannot be selected (`409`, RF-25): its obstacles and what data it
+ * lacks, each with its text. */
+export interface SelectionRefusal {
+  obstacles: { code: string; text: string }[];
+  missing: { code: string; text: string }[];
+}
+
+export function selectionRefusal(error: unknown): SelectionRefusal | undefined {
+  if (!(error instanceof ApiError) || error.status !== 409 || !isRecord(error.detail)) {
+    return undefined;
+  }
+  const reasons = (value: unknown) =>
+    Array.isArray(value)
+      ? value.filter(
+          (item): item is { code: string; text: string } =>
+            isRecord(item) && typeof item.code === "string" && typeof item.text === "string",
+        )
+      : [];
+  return { obstacles: reasons(error.detail.obstacles), missing: reasons(error.detail.missing) };
+}
+
 /** No reference data loaded (`503`) or no API: the whole application is affected. */
 export function isUnavailable(error: unknown): boolean {
   return error instanceof NetworkError || (error instanceof ApiError && error.status === 503);

@@ -62,6 +62,7 @@ test.beforeAll(async ({ request }) => {
 });
 
 test.afterAll(async ({ request }) => {
+  await request.put("/api/game-catalog/firered", { data: { selected: false } });
   for (const pokemon of FAVORITES) {
     await request.delete(`/api/favorites/${pokemon}`);
   }
@@ -157,6 +158,12 @@ for (const viewport of VIEWPORTS) {
       await expect(games.locator(":scope > li")).toHaveCount(1); // LeafGreen is completed (CA-68)
       await loadImages(page);
       await expectImageBoxes(games.locator("img"), 96, "nuevo juego");
+
+      await page.goto("/juegos");
+      const catalog = page.getByRole("list", { name: "Juegos de la 3.ª generación" });
+      await expect(catalog.locator(":scope > li")).toHaveCount(2);
+      await loadImages(page);
+      await expectImageBoxes(catalog.locator("img"), 40, "catálogo de juegos");
 
       await page.goto("/pokedex");
       const pokedexes = page.getByRole("list", { name: "Juegos superados" });
