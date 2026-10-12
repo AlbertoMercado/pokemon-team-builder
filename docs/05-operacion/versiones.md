@@ -86,7 +86,9 @@ versión y el PR ya sustituidos, y le pide que avise al terminar:
 scripts/publicar-version.sh X.Y.Z <n>
 ```
 
-Se puede ejecutar en la terminal o en el prompt de Claude Code con `!` delante. El script
+`<n>` es el número del PR de la versión, el que da Claude al prepararla: con otro número (o antes
+de que exista el PR) el script se para sin hacer nada y lo dice. Se puede ejecutar en la
+terminal o en el prompt de Claude Code con `!` delante. El script
 ([`scripts/publicar-version.sh`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/scripts/publicar-version.sh)):
 
 1. Comprueba que el PR es el de la rama `chore/release-X.Y.Z` y, si sigue abierto, que su CI
