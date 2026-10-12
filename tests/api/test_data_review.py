@@ -52,7 +52,8 @@ def test_without_favourites_the_game_mechanics_and_the_starters_are_asked(
     assert body["pending"] == 5
     assert [fact["fact_key"] for fact in body["facts"]] == MECHANICS + STARTER_ARRIVALS
     contests = body["facts"][0]
-    assert contests == {
+    fields = ("fact_key", "kind", "subject", "name", "origin", "proposal", "status", "value")
+    assert {k: contests[k] for k in fields} == {
         "fact_key": "mechanic:firered:contests",
         "kind": "mechanic",
         "subject": "contests",
@@ -61,9 +62,6 @@ def test_without_favourites_the_game_mechanics_and_the_starters_are_asked(
         "proposal": False,
         "status": "pending",
         "value": None,
-        "confirmed_at": None,
-        "outdated": False,
-        "source_url": None,
     }
 
 

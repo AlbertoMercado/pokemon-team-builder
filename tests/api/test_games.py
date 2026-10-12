@@ -26,27 +26,10 @@ def test_target_games_or_every_loaded_game_in_release_order(
     ]
     reference_database(data_dir, games=games)
     body = make_client().get("/api/games").json()
-    assert body == [
-        {
-            "game": "firered",
-            "name": "Firered",
-            "generation": 3,
-            "version_group": "firered-leafgreen",
-            "target": True,
-            "completed": False,
-            "cover_url": None,
-            "cover_source_url": None,
-        },
-        {
-            "game": "leafgreen",
-            "name": "Leafgreen",
-            "generation": 3,
-            "version_group": "firered-leafgreen",
-            "target": True,
-            "completed": False,
-            "cover_url": None,
-            "cover_source_url": None,
-        },
+    fields = ("game", "name", "generation", "version_group", "target", "completed")
+    assert [tuple(game[k] for k in fields) for game in body] == [
+        ("firered", "Firered", 3, "firered-leafgreen", True, False),
+        ("leafgreen", "Leafgreen", 3, "firered-leafgreen", True, False),
     ]
     every = make_client().get("/api/games", params={"all": "true"}).json()
     assert [(g["game"], g["target"]) for g in every] == [

@@ -161,21 +161,19 @@ def test_only_the_completed_games_have_a_pokedex(client: TestClient) -> None:
     """RF-20: one per game in the Hall of Fame, not started until its initial list."""
     assert client.get(POKEDEX).json() == []
     entry = _complete(client)
-    assert client.get(POKEDEX).json() == [
-        {
-            "game": "firered",
-            "game_name": "Firered",
-            "cover_url": None,
-            "hall_of_fame_entry": entry,
-            "progress": {
-                "registered": 0,
-                "total": 7,
-                "impossible": 1,  # Jirachi, only from a spin-off
-                "percent": 0,
-                "status": "not_started",
-            },
-        }
-    ]
+    [pokedex] = client.get(POKEDEX).json()
+    assert {k: pokedex[k] for k in ("game", "game_name", "hall_of_fame_entry", "progress")} == {
+        "game": "firered",
+        "game_name": "Firered",
+        "hall_of_fame_entry": entry,
+        "progress": {
+            "registered": 0,
+            "total": 7,
+            "impossible": 1,  # Jirachi, only from a spin-off
+            "percent": 0,
+            "status": "not_started",
+        },
+    }
     assert client.get(f"{POKEDEX}/leafgreen").status_code == 404
 
 

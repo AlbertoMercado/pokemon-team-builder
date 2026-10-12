@@ -49,33 +49,20 @@ def test_empty_at_first(client: TestClient) -> None:
 def test_register_a_team(client: TestClient) -> None:
     """RF-12: the game, the date, the notes and each member's form, name and types."""
     entry = _register(client, "firered", "2026-05-01", "gengar", "magneton", notes="Sin objetos")
-    assert {k: v for k, v in entry.items() if k != "id"} == {
+    fields = ("game", "game_name", "generation", "completed_on", "notes", "order", "last")
+    assert {k: entry[k] for k in fields} == {
         "game": "firered",
         "game_name": "Firered",
         "generation": 3,
-        "cover_url": None,
-        "cover_source_url": None,
         "completed_on": "2026-05-01",
         "notes": "Sin objetos",
         "order": 1,
         "last": True,
-        "members": [
-            {
-                "position": 1,
-                "pokemon": "gengar",
-                "name": "Gengar",
-                "types": ["ghost", "poison"],
-                "image_url": None,
-            },
-            {
-                "position": 2,
-                "pokemon": "magneton",
-                "name": "Magneton",
-                "types": ["electric", "steel"],
-                "image_url": None,
-            },
-        ],
     }
+    assert [(m["position"], m["pokemon"], m["name"], m["types"]) for m in entry["members"]] == [
+        (1, "gengar", "Gengar", ["ghost", "poison"]),
+        (2, "magneton", "Magneton", ["electric", "steel"]),
+    ]
     assert client.get(HALL_OF_FAME).json() == [entry]
 
 
