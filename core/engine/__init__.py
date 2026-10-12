@@ -125,10 +125,15 @@ def _members(
 
 
 def _sizes(presence: Sequence[PresenceRequirement]) -> tuple[range, list[frozenset[str]]]:
-    """The team sizes to try, largest first, and the sets the team must take one from."""
+    """The team sizes to try, largest first, and the sets the team must take one from.
+
+    Down to one member if some rule requires one: a single member can meet several presence
+    rules, like a starter of primary type Dragon (RN-13 and RN-21, #117).
+    """
     reserved = sum(1 for p in presence if p.status is PresenceStatus.RESERVED)
     required = [frozenset(p.options) for p in presence if p.requires_member]
-    return range(TEAM_SIZE - reserved, len(required) - 1, -1), required
+    smallest = 1 if required else 0
+    return range(TEAM_SIZE - reserved, smallest - 1, -1), required
 
 
 def _largest_best_teams(

@@ -20,6 +20,10 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ### Corregido
 
+- **Generación**: si un mismo favorito cumplía dos reglas de presencia (por ejemplo, un inicial
+  de tipo primario Dragón, para RN-13 y RN-21) y solo cabía solo en el equipo, el motor no lo
+  veía y daba RN-21 por no cumplida. Con los iniciales de las generaciones 1 a 3 no ocurre; lo
+  encontraron las pruebas de propiedades (#117).
 - **Web**: entre 768 y 1023 px de ancho, las tarjetas de Pokémon de la lista inicial de la
   Pokédex, del equipo del *Hall of Fame* y de las posiciones del resultado tenían distinta
   altura, porque dos tipos largos («Fantasma, Veneno») no cabían en una línea. Ahora la rejilla
