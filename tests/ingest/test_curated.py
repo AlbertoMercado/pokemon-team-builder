@@ -19,6 +19,8 @@ from db.reference import (
     MethodCategory,
     MethodKind,
     Origin,
+    Platform,
+    Playability,
     TediumReason,
 )
 from ingest import cli
@@ -26,6 +28,7 @@ from ingest.sources.curated import CuratedDataError, CuratedSource, read_curated
 from ingest.sources.curated.schemas import (
     ArrivalRule,
     BreedingFile,
+    CatalogFile,
     EvolutionMethodEntry,
     GamesFile,
     KeyBattlesFile,
@@ -248,6 +251,28 @@ def test_a_battle_of_a_game_outside_its_file_is_rejected() -> None:
     content = {"games": ["ruby", "sapphire"], "wikidex_section": "S", "battles": [battle]}
     with pytest.raises(ValidationError, match="emerald"):
         KeyBattlesFile.model_validate(content)
+
+
+def test_the_catalogue_has_the_main_games_and_the_legends() -> None:
+    """CA-90: 36 games in release order; Let's Go is not in it. CA-91: only the 1st
+    generation cannot receive a bred Pokémon. CA-92: the Switch games are known to be playable,
+    and nothing else is."""
+    games = read_curated(CURATED_DIR).catalog.games
+    slugs = [entry.game for entry in games]
+
+    assert len(games) == 36
+    assert (slugs[0], slugs[-1]) == ("red", "legends-za")
+    assert not {"lets-go-pikachu", "lets-go-eevee", "colosseum"} & set(slugs)
+    assert [e.game for e in games if not e.receives_bred] == ["red", "blue", "yellow"]
+    playable = [e.game for e in games if e.playable_now is Playability.YES]
+    assert playable == [e.game for e in games if e.platform is Platform.SWITCH]
+    assert len(playable) == 8
+
+
+def test_a_game_cannot_be_twice_in_the_catalogue() -> None:
+    entry = {"game": "red", "platform": "game_boy", "receives_bred": False}
+    with pytest.raises(ValidationError, match="repetidos"):
+        CatalogFile.model_validate({"games": [entry, entry]})
 
 
 def test_cli_reports_invalid_curated_data(

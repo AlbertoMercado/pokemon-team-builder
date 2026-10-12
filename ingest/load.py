@@ -43,7 +43,7 @@ from ingest.report import LoadReport
 from ingest.sources import Source
 from ingest.sources.pokeapi.sprites import MissingReason, MissingSpriteError, SpriteCache
 from ingest.sources.wikidex.covers import CoverCache, CoverMissing, MissingCoverError
-from ingest.targets import mark_incomplete_games
+from ingest.targets import fill_catalog, mark_incomplete_games
 from ingest.user_keys import check_user_keys
 
 ORIGIN_COLUMN_SUFFIX = "origin"
@@ -143,9 +143,11 @@ def _store_rows(engine: Engine, sources: Sequence[Source]) -> None:
 
 
 def _mark_target_games(engine: Engine, report: LoadReport) -> None:
-    """Only the complete games stay as target; the report lists the others (CA-67)."""
+    """Only the complete games stay as target; the report lists the others (CA-67). Each game
+    of the catalogue gets what it lacks to be complete (RF-25)."""
     with Session(engine) as session:
         report.incomplete_games = mark_incomplete_games(session)
+        fill_catalog(session)
         session.commit()
 
 

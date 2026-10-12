@@ -1,0 +1,134 @@
+# Catálogo de juegos (RF-25, CA-90): los juegos de la saga principal y los Leyendas que pueden
+# recibir un Pokémon criado, en orden de lanzamiento. En él, el usuario elige sus juegos
+# objetivo. Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# game es el identificador de PokeAPI; el nombre y la generación salen de PokeAPI.
+# receives_bred: si puede recibir un Pokémon criado, en el propio juego o por transferencia
+# (CA-29, CA-91). playable_now: "yes" (entre comillas, porque yes sin ellas es un booleano) si
+# se sabe que es jugable en un sistema actual de Nintendo (la Switch 2 ejecuta los juegos de
+# Switch); unknown (por defecto), si no, y se pregunta al usuario (CA-92).
+# Let's Go Pikachu y Let's Go Eevee no están: no se les puede llevar un Pokémon criado (CA-90).
+games:
+  - game: red
+    platform: game_boy
+    receives_bred: false
+    note: Sin crianza, y no recibe un Pokémon recién nacido de otro juego (CA-29).
+  - game: blue
+    platform: game_boy
+    receives_bred: false
+    note: Sin crianza, y no recibe un Pokémon recién nacido de otro juego (CA-29).
+  - game: yellow
+    platform: game_boy
+    receives_bred: false
+    note: Sin crianza, y no recibe un Pokémon recién nacido de otro juego (CA-29).
+  - game: gold
+    platform: game_boy_color
+    receives_bred: true
+  - game: silver
+    platform: game_boy_color
+    receives_bred: true
+  - game: crystal
+    platform: game_boy_color
+    receives_bred: true
+  - game: ruby
+    platform: game_boy_advance
+    receives_bred: true
+  - game: sapphire
+    platform: game_boy_advance
+    receives_bred: true
+  - game: firered
+    platform: game_boy_advance
+    receives_bred: true
+  - game: leafgreen
+    platform: game_boy_advance
+    receives_bred: true
+  - game: emerald
+    platform: game_boy_advance
+    receives_bred: true
+  - game: diamond
+    platform: ds
+    receives_bred: true
+  - game: pearl
+    platform: ds
+    receives_bred: true
+  - game: platinum
+    platform: ds
+    receives_bred: true
+  - game: heartgold
+    platform: ds
+    receives_bred: true
+  - game: soulsilver
+    platform: ds
+    receives_bred: true
+  - game: black
+    platform: ds
+    receives_bred: true
+  - game: white
+    platform: ds
+    receives_bred: true
+  - game: black-2
+    platform: ds
+    receives_bred: true
+  - game: white-2
+    platform: ds
+    receives_bred: true
+  - game: x
+    platform: 3ds
+    receives_bred: true
+  - game: y
+    platform: 3ds
+    receives_bred: true
+  - game: omega-ruby
+    platform: 3ds
+    receives_bred: true
+  - game: alpha-sapphire
+    platform: 3ds
+    receives_bred: true
+  - game: sun
+    platform: 3ds
+    receives_bred: true
+  - game: moon
+    platform: 3ds
+    receives_bred: true
+  - game: ultra-sun
+    platform: 3ds
+    receives_bred: true
+  - game: ultra-moon
+    platform: 3ds
+    receives_bred: true
+  - game: sword
+    platform: switch
+    receives_bred: true
+    playable_now: "yes"
+  - game: shield
+    platform: switch
+    receives_bred: true
+    playable_now: "yes"
+  - game: brilliant-diamond
+    platform: switch
+    receives_bred: true
+    playable_now: "yes"
+  - game: shining-pearl
+    platform: switch
+    receives_bred: true
+    playable_now: "yes"
+  - game: legends-arceus
+    platform: switch
+    receives_bred: true
+    playable_now: "yes"
+    note: Sin crianza; recibe por Pokémon HOME un Pokémon criado en otro juego (CA-91).
+  - game: scarlet
+    platform: switch
+    receives_bred: true
+    playable_now: "yes"
+  - game: violet
+    platform: switch
+    receives_bred: true
+    playable_now: "yes"
+  - game: legends-za
+    platform: switch
+    receives_bred: true
+    playable_now: "yes"
+    note: >-
+      Sin crianza; recibe por Pokémon HOME un Pokémon criado en otro juego (CA-91). Tiene
+      edición para Switch y para Switch 2.

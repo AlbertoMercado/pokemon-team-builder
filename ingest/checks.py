@@ -12,6 +12,7 @@ from sqlalchemy import func
 from sqlmodel import Session, col, select
 
 from db.reference import (
+    CatalogGame,
     Encounter,
     EventPokemon,
     EvolutionStep,
@@ -25,7 +26,10 @@ from db.reference import (
     KeyBattle,
     KeyBattlePokemon,
     Location,
+    MissingData,
     Origin,
+    Platform,
+    Playability,
     Pokedex,
     PokedexNumber,
     Pokemon,
@@ -68,6 +72,7 @@ EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     GamePokedex: 11,
     GameTransfer: 6 * 5 + 5 * 4,  # every ordered pair within the 1st-2nd and the 3rd gen.
     EventPokemon: 3 * 1 + 3 * 2 + 5 * 4,
+    CatalogGame: 36,  # CA-90
 }
 SPECIES_BY_POKEDEX = {"national": SPECIES_COUNT, "kanto": 151, "original-johto": 251, "hoenn": 202}
 # Encounter methods of the loaded games. ``core/`` classifies each of them (RN-26): a new one
@@ -442,6 +447,50 @@ def check_transfers(session: Session) -> list[str]:
     return problems
 
 
+def check_catalog(session: Session) -> list[str]:
+    """The game catalogue (RF-25, CA-90): every loaded game is in it, and known cases."""
+    problems = []
+    catalog = {entry.game: entry for entry in session.exec(select(CatalogGame)).all()}
+    loaded = set(session.exec(select(Game.slug)).all())
+    if outside := sorted(loaded - set(catalog)):
+        problems.append(f"juegos cargados que no están en el catálogo: {outside}")
+    expected = {
+        # game: (name, generation, platform, receives a bred Pokémon, playable, missing)
+        "red": ("Rojo", 1, Platform.GAME_BOY, False, Playability.UNKNOWN, None),
+        "firered": ("Rojo Fuego", 3, Platform.GAME_BOY_ADVANCE, True, Playability.UNKNOWN, []),
+        "emerald": ("Esmeralda", 3, Platform.GAME_BOY_ADVANCE, True, Playability.UNKNOWN, []),
+        "diamond": (
+            "Diamante",
+            4,
+            Platform.DS,
+            True,
+            Playability.UNKNOWN,
+            [MissingData.GENERATION_NOT_LOADED],
+        ),
+        "legends-za": (
+            "Leyendas: Z-A",
+            9,
+            Platform.SWITCH,
+            True,
+            Playability.YES,
+            [MissingData.GENERATION_NOT_LOADED],
+        ),
+    }
+    for game, (name, generation, platform, bred, playable, missing) in expected.items():
+        entry = catalog.get(game)
+        if entry is None:
+            problems.append(f"{game} no está en el catálogo")
+            continue
+        found = (entry.name_es, entry.generation, entry.platform, entry.receives_bred)
+        if found != (name, generation, platform, bred) or entry.playable_now != playable:
+            problems.append(f"{game} en el catálogo: {entry}")
+        if missing is not None and list(entry.missing) != missing:
+            problems.append(f"a {game} le falta {entry.missing}, se esperaba {missing}")
+    if "lets-go-pikachu" in catalog:
+        problems.append("Let's Go Pikachu no debería estar en el catálogo (CA-90)")
+    return problems
+
+
 FIRST_LOAD_CHECKS: Sequence[Check] = (
     check_counts,
     check_target_games,
@@ -456,4 +505,5 @@ FIRST_LOAD_CHECKS: Sequence[Check] = (
     check_pokedexes,
     check_encounters,
     check_transfers,
+    check_catalog,
 )

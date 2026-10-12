@@ -30,6 +30,7 @@ from ingest.sources.curated.schemas import (
     ArrivalFile,
     ArrivalRule,
     BreedingFile,
+    CatalogFile,
     CoversFile,
     EventsFile,
     EvolutionMethodsFile,
@@ -63,6 +64,7 @@ class CuratedData:
     events: EventsFile
     locations: LocationsFile
     evolution_methods: EvolutionMethodsFile
+    catalog: CatalogFile
 
     def arrival_rule(self, game: str) -> ArrivalRule | None:
         return self.arrival.games.get(game)
@@ -105,6 +107,7 @@ def read_curated(directory: Path) -> CuratedData:
         events=_read(directory / "events.yaml", EventsFile),
         locations=_read(directory / "locations.yaml", LocationsFile),
         evolution_methods=_read(directory / "evolution_methods.yaml", EvolutionMethodsFile),
+        catalog=_read(directory / "catalog.yaml", CatalogFile),
     )
 
 

@@ -185,6 +185,19 @@ Clasificar cada método en las formas de [RN-26](../01-ddf/reglas-negocio.md#rn-
 salvaje, errante…) es una regla de negocio y se hace en `core/`. La carga solo comprueba que no
 aparece ningún método sin clasificar ([comprobaciones](#comprobaciones-de-la-carga)).
 
+## Catálogo de juegos
+
+[`catalog.yaml`](datos-curados.md#catalogyaml) dice qué juegos tiene el catálogo
+([RF-25](../01-ddf/requisitos-funcionales.md#rf-25)); la fuente de PokeAPI añade a cada uno su
+nombre en español (`version_names.csv`) y su generación (la de su grupo de versiones), también a
+los que no se cargan. Al final de la carga, `ingest/targets.py` guarda en `catalog_game.missing`
+lo que le falta a cada juego para estar completo: lo mismo que deja un juego cargado sin ser
+juego objetivo o, si el juego no se carga, `generation_not_loaded`.
+
+Hoy no les falta nada a los 5 de la 3.ª generación. A Oro, Plata y Cristal les faltan sus
+Pokémon disponibles, sus mecánicas y sus combates clave, porque la 2.ª generación no es de juegos
+objetivo (`ingest/scope.py`); y a los de la 4.ª en adelante, su generación.
+
 ## WikiDex
 
 - Una petición por página de entrenador (`action=parse&prop=wikitext`): 13 para Rojo Fuego y
@@ -211,7 +224,10 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
   386 formas, 5 × 386 filas de disponibilidad, 4 Pokédex, 11 Pokédex de juego, 50
   transferencias y 29 Pokémon de evento. Tablas de eficacias completas: 15 × 15 pares
   en la 1.ª generación y 17 × 17 en la 2.ª y la 3.ª.
-- **Juegos objetivo**: exactamente Rojo Fuego y Verde Hoja, los completos.
+- **Juegos objetivo**: exactamente los 5 de la 3.ª generación, los completos.
+- **Catálogo de juegos**: 36 juegos; todos los cargados están en él; casos conocidos de nombre,
+  generación, plataforma, si reciben un Pokémon criado, si son jugables y qué les falta (nada a
+  Rojo Fuego ni a Esmeralda; la generación a Diamante y a Leyendas: Z-A); Let's Go no está.
 - **Tipos por generación**: Clefairy es Normal en la 3.ª, Magnemite es solo Eléctrico en la
   1.ª y Eléctrico/Acero en la 2.ª, y Bulbasaur es Planta/Veneno.
 - **Eficacias**: Fantasma no afecta a Psíquico en la 1.ª y le hace ×2 en la 3.ª, Fantasma
