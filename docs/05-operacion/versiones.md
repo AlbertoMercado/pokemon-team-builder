@@ -72,30 +72,48 @@ Todo lo que no publica nada fuera de la rama:
 7. **Commit y PR**: `chore: publicar la versión X.Y.Z`; en la descripción, qué incluye y qué
    falta después de fusionar. Claude espera a la CI (`gh pr checks <n> --watch`): los cinco
    jobs tienen que pasar.
-8. **Notas de la *release***: comprueba que el `awk` de la fase 2 extrae justo la sección de la
-   versión.
+8. **Notas de la *release***: comprueba que la sección `[X.Y.Z]` es lo que se publicará, con
+   la misma extracción que el script de la fase 2:
+   `awk -v heading="## [X.Y.Z]" 'index($0, heading) == 1 {f=1; next} /^## \[|^\[Sin publicar\]:/ {f=0} f' CHANGELOG.md`.
 
 ### 2. Publicar (usuario)
 
 Fusionar en `main`, etiquetar y crear la *release* son acciones visibles fuera del ordenador,
-así que las ejecuta el usuario; Claude **no** las ejecuta. Le da estos comandos con el PR y la
-versión ya sustituidos y con el prefijo `!`, que los ejecuta en la propia sesión, y le pide que
-avise al terminar:
+así que las ejecuta el usuario; Claude **no** las ejecuta. Le da un solo comando, con la
+versión y el PR ya sustituidos, y le pide que avise al terminar:
 
 ```bash
-! gh pr merge <n> --merge --delete-branch && git switch main && git pull && git tag -a vX.Y.Z -m "Versión X.Y.Z" && git push origin vX.Y.Z
+scripts/publicar-version.sh X.Y.Z <n>
 ```
 
-```bash
-! awk '/^## \[X.Y.Z\]/{f=1;next} /^## \[|^\[Sin publicar\]:/{f=0} f' CHANGELOG.md > /tmp/notas-X.Y.Z.md && gh release create vX.Y.Z --title "vX.Y.Z" --notes-file /tmp/notas-X.Y.Z.md --latest
-```
+Se puede ejecutar en la terminal o en el prompt de Claude Code con `!` delante. El script
+([`scripts/publicar-version.sh`](https://github.com/AlbertoMercado/pokemon-team-builder/blob/main/scripts/publicar-version.sh)):
 
-El `awk` copia a las notas solo la sección de la versión: se detiene en la sección siguiente o
-en los enlaces del final.
+1. Comprueba que el PR es el de la rama `chore/release-X.Y.Z` y, si sigue abierto, que su CI
+   ha pasado; entonces lo fusiona.
+2. Comprueba, en el commit de la fusión, que `pyproject.toml` dice `X.Y.Z` y que el
+   `CHANGELOG.md` tiene la sección `[X.Y.Z]`.
+3. Crea la etiqueta anotada `vX.Y.Z` **sobre el commit de la fusión**, no sobre la rama local, y
+   la sube.
+4. Crea la *release* con la sección `[X.Y.Z]` del CHANGELOG como notas (de su encabezado a la
+   sección siguiente o a los enlaces del final) y comprueba que es la más reciente.
+5. Actualiza `main` en local si está en ella y sin cambios.
+
+**Se puede repetir**: cada paso comprueba antes si ya está hecho. Si algo falla, se corrige y
+se vuelve a ejecutar el mismo comando, que sigue desde donde se paró. Sobre una versión ya
+publicada, solo la comprueba.
+
+!!! warning "Por qué un script y no una cadena de comandos"
+    Antes, la fase 2 era una cadena de comandos con `&&` y `!` delante, para el prompt de
+    Claude Code. Pegada en zsh, el `!` niega el resultado del primer comando: si la fusión
+    fallaba, la cadena seguía y etiquetaba el commit anterior (v1.4.0); si salía bien, se
+    cortaba sin etiquetar (v1.6.0). Con un solo comando que se puede repetir, el `!` no cambia
+    nada y un corte no deja la versión a medias.
 
 ### 3. Comprobar (Claude)
 
-Cuando el usuario avisa de que ha ejecutado los comandos:
+Cuando el usuario avisa de que ha ejecutado el script (su salida ya dice qué ha hecho, pero se
+comprueba aparte):
 
 ```bash
 git fetch --tags --prune
@@ -113,8 +131,8 @@ gh run list --branch main --limit 1              # CI del merge; esperar con gh 
 
 Las notas de la *release* tienen que ser la sección `X.Y.Z` del `CHANGELOG.md` (ni vacías ni las
 de otra versión) y la CI de `main` tiene que terminar en verde. Claude lo resume en una tabla
-(comprobación → resultado). Si algo está mal, explica cómo corregirlo y, si hace falta un comando
-de publicación, se lo da al usuario como en la fase 2. Por último, le recuerda comprobar
+(comprobación → resultado). Si algo está mal, explica cómo corregirlo; si falta un paso de la
+publicación, basta con que el usuario vuelva a ejecutar el script de la fase 2. Por último, le recuerda comprobar
 `GET /api/meta` en su API y que lo nuevo se anota en **Sin publicar**.
 
 ### Entre versiones
