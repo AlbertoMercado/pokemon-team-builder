@@ -10,6 +10,7 @@ from collections.abc import Iterable
 from functools import cached_property
 
 from db.reference import ReferenceModel
+from ingest.blockers import Blocker
 from ingest.sources.curated import CuratedData
 from ingest.sources.pokeapi.download import CsvCache
 from ingest.sources.pokeapi.index import PokemonIndex, build_index
@@ -49,6 +50,7 @@ class PokeapiCsvSource:
     """Ingest source that builds rows from the PokeAPI CSV dump of one commit."""
 
     name = "pokeapi"
+    blockers: tuple[Blocker, ...] = ()
 
     def __init__(self, cache: CsvCache, curated: CuratedData) -> None:
         self._cache = cache

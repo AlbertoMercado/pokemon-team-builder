@@ -206,12 +206,12 @@ tiene varios combates, cada uno va precedido de un rótulo (una línea `; En Sil
 Lance el primer combate es «Primer combate», y en Bruno, «Primera vez». Varias plantillas
 bajo el mismo rótulo (a menudo en pestañas, una por inicial) son **variantes** del combate.
 
-Si la página, la sección, el rótulo o algún Pokémon no se encuentran, la carga falla con un
-mensaje que dice qué combate y qué falta, p. ej.:
-
-```text
-WikidexDataError: lorelei (Lorelei): la sección tiene varios combates ['Primer combate', 'Revanchas']: falta wikidex_team
-```
+Si la página, la sección o el rótulo no se encuentran, la carga queda **bloqueada**
+(`wikidex_team_not_found`): el informe dice qué combate y qué falta, p. ej.
+`página «Lorelei», sección «…»: la sección tiene varios combates ['Primer combate',
+'Revanchas']: falta wikidex_team`, y sigue leyendo el resto para listarlos todos
+([bloqueos](../05-operacion/ingesta.md#bloqueos)). Si lo que no se encuentra es un Pokémon, la
+carga falla con un error que nombra el combate.
 
 Cada combate se carga, para cada juego, como una fila de `key_battle` con:
 

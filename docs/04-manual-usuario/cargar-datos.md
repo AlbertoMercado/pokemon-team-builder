@@ -38,9 +38,12 @@ Al terminar, la carga muestra un informe y sale con un código que dice cómo ha
 |--------|-----------|-----------|
 | `0` | **Completada**. Los datos nuevos ya están en `data/reference.sqlite`. | Reiniciar la aplicación para que los use. |
 | `1` | **Error** (red, un fichero curado no válido, una comprobación fallida…). Se conservan los datos anteriores. | Leer el mensaje, corregir y repetir. Ver [errores habituales](#errores-habituales). |
-| `2` | **Bloqueada**: hay algo que la aplicación no sabe tratar. Se conservan los datos anteriores. *(Pendiente, #78: hasta entonces, estos casos salen como código 1.)* | Registrar el informe y avisar al arquitecto. Ver [carga bloqueada](#si-la-carga-queda-bloqueada). |
+| `2` | **Bloqueada**: hay algo que la aplicación no sabe tratar. Se conservan los datos anteriores. | Registrar el informe y avisar al arquitecto. Ver [carga bloqueada](#si-la-carga-queda-bloqueada). |
 
 Para ver el código después de ejecutarla: `echo $?`.
+
+Si se completa o queda bloqueada, la carga guarda además su informe en `data/reports/` (fuera
+de git) y la última línea dice dónde: `Informe: data/reports/AAAA-MM-DDTHHMMSS-completada.md`.
 
 La carga lee tus datos (`data/user.sqlite`) para comprobar que tus favoritos y tu *Hall of
 Fame* siguen existiendo en los datos nuevos; si alguno no, no sustituye nada y te dice cuál
@@ -61,15 +64,24 @@ No hace falta repetir la carga si no ha cambiado nada: daría el mismo resultado
 
 ## Si la carga queda bloqueada
 
-!!! note "Pendiente de implementar"
-    Las cargas bloqueadas ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)) están diseñadas
-    pero no implementadas (#78). Hasta entonces, si la carga encuentra algo que la aplicación
-    no sabe tratar (un método de evolución nuevo, por ejemplo), termina con un **error** y se
-    trata como los [errores habituales](#errores-habituales): la aplicación sigue funcionando con
-    los datos anteriores.
+La carga ha encontrado algo que no se puede resolver sin decidir cómo lo tratan las reglas,
+por ejemplo un combate clave cuyo equipo ya no está en WikiDex
+([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)). La terminal lo dice así:
 
-Cuando esté implementada, el procedimiento será el del
-[protocolo de registro](../05-operacion/ingesta.md#protocolo-de-registro).
+```text
+BLOQUEADA (1 bloqueo): hace falta una nueva versión; se conserva la base de datos anterior.
+  - wikidex_team_not_found: giovanni-gym (1 caso)
+Informe: data/reports/2026-10-12T110949-bloqueada.md
+```
+
+La aplicación sigue funcionando con los datos anteriores. No hay nada que corregir en local:
+
+1. Registra el informe en git y avisa al arquitecto, siguiendo el
+   [protocolo de registro](../05-operacion/ingesta.md#protocolo-de-registro). El informe
+   (`.md`) dice, de cada bloqueo, qué es, dónde aparece y qué hay que decidir.
+2. Cuando la versión que lo resuelve esté en `main`, actualiza (`git pull`) y repite la carga.
+
+Qué es cada bloqueo: [bloqueos](../05-operacion/ingesta.md#bloqueos).
 
 ## Errores habituales
 

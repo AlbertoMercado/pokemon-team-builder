@@ -19,6 +19,7 @@ from sqlmodel import Session, select
 from db.reference import Game, ReferenceModel
 from db.sqlite import create_sqlite_engine
 from ingest import cli
+from ingest.blockers import Blocker
 from ingest.load import Images, build_reference
 from ingest.sources.curated import CuratedDataError, read_covers
 from ingest.sources.wikidex.covers import (
@@ -280,6 +281,7 @@ class _Games:
 
     name: str = "games"
     pokeapi_commit: str | None = None
+    blockers: tuple[Blocker, ...] = ()
 
     def rows(self) -> Iterable[ReferenceModel]:
         return FakeSource(_firered_rows()).rows()

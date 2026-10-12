@@ -6,6 +6,11 @@ and the keys that user.sqlite uses still exist (``ingest/user_keys.py``) does it
 previous file, in a single atomic rename. If anything fails, the previous database is kept
 untouched (RF-11, ADR-0003).
 
+A load is blocked when the sources or the stored rows have something the application cannot
+handle without a new version (``ingest/blockers.py``, ADR-0008). Every blocker is collected
+and the previous database is kept too; the rest of the steps are skipped, since a blocked
+load is reviewed and repeated with the new version.
+
 Once the rows are stored, only the complete games stay as target games (``ingest/targets.py``,
 RF-05); the others are reported with what they lack. Locations without a Spanish name are
 reported as a warning, since the English one is shown (ADR-0013). Each form gets its images,
@@ -32,6 +37,7 @@ from db.reference import (
     create_reference_schema,
 )
 from db.sqlite import create_sqlite_engine
+from ingest.blockers import find_data_blockers
 from ingest.checks import Check
 from ingest.report import LoadReport
 from ingest.sources import Source
@@ -71,19 +77,27 @@ def build_reference(
     With ``images``, every form gets the paths of its images and every game its cover; those
     without them are reported as warnings.
 
+    Blockers of the sources and of the stored rows block the load before the rest of steps.
     ``checks`` run on the new database; any problem they report rejects the load. Then, if
     ``user_database`` is given, the keys of user.sqlite are checked against the new database:
     missing favourites or Hall of Fame data reject it, missing confirmations are warnings.
     """
-    report = LoadReport(target=target)
+    started_at = datetime.now(UTC)
+    report = LoadReport(target=target, started_at=started_at)
     temporary = target.with_name(f"{target.name}.tmp")
     temporary.unlink(missing_ok=True)
-    started_at = datetime.now(UTC)
     engine = create_sqlite_engine(temporary)
     try:
+        report.pokeapi_commit = _pokeapi_commit(sources)
         create_reference_schema(engine)
         _store_rows(engine, sources)
         _check_integrity(engine)
+        report.games = _games(engine)
+        report.blockers = [blocker for source in sources for blocker in source.blockers]
+        with Session(engine) as session:
+            report.blockers.extend(find_data_blockers(session))
+        if report.blockers:
+            return report
         _mark_target_games(engine, report)
         _report_unnamed_locations(engine, report)
         if images is not None and images.sprites is not None:
@@ -102,11 +116,11 @@ def build_reference(
         report.errors.append(f"{type(error).__name__}: {error}")
     finally:
         engine.dispose()
-
-    if report.succeeded:
-        temporary.replace(target)
-    else:
-        temporary.unlink(missing_ok=True)
+        report.finished_at = datetime.now(UTC)
+        if report.succeeded:
+            temporary.replace(target)
+        else:
+            temporary.unlink(missing_ok=True)
     return report
 
 
@@ -257,22 +271,31 @@ def _run_checks(engine: Engine, checks: Sequence[Check]) -> list[str]:
         return [problem for check in checks for problem in check(session)]
 
 
-def _record_run(
-    engine: Engine, sources: Sequence[Source], started_at: datetime, sprites: SpriteCache | None
-) -> None:
+def _pokeapi_commit(sources: Sequence[Source]) -> str | None:
     commits = {source.pokeapi_commit for source in sources} - {None}
     if len(commits) > 1:
         raise IntegrityCheckError(f"varios commits de PokeAPI: {sorted(map(str, commits))}")
+    return next(iter(commits), None)
+
+
+def _games(engine: Engine) -> list[str]:
     with Session(engine) as session:
-        games = list(session.exec(select_model(Game.slug).order_by(col(Game.release_order))).all())
-        summary = _count_rows(engine)
+        query = select_model(Game.slug).order_by(col(Game.release_order))
+        return list(session.exec(query).all())
+
+
+def _record_run(
+    engine: Engine, sources: Sequence[Source], started_at: datetime, sprites: SpriteCache | None
+) -> None:
+    summary = _count_rows(engine)
+    with Session(engine) as session:
         session.add(
             IngestRun(
                 started_at=started_at,
                 finished_at=datetime.now(UTC),
-                pokeapi_commit=next(iter(commits), None),
+                pokeapi_commit=_pokeapi_commit(sources),
                 sprites_commit=sprites.commit if sprites is not None else None,
-                games=games,
+                games=_games(engine),
                 summary=summary,
             )
         )

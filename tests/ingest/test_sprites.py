@@ -18,6 +18,7 @@ from sqlmodel import Session, select
 
 from db.reference import IngestRun, Pokemon, ReferenceModel
 from db.sqlite import create_sqlite_engine
+from ingest.blockers import Blocker
 from ingest.load import Images, build_reference
 from ingest.sources.pokeapi.sprites import (
     ARTWORK_SIZE,
@@ -228,6 +229,7 @@ class _Forms:
 
     name: str = "forms"
     pokeapi_commit: str | None = None
+    blockers: tuple[Blocker, ...] = ()
 
     def rows(self) -> Iterable[ReferenceModel]:
         rows = FakeSource(_firered_rows()).rows()

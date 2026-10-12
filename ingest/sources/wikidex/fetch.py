@@ -18,6 +18,8 @@ from ingest.sources.pokeapi.download import DOWNLOAD_TIMEOUT_SECONDS, USER_AGENT
 
 API_URL = "https://www.wikidex.net/api.php"
 MIN_SECONDS_BETWEEN_REQUESTS = 1.0
+# MediaWiki error code of a title without page.
+MISSING_PAGE_CODE = "missingtitle"
 
 
 class WikiPage(BaseModel):
@@ -35,6 +37,10 @@ type PageFetcher = Callable[[str], WikiPage]
 
 class WikidexError(Exception):
     """A page could not be obtained from WikiDex or its cache."""
+
+
+class MissingPageError(WikidexError):
+    """WikiDex has no page with that title: the curated data must be checked."""
 
 
 class _ParseResult(BaseModel):
@@ -71,6 +77,8 @@ def fetch_page(title: str) -> WikiPage:
     response.raise_for_status()
     data = _ApiResponse.model_validate_json(response.content)
     if data.parse is None:
+        if data.error is not None and data.error.code == MISSING_PAGE_CODE:
+            raise MissingPageError(f"WikiDex no tiene la página {title!r}")
         detail = data.error.info if data.error else "respuesta sin contenido"
         raise WikidexError(f"WikiDex no devuelve la página {title!r}: {detail}")
     return WikiPage(title=data.parse.title, revision=data.parse.revid, wikitext=data.parse.wikitext)

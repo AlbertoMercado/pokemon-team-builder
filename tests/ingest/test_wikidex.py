@@ -10,11 +10,18 @@ import httpx
 import pytest
 
 from db.reference import BattleCategory, KeyBattle, KeyBattlePokemon, Origin, ReferenceModel
+from ingest.blockers import BlockerKind
 from ingest.sources.curated import CuratedData, read_curated
 from ingest.sources.curated.schemas import BattleEntry, KeyBattlesFile
 from ingest.sources.pokeapi.index import IndexedPokemon, PokemonIndex, normalize_name
 from ingest.sources.wikidex import WikidexDataError, WikidexSource
-from ingest.sources.wikidex.fetch import PageCache, WikidexError, WikiPage, fetch_page
+from ingest.sources.wikidex.fetch import (
+    MissingPageError,
+    PageCache,
+    WikidexError,
+    WikiPage,
+    fetch_page,
+)
 from ingest.sources.wikidex.parse import TeamMember, TeamParseError, find_section, team_variants
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "wikidex"
@@ -113,8 +120,17 @@ def test_fetch_page_reports_a_missing_page(monkeypatch: pytest.MonkeyPatch) -> N
     payload = {"error": {"code": "missingtitle", "info": "The page does not exist."}}
     _fake_api(monkeypatch, payload)
 
-    with pytest.raises(WikidexError, match="does not exist"):
+    with pytest.raises(MissingPageError, match="no tiene la página 'Brok'"):
         fetch_page("Brok")
+
+
+def test_fetch_page_reports_other_api_errors(monkeypatch: pytest.MonkeyPatch) -> None:
+    payload = {"error": {"code": "ratelimited", "info": "Too many requests."}}
+    _fake_api(monkeypatch, payload)
+
+    with pytest.raises(WikidexError, match="Too many requests") as error:
+        fetch_page("Brock")
+    assert not isinstance(error.value, MissingPageError)
 
 
 # --- Parsing -------------------------------------------------------------------------------
@@ -277,7 +293,37 @@ def test_wrong_starter_lines_fail() -> None:
         _rows(wrong)
 
 
-def test_parse_errors_name_the_battle() -> None:
-    wrong = BROCK.model_copy(update={"wikidex_team": "Revancha"})
-    with pytest.raises(WikidexDataError, match=r"brock \(Brock\)"):
-        _rows(wrong)
+def _missing_page(title: str) -> WikiPage:
+    raise MissingPageError(f"WikiDex no tiene la página {title!r}")
+
+
+@pytest.mark.rn("RN-17")
+def test_teams_not_found_block_the_load_and_the_rest_is_read() -> None:
+    """ADR-0008: a wrong team or page is a blocker, not an error, so all are listed at once."""
+    wrong_team = BROCK.model_copy(update={"id": "brock-rematch", "wikidex_team": "Revancha"})
+    wrong_page = BROCK.model_copy(update={"id": "misty", "wikidex_page": "Mysty"})
+    pages = PageCache(FIXTURES, _missing_page, sleep=lambda _: None)
+    source = WikidexSource(_curated_with(wrong_team, BROCK, wrong_page), pages, _index)
+
+    rows = list(source.rows())
+
+    battles = [row.slug for row in rows if isinstance(row, KeyBattle)]
+    assert battles == ["firered-brock", "leafgreen-brock"]
+    assert [(b.kind, b.subject) for b in source.blockers] == [
+        (BlockerKind.WIKIDEX_TEAM_NOT_FOUND, "brock-rematch"),
+        (BlockerKind.WIKIDEX_TEAM_NOT_FOUND, "misty"),
+    ]
+    [rematch] = source.blockers[0].occurrences
+    assert rematch.startswith(f"página «Brock», sección «{SECTION}», combate «Revancha»: ")
+    assert source.blockers[1].occurrences == (
+        f"página «Mysty», sección «{SECTION}»: WikiDex no tiene la página 'Mysty'",
+    )
+    assert source.blockers[1].template == "- id: misty\n  wikidex_page: Mysty\n  wikidex_team: ???"
+
+
+def test_an_unavailable_page_is_still_an_error(tmp_path: Path) -> None:
+    """Without the page in the cache, nothing says the curated data is wrong."""
+    source = WikidexSource(_curated_with(BROCK), PageCache(tmp_path, None), _index)
+
+    with pytest.raises(WikidexError, match="no está en la caché"):
+        list(source.rows())
