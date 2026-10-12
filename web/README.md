@@ -27,8 +27,8 @@ con TanStack Query.
 | `src/test/` | Configuración de Vitest, `renderApp` y la API simulada con MSW (la Pokédex, en `pokedex.ts`). |
 
 Los tests están junto a lo que prueban (`*.test.ts(x)`). Las pruebas de extremo a extremo están
-en `e2e/` (Playwright, `playwright.config.ts`) y van contra la API real, que arranca
-`tests/e2e/serve.py`.
+en `e2e/` (Playwright, `playwright.config.ts`): los flujos y la maquetación, contra la API real,
+que arranca `tests/e2e/serve.py`; `e2e/test.ts` es el `test` que usan, sin acceso a la red.
 
 **Más información**: cómo se arranca y se prueba en [Operación](../docs/05-operacion/web.md);
 cómo se usa en el [manual](../docs/04-manual-usuario/web.md); los comandos en

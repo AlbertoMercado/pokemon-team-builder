@@ -215,7 +215,7 @@ function Entry({
         )}
       </div>
       {entry.notes !== null && <p className="text-sm text-slate-700">{entry.notes}</p>}
-      <ol aria-label="Equipo" className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+      <ol aria-label="Equipo" className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {entry.members.map((member) => (
           // The name on one line and the types always below, so every member is as tall as
           // the others whatever its name or its types (like the initial list of the Pokédex).

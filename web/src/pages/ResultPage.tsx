@@ -237,7 +237,7 @@ function GroupCard({ group, title, chosen }: GroupCardProps) {
   return (
     <section aria-label={title} className={CARD}>
       <h2 className="text-lg font-semibold">{title}</h2>
-      <ol aria-label="Posiciones" className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+      <ol aria-label="Posiciones" className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {group.positions.map((position) => (
           <Position
             key={position.map((pokemon) => pokemon.pokemon).join("+")}
