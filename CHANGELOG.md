@@ -6,31 +6,46 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+## [1.6.0] - 2026-10-12
+
+La carga de datos ya no se corta ante lo que la aplicación no sabe tratar: queda **bloqueada**,
+conserva los datos anteriores, termina con el código de salida 2 y deja un informe para
+resolverlo en una nueva versión (RF-16, #78). Qué evoluciones son tediosas pasa a ser un dato
+curado, el catálogo de métodos de evolución.
+
+**Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`, o
+`scripts/start.sh`, que la hace): añade el catálogo de métodos de evolución a
+`reference.sqlite`. Hasta repetirla, la API pide hacerlo.
+
 ### Añadido
 
 - **Ingesta**: cargas bloqueadas (RF-16, ADR-0008). Si un combate clave no se encuentra en
   WikiDex o una evolución exige conocer un movimiento, la carga no se corta en el primero:
   los recoge todos, conserva los datos anteriores y termina con el código de salida 2. Cada
-  carga completada o bloqueada deja su informe, en Markdown y JSON, en `data/reports/` (#78).
+  carga completada o bloqueada deja su informe, en Markdown y JSON, en `data/reports/` (#106).
 - **Ingesta**: catálogo de métodos de evolución (`data/curated/evolution_methods.yaml`): qué
   disparadores y condiciones de evolución son tediosos, aleatorios o no, como dato y no en el
   código. Un método que no está en el catálogo, por ejemplo con un commit de PokeAPI nuevo,
-  bloquea la carga en lugar de contar como tedioso (CA-42, #78).
+  bloquea la carga en lugar de contar como tedioso (CA-42, #107).
 
 ### Cambiado
 
 - **Generación**: una evolución que depende del sexo, como Kirlia → Gallade, ya no es tediosa:
-  se cría hasta que sale el sexo necesario (RN-15, CA-43). No cambia nada hasta la
+  se cría hasta que sale el sexo necesario (RN-15, CA-43, #107). No cambia nada hasta la
   4.ª generación.
-- **Datos**: al actualizar hay que repetir la carga de datos (`uv run python -m ingest`, o
-  `scripts/start.sh`), que añade el catálogo de métodos de evolución a `reference.sqlite`.
-  Hasta repetirla, la API pide hacerlo.
 
 ### Corregido
 
 - **Web**: en la lista inicial de la Pokédex y en el equipo de cada registro del *Hall of Fame*,
   todas las tarjetas de Pokémon tienen la misma altura. Antes, los tipos bajaban a otra línea
-  solo cuando no cabían junto al nombre, y unas tarjetas eran más altas que otras.
+  solo cuando no cabían junto al nombre, y unas tarjetas eran más altas que otras (#105).
+
+### Pendiente
+
+- Mecánicas y combates clave de Rubí, Zafiro y Esmeralda, para poder elegirlos como juego
+  objetivo, y restricciones de llegada del resto de juegos (CA-28, #8).
+- Pruebas más robustas de la web (#77).
+- Sin prioridad: puesta en producción (ADR-0009, #51) y protección del acceso (RF-19, #52).
 
 ## [1.5.0] - 2026-10-10
 
@@ -277,7 +292,8 @@ Hoja**.
   acceso (RF-19, #52).
 - Restricciones de llegada del resto de juegos (CA-28, #8).
 
-[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.5.0...HEAD
+[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.2.0...v1.3.0
