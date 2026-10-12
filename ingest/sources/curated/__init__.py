@@ -16,10 +16,12 @@ from pydantic import BaseModel, ValidationError
 
 from db.reference import (
     EventPokemon,
+    EvolutionMethod,
     GameMechanic,
     GamePokedex,
     GameStarter,
     GameTransfer,
+    MethodKind,
     Origin,
     ReferenceModel,
 )
@@ -30,6 +32,7 @@ from ingest.sources.curated.schemas import (
     BreedingFile,
     CoversFile,
     EventsFile,
+    EvolutionMethodsFile,
     GamesFile,
     KeyBattlesFile,
     LocationsFile,
@@ -59,6 +62,7 @@ class CuratedData:
     transfers: TransfersFile
     events: EventsFile
     locations: LocationsFile
+    evolution_methods: EvolutionMethodsFile
 
     def arrival_rule(self, game: str) -> ArrivalRule | None:
         return self.arrival.games.get(game)
@@ -100,12 +104,13 @@ def read_curated(directory: Path) -> CuratedData:
         transfers=_read(directory / "transfers.yaml", TransfersFile),
         events=_read(directory / "events.yaml", EventsFile),
         locations=_read(directory / "locations.yaml", LocationsFile),
+        evolution_methods=_read(directory / "evolution_methods.yaml", EvolutionMethodsFile),
     )
 
 
 class CuratedSource:
     """Ingest source of the rows that only come from curated data: game mechanics, starters,
-    the Pokédex of each game, transfers and event Pokémon."""
+    the Pokédex of each game, transfers, event Pokémon and the catalog of evolution methods."""
 
     name = "curated"
     pokeapi_commit = None
@@ -140,6 +145,20 @@ class CuratedSource:
         }
         for game, pokemon in sorted(events):
             yield EventPokemon(game=game, pokemon=pokemon)
+        catalog = self._curated.evolution_methods
+        for kind, methods in (
+            (MethodKind.TRIGGER, catalog.triggers),
+            (MethodKind.CONDITION, catalog.conditions),
+        ):
+            for name, method in methods.items():
+                yield EvolutionMethod(
+                    kind=kind,
+                    name=name,
+                    category=method.category,
+                    reason=method.reason,
+                    requires_mechanic=method.requires_mechanic,
+                    unless_learnt_by_level=method.unless_learnt_by_level,
+                )
 
 
 def transfer_pairs(transfers: TransfersFile) -> dict[tuple[str, str], int | None]:

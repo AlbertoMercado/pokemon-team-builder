@@ -87,17 +87,14 @@ Módulo `db/reference/evolution.py`.
 | `evolution_step` | `id` PK, `version_group` FK, `from_pokemon` FK → `pokemon`, `to_pokemon` FK → `pokemon`, `trigger`, `conditions` (JSON) | Paso aplicable en ese grupo de versiones, ya resuelto a partir del `version_group_id` del CSV, que indica el grupo en que se introdujo la evolución ([plan de carga](carga-datos.md#evoluciones)). `trigger` es el disparador de PokeAPI (`level-up`, `trade`, `use-item`, `shed`…) y `conditions`, un objeto JSON con las condiciones no vacías (amistad, hora del día, objeto, belleza, comparación de estadísticas…), tal como vienen. Puede haber varias filas si hay métodos alternativos, por eso la clave es un `id`. |
 | `level_move` | `pokemon`, `version_group`, `move`, `level` | Solo los movimientos que exige alguna evolución (`known_move`), para [RN-15](../01-ddf/reglas-negocio.md#rn-15) y [CA-32](../01-ddf/cuestiones-abiertas.md#resueltas). **No implementada**: no hace falta hasta la 4.ª generación. |
 
-Clasificar un paso como tedioso o aleatorio a partir de su disparador y sus condiciones es una
-regla de negocio y se hace en `core/evolution.py`, no en la base de datos. Por eso se guardan
-los datos de PokeAPI sin reducirlos a una categoría.
-
-Pendiente (#78): la categoría de cada
-disparador y condición pasa a ser un dato
-([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)):
+Los pasos guardan los datos de PokeAPI sin reducirlos a una categoría. La categoría de cada
+disparador y condición es un dato curado aparte
+([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)), y `core/evolution.py` decide con él si
+un paso es tedioso o aleatorio:
 
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
-| `evolution_method` | `kind` (`trigger` o `condition`) y `name` PK, `category`, `reason`?, `requires_mechanic`?, `unless_learnt_by_level` | Desde [`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml). `core/evolution.py` la recibe en el contexto en lugar de tener la clasificación en el código. |
+| `evolution_method` | `kind` (`trigger` o `condition`) y `name` PK, `category` (`easy`, `tedious` o `random`), `reason`?, `requires_mechanic`?, `unless_learnt_by_level` | Desde [`evolution_methods.yaml`](datos-curados.md#evolution_methodsyaml). `reason` existe solo, y siempre, si es `tedious` (`CHECK`). La API la pasa al motor en el contexto. Un disparador o condición de `evolution_step` que no esté aquí bloquea la carga ([ingesta](../05-operacion/ingesta.md#bloqueos)). |
 
 ### Combates clave
 

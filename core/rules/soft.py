@@ -76,7 +76,7 @@ class MemberProfile:
 
 
 def member_profile(pokemon: PokemonData, ctx: GameContext, rivals: Rivals) -> MemberProfile:
-    assessment = evolution.assess(pokemon, ctx.game)
+    assessment = evolution.assess(pokemon, ctx.game, ctx.evolution_methods)
     chart = ctx.type_chart
     attack = defense = 0
     for bit, rival in enumerate(rivals.rivals):

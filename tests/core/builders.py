@@ -2,29 +2,65 @@
 
 They fill in sensible defaults so each test only states what matters to it, e.g.
 ``pokemon("gengar", ("ghost", "poison"), line=("gastly", "haunter"), steps=[...])``.
+
+``EVOLUTION_METHODS`` is the real catalog of evolution methods, read from the curated data,
+so the tests of RN-15 and RN-20 also check how it classifies each method.
 """
 
 import zlib
 from collections.abc import Iterable, Mapping, Sequence
 from itertools import pairwise
+from pathlib import Path
+
+import yaml
 
 from core.domain import (
     Availability,
     Candidate,
     ConditionValue,
+    EvolutionCatalog,
+    EvolutionMethod,
     EvolutionStep,
     GameContext,
     GameInfo,
     HallOfFameEntry,
     JourneyMember,
     KeyBattle,
+    MethodCategory,
     PokemonData,
     PoolEntry,
     Rival,
     Stage,
+    Tedium,
     TypeChart,
 )
 from core.rules.catalog import RuleSettings
+
+CURATED_EVOLUTION_METHODS = (
+    Path(__file__).resolve().parents[2] / "data" / "curated" / "evolution_methods.yaml"
+)
+
+
+def _evolution_methods(entries: Mapping[str, Mapping[str, str]]) -> dict[str, EvolutionMethod]:
+    return {
+        name: EvolutionMethod(
+            MethodCategory(entry["category"]),
+            Tedium(entry["reason"]) if "reason" in entry else None,
+            entry.get("requires_mechanic"),
+        )
+        for name, entry in entries.items()
+    }
+
+
+def evolution_catalog() -> EvolutionCatalog:
+    """The catalog of ``data/curated/evolution_methods.yaml``."""
+    raw = yaml.safe_load(CURATED_EVOLUTION_METHODS.read_text(encoding="utf-8"))
+    return EvolutionCatalog(
+        _evolution_methods(raw["triggers"]), _evolution_methods(raw["conditions"])
+    )
+
+
+EVOLUTION_METHODS = evolution_catalog()
 
 GEN1_TYPES = (
     "normal",
@@ -150,6 +186,7 @@ def context(
         pool=tuple(pool),
         key_battles=tuple(key_battles),
         settings=settings or RuleSettings.defaults(),
+        evolution_methods=EVOLUTION_METHODS,
         journey=tuple(journey),
     )
 

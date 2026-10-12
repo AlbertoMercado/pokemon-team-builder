@@ -32,20 +32,25 @@ from api.services import wikidex
 from core.domain import (
     Availability,
     Candidate,
+    EvolutionCatalog,
+    EvolutionMethod,
     EvolutionStep,
     GameContext,
     GameInfo,
     HallOfFameEntry,
     KeyBattle,
+    MethodCategory,
     PokemonData,
     PoolEntry,
     Rival,
     Stage,
+    Tedium,
     TypeChart,
 )
 from core.review import Fact, FactKind, FactValue, FavoriteFacts, Origin
 from core.rules.catalog import RuleSettings
 from db import reference as ref_db
+from db.reference import MethodKind
 from db.user import ConfirmedValue, FactConfirmation, value_hash
 
 type Confirmations = Mapping[str, FactConfirmation]
@@ -127,7 +132,8 @@ class GameReference:
     generation keeps the types it appeared with and has no evolution steps, because RN-03
     discards it first. ``types`` are the types in the game's generation of every form that
     has them, to give a key battle's team corrected by the user its types. ``starters`` are
-    the game's starters (RN-21).
+    the game's starters (RN-21). ``evolution_methods`` is the catalog of evolution methods
+    (RN-15, RN-20).
     """
 
     slug: str
@@ -139,6 +145,7 @@ class GameReference:
     availability: Mapping[str, FormFacts]
     mechanics: tuple[Reviewable, ...]
     key_battles: tuple[LoadedBattle, ...]
+    evolution_methods: EvolutionCatalog
     starters: frozenset[str] = frozenset()
 
     def form_facts(self, pokemon: str) -> FormFacts:
@@ -240,6 +247,7 @@ def build_context(
         pool=tuple(pool),
         key_battles=_key_battles(game, confirmations),
         settings=settings,
+        evolution_methods=game.evolution_methods,
         journey=tuple(journey),
     )
 
@@ -293,7 +301,23 @@ def load_game_reference(reference: Session, slug: str) -> GameReference:
             for row in reference_repo.game_mechanics(reference, slug)
         ),
         key_battles=_loaded_battles(reference, slug),
+        evolution_methods=load_evolution_catalog(reference),
         starters=frozenset(reference_repo.game_starters(reference, slug)),
+    )
+
+
+def load_evolution_catalog(reference: Session) -> EvolutionCatalog:
+    """The catalog of evolution methods as the engine takes it (RN-15, RN-20, CA-42)."""
+    methods: dict[MethodKind, dict[str, EvolutionMethod]] = {kind: {} for kind in MethodKind}
+    for row in reference_repo.evolution_methods(reference):
+        methods[row.kind][row.name] = EvolutionMethod(
+            MethodCategory(row.category.value),
+            Tedium(row.reason.value) if row.reason is not None else None,
+            row.requires_mechanic,
+        )
+    return EvolutionCatalog(
+        MappingProxyType(methods[MethodKind.TRIGGER]),
+        MappingProxyType(methods[MethodKind.CONDITION]),
     )
 
 

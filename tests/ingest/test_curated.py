@@ -1,6 +1,7 @@
 """Curated data (data/curated/*.yaml): schemas, the real files and the curated source
 (ADR-0005, docs/02-ddt/datos-curados.md)."""
 
+import csv
 import shutil
 from pathlib import Path
 
@@ -10,17 +11,22 @@ from pydantic import ValidationError
 from db.reference import (
     BattleCategory,
     EventPokemon,
+    EvolutionMethod,
     GameMechanic,
     GamePokedex,
     GameStarter,
     GameTransfer,
+    MethodCategory,
+    MethodKind,
     Origin,
+    TediumReason,
 )
 from ingest import cli
 from ingest.sources.curated import CuratedDataError, CuratedSource, read_curated, transfer_pairs
 from ingest.sources.curated.schemas import (
     ArrivalRule,
     BreedingFile,
+    EvolutionMethodEntry,
     GamesFile,
     KeyBattlesFile,
     LocationEntry,
@@ -29,8 +35,16 @@ from ingest.sources.curated.schemas import (
     TransferGroup,
     TransfersFile,
 )
+from ingest.sources.pokeapi.transform import condition_keys
 
 CURATED_DIR = Path(__file__).resolve().parents[2] / "data" / "curated"
+EVOLUTION_TRIGGERS = (
+    Path(__file__).resolve().parent
+    / "fixtures"
+    / "pokeapi"
+    / "bc92d3b6029ef1abe9e7ad424c400b338f3c11fe"
+    / "evolution_triggers.csv"
+)
 
 
 def test_repository_curated_files_are_valid() -> None:
@@ -146,8 +160,9 @@ def test_transfer_pairs_keep_the_least_restrictive_limit() -> None:
 
 
 def test_curated_source_rows() -> None:
-    """Game mechanics, starters, the Pokédex of each game, transfers and event Pokémon; key
-    battles are loaded by the WikiDex source with their teams, and locations by PokeAPI's."""
+    """Game mechanics, starters, the Pokédex of each game, transfers, event Pokémon and the
+    catalog of evolution methods; key battles are loaded by the WikiDex source with their
+    teams, and locations by PokeAPI's."""
     rows = list(CuratedSource(read_curated(CURATED_DIR)).rows())
     mechanics = [row for row in rows if isinstance(row, GameMechanic)]
     starters = [(row.game, row.pokemon) for row in rows if isinstance(row, GameStarter)]
@@ -158,12 +173,19 @@ def test_curated_source_rows() -> None:
         if isinstance(row, GameTransfer)
     }
     events = {(row.game, row.pokemon) for row in rows if isinstance(row, EventPokemon)}
+    methods = {(row.kind, row.name): row for row in rows if isinstance(row, EvolutionMethod)}
 
     assert len(mechanics) == 4
     assert len(starters) == 31  # 3 per game, 1 in Yellow
-    assert len(rows) == len(mechanics) + len(starters) + len(pokedexes) + len(transfers) + len(
-        events
+    assert len(rows) == (
+        len(mechanics) + len(starters) + len(pokedexes) + len(transfers) + len(events)
+    ) + len(methods)
+    time_of_day = methods[(MethodKind.CONDITION, "time_of_day")]
+    assert (time_of_day.reason, time_of_day.requires_mechanic) == (
+        TediumReason.TIME_OF_DAY,
+        "day_night_cycle",
     )
+    assert methods[(MethodKind.CONDITION, "known_move")].unless_learnt_by_level
     assert (pokedexes["red"], pokedexes["gold"], pokedexes["firered"]) == (
         "kanto",
         "original-johto",
@@ -206,3 +228,37 @@ def test_cli_reports_invalid_curated_data(
     output = capsys.readouterr().out
     assert "ERROR en los datos curados" in output
     assert "arrival.yaml" in output
+
+
+def test_every_evolution_method_of_pokeapi_is_catalogued() -> None:
+    """CA-42: the 18 triggers and every condition of the pinned dump, also those not in the
+    loaded games yet, so only a new commit of PokeAPI can block the load."""
+    catalog = read_curated(CURATED_DIR).evolution_methods
+    with EVOLUTION_TRIGGERS.open(encoding="utf-8") as file:
+        triggers = {row["identifier"] for row in csv.DictReader(file)}
+
+    assert len(triggers) == 18
+    assert set(catalog.triggers) == triggers
+    assert set(catalog.conditions) == set(condition_keys())
+
+
+@pytest.mark.rn("RN-15")
+def test_gender_is_not_tedious() -> None:
+    """CA-43: it is bred until it has the right gender."""
+    catalog = read_curated(CURATED_DIR).evolution_methods
+    assert catalog.conditions["gender_id"].category is MethodCategory.EASY
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [{"category": "tedious"}, {"category": "easy", "reason": "trade"}],
+)
+def test_only_a_tedious_method_has_a_reason(entry: dict[str, str]) -> None:
+    with pytest.raises(ValidationError, match="reason"):
+        EvolutionMethodEntry.model_validate(entry)
+
+
+def test_an_evolution_method_needs_a_known_mechanic() -> None:
+    entry = {"category": "tedious", "reason": "other", "requires_mechanic": "weather"}
+    with pytest.raises(ValidationError, match="requires_mechanic"):
+        EvolutionMethodEntry.model_validate(entry)

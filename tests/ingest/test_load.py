@@ -12,11 +12,14 @@ import pytest
 from sqlmodel import Session, select
 
 from db.reference import (
+    EvolutionMethod,
     EvolutionStep,
     Game,
     GamePokemon,
     Generation,
     IngestRun,
+    MethodCategory,
+    MethodKind,
     Origin,
     Pokemon,
     ReferenceModel,
@@ -296,13 +299,69 @@ def test_an_error_fails_the_load_even_with_blockers(tmp_path: Path) -> None:
     assert report.status is LoadStatus.FAILED
 
 
-def _evolution(to_pokemon: str, **conditions: str | int) -> EvolutionStep:
+def _evolution(
+    to_pokemon: str, trigger: str = "level-up", **conditions: str | int
+) -> EvolutionStep:
     return EvolutionStep(
         version_group="firered-leafgreen",
         from_pokemon="bulbasaur",
         to_pokemon=to_pokemon,
-        trigger="level-up",
+        trigger=trigger,
         conditions=conditions,
+    )
+
+
+def _method(kind: MethodKind, name: str, *, by_level: bool = False) -> EvolutionMethod:
+    return EvolutionMethod(
+        kind=kind, name=name, category=MethodCategory.EASY, unless_learnt_by_level=by_level
+    )
+
+
+def _with_evolutions(*steps: EvolutionStep) -> list[ReferenceModel]:
+    """FireRed rows, Bulbasaur's steps and a catalog with level-up, minimum_level and
+    known_move (which needs the moves learnt by level)."""
+    bulbasaur = Pokemon(
+        slug="bulbasaur", species="bulbasaur", name_es="Bulbasaur", is_default=True, pokeapi_id=1
+    )
+    return [
+        *_firered_rows(),
+        bulbasaur,
+        _method(MethodKind.TRIGGER, "level-up"),
+        _method(MethodKind.CONDITION, "minimum_level"),
+        _method(MethodKind.CONDITION, "known_move", by_level=True),
+        *steps,
+    ]
+
+
+def test_catalogued_evolutions_do_not_block_the_load(tmp_path: Path) -> None:
+    rows = _with_evolutions(_evolution("ivysaur", minimum_level=16))
+
+    report = build_reference([FakeSource(rows)], tmp_path / "reference.sqlite")
+
+    assert report.status is LoadStatus.COMPLETED
+
+
+@pytest.mark.rn("RN-15")
+@pytest.mark.rn("RN-20")
+def test_uncatalogued_evolution_methods_block_the_load(tmp_path: Path) -> None:
+    """CA-42: the architect classifies them first, so the engine never guesses (one blocker
+    per trigger or condition, with every step that uses it)."""
+    rows = _with_evolutions(
+        _evolution("ivysaur", "spin", minimum_level=16, needs_full_moon=1),
+        _evolution("ivysaur", "spin"),
+    )
+
+    report = build_reference([FakeSource(rows)], tmp_path / "reference.sqlite")
+
+    assert report.status is LoadStatus.BLOCKED
+    trigger, condition = report.blockers
+    assert (trigger.kind, trigger.subject) == (BlockerKind.UNKNOWN_EVOLUTION_TRIGGER, "spin")
+    assert trigger.occurrences == ("bulbasaur → ivysaur (firered-leafgreen)",) * 2
+    assert trigger.rules == ("RN-15", "RN-20")
+    assert trigger.template == "triggers:\n  spin: {category: ???, reason: ???}"
+    assert (condition.kind, condition.subject) == (
+        BlockerKind.UNKNOWN_EVOLUTION_CONDITION,
+        "needs_full_moon",
     )
 
 
@@ -310,15 +369,9 @@ def _evolution(to_pokemon: str, **conditions: str | int) -> EvolutionStep:
 def test_an_evolution_by_move_blocks_the_load_without_level_moves(tmp_path: Path) -> None:
     """CA-45: whether the step is tedious depends on the moves learnt by level (CA-32), which
     are not loaded."""
-    bulbasaur = Pokemon(
-        slug="bulbasaur", species="bulbasaur", name_es="Bulbasaur", is_default=True, pokeapi_id=1
+    rows = _with_evolutions(
+        _evolution("ivysaur", minimum_level=16), _evolution("ivysaur", known_move="vine-whip")
     )
-    rows = [
-        *_firered_rows(),
-        bulbasaur,
-        _evolution("ivysaur", minimum_level=16),
-        _evolution("ivysaur", known_move="vine-whip"),
-    ]
 
     report = build_reference([FakeSource(rows)], tmp_path / "reference.sqlite")
 

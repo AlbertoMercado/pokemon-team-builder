@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 
+from core.domain.evolution import EvolutionCatalog
 from core.domain.game import GameInfo, KeyBattle
 from core.domain.journey import HallOfFameEntry
 from core.domain.pokemon import Candidate, PokemonData, PoolEntry
@@ -18,8 +19,9 @@ class GameContext:
     """Data of one target game, the user's favourites and settings, already resolved.
 
     Built by ``api/services/`` from both databases. Every value is already confirmed (RN-18):
-    the engine does not know where data comes from. ``journey`` are the user's Hall of Fame
-    entries; ``core.journey`` decides which forms they exclude (RN-16).
+    the engine does not know where data comes from. ``evolution_methods`` says how tedious
+    each evolution method is (RN-15, RN-20). ``journey`` are the user's Hall of Fame entries;
+    ``core.journey`` decides which forms they exclude (RN-16).
     """
 
     game: GameInfo
@@ -28,6 +30,7 @@ class GameContext:
     pool: tuple[PoolEntry, ...]
     key_battles: tuple[KeyBattle, ...]
     settings: RuleSettings
+    evolution_methods: EvolutionCatalog
     journey: tuple[HallOfFameEntry, ...] = ()
 
     def __post_init__(self) -> None:

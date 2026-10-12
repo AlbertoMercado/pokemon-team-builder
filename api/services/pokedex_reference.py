@@ -19,8 +19,8 @@ from sqlmodel import Session
 
 from api.errors import NotFoundError
 from api.repositories import reference as reference_repo
-from api.services.context import Confirmations, Reviewable
-from core.domain import CONTESTS, DAY_NIGHT_CYCLE, EvolutionStep, GameInfo
+from api.services.context import Confirmations, Reviewable, load_evolution_catalog
+from core.domain import CONTESTS, DAY_NIGHT_CYCLE, EvolutionCatalog, EvolutionStep, GameInfo
 from core.pokedex import DexSpecies, Encounter
 from core.review import FactKind, Origin
 from db import reference as ref_db
@@ -48,6 +48,7 @@ class PokedexReference:
     has the number shown. ``encounters`` are by species, to transfer from this game (RN-25).
     ``transfers`` are the games that can send Pokémon to this one, with their generation
     limit. ``mechanics`` are the reviewable mechanics as loaded (RN-18).
+    ``evolution_methods`` is the catalog of evolution methods (RN-15).
     """
 
     slug: str
@@ -61,6 +62,7 @@ class PokedexReference:
     encounters: Mapping[str, tuple[Encounter, ...]]
     starters: frozenset[str]
     transfers: tuple[tuple[str, int | None], ...]
+    evolution_methods: EvolutionCatalog
 
     def game(self, confirmations: Confirmations) -> GameInfo:
         """The game with its mechanics. One not loaded, or pending, counts as present: better
@@ -177,6 +179,7 @@ def load_pokedex_reference(reference: Session, slug: str) -> PokedexReference:
         transfers=tuple(
             (source.slug, limit) for source, limit in reference_repo.transfers_to(reference, slug)
         ),
+        evolution_methods=load_evolution_catalog(reference),
     )
 
 

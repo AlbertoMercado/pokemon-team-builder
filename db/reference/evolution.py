@@ -1,9 +1,12 @@
-"""Evolution steps applicable in each version group (RN-07, RN-09, RN-15, RN-20)."""
+"""Evolution steps applicable in each version group, and the category of each evolution
+method (RN-07, RN-09, RN-15, RN-20)."""
 
-from sqlalchemy import JSON
+from enum import StrEnum
+
+from sqlalchemy import JSON, CheckConstraint
 from sqlmodel import Field
 
-from db.reference.base import ReferenceModel
+from db.reference.base import ReferenceModel, enum_column
 
 type ConditionValue = str | int | bool
 
@@ -26,3 +29,51 @@ class EvolutionStep(ReferenceModel, table=True):
     to_pokemon: str = Field(foreign_key="pokemon.slug")
     trigger: str
     conditions: dict[str, ConditionValue] = Field(default_factory=dict, sa_type=JSON)
+
+
+class MethodKind(StrEnum):
+    TRIGGER = "trigger"
+    CONDITION = "condition"
+
+
+class MethodCategory(StrEnum):
+    EASY = "easy"
+    TEDIOUS = "tedious"
+    RANDOM = "random"
+
+
+class TediumReason(StrEnum):
+    """Why a tedious method is tedious, to explain it in the breakdown (RN-15)."""
+
+    TRADE = "trade"
+    SHED = "shed"
+    STATS = "stats"
+    TIME_OF_DAY = "time_of_day"
+    BEAUTY = "beauty"
+    LOCATION = "location"
+    PARTY = "party"
+    MOVE = "move"
+    OTHER = "other"
+
+
+class EvolutionMethod(ReferenceModel, table=True):
+    """The category of an evolution trigger or condition, from ``evolution_methods.yaml``.
+
+    ``name`` is PokeAPI's identifier of the trigger, or the key of the condition in
+    ``EvolutionStep.conditions``. Only a tedious method has a ``reason``.
+    ``requires_mechanic`` is the game mechanic without which the step is impossible there;
+    ``unless_learnt_by_level`` marks the methods that need the moves learnt by level (CA-32,
+    CA-45). Steps whose methods are not here block the load (CA-42, ADR-0008).
+    """
+
+    __tablename__ = "evolution_method"
+    __table_args__ = (
+        CheckConstraint("(reason IS NULL) = (category != 'tedious')", name="tedious_reason"),
+    )
+
+    kind: MethodKind = Field(primary_key=True, sa_type=enum_column(MethodKind))
+    name: str = Field(primary_key=True)
+    category: MethodCategory = Field(sa_type=enum_column(MethodCategory))
+    reason: TediumReason | None = Field(default=None, sa_type=enum_column(TediumReason))
+    requires_mechanic: str | None = None
+    unless_learnt_by_level: bool = False

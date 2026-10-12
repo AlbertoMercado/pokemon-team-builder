@@ -10,7 +10,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from db.reference import BattleCategory
+from db.reference import BattleCategory, MethodCategory, TediumReason
 
 SLUG_PATTERN = r"^[a-z0-9]+(-[a-z0-9]+)*$"
 COMMIT_PATTERN = r"^[0-9a-f]{40}$"
@@ -229,6 +229,35 @@ class LocationsFile(CuratedModel):
     """``locations.yaml``: Spanish names and event items of locations (ADR-0013)."""
 
     locations: dict[Slug, LocationEntry]
+
+
+class EvolutionMethodEntry(CuratedModel):
+    """The category of an evolution trigger or condition (RN-15, RN-20).
+
+    Only a tedious one has a ``reason``. ``requires_mechanic`` is the mechanic of
+    ``games.yaml`` without which the step is impossible in a game; ``unless_learnt_by_level``,
+    that whether it is tedious depends on the moves learnt by level (CA-32, CA-45).
+    """
+
+    category: MethodCategory
+    reason: TediumReason | None = None
+    requires_mechanic: Mechanic | None = None
+    unless_learnt_by_level: bool = False
+    note: str | None = None
+
+    @model_validator(mode="after")
+    def _reason_only_if_tedious(self) -> Self:
+        if (self.category is MethodCategory.TEDIOUS) != (self.reason is not None):
+            raise ValueError("reason solo puede estar, y debe estar, si category es tedious")
+        return self
+
+
+class EvolutionMethodsFile(CuratedModel):
+    """``evolution_methods.yaml``: the category of every trigger and condition of PokeAPI
+    (CA-42). Triggers by PokeAPI identifier; conditions by their key in the loaded steps."""
+
+    triggers: dict[str, EvolutionMethodEntry]
+    conditions: dict[str, EvolutionMethodEntry]
 
 
 class PinnedCommitFile(CuratedModel):

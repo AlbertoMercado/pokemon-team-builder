@@ -9,7 +9,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from functools import cached_property
 
-from core.domain import EvolutionStep, GameInfo
+from core.domain import EvolutionCatalog, EvolutionStep, GameInfo
 from core.pokedex.encounters import Encounter, GiftPlace, shared_gifts
 
 
@@ -81,12 +81,14 @@ class PokedexContext:
     Pokédex (RN-22). ``registered`` and ``impossible`` are the user's marks (RF-21, RF-22);
     ``started`` says whether the initial list was confirmed (RN-22). ``sources`` are the games
     that can send Pokémon to this one, in the order to propose them (RN-25). ``starters`` are
-    the species received as the game's starter (CA-87).
+    the species received as the game's starter (CA-87). ``evolution_methods`` says how
+    tedious each evolution method is, to propose the easiest one (RN-15).
     """
 
     game: GameInfo
     has_breeding: bool
     species: tuple[DexSpecies, ...]
+    evolution_methods: EvolutionCatalog
     registered: frozenset[str] = frozenset()
     impossible: frozenset[str] = frozenset()
     started: bool = False

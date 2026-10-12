@@ -42,7 +42,7 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`transfers.yaml`](#transfersyaml) | Juegos que pueden enviarse Pokémon (RN-25). | `game_transfer` | Los 11 juegos cargados |
 | [`events.yaml`](#eventsyaml) | Pokémon que solo se obtienen por evento (RN-24). | `event_pokemon` | Los 11 juegos cargados |
 | [`locations.yaml`](#locationsyaml) | Nombres en español de los lugares que PokeAPI no tiene y objetos de evento para llegar a algunos. | `location.name_es`, `location.event_item` | Kanto, Johto, Archi7 y Hoenn |
-| [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). **Pendiente de implementar.** | `evolution_method` | — |
+| [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). | `evolution_method` | Todos los métodos de PokeAPI |
 
 Los datos de Rubí, Zafiro y Esmeralda están pendientes (#8): hasta tenerlos, no se pueden elegir
 como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)).
@@ -341,10 +341,6 @@ con el inglés y el informe lo avisa ([ingesta](../05-operacion/ingesta.md#infor
 
 ### `evolution_methods.yaml`
 
-!!! note "Pendiente de implementar"
-    Pendiente en #78. Hasta entonces, la clasificación está en el código de
-    `core/evolution.py` ([motor](motor.md#evoluciones-coreevolutionpy)).
-
 **Qué es**: la categoría de cada disparador (`trigger`) y de cada condición de evolución de
 PokeAPI: no tedioso, tedioso con su motivo, o aleatorio
 ([RN-15](../01-ddf/reglas-negocio.md#rn-15), [RN-20](../01-ddf/reglas-negocio.md#rn-20)).
@@ -355,37 +351,37 @@ catalogado y quede bloqueada, en lugar de que el motor tenga que adivinarlo
 ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas),
 [ADR-0008](../03-adr/0008-cargas-bloqueadas.md)).
 
-**Esquema** (orientativo; se fija al implementarlo):
-
 ```yaml
 triggers:
   level-up: {category: easy}
-  use-item: {category: easy}
   trade: {category: tedious, reason: trade}
-  shed: {category: tedious, reason: shed}
-  spin: {category: tedious, reason: other}
+  spin: {category: tedious, reason: other, note: "Girar con el personaje (Alcremie)."}
 conditions:
-  minimum_level: {category: easy}
   gender_id: {category: easy, note: "Se cría hasta que sale el sexo necesario (CA-43)."}
-  held_item: {category: easy, note: "Como usar un objeto (CA-43)."}
   time_of_day: {category: tedious, reason: time_of_day, requires_mechanic: day_night_cycle}
-  minimum_beauty: {category: tedious, reason: beauty, requires_mechanic: contests}
   percentage_chance: {category: random}
   known_move: {category: tedious, reason: move, unless_learnt_by_level: true}
 ```
 
+Los disparadores van por su identificador de PokeAPI (`evolution_triggers.csv`); las
+condiciones, por su clave en `evolution_step.conditions`, que es la columna de
+`pokemon_evolution.csv` sin `_id` cuando la carga sustituye el id por su identificador
+(`trigger_item`, `known_move`…; [carga](carga-datos.md#evoluciones)).
+
 | Campo | Significado |
 |-------|-------------|
 | `category` | `easy`, `tedious` o `random`. Un método aleatorio también es tedioso. |
-| `reason` | Motivo del tedio, para explicarlo en el desglose: `trade`, `shed`, `stats`, `time_of_day`, `beauty`, `location`, `party`, `move` u `other`. |
-| `requires_mechanic` | Mecánica del juego sin la cual el paso es imposible en él y, por tanto, tedioso (`games.yaml`). |
-| `unless_learnt_by_level` | El paso no es tedioso si el Pokémon aprende el movimiento por nivel a partir del nivel 2 ([CA-32](../01-ddf/cuestiones-abiertas.md#resueltas)). Exige los movimientos por nivel ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `reason` | Solo, y siempre, si es `tedious`: el motivo, para explicarlo en el desglose: `trade`, `shed`, `stats`, `time_of_day`, `beauty`, `location`, `party`, `move` u `other`. |
+| `requires_mechanic` | Opcional. Mecánica del juego (`day_night_cycle` o `contests`, de `games.yaml`) sin la cual el paso es imposible en él y, por tanto, tedioso. |
+| `unless_learnt_by_level` | Opcional (`false`). El paso no es tedioso si el Pokémon aprende el movimiento por nivel a partir del nivel 2 ([CA-32](../01-ddf/cuestiones-abiertas.md#resueltas)). Como los movimientos por nivel no se cargan, un paso con esta condición bloquea la carga (`missing_level_moves`, [CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `note` | Opcional. |
 
-Se catalogan los 18 disparadores y todas las condiciones del volcado de PokeAPI, también los
-que aún no aparecen en los juegos cargados, con la categoría que les da RN-15. Si la carga
-encuentra un disparador o una condición que no está aquí, queda bloqueada y el informe lo
-lista con una plantilla para añadirlo a este fichero
-([RF-16](../01-ddf/requisitos-funcionales.md#rf-16)). El arquitecto lo completa mediante PR
+Están catalogados los 18 disparadores y las 27 condiciones del volcado de PokeAPI fijado,
+también los que aún no aparecen en los juegos cargados, con la categoría que les da RN-15; un
+test lo comprueba. Si la carga encuentra un disparador o una condición que no está aquí (con
+un commit de PokeAPI nuevo), queda bloqueada y el informe lo lista con una plantilla para
+añadirlo a este fichero ([RF-16](../01-ddf/requisitos-funcionales.md#rf-16),
+[bloqueos](../05-operacion/ingesta.md#bloqueos)). El arquitecto lo completa mediante PR
 ([protocolo](../05-operacion/ingesta.md#carga-bloqueada)).
 
 ## Implementación
@@ -393,7 +389,7 @@ lista con una plantilla para añadirlo a este fichero
 | Fichero | Qué hace |
 |---------|----------|
 | `ingest/sources/curated/schemas.py` | Un modelo pydantic por fichero, con las validaciones de esta página. |
-| `ingest/sources/curated/__init__.py` | `read_curated(directorio)` lee y valida todos los ficheros (`CuratedData`). `CuratedSource` carga las mecánicas, los iniciales, la Pokédex de cada juego, las transferencias (`transfer_pairs`) y los Pokémon de evento. |
+| `ingest/sources/curated/__init__.py` | `read_curated(directorio)` lee y valida todos los ficheros (`CuratedData`). `CuratedSource` carga las mecánicas, los iniciales, la Pokédex de cada juego, las transferencias (`transfer_pairs`), los Pokémon de evento y el catálogo de métodos de evolución. |
 | `ingest/sources/pokeapi/transform.py` | Usa `CuratedData` para marcar los bebés de incienso, proponer la llegada y completar los lugares. |
 | `ingest/sources/wikidex/` | Usa la lista de combates de `CuratedData` para leer sus equipos de WikiDex y cargarlos ([ingesta](../05-operacion/ingesta.md#wikidex)). |
 
