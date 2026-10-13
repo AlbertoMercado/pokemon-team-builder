@@ -18,6 +18,7 @@ from mwparserfromhell.nodes import Template
 TEAM_TEMPLATE = "equipo"
 DISAMBIGUATION_MARK = "puede referirse a"
 LABEL_LINE = re.compile(r"^;\s*(?P<label>[^\n:]+?)\s*$", re.MULTILINE)
+HEADING_LINE = re.compile(r"^=+[^\n]*=+\s*$", re.MULTILINE)
 POKEMON_PARAM = re.compile(r"^P(?P<position>\d+)$")
 
 
@@ -57,7 +58,8 @@ def find_section(wikitext: str, title: str) -> str:
 def team_variants(section: str, label: str | None) -> list[list[TeamMember]]:
     """Teams of a battle in a section: one, or several variants.
 
-    With ``label``, the templates after the ``; label`` line, up to the next label. Without
+    With ``label``, the templates after the ``; label`` line, up to the next label or heading
+    (Clair in HeartGold: her rematch is in a subsection after the gym battle). Without
     it, every template of the section or, if it has labels, those before the first one.
     """
     labels = list(LABEL_LINE.finditer(section))
@@ -73,7 +75,8 @@ def team_variants(section: str, label: str | None) -> list[list[TeamMember]]:
             raise TeamParseError(f"no hay un combate «{label}»; hay {found}")
         start = labels[matches[0]].end()
         end = labels[matches[0] + 1].start() if matches[0] + 1 < len(labels) else len(section)
-        text = section[start:end]
+        heading = HEADING_LINE.search(section, start, end)
+        text = section[start : heading.start() if heading else end]
 
     templates = _team_templates(text)
     if not templates:

@@ -198,7 +198,7 @@ tiene. Con el catálogo actual:
 | `party` | `party_species`, `party_type` | Mantyke → Mantine (4.ª generación) |
 | `move` | `known_move`, `known_move_type` | Piloswine → Mamoswine (4.ª generación) |
 | `other` | El resto de disparadores y condiciones raros | Lluvia, girar la consola, golpes críticos |
-| `impossible` | `time_of_day` sin `day_night_cycle` o `minimum_beauty` sin `contests` en el juego | Espeon y Milotic en Rojo Fuego |
+| `impossible` | `time_of_day` sin `day_night_cycle`, `minimum_beauty` sin `contests`, o `location` y `near_special_rock` sin `evolution_places` en el juego ([CA-97](../01-ddf/cuestiones-abiertas.md#resueltas)) | Espeon y Milotic en Rojo Fuego; Magnezone y Leafeon en HeartGold |
 
 Un paso por movimiento (`known_move`, marcado `unless_learnt_by_level` en el catálogo) no es
 tedioso si el Pokémon que evoluciona aprende el movimiento por nivel, a partir del nivel 2, en el

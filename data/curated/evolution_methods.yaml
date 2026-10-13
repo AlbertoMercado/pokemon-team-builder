@@ -37,7 +37,7 @@ conditions:
   relative_physical_stats: {category: tedious, reason: stats}
   time_of_day: {category: tedious, reason: time_of_day, requires_mechanic: day_night_cycle}
   minimum_beauty: {category: tedious, reason: beauty, requires_mechanic: contests}
-  location: {category: tedious, reason: location}
+  location: {category: tedious, reason: location, requires_mechanic: evolution_places}
   region: {category: tedious, reason: location}
   party_species: {category: tedious, reason: party}
   party_type: {category: tedious, reason: party}
@@ -47,7 +47,7 @@ conditions:
   needs_overworld_rain: {category: tedious, reason: other}
   turn_upside_down: {category: tedious, reason: other}
   needs_multiplayer: {category: tedious, reason: other}
-  near_special_rock: {category: tedious, reason: other}
+  near_special_rock: {category: tedious, reason: other, requires_mechanic: evolution_places}
   used_move: {category: tedious, reason: other}
   minimum_move_count: {category: tedious, reason: other}
   minimum_steps: {category: tedious, reason: other}

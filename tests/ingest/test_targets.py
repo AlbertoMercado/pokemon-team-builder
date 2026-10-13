@@ -136,6 +136,24 @@ def test_a_game_with_some_mechanics_is_not_complete(session: Session) -> None:
     assert missing_data(session, "firered") == [MissingData.MECHANICS]
 
 
+@pytest.mark.parametrize(("generation", "missing"), [(3, []), (4, [MissingData.MECHANICS])])
+def test_the_evolution_places_are_needed_from_the_4th_generation(
+    session: Session, generation: int, missing: list[MissingData]
+) -> None:
+    """CA-97: the evolutions by place appear in the 4th generation."""
+    places = session.get(GameMechanic, ("firered", "evolution_places"))
+    assert places is not None
+    session.delete(places)
+    session.add(Generation(number=4, slug="generation-iv"))
+    session.flush()
+    game = session.get(Game, "firered")
+    assert game is not None
+    game.generation = generation
+    session.flush()
+
+    assert missing_data(session, "firered") == missing
+
+
 @pytest.mark.rn("RN-03")
 def test_a_game_with_pending_arrivals_lacks_its_pokemon(session: Session) -> None:
     """CA-28: without an arrival rule (arrival.yaml), its arrivals stay pending."""

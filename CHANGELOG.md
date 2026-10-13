@@ -8,10 +8,16 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 **Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`): descarga de
 PokeAPI los movimientos que se aprenden por nivel, las 107 especies de la 4.ª generación y sus
-imágenes, las portadas de sus juegos y, de WikiDex, las páginas de los entrenadores de Sinnoh. Hasta repetirla, la API pide hacerlo.
+imágenes, las portadas de sus juegos y, de WikiDex, las páginas de los entrenadores de Sinnoh y
+Johto. Hasta repetirla, la API pide hacerlo.
 
 ### Añadido
 
+- **HeartGold y SoulSilver se pueden elegir como juego objetivo**. Tienen reloj, pero no
+  concursos, así que Feebas no puede evolucionar a Milotic; tampoco tienen los lugares de las
+  evoluciones por lugar, así que Magnezone, Probopass, Leafeon y Glaceon no pueden evolucionar
+  allí (CA-97). Sus 15 combates clave son los de Johto, con Atlas y Plata; lo de Kanto no
+  cuenta (CA-95, CA-96, #125).
 - **Diamante, Perla y Platino se pueden elegir como juego objetivo**, en la pantalla Juegos.
   Tienen sus mecánicas (reloj y súper concursos), su regla de llegada (puede llegar cualquier
   especie: comprobado en el código del juego) y sus 15 combates clave, con Helio e Israel por

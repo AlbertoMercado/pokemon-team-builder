@@ -49,7 +49,7 @@ GEN_4_GAMES = frozenset({"diamond", "pearl", "platinum", "heartgold", "soulsilve
 # Games of the target generations (scope): they have existence and arrival rows (RN-03).
 TARGET_GENERATION_GAMES = GEN_3_GAMES | GEN_4_GAMES
 # Games with curated data: mechanics, arrival rule and key battles (RF-05).
-CURATED_GAMES = GEN_3_GAMES | {"diamond", "pearl", "platinum"}
+CURATED_GAMES = TARGET_GENERATION_GAMES
 # Key battles of each game (RN-17): 8 gyms, the Elite Four and the Champion; in Hoenn, the
 # villain boss of the version (both in Emerald) and Wally (CA-88, CA-89). First and last.
 KEY_BATTLES = {
@@ -62,6 +62,9 @@ KEY_BATTLES = {
     "diamond": (15, "Roco", "Cintia"),
     "pearl": (15, "Roco", "Cintia"),
     "platinum": (15, "Roco", "Cintia"),
+    # In Johto, Archer and Silver; nothing of Kanto (CA-95, CA-96).
+    "heartgold": (15, "Pegaso", "Lance"),
+    "soulsilver": (15, "Pegaso", "Lance"),
 }
 SPECIES_COUNT = 493
 # Species up to each generation: a game has those of its generation and earlier (RN-03).
@@ -74,7 +77,8 @@ EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
     Species: SPECIES_COUNT,
     Pokemon: SPECIES_COUNT,
     GamePokemon: len(GEN_3_GAMES) * SPECIES_UP_TO[3] + len(GEN_4_GAMES) * SPECIES_UP_TO[4],
-    GameMechanic: len(CURATED_GAMES) * 2,  # day_night_cycle and contests
+    # day_night_cycle and contests; from the 4th generation, also evolution_places (CA-97)
+    GameMechanic: len(GEN_3_GAMES) * 2 + len(GEN_4_GAMES) * 3,
     KeyBattle: sum(count for count, _first, _last in KEY_BATTLES.values()),
     # Three per game of the 2nd to 4th generations and of Red and Blue; Pikachu in Yellow.
     GameStarter: (3 + len(TARGET_GENERATION_GAMES) + 2) * 3 + 1,
@@ -157,6 +161,9 @@ EXPECTED_ARRIVAL = (
     ("diamond", "bulbasaur", True),
     ("platinum", "garchomp", True),
     ("platinum", "crobat", True),
+    # HeartGold and SoulSilver: the same.
+    ("heartgold", "garchomp", True),
+    ("soulsilver", "bulbasaur", True),
 )
 # 15 types in the 1st generation, 17 from the 2nd: one factor per pair.
 EFFICACY_PAIRS_BY_GENERATION = {1: 15 * 15, 2: 17 * 17, 3: 17 * 17, 4: 17 * 17}
@@ -407,6 +414,9 @@ def check_key_battles(session: Session) -> list[str]:
         "diamond-cyrus": ["honchkrow", "gyarados", "crobat", "weavile"],
         "platinum-fantina": ["duskull", "haunter", "mismagius"],  # Platinum has its own teams
         "platinum-barry": ["staraptor", "heracross", "snorlax"],
+        "heartgold-archer": ["houndour", "koffing", "houndoom"],  # CA-95
+        # The gym battle, not the rematch of the next subsection.
+        "heartgold-clair": ["gyarados", "dragonair", "dragonair", "kingdra"],
     }
     for slug, team in expected_teams.items():
         if _team(session, slug) != team:
@@ -517,11 +527,12 @@ def check_catalog(session: Session) -> list[str]:
         "firered": ("Rojo Fuego", 3, Platform.GAME_BOY_ADVANCE, True, Playability.UNKNOWN, []),
         "emerald": ("Esmeralda", 3, Platform.GAME_BOY_ADVANCE, True, Playability.UNKNOWN, []),
         "diamond": ("Diamante", 4, Platform.DS, True, Playability.UNKNOWN, []),
-        # Loaded, without arrival rule, mechanics or key battles yet (plan of the 4th gen.).
-        "heartgold": (
-            "Oro HeartGold",
-            4,
-            Platform.DS,
+        "heartgold": ("Oro HeartGold", 4, Platform.DS, True, Playability.UNKNOWN, []),
+        # Loaded but not of a target generation: no arrival, mechanics or key battles.
+        "gold": (
+            "Oro",
+            2,
+            Platform.GAME_BOY_COLOR,
             True,
             Playability.UNKNOWN,
             [MissingData.POKEMON, MissingData.MECHANICS, MissingData.KEY_BATTLES],

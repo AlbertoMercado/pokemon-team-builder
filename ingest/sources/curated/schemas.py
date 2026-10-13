@@ -18,9 +18,17 @@ COVER_TITLE = re.compile(r"Archivo:[^|#\[\]{}]+\.(png|jpe?g)", re.IGNORECASE)
 
 type Slug = str
 type ReviewableOrigin = Literal["automatic", "inferred", "pending"]
-type Mechanic = Literal["day_night_cycle", "contests"]
-# Every mechanic a target game needs in games.yaml to be complete (RF-05).
-MECHANICS: tuple[Mechanic, ...] = ("day_night_cycle", "contests")
+type Mechanic = Literal["day_night_cycle", "contests", "evolution_places"]
+# Every mechanic a target game may need in games.yaml to be complete (RF-05).
+MECHANICS: tuple[Mechanic, ...] = ("day_night_cycle", "contests", "evolution_places")
+# The generation from which a game needs each mechanic: the evolutions by place appear in the
+# 4th, so the games of the 3rd do not need ``evolution_places`` (CA-97).
+FIRST_GENERATION: dict[Mechanic, int] = {"evolution_places": 4}
+
+
+def mechanics_for(generation: int) -> tuple[Mechanic, ...]:
+    """The mechanics that a game of ``generation`` needs to be complete."""
+    return tuple(m for m in MECHANICS if FIRST_GENERATION.get(m, 0) <= generation)
 
 
 class CuratedModel(BaseModel):

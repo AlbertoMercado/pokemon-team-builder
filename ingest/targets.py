@@ -27,7 +27,7 @@ from db.reference import (
     Origin,
     ReferenceModel,
 )
-from ingest.sources.curated.schemas import MECHANICS
+from ingest.sources.curated.schemas import mechanics_for
 
 type Count = Callable[[Session, str], int]
 
@@ -51,10 +51,19 @@ def _pokemon(session: Session, game: str) -> int:
     return 1 if rows and not pending else 0
 
 
+def _mechanics(session: Session, game: str) -> int:
+    """1 if the game has every mechanic of its generation (CA-97)."""
+    found = session.get(Game, game)
+    if found is None:
+        return 0
+    query = select(GameMechanic.mechanic).where(GameMechanic.game == game)
+    return 1 if set(mechanics_for(found.generation)) <= set(session.exec(query).all()) else 0
+
+
 # What a game needs, in the order of RF-05, and how many rows it needs at least.
 _REQUIRED: tuple[tuple[MissingData, Count, int], ...] = (
     (MissingData.POKEMON, _pokemon, 1),
-    (MissingData.MECHANICS, _rows(GameMechanic, GameMechanic.game), len(MECHANICS)),
+    (MissingData.MECHANICS, _mechanics, 1),
     (MissingData.KEY_BATTLES, _rows(KeyBattle, KeyBattle.game), 1),
     (MissingData.STARTERS, _rows(GameStarter, GameStarter.game), 1),
 )

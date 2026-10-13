@@ -120,8 +120,8 @@ Liga. Se carga como propuesta inferida de cada juego, con la regla de
 [`arrival.yaml`](datos-curados.md#arrivalyaml).
 
 Está comprobado en el **código de los juegos**: las decompilaciones de
-[pret](https://github.com/pret) (`pokefirered`, `pokeemerald`, `pokeruby`, `pokeplatinum` y
-`pokediamond`), que reproducen el original byte a byte. Es más fiable que las guías, que se contradicen en esto.
+[pret](https://github.com/pret) (`pokefirered`, `pokeemerald`, `pokeruby`, `pokeplatinum`,
+`pokediamond` y `pokeheartgold`), que reproducen el original byte a byte. Es más fiable que las guías, que se contradicen en esto.
 
 | Juego | Qué puede recibir antes de la Liga | Evoluciones antes de la Liga | Regla |
 |-------|------------------------------------|------------------------------|-------|
@@ -129,6 +129,7 @@ Está comprobado en el **código de los juegos**: las decompilaciones de
 | Esmeralda | Solo especies de la Pokédex de Hoenn, y ningún huevo, de Rubí, Zafiro o Esmeralda | Sin restricciones | `hoenn` (202 de 386) |
 | Rubí y Zafiro | Cualquier especie, de Rubí, Zafiro, Esmeralda o un Rojo Fuego o Verde Hoja terminado | Sin restricciones | `national` (386 de 386) |
 | Diamante, Perla y Platino | Cualquier especie, de otro juego de la 4.ª generación | Sin restricciones | `national` (493 de 493) |
+| HeartGold y SoulSilver | Cualquier especie, de otro juego de la 4.ª generación | Sin restricciones de Pokédex; las de lugar no se pueden hacer ([CA-97](../01-ddf/cuestiones-abiertas.md#resueltas)) | `national` (493 de 493) |
 
 ### Rojo Fuego y Verde Hoja (comprobado)
 
@@ -202,12 +203,29 @@ que ya está decompilado, en [`pokediamond`](https://github.com/pret/pokediamond
 - Conclusión: puede llegar cualquier Pokémon de las generaciones 1 a 4, de otro Diamante,
   Perla o Platino o de un HeartGold o SoulSilver, y evolucionar sin restricciones.
 
+### HeartGold y SoulSilver (comprobado)
+
+Comprobado el 2026-10-13 en [`pokeheartgold`](https://github.com/pret/pokeheartgold):
+
+- Como en Platino, la Pokédex Nacional no se comprueba en el intercambio ni en la evolución, y
+  los únicos rechazos de los textos son el huevo malo y los de la GTS. Con la 3.ª generación
+  solo se comunica el Parque Compi, tras la Liga.
+- **Evoluciones por lugar**: el código las tiene (`EVO_CORONET`, `EVO_ETERNA` y `EVO_ROUTE217`
+  en [`pokemon.c`](https://github.com/pret/pokeheartgold/blob/master/src/pokemon.c)), pero solo
+  ocurren si el mapa las activa, y ningún mapa lo hace. En Platino las activan los mapas del
+  Monte Corona, el Bosque Vetusto y la Ruta 217
+  ([`map_header.c`](https://github.com/pret/pokeplatinum/blob/main/src/map_header.c)). Magnezone,
+  Probopass, Leafeon y Glaceon no pueden evolucionar en HeartGold y SoulSilver
+  ([CA-97](../01-ddf/cuestiones-abiertas.md#resueltas)).
+- **Belleza**: no tiene concursos ni Pokochos; solo los intercambios con PNJ le dan belleza a un
+  Pokémon, un valor fijo (`npc_trade.c`). Feebas no puede evolucionar a Milotic.
+- Conclusión: puede llegar cualquier Pokémon de las generaciones 1 a 4, de otro HeartGold o
+  SoulSilver o de un Diamante, Perla o Platino, y evolucionar salvo por lugar o por belleza.
+
 ### Otras generaciones
 
-Pueden ser juego objetivo los juegos de la 3.ª y la 4.ª generación (`ingest/scope.py`). La
-regla de HeartGold y SoulSilver se investiga en su fase del
-[plan de la 4.ª generación](plan-cuarta-generacion.md); Oro, Plata, Cristal y la 5.ª
-generación en adelante, cuando puedan serlo (#114).
+Pueden ser juego objetivo los juegos de la 3.ª y la 4.ª generación (`ingest/scope.py`). Oro,
+Plata, Cristal y la 5.ª generación en adelante se investigarán cuando puedan serlo (#114).
 
 ## Comprobación de las fuentes
 

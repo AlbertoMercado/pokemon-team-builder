@@ -1,0 +1,96 @@
+# Combates clave de HeartGold y SoulSilver (RN-17), en su orden habitual.
+# Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# Los equipos se leen de la sección wikidex_section de la página de WikiDex de cada
+# entrenador; algunas páginas la titulan de otra forma, o ponen cada combate en una subsección,
+# y el combate da la suya. En los gimnasios, el combate por la medalla, y en el Alto Mando, el
+# primero: las revanchas son tras la Liga. Del Team Rocket cuenta Atlas, en la Torre Radio
+# (CA-95), y del rival, su último combate obligatorio, sin su inicial y solo los Pokémon comunes
+# a sus tres variantes (CA-26, CA-38, CA-89). Lo de Kanto, posterior a la Liga, no cuenta
+# (CA-96).
+games: [heartgold, soulsilver]
+wikidex_section: Pokémon Oro HeartGold y Pokémon Plata SoulSilver
+battles:
+  - id: falkner
+    category: gym_leader
+    trainer: Pegaso
+    wikidex_page: Pegaso
+    wikidex_team: Combate de gimnasio
+  - id: bugsy
+    category: gym_leader
+    trainer: Antón
+    wikidex_page: Antón
+    wikidex_section: Pokémon Oro HeartGold y Plata SoulSilver
+    wikidex_team: Primera batalla
+  - id: whitney
+    category: gym_leader
+    trainer: Blanca
+    wikidex_page: Blanca
+    wikidex_section: Primera batalla
+  - id: morty
+    category: gym_leader
+    trainer: Morti
+    wikidex_page: Morti
+    wikidex_team: Combate de gimnasio
+  - id: chuck
+    category: gym_leader
+    trainer: Aníbal
+    wikidex_page: Aníbal
+    wikidex_team: Primera batalla
+  - id: jasmine
+    category: gym_leader
+    trainer: Yasmina
+    wikidex_page: Yasmina
+    wikidex_team: Combate de gimnasio
+  - id: pryce
+    category: gym_leader
+    trainer: Fredo
+    wikidex_page: Fredo
+    wikidex_section: Primera batalla
+  - id: archer
+    category: villain_boss
+    trainer: Atlas
+    wikidex_page: Atlas
+    note: >-
+      Jefe del Team Rocket mientras Giovanni no está. Su último combate obligatorio, en la
+      Torre Radio (CA-95).
+  - id: clair
+    category: gym_leader
+    trainer: Débora
+    wikidex_page: Débora
+    wikidex_section: "[[Pokémon Oro HeartGold y Plata SoulSilver]]"
+    wikidex_team: Primera batalla
+  - id: silver
+    category: rival_final
+    trainer: Plata
+    wikidex_page: Plata (personaje)
+    wikidex_team: Quinto combate
+    rival_starter_lines: [chikorita, cyndaquil, totodile]
+    note: >-
+      Rival. Su último combate obligatorio, a la salida de la Calle Victoria, antes de la Liga
+      (CA-89).
+  - id: will
+    category: elite_four
+    trainer: Mento
+    wikidex_page: Mento
+    wikidex_team: Primera vez
+  - id: koga
+    category: elite_four
+    trainer: Koga
+    wikidex_page: Koga
+    wikidex_team: Primer encuentro
+  - id: bruno
+    category: elite_four
+    trainer: Bruno
+    wikidex_page: Bruno (Alto Mando)
+    wikidex_team: Primera vez
+  - id: karen
+    category: elite_four
+    trainer: Karen
+    wikidex_page: Karen
+    wikidex_team: Primer combate
+  - id: champion
+    category: champion
+    trainer: Lance
+    wikidex_page: Lance
+    wikidex_section: Combate por el título de campeón

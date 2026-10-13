@@ -29,7 +29,11 @@ from core.domain import GameInfo
 from core.review import FactKind, Origin, involved_facts, with_starters
 from db.user import ConfirmedValue
 
-MECHANIC_NAMES = {"day_night_cycle": "Ciclo de día y noche", "contests": "Concursos"}
+MECHANIC_NAMES = {
+    "day_night_cycle": "Ciclo de día y noche",
+    "contests": "Concursos",
+    "evolution_places": "Lugares de evolución",
+}
 
 
 def involved_values(user: Session, reference: Session, game: GameReference) -> list[Reviewable]:

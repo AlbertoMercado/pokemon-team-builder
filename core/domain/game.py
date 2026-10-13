@@ -5,6 +5,7 @@ from dataclasses import dataclass
 # Mechanics that condition evolutions (docs/02-ddt/datos-curados.md, games.yaml).
 DAY_NIGHT_CYCLE = "day_night_cycle"
 CONTESTS = "contests"
+EVOLUTION_PLACES = "evolution_places"  # CA-97: the places of the evolutions by place
 
 
 @dataclass(frozen=True)

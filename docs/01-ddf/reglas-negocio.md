@@ -325,7 +325,9 @@ parámetros son fijos.
       → Escavalier).
     - Subir una característica de concurso, como la belleza (Feebas → Milotic en la 3.ª y la
       4.ª generación).
-    - Subir de nivel en un lugar concreto (Magneton → Magnezone hasta la 7.ª generación).
+    - Subir de nivel en un lugar concreto (Magneton → Magnezone hasta la 7.ª generación). En un
+      juego que no tiene ese lugar, como HeartGold y SoulSilver, es una evolución que no se
+      puede hacer en él ([CA-97](cuestiones-abiertas.md#resueltas)).
     - Caminar un número de pasos o hacer acciones repetidas (Pawmo → Pawmot).
     - Comparar estadísticas (Tyrogue → Hitmonlee, Hitmonchan o Hitmontop).
     - Hora del día, con o sin objeto equipado (Sneasel → Weavile).

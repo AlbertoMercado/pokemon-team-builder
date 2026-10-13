@@ -64,7 +64,7 @@ def test_repository_curated_files_are_valid() -> None:
     assert len(curated.breeding.incense_babies) == 9
     # Every target game has its mechanics, its arrival rule (CA-28) and its key battles (RF-05).
     targets = {"ruby", "sapphire", "emerald", "firered", "leafgreen", "diamond", "pearl"}
-    targets |= {"platinum"}
+    targets |= {"platinum", "heartgold", "soulsilver"}
     assert set(curated.games.games) == targets
     assert set(curated.arrival.games) == targets
     assert len(curated.starters.games) == 16  # every loaded game, for the Pokédex (CA-87)
@@ -220,7 +220,7 @@ def test_curated_source_rows() -> None:
     events = {(row.game, row.pokemon) for row in rows if isinstance(row, EventPokemon)}
     methods = {(row.kind, row.name): row for row in rows if isinstance(row, EvolutionMethod)}
 
-    assert len(mechanics) == 16  # two per game with curated data
+    assert len(mechanics) == 25  # two per game of the 3rd generation, three of the 4th (CA-97)
     assert len(starters) == 46  # 3 per game, 1 in Yellow
     assert len(rows) == (
         len(mechanics) + len(starters) + len(pokedexes) + len(transfers) + len(events)
