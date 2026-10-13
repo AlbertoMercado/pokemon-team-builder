@@ -8,10 +8,14 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 **Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`): descarga de
 PokeAPI los movimientos que se aprenden por nivel, las 107 especies de la 4.ª generación y sus
-imágenes, y las portadas de sus juegos. Hasta repetirla, la API pide hacerlo.
+imágenes, las portadas de sus juegos y, de WikiDex, las páginas de los entrenadores de Sinnoh. Hasta repetirla, la API pide hacerlo.
 
 ### Añadido
 
+- **Diamante, Perla y Platino se pueden elegir como juego objetivo**, en la pantalla Juegos.
+  Tienen sus mecánicas (reloj y súper concursos), su regla de llegada (puede llegar cualquier
+  especie: comprobado en el código del juego) y sus 15 combates clave, con Helio e Israel por
+  su último combate obligatorio (RN-17, CA-28, #125).
 - **4.ª generación cargada**: las 493 especies y Diamante, Perla, Platino, HeartGold y
   SoulSilver, con su Pokédex, sus apariciones (árboles de miel, Cabezazo, Pokéradar…), sus
   Pokémon de evento, sus iniciales, sus portadas y los nombres en español de sus lugares. Ya se

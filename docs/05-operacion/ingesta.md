@@ -183,31 +183,28 @@ Filas cargadas por tabla:
   encounter             24867
   event_pokemon            60
   evolution_step         1678
-  game_mechanic            10
+  game_mechanic            16
   game_pokedex             16
   game_pokemon           4395
   game_starter             46
   game_transfer            95
-  key_battle               72
+  key_battle              117
   level_move              735
   pokemon_type           1847
-  key_battle_pokemon      285
+  key_battle_pokemon      463
 Datos revisables por origen:
-  game_mechanic        inferred 10
-  game_pokemon         automatic 4395, inferred 1930, pending 2465
-  key_battle           automatic 72
+  game_mechanic        inferred 16
+  game_pokemon         automatic 4395, inferred 3409, pending 986
+  key_battle           automatic 117
 Imágenes: 493 de 493 formas
 Ilustraciones: 493 de 493 formas
 Portadas: 16 de 16 juegos
 Juegos que no se pueden elegir como objetivo (datos incompletos):
-  Diamante: faltan los Pokémon que existen y pueden llegar (RN-03), sus mecánicas (RN-15) y sus combates clave (RN-17)
-  Perla: faltan los Pokémon que existen y pueden llegar (RN-03), sus mecánicas (RN-15) y sus combates clave (RN-17)
-  Platino: faltan los Pokémon que existen y pueden llegar (RN-03), sus mecánicas (RN-15) y sus combates clave (RN-17)
   Oro HeartGold: faltan los Pokémon que existen y pueden llegar (RN-03), sus mecánicas (RN-15) y sus combates clave (RN-17)
   Plata SoulSilver: faltan los Pokémon que existen y pueden llegar (RN-03), sus mecánicas (RN-15) y sus combates clave (RN-17)
 Comprobaciones superadas: 14
 Carga completada.
-Informe: data/reports/2026-10-13T200653-completada.md
+Informe: data/reports/2026-10-13T202552-completada.md
 ```
 
 - **Filas cargadas por tabla**: en orden de dependencias. No incluye `ingest_run`.
@@ -231,7 +228,7 @@ Informe: data/reports/2026-10-13T200653-completada.md
 - **Juegos que no se pueden elegir como objetivo**: los que no están completos y qué les falta
   ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Se cargan igualmente y se pueden
   registrar en el *Hall of Fame*, pero no aparecen al elegir el juego. No es un error: la
-  carga se completa. Con los datos actuales salen los 5 de la 4.ª generación, a los que les
+  carga se completa. Con los datos actuales salen HeartGold y SoulSilver, a los que les
   faltan su regla de llegada, sus mecánicas y sus combates clave
   ([plan de la 4.ª generación](../02-ddt/plan-cuarta-generacion.md)).
 - **Comprobaciones superadas**: número de comprobaciones de la carga que se han cumplido.

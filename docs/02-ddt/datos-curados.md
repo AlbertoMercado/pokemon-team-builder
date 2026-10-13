@@ -32,12 +32,12 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | Fichero | Qué contiene | Se carga en | Juegos con datos |
 |---------|--------------|-------------|------------------|
 | [`pokeapi.yaml`](#pokeapiyaml) | Commits fijados del volcado de PokeAPI y del repositorio de imágenes. | `ingest_run.pokeapi_commit`, `ingest_run.sprites_commit` | — |
-| [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Los 5 juegos objetivo |
+| [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Los de la 3.ª generación, Diamante, Perla y Platino |
 | [`starters.yaml`](#startersyaml) | Iniciales de cada juego (RN-21, CA-87). | `game_starter` | Los 16 juegos cargados |
 | [`breeding.yaml`](#breedingyaml) | Bebés que solo nacen con incienso. | `species.requires_incense` | — |
-| [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Los 5 juegos objetivo |
+| [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Los de la 3.ª generación, Diamante, Perla y Platino |
 | [`covers.yaml`](#coversyaml) | Título del fichero de la portada de cada juego en WikiDex (RF-18). | `game.cover`, `game.cover_source` | Los 16 juegos cargados |
-| [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Los 5 juegos objetivo, Verde Hoja |
+| [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Los de la 3.ª generación, Diamante, Perla y Platino |
 | [`pokedex.yaml`](#pokedexyaml) | Pokédex que completa cada juego (RN-22). | `game_pokedex` | Los 16 juegos cargados |
 | [`transfers.yaml`](#transfersyaml) | Juegos que pueden enviarse Pokémon (RN-25). | `game_transfer` | Los 16 juegos cargados |
 | [`events.yaml`](#eventsyaml) | Pokémon que solo se obtienen por evento (RN-24). | `event_pokemon` | Los 16 juegos cargados |
@@ -45,9 +45,10 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 | [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). | `evolution_method` | Todos los métodos de PokeAPI |
 | [`catalog.yaml`](#catalogyaml) | Juegos del catálogo de juegos, en orden de lanzamiento (RF-25, CA-90). | `catalog_game` | Los 36 juegos del catálogo |
 
-Los 5 juegos de la 3.ª generación tienen todos sus datos curados, así que todos se pueden
-elegir como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). A los 5 de la
-4.ª todavía les faltan sus mecánicas, su regla de llegada y sus combates clave
+Los 5 juegos de la 3.ª generación, Diamante, Perla y Platino tienen todos sus datos curados,
+así que se pueden elegir como juego objetivo
+([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). A HeartGold y SoulSilver todavía les
+faltan sus mecánicas, su regla de llegada y sus combates clave
 ([plan de la 4.ª generación](plan-cuarta-generacion.md)).
 
 ### `pokeapi.yaml`
@@ -80,9 +81,9 @@ games:
       note: No tiene reloj…   # opcional
 ```
 
-| Mecánica | Significado | Evoluciones afectadas en las generaciones 1 a 3 |
+| Mecánica | Significado | Evoluciones afectadas en las generaciones 1 a 4 |
 |----------|-------------|--------------------------------------------------|
-| `day_night_cycle` | El juego tiene reloj y distingue el día de la noche. | Eevee → Espeon o Umbreon |
+| `day_night_cycle` | El juego tiene reloj y distingue el día de la noche. | Eevee → Espeon o Umbreon; en la 4.ª, Happiny → Chansey, Sneasel → Weavile y Gligar → Gliscor |
 | `contests` | El juego tiene concursos y se puede subir la belleza. | Feebas → Milotic |
 
 Cada mecánica se carga como una fila de `game_mechanic` con la clave revisable
@@ -158,7 +159,7 @@ las evoluciones de la 2.ª generación, como Crobat o Espeon
 
 En Esmeralda, con la Pokédex de Hoenn, pueden llegar 202: exactamente los de esa Pokédex,
 porque hasta la 3.ª generación sus líneas evolutivas están enteras en ella. En Rubí y Zafiro,
-con la Nacional, pueden llegar los 386
+con la Nacional, pueden llegar los 386, y en Diamante, Perla y Platino, los 493
 ([restricciones comprobadas](datos-requeridos.md#restricciones-de-llegada-por-juego)).
 
 Las propuestas son **inferidas**: el usuario las confirma. Un juego objetivo sin regla queda
@@ -218,6 +219,10 @@ tiene varios combates, cada uno va precedido de un rótulo (una línea `; En Sil
 `wikidex_team` dice cuál usar. Los rótulos cambian de una página a otra: en Lorelei, Agatha y
 Lance el primer combate es «Primer combate», y en Bruno, «Primera vez». Varias plantillas
 bajo el mismo rótulo (a menudo en pestañas, una por inicial) son **variantes** del combate.
+Algunas secciones dan primero el combate principal, sin rótulo, y solo rotulan las revanchas
+(Fantina y Acerón en Platino): sin `wikidex_team` se toman los equipos anteriores al primer
+rótulo. Si una página repite el título de la sección (Acerón, para los equipos y para los
+diálogos), cuenta la que tiene equipos.
 
 Si la página, la sección o el rótulo no se encuentran, la carga queda **bloqueada**
 (`wikidex_team_not_found`): el informe dice qué combate y qué falta, p. ej.

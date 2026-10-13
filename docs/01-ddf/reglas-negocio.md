@@ -431,12 +431,18 @@ parámetros son fijos.
 - **Dos rivales en Hoenn** ([CA-89](cuestiones-abiertas.md#resueltas)): cuentan Bruno o Aura
   (Ruta 119) y Blasco (Calle Victoria). Bruno o Aura no aporta ningún Pokémon, porque sus tres
   variantes solo comparten el inicial.
+- **Sinnoh** ([CA-88](cuestiones-abiertas.md#resueltas),
+  [CA-89](cuestiones-abiertas.md#resueltas)): Helio cuenta por su último combate obligatorio
+  (en las Columnas Lanza en Diamante y Perla, en el Mundo Distorsión en Platino), e Israel por
+  el suyo, en la Liga Pokémon antes del Alto Mando.
 - **HeartGold y SoulSilver**: el jefe del Team Rocket es Atlas, en su último combate obligatorio
   ([CA-95](cuestiones-abiertas.md#resueltas)); lo de Kanto, posterior a la Liga, no cuenta
-  ([CA-96](cuestiones-abiertas.md#resueltas)). Si el rival es también el Campeón, como en Rojo
-  Fuego, ese combate cuenta una sola vez y también sin su inicial. Se usan solo los tipos de los miembros y de los Pokémon
-  rivales, con la tabla de eficacias del juego objetivo ([RN-10](#rn-10)). No se tienen en
-  cuenta movimientos, niveles ni estadísticas.
+  ([CA-96](cuestiones-abiertas.md#resueltas)).
+- **Rival y Campeón a la vez**: si el rival es también el Campeón, como en Rojo Fuego, ese
+  combate cuenta una sola vez y también sin su inicial.
+- **Solo los tipos**: se usan solo los tipos de los miembros y de los Pokémon rivales, con la
+  tabla de eficacias del juego objetivo ([RN-10](#rn-10)). No se tienen en cuenta movimientos,
+  niveles ni estadísticas.
 - **Puntuación** ([CA-24](cuestiones-abiertas.md#resueltas)): para cada Pokémon rival
   de los combates clave se miran dos aspectos:
     - **Ataque**: algún miembro del equipo tiene un tipo que es superefectivo (×2 o más) contra

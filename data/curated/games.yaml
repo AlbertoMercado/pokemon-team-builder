@@ -69,3 +69,42 @@ games:
       note: >-
         Tiene concursos y Pokécubos: se puede subir la belleza que necesita Feebas para
         evolucionar a Milotic.
+  diamond:
+    day_night_cycle:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene reloj interno: Eevee evoluciona a Espeon de día (de 4:00 a 19:59) y a Umbreon de
+        noche (de 20:00 a 3:59), con mucha amistad.
+    contests:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene súper concursos y Pokochos: se puede subir la belleza que necesita Feebas para
+        evolucionar a Milotic.
+  pearl:
+    day_night_cycle:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene reloj interno: Eevee evoluciona a Espeon de día (de 4:00 a 19:59) y a Umbreon de
+        noche (de 20:00 a 3:59), con mucha amistad.
+    contests:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene súper concursos y Pokochos: se puede subir la belleza que necesita Feebas para
+        evolucionar a Milotic.
+  platinum:
+    day_night_cycle:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene reloj interno: Eevee evoluciona a Espeon de día (de 4:00 a 19:59) y a Umbreon de
+        noche (de 20:00 a 3:59), con mucha amistad.
+    contests:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene súper concursos y Pokochos: se puede subir la belleza que necesita Feebas para
+        evolucionar a Milotic.

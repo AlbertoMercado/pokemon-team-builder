@@ -120,14 +120,15 @@ Liga. Se carga como propuesta inferida de cada juego, con la regla de
 [`arrival.yaml`](datos-curados.md#arrivalyaml).
 
 Está comprobado en el **código de los juegos**: las decompilaciones de
-[pret](https://github.com/pret) (`pokefirered`, `pokeemerald` y `pokeruby`), que reproducen el
-original byte a byte. Es más fiable que las guías, que se contradicen en esto.
+[pret](https://github.com/pret) (`pokefirered`, `pokeemerald`, `pokeruby`, `pokeplatinum` y
+`pokediamond`), que reproducen el original byte a byte. Es más fiable que las guías, que se contradicen en esto.
 
 | Juego | Qué puede recibir antes de la Liga | Evoluciones antes de la Liga | Regla |
 |-------|------------------------------------|------------------------------|-------|
 | Rojo Fuego y Verde Hoja | Solo especies de la Pokédex de Kanto, de otro Rojo Fuego o Verde Hoja | Ninguna a una especie posterior a Mew | `kanto` (140 de 386) |
 | Esmeralda | Solo especies de la Pokédex de Hoenn, y ningún huevo, de Rubí, Zafiro o Esmeralda | Sin restricciones | `hoenn` (202 de 386) |
 | Rubí y Zafiro | Cualquier especie, de Rubí, Zafiro, Esmeralda o un Rojo Fuego o Verde Hoja terminado | Sin restricciones | `national` (386 de 386) |
+| Diamante, Perla y Platino | Cualquier especie, de otro juego de la 4.ª generación | Sin restricciones | `national` (493 de 493) |
 
 ### Rojo Fuego y Verde Hoja (comprobado)
 
@@ -181,10 +182,30 @@ original byte a byte. Es más fiable que las guías, que se contradicen en esto.
 - Conclusión: puede llegar cualquier Pokémon de las generaciones 1 a 3, de otro Rubí o Zafiro o
   de un Rojo Fuego o Verde Hoja ya terminado.
 
+### Diamante, Perla y Platino (comprobado)
+
+Comprobado el 2026-10-13 en [`pokeplatinum`](https://github.com/pret/pokeplatinum) y, en lo
+que ya está decompilado, en [`pokediamond`](https://github.com/pret/pokediamond):
+
+- La Pokédex Nacional (`Pokedex_IsNationalDexObtained`) se comprueba en apariciones,
+  concursos, el Subsuelo o el menú, pero **ni en el intercambio ni en la evolución**:
+  [`evolution.c`](https://github.com/pret/pokeplatinum/blob/main/src/evolution.c) y las
+  condiciones de evolución de
+  [`pokemon.c`](https://github.com/pret/pokeplatinum/blob/main/src/pokemon.c) no la miran.
+- La Sala Unión solo rechaza el huevo malo, que son datos corruptos (`BadEggInParty` en
+  [`union_room.json`](https://github.com/pret/pokeplatinum/blob/main/res/text/union_room.json)).
+  Los únicos rechazos que tienen los textos de Diamante y Perla son de la GTS (los huevos y los
+  Pokémon con una cinta especial).
+- Con la 3.ª generación solo se comunica el Parque Compi, que exige la Pokédex Nacional, que
+  se obtiene tras la Liga. Antes de la Liga, el Pokémon viene de otro juego de la 4.ª
+  generación.
+- Conclusión: puede llegar cualquier Pokémon de las generaciones 1 a 4, de otro Diamante,
+  Perla o Platino o de un HeartGold o SoulSilver, y evolucionar sin restricciones.
+
 ### Otras generaciones
 
-Pueden ser juego objetivo los juegos de la 3.ª y la 4.ª generación (`ingest/scope.py`). Las
-reglas de Diamante, Perla, Platino, HeartGold y SoulSilver se investigan en su fase del
+Pueden ser juego objetivo los juegos de la 3.ª y la 4.ª generación (`ingest/scope.py`). La
+regla de HeartGold y SoulSilver se investiga en su fase del
 [plan de la 4.ª generación](plan-cuarta-generacion.md); Oro, Plata, Cristal y la 5.ª
 generación en adelante, cuando puedan serlo (#114).
 
