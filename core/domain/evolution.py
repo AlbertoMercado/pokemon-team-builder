@@ -43,12 +43,14 @@ class EvolutionMethod:
 
     A tedious one has its ``reason``, which cannot be random or impossible: those come from the
     category and from ``requires_mechanic``, the mechanic without which the step is impossible
-    in the game.
+    in the game. ``unless_learnt_by_level``: it is not tedious if the Pokémon that evolves learns
+    the move by level from level 2 in the game (CA-32).
     """
 
     category: MethodCategory
     reason: Tedium | None = None
     requires_mechanic: str | None = None
+    unless_learnt_by_level: bool = False
 
     def __post_init__(self) -> None:
         if (self.category is MethodCategory.TEDIOUS) != (self.reason is not None):

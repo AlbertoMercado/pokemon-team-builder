@@ -22,6 +22,7 @@ id,identifier,species_id,height,weight,base_experience,order,is_default
 106,hitmonlee,106,15,498,159,168,1
 107,hitmonchan,107,14,502,159,169,1
 113,chansey,113,11,346,395,180,1
+114,tangela,114,10,350,87,182,1
 131,lapras,131,25,2200,187,213,1
 132,ditto,132,3,40,101,214,1
 133,eevee,133,3,65,65,215,1
@@ -46,6 +47,8 @@ id,identifier,species_id,height,weight,base_experience,order,is_default
 197,umbreon,197,10,270,184,221,1
 199,slowking,199,20,795,172,130,1
 202,wobbuffet,202,13,285,142,299,1
+220,swinub,220,4,65,50,318,1
+221,piloswine,221,11,558,158,319,1
 236,tyrogue,236,7,210,42,167,1
 237,hitmontop,237,14,480,159,170,1
 242,blissey,242,15,468,608,181,1
@@ -69,6 +72,8 @@ id,identifier,species_id,height,weight,base_experience,order,is_default
 385,jirachi,385,3,11,270,513,1
 386,deoxys-normal,386,17,608,270,514,1
 440,happiny,440,6,244,110,179,1
+465,tangrowth,465,20,1286,187,183,1
+473,mamoswine,473,25,2910,239,320,1
 10001,deoxys-attack,386,17,608,270,515,0
 10002,deoxys-defense,386,17,608,270,516,0
 10003,deoxys-speed,386,17,608,270,517,0

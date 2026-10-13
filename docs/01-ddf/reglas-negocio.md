@@ -361,10 +361,12 @@ parámetros son fijos.
   cada condición de evolución de las fuentes tiene una categoría (no tedioso, tedioso o
   aleatorio). Si la carga de datos encuentra uno sin catalogar, queda bloqueada y el
   arquitecto lo cataloga en una nueva versión ([RF-16](requisitos-funcionales.md#rf-16),
-  [CA-47](cuestiones-abiertas.md#resueltas)). Lo mismo si una evolución exige un
-  movimiento y no se sabe qué movimientos aprende por nivel
-  ([CA-45](cuestiones-abiertas.md#resueltas)). Así la regla nunca evalúa un método que no
+  [CA-47](cuestiones-abiertas.md#resueltas)). Así la regla nunca evalúa un método que no
   conoce.
+- **Evolución por movimiento** ([CA-32](cuestiones-abiertas.md#resueltas)): no es tediosa si
+  el Pokémon aprende el movimiento por nivel, a partir del nivel 2, en el juego objetivo. Por
+  eso se cargan los movimientos por nivel que exigen las evoluciones
+  ([CA-45](cuestiones-abiertas.md#resueltas)).
 - **Puntuación**: `1 − (miembros con alguna evolución tediosa / miembros del equipo)`.
 - **Ejemplos**:
     - Gengar puntúa en contra, porque Haunter evoluciona por intercambio.

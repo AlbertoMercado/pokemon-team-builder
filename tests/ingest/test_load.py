@@ -365,22 +365,6 @@ def test_uncatalogued_evolution_methods_block_the_load(tmp_path: Path) -> None:
     )
 
 
-@pytest.mark.rn("RN-15")
-def test_an_evolution_by_move_blocks_the_load_without_level_moves(tmp_path: Path) -> None:
-    """CA-45: whether the step is tedious depends on the moves learnt by level (CA-32), which
-    are not loaded."""
-    rows = _with_evolutions(
-        _evolution("ivysaur", minimum_level=16), _evolution("ivysaur", known_move="vine-whip")
-    )
-
-    report = build_reference([FakeSource(rows)], tmp_path / "reference.sqlite")
-
-    [blocker] = report.blockers
-    assert (blocker.kind, blocker.subject) == (BlockerKind.MISSING_LEVEL_MOVES, "vine-whip")
-    assert blocker.occurrences == ("bulbasaur → ivysaur (firered-leafgreen)",)
-    assert blocker.rules == ("RN-15",)
-
-
 def test_cli_ends_a_blocked_load_with_code_2_and_its_report(
     tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:

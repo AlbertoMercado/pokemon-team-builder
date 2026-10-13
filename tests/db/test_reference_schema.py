@@ -61,6 +61,7 @@ DOCUMENTED_TABLES = {
     "pokemon_type",
     "evolution_step",
     "evolution_method",
+    "level_move",
     "key_battle",
     "key_battle_pokemon",
     "pokedex",

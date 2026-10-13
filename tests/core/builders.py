@@ -47,6 +47,7 @@ def _evolution_methods(entries: Mapping[str, Mapping[str, str]]) -> dict[str, Ev
             MethodCategory(entry["category"]),
             Tedium(entry["reason"]) if "reason" in entry else None,
             entry.get("requires_mechanic"),
+            bool(entry.get("unless_learnt_by_level", False)),
         )
         for name, entry in entries.items()
     }

@@ -9,14 +9,15 @@ import pytest
 from sqlmodel import Session
 
 from api.errors import NotFoundError
-from api.services.context import GameReference, GameReferences, build_context
+from api.services.context import GameReference, GameReferences, StepBuilder, build_context
 from core.domain import GameContext
 from core.engine import generate
 from core.review import FactValue
 from core.rules.catalog import RuleSettings
-from db.reference import Origin
+from db.reference import EvolutionStep, LevelMove, Origin
 from db.sqlite import create_sqlite_engine
 from db.user import FactConfirmation, value_hash
+from tests.api.factories import form, reference_database
 from tests.api.scenario import Load, ScenarioData, firered_data, write_firered
 from tests.core.scenario import FAVORITES, firered_context
 
@@ -219,3 +220,40 @@ def test_a_game_that_is_not_a_target_is_not_found(tmp_path: Path) -> None:
     with Session(engine) as session, pytest.raises(NotFoundError, match="gold"):
         GameReferences().get(session, "gold")
     engine.dispose()
+
+
+@pytest.mark.rn("RN-15")
+@pytest.mark.parametrize(("level", "learnt"), [(33, True), (1, False)])
+def test_a_step_knows_whether_its_move_is_learnt_by_level(
+    tmp_path: Path, level: int, learnt: bool
+) -> None:
+    """CA-32: Tangela learns Ancient Power by level; at level 1 only the move reminder does."""
+    path = reference_database(
+        tmp_path,
+        pokemon=[form("tangela", ("grass",), dex=114), form("tangrowth", ("grass",), dex=465)],
+    )
+    engine = create_sqlite_engine(path)
+    with Session(engine) as session:
+        step = EvolutionStep(
+            version_group="firered-leafgreen",
+            from_pokemon="tangela",
+            to_pokemon="tangrowth",
+            trigger="level-up",
+            conditions={"known_move": "ancient-power"},
+        )
+        session.add_all(
+            [
+                step,
+                LevelMove(
+                    pokemon="tangela",
+                    version_group="firered-leafgreen",
+                    move="ancient-power",
+                    level=level,
+                ),
+            ]
+        )
+        session.commit()
+        built = StepBuilder(session, "firered-leafgreen").step(step, "tangela", "tangrowth")
+    engine.dispose()
+
+    assert built.move_learnt_by_level is learnt

@@ -200,6 +200,13 @@ tiene. Con el catálogo actual:
 | `other` | El resto de disparadores y condiciones raros | Lluvia, girar la consola, golpes críticos |
 | `impossible` | `time_of_day` sin `day_night_cycle` o `minimum_beauty` sin `contests` en el juego | Espeon y Milotic en Rojo Fuego |
 
+Un paso por movimiento (`known_move`, marcado `unless_learnt_by_level` en el catálogo) no es
+tedioso si el Pokémon que evoluciona aprende el movimiento por nivel, a partir del nivel 2, en el
+juego ([CA-32](../01-ddf/cuestiones-abiertas.md#resueltas)): la API lo indica en
+`EvolutionStep.move_learnt_by_level`, a partir de la tabla `level_move`. Tangela aprende Poder
+Pasado al nivel 33, así que Tangrowth no puntúa en contra; Piloswine solo lo aprende al nivel 1
+(con el recordador de movimientos), así que Mamoswine sí.
+
 No son tediosos `level-up` y `use-item` con nivel, amistad, cariño, objeto, un objeto
 equipado o el sexo ([CA-43](../01-ddf/cuestiones-abiertas.md#resueltas)) sin más condiciones.
 

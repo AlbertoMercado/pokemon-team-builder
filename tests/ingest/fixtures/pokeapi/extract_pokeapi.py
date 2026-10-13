@@ -53,6 +53,8 @@ SPECIES = frozenset(
         249,  # Lugia: static in Navel Rock, reached only with an event item
         251,  # Celebi: event, spin-off bonus disc and Virtual Console
         385,  # Jirachi: spin-off methods only
+        *(114, 465),  # Tangela line: Tangrowth needs Ancient Power, learnt at level 33
+        *(220, 221, 473),  # Swinub line: Piloswine learns Ancient Power only at level 1
     }
 )
 # Versions of the loaded games (red to leafgreen): the encounters of the rest are left out.
@@ -146,6 +148,13 @@ def main(source: Path) -> None:
     items = referenced("trigger_item_id", "held_item_id")
     keep(source, "items", lambda row: row["id"] in items or row["identifier"] in EVENT_ITEMS)
     keep(source, "moves", in_ids(referenced("known_move_id", "used_move_id")))
+    # The moves learnt by level that an evolution needs (CA-32), only of the forms kept.
+    known_moves = referenced("known_move_id")
+    keep(
+        source,
+        "pokemon_moves",
+        lambda row: row["move_id"] in known_moves and row["pokemon_id"] in pokemon_ids,
+    )
     locations = {row["location_id"] for row in evolutions if row["location_id"]}
     locations |= {row["location_id"] for row in areas}
     keep(source, "locations", in_ids(locations))

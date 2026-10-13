@@ -269,7 +269,6 @@ Los códigos de salida están en el [manual](../04-manual-usuario/cargar-datos.m
 |------------------|--------|--------------------------|
 | `unknown_evolution_trigger` | Un disparador de evolución que no está en [`evolution_methods.yaml`](../02-ddt/datos-curados.md#evolution_methodsyaml) ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas)). | Su categoría para RN-15 y RN-20, con la plantilla para el fichero. |
 | `unknown_evolution_condition` | Una condición de evolución que no está en ese fichero; también una columna nueva de `pokemon_evolution.csv`. | Igual. |
-| `missing_level_moves` | Un paso tiene una condición marcada con `unless_learnt_by_level` en el catálogo (`known_move`) y no se cargan los movimientos por nivel ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). Un bloqueo por movimiento, con los pasos que lo exigen. | Activar la carga de `level_move`. |
 | `wikidex_team_not_found` | La lista curada de combates no encuentra en WikiDex la página, la sección o el combate. Un bloqueo por combate; el resto de combates se leen igual. Una página que no está en la caché sin red, o un fallo de WikiDex, sigue siendo un error. | Corregir la página, la sección o el rótulo en `key_battles/*.yaml`. |
 
 ### Informe
@@ -302,8 +301,7 @@ JSON es la fuente; el Markdown se genera a partir de él para leerlo o pegarlo e
 ```
 
 Las fechas van en la hora local del equipo, con su desfase, y el nombre de los ficheros usa
-la de inicio. `template` es `null` cuando no hay nada que copiar (en `missing_level_moves`, el
-cambio es de código). Una carga bloqueada no llega a las comprobaciones, así que su `summary`
+la de inicio. `template` es `null` cuando no hay nada que copiar. Una carga bloqueada no llega a las comprobaciones, así que su `summary`
 va vacío. Una carga fallida (código 1) no genera ficheros.
 
 El Markdown tiene una cabecera (fecha, estado, commit de PokeAPI y juegos), un resumen con

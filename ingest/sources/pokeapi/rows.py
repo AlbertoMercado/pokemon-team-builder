@@ -7,6 +7,7 @@ missing values.
 """
 
 import csv
+from collections.abc import Callable
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, ValidationError
@@ -22,8 +23,14 @@ class CsvRow(BaseModel):
     model_config = ConfigDict(frozen=True, extra="ignore")
 
 
-def read_rows[R: BaseModel](path: Path, model: type[R]) -> list[R]:
-    """Read and validate every row of a CSV file."""
+def read_rows[R: BaseModel](
+    path: Path, model: type[R], keep: Callable[[dict[str, str]], bool] | None = None
+) -> list[R]:
+    """Read and validate every row of a CSV file; with ``keep``, only the raw rows it accepts.
+
+    Filtering before validating keeps big files fast, like the 600 000 rows of
+    ``pokemon_moves.csv`` of which the load needs a few.
+    """
     with path.open(encoding="utf-8", newline="") as file:
         reader = csv.DictReader(file)
         header = set(reader.fieldnames or [])
@@ -32,6 +39,8 @@ def read_rows[R: BaseModel](path: Path, model: type[R]) -> list[R]:
             raise CsvSchemaError(f"{path.name}: faltan las columnas {missing}")
         rows: list[R] = []
         for line, raw in enumerate(reader, start=2):
+            if keep is not None and not keep(raw):
+                continue
             values = {column: value for column, value in raw.items() if value != ""}
             try:
                 rows.append(model.model_validate(values))
@@ -268,3 +277,13 @@ class EvolutionRow(BaseModel):
     nature_bitmask: str | None = None
     condition_expression: str | None = None
     percentage_chance: int | None = None
+
+
+class LevelMoveRow(CsvRow):
+    """A row of ``pokemon_moves.csv``: a move a form learns in a version group, and how."""
+
+    pokemon_id: int
+    version_group_id: int
+    move_id: int
+    pokemon_move_method_id: int
+    level: int

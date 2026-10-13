@@ -37,9 +37,13 @@ Decisiones de alcance:
   solo los completos; el informe dice qué les falta a los demás, que se cargan igualmente. Hoy
   son los 5: todos tienen sus mecánicas, sus combates clave y su regla de llegada
   ([CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)).
-- **Sin movimientos por nivel**. Ninguna evolución de las especies 1 a 386 exige conocer un
-  movimiento (eso empieza en la 4.ª generación: Tangrowth, Mamoswine…). La tabla `level_move`
-  y el fichero `pokemon_moves.csv` (10,7 MB) se dejan para cuando haga falta.
+- **Solo los movimientos por nivel que exigen las evoluciones**. De `pokemon_moves.csv`
+  (10,7 MB, unas 640 000 filas) se leen solo las filas aprendidas por nivel
+  (`pokemon_move_method_id` 1) de un movimiento que alguna evolución exige conocer
+  (`known_move_id` de `pokemon_evolution.csv`), y se guardan las de las formas y grupos de
+  versiones cargados en `level_move`. El filtro va antes de validar cada fila, para que la
+  lectura siga siendo rápida. Con ellas el motor decide si un paso por movimiento es tedioso
+  ([CA-32](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - **Pokémon Showdown sigue aplazado** ([ADR-0004](../03-adr/0004-pokeapi-volcado-csv.md)).
 
 ## Cómo se interpreta el volcado de PokeAPI
