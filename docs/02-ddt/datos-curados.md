@@ -33,20 +33,22 @@ es, por qué existe, su esquema y cómo lo usa la ingesta.
 |---------|--------------|-------------|------------------|
 | [`pokeapi.yaml`](#pokeapiyaml) | Commits fijados del volcado de PokeAPI y del repositorio de imágenes. | `ingest_run.pokeapi_commit`, `ingest_run.sprites_commit` | — |
 | [`games.yaml`](#gamesyaml) | Mecánicas de cada juego objetivo. | `game_mechanic` | Los 5 juegos objetivo |
-| [`starters.yaml`](#startersyaml) | Iniciales de cada juego (RN-21, CA-87). | `game_starter` | Los 11 juegos cargados |
+| [`starters.yaml`](#startersyaml) | Iniciales de cada juego (RN-21, CA-87). | `game_starter` | Los 16 juegos cargados |
 | [`breeding.yaml`](#breedingyaml) | Bebés que solo nacen con incienso. | `species.requires_incense` | — |
 | [`arrival.yaml`](#arrivalyaml) | Regla de llegada de cada juego objetivo. | `game_pokemon.can_arrive` | Los 5 juegos objetivo |
-| [`covers.yaml`](#coversyaml) | Título del fichero de la portada de cada juego en WikiDex (RF-18). | `game.cover`, `game.cover_source` | Los 11 juegos cargados |
+| [`covers.yaml`](#coversyaml) | Título del fichero de la portada de cada juego en WikiDex (RF-18). | `game.cover`, `game.cover_source` | Los 16 juegos cargados |
 | [`key_battles/*.yaml`](#key_battlesyaml) | Lista de combates clave de cada juego y dónde está su equipo en WikiDex. | `key_battle`, `key_battle_pokemon` | Los 5 juegos objetivo, Verde Hoja |
-| [`pokedex.yaml`](#pokedexyaml) | Pokédex que completa cada juego (RN-22). | `game_pokedex` | Los 11 juegos cargados |
-| [`transfers.yaml`](#transfersyaml) | Juegos que pueden enviarse Pokémon (RN-25). | `game_transfer` | Los 11 juegos cargados |
-| [`events.yaml`](#eventsyaml) | Pokémon que solo se obtienen por evento (RN-24). | `event_pokemon` | Los 11 juegos cargados |
-| [`locations.yaml`](#locationsyaml) | Nombres en español de los lugares que PokeAPI no tiene y objetos de evento para llegar a algunos. | `location.name_es`, `location.event_item` | Kanto, Johto, Archi7 y Hoenn |
+| [`pokedex.yaml`](#pokedexyaml) | Pokédex que completa cada juego (RN-22). | `game_pokedex` | Los 16 juegos cargados |
+| [`transfers.yaml`](#transfersyaml) | Juegos que pueden enviarse Pokémon (RN-25). | `game_transfer` | Los 16 juegos cargados |
+| [`events.yaml`](#eventsyaml) | Pokémon que solo se obtienen por evento (RN-24). | `event_pokemon` | Los 16 juegos cargados |
+| [`locations.yaml`](#locationsyaml) | Nombres en español de los lugares que PokeAPI no tiene y objetos de evento para llegar a algunos. | `location.name_es`, `location.event_item` | Kanto, Johto, Archi7, Hoenn y Sinnoh |
 | [`evolution_methods.yaml`](#evolution_methodsyaml) | Categoría de cada disparador y condición de evolución de PokeAPI (RN-15, RN-20). | `evolution_method` | Todos los métodos de PokeAPI |
 | [`catalog.yaml`](#catalogyaml) | Juegos del catálogo de juegos, en orden de lanzamiento (RF-25, CA-90). | `catalog_game` | Los 36 juegos del catálogo |
 
 Los 5 juegos de la 3.ª generación tienen todos sus datos curados, así que todos se pueden
-elegir como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)).
+elegir como juego objetivo ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). A los 5 de la
+4.ª todavía les faltan sus mecánicas, su regla de llegada y sus combates clave
+([plan de la 4.ª generación](plan-cuarta-generacion.md)).
 
 ### `pokeapi.yaml`
 
@@ -119,6 +121,7 @@ juego objetivo es la que nace sin incienso. PokeAPI no indica qué bebés necesi
 incense_babies:
   azurill: sea-incense    # <bebé>: <incienso>
   wynaut: lax-incense
+  happiny: luck-incense   # y los otros 6 de la 4.ª generación
 ```
 
 La ingesta marca esas especies con `species.requires_incense` y falla si alguna no es un bebé
@@ -308,11 +311,15 @@ groups:
     max_species_generation: 1    # Cápsula del Tiempo: solo especies de la 1.ª generación
   - games: [gold, silver, crystal]
   - games: [ruby, sapphire, emerald, firered, leafgreen]
+  - games: [diamond, pearl, platinum, heartgold, soulsilver]
+  - games: [ruby, sapphire, emerald, firered, leafgreen]    # Parque Compi
+    to: [diamond, pearl, platinum, heartgold, soulsilver]
 ```
 
 | Campo | Significado |
 |-------|-------------|
-| `games` | Juegos del grupo, al menos dos y sin repetir. Cada uno puede enviar Pokémon a los demás. |
+| `games` | Juegos del grupo, sin repetir. Sin `to`, al menos dos, y cada uno puede enviar Pokémon a los demás. |
+| `to` | Opcional. Grupo en un solo sentido: cada juego de `games` puede enviar a cada uno de `to`, y no al revés. Un juego no puede estar en las dos listas. |
 | `max_species_generation` | Solo se pueden enviar especies de esa generación o anteriores. Sin él, no hay límite. |
 | `note` | Opcional. |
 
@@ -332,13 +339,15 @@ events:
 ```
 
 Solo los Pokémon que en esos juegos no se obtienen de otra forma: hoy, los singulares. Son
-formas, como en `starters.yaml` (`deoxys-normal`). Lo que solo se obtiene en spin-offs no es un
+formas, como en `starters.yaml` (`deoxys-normal`, `shaymin-land`). Si un singular está en un
+lugar al que solo se llega con un objeto de evento (Darkrai en Diamante, Perla y Platino), no va
+aquí, sino en [`locations.yaml`](#locationsyaml). Lo que solo se obtiene en spin-offs no es un
 evento: lo deduce `core/` de las apariciones ([RN-25](../01-ddf/reglas-negocio.md#rn-25)).
 
 ### `locations.yaml`
 
-**Por qué existe**: PokeAPI no tiene el nombre en español de los lugares de Kanto, Johto y
-Archi7, ni dice a qué lugares solo se llega con un objeto repartido en eventos
+**Por qué existe**: PokeAPI no tiene el nombre en español de los lugares de Kanto, Johto,
+Archi7 y Sinnoh, ni dice a qué lugares solo se llega con un objeto repartido en eventos
 ([ADR-0013](../03-adr/0013-obtencion-pokeapi-y-curados.md)).
 
 ```yaml
@@ -353,7 +362,7 @@ locations:
 
 | Campo | Significado |
 |-------|-------------|
-| `name_es` | Nombre en español, comprobado en WikiDex. No se admite si PokeAPI ya lo tiene. |
+| `name_es` | Nombre en español de España, comprobado en WikiDex (su «Lista de localizaciones en todos los idiomas» da el de España y el de Hispanoamérica). No se admite si PokeAPI ya lo tiene. |
 | `event_item` | Identificador de PokeAPI del objeto de evento sin el que no se llega al lugar. |
 | `note` | Opcional. |
 

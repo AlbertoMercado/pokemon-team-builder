@@ -82,6 +82,9 @@ Para cada grupo (Diamante, Perla y Platino; HeartGold y SoulSilver):
   [CA-95](../01-ddf/cuestiones-abiertas.md#resueltas)) y del rival (Israel en Sinnoh, Plata en
   Johto), sin Kanto en HeartGold y SoulSilver
   ([CA-96](../01-ddf/cuestiones-abiertas.md#resueltas)). Platino tiene sus propios equipos.
+- Evoluciones por lugar: PokeAPI da Magnezone y Probopass «en el Monte Corona», y Leafeon y
+  Glaceon junto a sus rocas, también en HeartGold y SoulSilver, donde esos lugares no existen.
+  Hay que decidir cómo se tratan allí (fase 5).
 
 ## Fases
 

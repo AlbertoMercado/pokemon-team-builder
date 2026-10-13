@@ -10,9 +10,10 @@ datos reales, los tests comprueban las transformaciones con los mismos casos que
 completa, pero en milisegundos.
 
 **Qué contiene**: los ficheros pequeños completos (generaciones, versiones, tipos, eficacias,
-Pokédex, métodos y condiciones de aparición…) y los grandes filtrados a unas 70 especies
-elegidas por sus casos especiales. Las apariciones, además, solo de los 11 juegos cargados, y los
-lugares, solo los de esas apariciones:
+Pokédex, métodos y condiciones de aparición…) y los grandes filtrados a unas 90 especies
+elegidas por sus casos especiales. Las apariciones, además, solo de los 11 juegos hasta la 3.ª
+generación (de la 4.ª, las de tres especies; ver abajo), y los lugares, solo los de esas
+apariciones:
 
 | Especies | Caso |
 |----------|------|
@@ -23,7 +24,7 @@ lugares, solo los de esas apariciones:
 | Slowpoke, Slowbro, Slowking | Intercambio con objeto y filas de formas de Galar |
 | Magnemite, Magneton | Solo Eléctrico en la 1.ª generación |
 | Gastly, Haunter, Gengar | Intercambio |
-| Happiny, Chansey, Blissey | Happiny es de la 4.ª generación: no se carga y Chansey queda como base |
+| Happiny, Chansey, Blissey | Happiny es de la 4.ª generación: en los juegos anteriores, Chansey nace del huevo |
 | Ditto | Grupo huevo `ditto` |
 | Eevee y sus evoluciones hasta la 2.ª generación | Piedras, amistad y hora del día |
 | Mewtwo | Legendario |
@@ -47,6 +48,11 @@ lugares, solo los de esas apariciones:
 | Celebi, Jirachi | Singulares de evento, con métodos de spin-offs |
 | Tangela, Tangrowth | Evolución por movimiento: Tangela aprende Poder Pasado por nivel (CA-32) |
 | Swinub, Piloswine, Mamoswine | Evolución por movimiento: Piloswine solo aprende Poder Pasado al nivel 1 |
+| Budew, Chingling, Bonsly, Mime Jr., Happiny, Munchlax, Mantyke y sus líneas | Bebés de incienso de la 4.ª generación (`breeding.yaml`); Remoraid, para Mantine |
+| Manaphy, Darkrai, Shaymin, Arceus | Singulares de evento de la 4.ª generación (`events.yaml`) |
+
+De la 4.ª generación solo se guardan las apariciones de Munchlax (árboles de miel), Manaphy
+(Pokémon Ranger) y Darkrai (Isla Lunanueva), para que el extracto siga siendo pequeño.
 
 **Cómo se regenera** (por ejemplo, al cambiar el commit fijado o la lista de especies):
 

@@ -87,7 +87,7 @@ API REST, que se usaron para comprobar los datos; en el CSV están en las tablas
 | Tipos actuales y antiguos | PokeAPI | `types` y `past_types` de cada Pokémon. |
 | Tabla de eficacias por generación | PokeAPI | `damage_relations` y `past_damage_relations` de cada tipo. |
 | Cadenas y métodos de evolución | PokeAPI | `evolution_details` describe las condiciones e incluye `version_group`, el grupo de versiones en el que **se introdujo** cada evolución, no un intervalo de validez (p. ej., Pichu → Pikachu figura con Oro y Plata). Feebas tiene varias filas: belleza en Rubí y Zafiro, intercambio con Escama Bella en Negro y Blanco. Cómo se aplica en la primera carga: [plan de carga](carga-datos.md#evoluciones). Faltan mecánicas de juego, como el ciclo de día y noche, que se cargan como datos inferidos. |
-| Movimientos por nivel | PokeAPI | `moves` de cada Pokémon, por grupo de versiones y método de aprendizaje. No hacen falta hasta la 4.ª generación: ninguna evolución de las especies 1 a 386 exige conocer un movimiento ([plan de carga](carga-datos.md#alcance)). |
+| Movimientos por nivel | PokeAPI | `moves` de cada Pokémon, por grupo de versiones y método de aprendizaje. Solo hacen falta los que exigen las evoluciones, desde la 4.ª generación ([plan de carga](carga-datos.md#alcance)). |
 | Pokémon que existen en cada juego | PokeAPI, completado con WikiDex | Las Pokédex regionales de cada grupo de versiones están en PokeAPI. `game_indices` no sirve (p. ej., Crobat no figura en Escarlata y Violeta, y las formas de Hisui no tienen ninguno). Hasta la 7.ª generación se puede deducir de la Pokédex Nacional; desde la 8.ª hay que sumar Pokédex regionales, contenidos descargables y Pokémon que solo llegan por HOME. Lo que no sea seguro se carga como inferido (RN-18). |
 | Combates clave | WikiDex | PokeAPI no tiene entrenadores. Las páginas de WikiDex tienen los equipos en plantillas `{{Equipo}}` (Pokémon, tipos, nivel y movimientos) bajo una sección por juego, que se pueden procesar con mwparserfromhell. La lista de entrenadores de cada juego se mantiene a mano. Lo que no se pueda procesar con certeza (revanchas, variantes según el inicial) se carga como inferido (RN-18). |
 
@@ -183,8 +183,10 @@ original byte a byte. Es más fiable que las guías, que se contradicen en esto.
 
 ### Otras generaciones
 
-Solo los juegos de la 3.ª generación pueden ser juego objetivo (`ingest/scope.py`). Oro, Plata,
-Cristal y la 4.ª generación en adelante se investigarán cuando puedan serlo (#114).
+Pueden ser juego objetivo los juegos de la 3.ª y la 4.ª generación (`ingest/scope.py`). Las
+reglas de Diamante, Perla, Platino, HeartGold y SoulSilver se investigan en su fase del
+[plan de la 4.ª generación](plan-cuarta-generacion.md); Oro, Plata, Cristal y la 5.ª
+generación en adelante, cuando puedan serlo (#114).
 
 ## Comprobación de las fuentes
 

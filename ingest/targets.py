@@ -24,6 +24,7 @@ from db.reference import (
     GameStarter,
     KeyBattle,
     MissingData,
+    Origin,
     ReferenceModel,
 )
 from ingest.sources.curated.schemas import MECHANICS
@@ -39,9 +40,20 @@ def _rows(model: type[ReferenceModel], game_column: object) -> Count:
     return count
 
 
+def _pokemon(session: Session, game: str) -> int:
+    """1 if the game has its Pokémon and none of their arrivals is pending (RN-03, CA-28): a
+    game without an arrival rule in ``arrival.yaml`` has every arrival pending."""
+    rows = _rows(GamePokemon, GamePokemon.game)(session, game)
+    query = select(func.count()).select_from(GamePokemon)
+    pending = session.exec(
+        query.where(GamePokemon.game == game, GamePokemon.arrival_origin == Origin.PENDING)
+    ).one()
+    return 1 if rows and not pending else 0
+
+
 # What a game needs, in the order of RF-05, and how many rows it needs at least.
 _REQUIRED: tuple[tuple[MissingData, Count, int], ...] = (
-    (MissingData.POKEMON, _rows(GamePokemon, GamePokemon.game), 1),
+    (MissingData.POKEMON, _pokemon, 1),
     (MissingData.MECHANICS, _rows(GameMechanic, GameMechanic.game), len(MECHANICS)),
     (MissingData.KEY_BATTLES, _rows(KeyBattle, KeyBattle.game), 1),
     (MissingData.STARTERS, _rows(GameStarter, GameStarter.game), 1),

@@ -136,6 +136,17 @@ def test_a_game_with_some_mechanics_is_not_complete(session: Session) -> None:
     assert missing_data(session, "firered") == [MissingData.MECHANICS]
 
 
+@pytest.mark.rn("RN-03")
+def test_a_game_with_pending_arrivals_lacks_its_pokemon(session: Session) -> None:
+    """CA-28: without an arrival rule (arrival.yaml), its arrivals stay pending."""
+    row = session.get(GamePokemon, ("firered", "venusaur"))
+    assert row is not None
+    row.can_arrive, row.arrival_origin = None, Origin.PENDING
+    session.flush()
+
+    assert missing_data(session, "firered") == [MissingData.POKEMON]
+
+
 def test_only_the_complete_games_stay_as_target(session: Session) -> None:
     """CA-67: Ruby stays loaded but cannot be chosen; Gold was never a target."""
     incomplete = mark_incomplete_games(session)

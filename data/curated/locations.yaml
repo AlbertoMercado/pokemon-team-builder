@@ -1,10 +1,11 @@
 # Lo que PokeAPI no tiene de los lugares con apariciones (ADR-0013): el nombre en español
-# de los de Kanto, Johto y Archi7, y el objeto de evento sin el que no se llega a algunos.
+# de los de Kanto, Johto, Archi7 y Sinnoh, y el objeto de evento sin el que no se llega a algunos.
 # Esquema y significado: docs/02-ddt/datos-curados.md.
 #
-# Nombres comprobados en WikiDex el 2026-10-08. Un lugar que ya tiene nombre en español en
-# PokeAPI no puede llevar name_es aquí. Los lugares que faltan se cargan con su nombre en
-# inglés y la carga avisa.
+# Nombres comprobados en WikiDex el 2026-10-08 y, los de la 4.ª generación, el 2026-10-13 (los
+# de España, en la «Lista de localizaciones en todos los idiomas»). Un lugar que ya tiene nombre
+# en español en PokeAPI no puede llevar name_es aquí. Los lugares que faltan se cargan con su
+# nombre en inglés y la carga avisa.
 locations:
   # Kanto
   pallet-town:
@@ -299,6 +300,174 @@ locations:
     name_es: Centro Pokémon
   hoenn-pokecenter:
     name_es: Centro Pokémon
+  # Sinnoh
+  twinleaf-town:
+    name_es: Pueblo Hojaverde
+  oreburgh-city:
+    name_es: Ciudad Pirita
+  eterna-city:
+    name_es: Ciudad Vetusta
+  hearthome-city:
+    name_es: Ciudad Corazón
+  pastoria-city:
+    name_es: Ciudad Pradera
+  veilstone-city:
+    name_es: Ciudad Rocavelo
+  celestic-town:
+    name_es: Pueblo Caelestis
+  canalave-city:
+    name_es: Ciudad Canal
+  snowpoint-city:
+    name_es: Ciudad Puntaneva
+  sunyshore-city:
+    name_es: Ciudad Marina
+  sinnoh-route-201:
+    name_es: Ruta 201
+  sinnoh-route-202:
+    name_es: Ruta 202
+  sinnoh-route-203:
+    name_es: Ruta 203
+  sinnoh-route-204:
+    name_es: Ruta 204
+  sinnoh-route-205:
+    name_es: Ruta 205
+  sinnoh-route-206:
+    name_es: Ruta 206
+  sinnoh-route-207:
+    name_es: Ruta 207
+  sinnoh-route-208:
+    name_es: Ruta 208
+  sinnoh-route-209:
+    name_es: Ruta 209
+  sinnoh-route-210:
+    name_es: Ruta 210
+  sinnoh-route-211:
+    name_es: Ruta 211
+  sinnoh-route-212:
+    name_es: Ruta 212
+  sinnoh-route-213:
+    name_es: Ruta 213
+  sinnoh-route-214:
+    name_es: Ruta 214
+  sinnoh-route-215:
+    name_es: Ruta 215
+  sinnoh-route-216:
+    name_es: Ruta 216
+  sinnoh-route-217:
+    name_es: Ruta 217
+  sinnoh-route-218:
+    name_es: Ruta 218
+  sinnoh-route-219:
+    name_es: Ruta 219
+  sinnoh-route-221:
+    name_es: Ruta 221
+  sinnoh-route-222:
+    name_es: Ruta 222
+  sinnoh-route-224:
+    name_es: Ruta 224
+  sinnoh-route-225:
+    name_es: Ruta 225
+  sinnoh-route-227:
+    name_es: Ruta 227
+  sinnoh-route-228:
+    name_es: Ruta 228
+  sinnoh-route-229:
+    name_es: Ruta 229
+  sinnoh-sea-route-220:
+    name_es: Ruta 220
+  sinnoh-sea-route-223:
+    name_es: Ruta 223
+  sinnoh-sea-route-226:
+    name_es: Ruta 226
+  sinnoh-sea-route-230:
+    name_es: Ruta 230
+  oreburgh-gate:
+    name_es: Puerta Pirita
+  oreburgh-mine:
+    name_es: Mina Pirita
+  valley-windworks:
+    name_es: Valle Eólico
+  eterna-forest:
+    name_es: Bosque Vetusto
+  fuego-ironworks:
+    name_es: Forja Fuego
+  floaroma-meadow:
+    name_es: Prado Aromaflor
+  mt-coronet:
+    name_es: Monte Corona
+  great-marsh:
+    name_es: Gran Pantano
+  solaceon-ruins:
+    name_es: Ruinas Sosiego
+  sinnoh-victory-road:
+    name_es: Calle Victoria
+  sinnoh-pokemon-league:
+    name_es: Liga Pokémon
+  ravaged-path:
+    name_es: Senda Desolada
+  lost-tower:
+    name_es: Torre Perdida
+  iron-island:
+    name_es: Isla Hierro
+  old-chateau:
+    name_es: Vieja Mansión
+  lake-verity:
+    name_es: Lago Veraz
+  lake-valor:
+    name_es: Lago Valor
+  lake-acuity:
+    name_es: Lago Agudeza
+  valor-lakefront:
+    name_es: Orilla Valor
+  acuity-lakefront:
+    name_es: Orilla Agudeza
+  spear-pillar:
+    name_es: Columnas Lanza
+  distortion-world:
+    name_es: Mundo Distorsión
+  sendoff-spring:
+    name_es: Fuente Despedida
+  turnback-cave:
+    name_es: Cueva Retorno
+  snowpoint-temple:
+    name_es: Templo Puntaneva
+  wayward-cave:
+    name_es: Cueva Extravío
+  ruin-maniac-cave:
+    name_es: Mina Ruinamaníaco
+  maniac-tunnel:
+    name_es: Túnel del Ruinamaníaco
+  trophy-garden:
+    name_es: Jardín Trofeo
+  resort-area:
+    name_es: Zona Descanso
+  stark-mountain:
+    name_es: Montaña Dura
+  roaming-sinnoh:
+    name_es: Errante por Sinnoh
+  sinnoh-pokemart:
+    name_es: Tienda Pokémon
+  # Johto en HeartGold y SoulSilver; los «unknown-all-*» son lugares que PokeAPI no identifica
+  johto-route-47:
+    name_es: Ruta 47
+  johto-route-48:
+    name_es: Ruta 48
+  johto-safari-zone:
+    name_es: Zona Safari
+  safari-zone-gate:
+    name_es: Entrada Safari
+  embedded-tower:
+    name_es: Torre Oculta
+  sinjoh-ruins:
+    name_es: Ruinas de Sinjoh
+  johto-pokemart:
+    name_es: Tienda Pokémon
+  unknown-all-bugs:
+    name_es: Lugar sin identificar
+  unknown-all-poliwag:
+    name_es: Lugar sin identificar
+  unknown-all-rattata:
+    name_es: Lugar sin identificar
   # Lugares a los que solo se llega con un objeto repartido en eventos
   navel-rock:
     name_es: Roca Ombligo
@@ -314,4 +483,16 @@ locations:
     note: Solo se llega con un objeto repartido por evento.
   southern-island:
     event_item: eon-ticket
+    note: Solo se llega con un objeto repartido por evento.
+  newmoon-island:
+    name_es: Isla Lunanueva
+    event_item: member-card
+    note: Solo se llega con un objeto repartido por evento.
+  flower-paradise:
+    name_es: Paraíso Floral
+    event_item: oaks-letter
+    note: Solo se llega con un objeto repartido por evento.
+  sinnoh-hall-of-origin-1:
+    name_es: Sala del Origen
+    event_item: azure-flute
     note: Solo se llega con un objeto repartido por evento.

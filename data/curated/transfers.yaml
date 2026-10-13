@@ -1,8 +1,9 @@
 # Juegos que pueden enviarse Pokémon entre sí (RN-25, CA-78). Esquema y significado:
 # docs/02-ddt/datos-curados.md.
 #
-# Cada juego de un grupo puede enviar Pokémon a los demás del grupo. Si dos grupos unen los
-# mismos juegos, se aplica el menos restrictivo.
+# Cada juego de un grupo puede enviar Pokémon a los demás del grupo; con «to», solo en un sentido:
+# de cada juego de «games» a cada uno de «to». Si dos grupos unen los mismos juegos, se aplica el
+# menos restrictivo.
 groups:
   - games: [red, blue, yellow, gold, silver, crystal]
     max_species_generation: 1
@@ -11,3 +12,9 @@ groups:
   - games: [gold, silver, crystal]
   - games: [ruby, sapphire, emerald, firered, leafgreen]
     note: De la 1.ª o la 2.ª generación a la 3.ª no se puede.
+  - games: [diamond, pearl, platinum, heartgold, soulsilver]
+  - games: [ruby, sapphire, emerald, firered, leafgreen]
+    to: [diamond, pearl, platinum, heartgold, soulsilver]
+    note: >-
+      Con el Parque Compi, insertando el juego de GBA en la ranura de una Nintendo DS o DS Lite,
+      y solo en ese sentido.

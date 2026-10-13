@@ -2,7 +2,7 @@
 # significado: docs/02-ddt/datos-curados.md.
 #
 # Solo los singulares, que no se obtienen de otra forma en esos juegos. Son formas, como en
-# starters.yaml: Deoxys es deoxys-normal. Los lugares a los que solo se llega con un objeto de
+# starters.yaml: Deoxys es deoxys-normal y Shaymin, shaymin-land. Los lugares a los que solo se llega con un objeto de
 # evento (Roca Ombligo, Isla Origen…) están en locations.yaml.
 events:
   - games: [red, blue, yellow]
@@ -17,3 +17,13 @@ events:
     note: >-
       Repartidos, entre otros, en los eventos del décimo aniversario (2006). Los de los discos
       de Colosseum y Pokémon Channel son de spin-offs y no cuentan (CA-73).
+  - games: [diamond, pearl, platinum]
+    pokemon: [mew, celebi, jirachi, deoxys-normal, manaphy]
+    note: >-
+      Darkrai, Shaymin y Arceus están en lugares a los que solo se llega con un objeto de evento
+      (locations.yaml). El huevo de Manaphy de Pokémon Ranger es de un spin-off y no cuenta
+      (CA-73).
+  - games: [heartgold, soulsilver]
+    pokemon: [mew, celebi, jirachi, deoxys-normal, manaphy, darkrai, shaymin-land, arceus]
+    note: >-
+      Celebi aparece en el Santuario de Encinar solo si se lleva un Celebi de evento.

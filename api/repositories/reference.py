@@ -308,12 +308,15 @@ def pokedex_numbers(reference: Session, game: str) -> list[tuple[str, int]]:
     """The species of the Pokédex that ``game`` completes, with their number, in its order.
 
     With several Pokédexes (a base game and its DLC), those of the first come first, and a
-    species keeps its first number (RN-22).
+    species keeps its first number (RN-22). Only the species of the game's generation or earlier:
+    the National Pokédex of FireRed has 386, though the load has later ones (RN-03).
     """
     rows = reference.exec(
         select(PokedexNumber.species, PokedexNumber.number)
         .join(GamePokedex, col(GamePokedex.pokedex) == col(PokedexNumber.pokedex))
-        .where(GamePokedex.game == game)
+        .join(Game, col(Game.slug) == col(GamePokedex.game))
+        .join(Species, col(Species.slug) == col(PokedexNumber.species))
+        .where(GamePokedex.game == game, col(Species.generation) <= col(Game.generation))
         .order_by(col(GamePokedex.pokedex), col(PokedexNumber.number))
     ).all()
     seen: dict[str, int] = {}

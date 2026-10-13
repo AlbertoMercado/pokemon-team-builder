@@ -81,6 +81,53 @@ describe("Formas de obtenerlo en el juego (RN-26)", () => {
       way({ kind: "event", location_name: "Isla Suprema", item: "auroraticket" }),
       "Evento: Isla Suprema con el Ticket Aurora",
     ],
+    // 4th generation
+    [
+      way({ kind: "event", location_name: "Paraíso Floral", item: "oaks-letter" }),
+      "Evento: Paraíso Floral con la Carta del Profesor Oak",
+    ],
+    [
+      way({ kind: "fossil", location_name: "Ciudad Pirita", item: "skull-fossil" }),
+      "Revivir el Fósil Cráneo en Ciudad Pirita",
+    ],
+    [
+      way({
+        kind: "wild",
+        location_name: "Ruta 205",
+        method: "honey-tree",
+        rarity: 1,
+        conditions: ["honey-tree-group-c"],
+      }),
+      "Aparece salvaje en Ruta 205 en los árboles de miel (grupo C de los árboles de miel): 1 %",
+    ],
+    [
+      way({
+        kind: "wild",
+        location_name: "Ruta 201",
+        method: "walk",
+        rarity: 10,
+        conditions: ["slot2-emerald"],
+      }),
+      "Aparece salvaje en Ruta 201 (con Esmeralda en la ranura de GBA): 10 %",
+    ],
+    [
+      way({
+        kind: "wild",
+        location_name: "Zona Safari",
+        method: "walk",
+        rarity: 10,
+        conditions: ["johto-safari-blocks-forest-min-35"],
+      }),
+      "Aparece salvaje en Zona Safari (con 35 objetos de bosque o más en la zona): 10 %",
+    ],
+    [
+      way({
+        kind: "static",
+        location_name: "Ruta 209",
+        conditions: ["item-odd-keystone", "other-talked-to-32-people-underground"],
+      }),
+      "Aparece salvaje en Ruta 209 (con la Piedra Espíritu, tras hablar con 32 personas en el Subsuelo): 100 %",
+    ],
   ])("%#: «%s»", (found, text) => {
     expect(describeWay(found, "x")).toBe(text);
   });

@@ -41,6 +41,7 @@ from ingest.checks import (
     check_arrival_proposals,
     check_catalog,
     check_counts,
+    check_encounters,
     check_key_battles,
     check_starters,
     check_target_games,
@@ -225,10 +226,12 @@ def test_an_unknown_evolution_condition_blocks_the_load(tmp_path: Path) -> None:
 # --- Games ---------------------------------------------------------------------------------
 
 
-def test_loads_the_games_of_the_first_three_generations(loaded: Session) -> None:
+def test_loads_the_games_of_the_first_four_generations(loaded: Session) -> None:
+    """CA-94: up to Diamond, Pearl, Platinum, HeartGold and SoulSilver."""
     games = {game.slug: game for game in loaded.exec(select(Game)).all()}
 
-    assert len(games) == 11  # without Colosseum, XD and the Japan-only versions
+    assert len(games) == 16  # without Colosseum, XD and the Japan-only versions
+    assert games["heartgold"].generation == 4
     assert games["firered"].name_es == "Rojo Fuego"
     # The extract has no key battles: no game is complete, so none is a target (CA-67).
     assert not any(game.is_target for game in games.values())
@@ -246,7 +249,8 @@ def test_only_default_forms_of_loaded_species(loaded: Session) -> None:
     pokemon = set(loaded.exec(select(Pokemon.slug)).all())
 
     assert "deoxys-normal" in pokemon
-    assert not {"deoxys-attack", "raichu-alola", "slowbro-galar", "happiny"} & pokemon
+    assert "shaymin-land" in pokemon
+    assert not {"deoxys-attack", "raichu-alola", "slowbro-galar", "shaymin-sky"} & pokemon
     assert loaded.exec(select(Pokemon).where(Pokemon.slug == "pikachu")).one().name_es == "Pikachu"
 
 
@@ -258,11 +262,15 @@ def test_each_form_keeps_its_pokeapi_id(loaded: Session) -> None:
     assert ids["deoxys-normal"] == 386
 
 
-def test_pre_evolution_of_a_later_generation_is_left_out(loaded: Session) -> None:
-    """Happiny is a 4th generation baby: in generations 1 to 3, Chansey is the first stage."""
+@pytest.mark.rn("RN-03")
+def test_a_pre_evolution_of_a_later_generation_does_not_hatch_in_earlier_games(
+    loaded: Session,
+) -> None:
+    """Happiny is a 4th generation baby: in a game of the 3rd generation, Chansey hatches."""
     chansey = loaded.get(Species, "chansey")
     assert chansey is not None
-    assert chansey.evolves_from is None
+    assert chansey.evolves_from == "happiny"
+    assert _arrival(loaded, "leafgreen", "chansey") == (True, Origin.INFERRED)
     blissey = loaded.get(Species, "blissey")
     assert blissey is not None
     assert blissey.evolves_from == "chansey"
@@ -370,7 +378,11 @@ def test_every_loaded_form_exists_in_every_target_game(loaded: Session) -> None:
     rows = loaded.exec(select(GamePokemon)).all()
     pokemon = loaded.exec(select(Pokemon.slug)).all()
 
-    assert len(rows) == 5 * len(pokemon)
+    by_generation = dict(loaded.exec(select(Species.slug, Species.generation)).all())
+    species = dict(loaded.exec(select(Pokemon.slug, Pokemon.species)).all())
+    up_to_third = [form for form in pokemon if by_generation[species[form]] <= 3]
+    # The 3rd generation games have the species up to theirs; the 4th, every one (RN-03).
+    assert len(rows) == 5 * len(up_to_third) + 5 * len(pokemon)
     assert all(row.exists_in_game and row.exists_origin is Origin.AUTOMATIC for row in rows)
 
 
@@ -392,7 +404,7 @@ def test_arrival_is_proposed_from_the_kanto_pokedex_in_firered(loaded: Session) 
 
 
 def test_the_games_of_the_target_generation_are_proposed_as_target() -> None:
-    """The source proposes the 3rd generation; the load then keeps the complete ones."""
+    """The source proposes the 3rd and 4th generations; the load then keeps the complete ones."""
     games = [row for row in _offline_source().rows() if isinstance(row, Game)]
     assert {game.slug for game in games if game.is_target} == {
         "ruby",
@@ -400,6 +412,11 @@ def test_the_games_of_the_target_generation_are_proposed_as_target() -> None:
         "emerald",
         "firered",
         "leafgreen",
+        "diamond",
+        "pearl",
+        "platinum",
+        "heartgold",
+        "soulsilver",
     }
 
 
@@ -473,13 +490,15 @@ def test_loads_the_national_pokedex_and_those_of_the_loaded_games(loaded: Sessio
         "kanto",
         "original-johto",
         "hoenn",
+        "original-sinnoh",
+        "extended-sinnoh",
+        "updated-johto",
     }
     numbers = {(row.pokedex, row.species): row.number for row in loaded.exec(select(PokedexNumber))}
     assert numbers[("kanto", "mew")] == 151
     assert numbers[("national", "deoxys")] == 386
+    assert numbers[("national", "arceus")] == 493
     assert numbers[("original-johto", "hoothoot")] == 15
-    # Only loaded species: no Happiny in the National Pokédex.
-    assert ("national", "happiny") not in numbers
 
 
 @pytest.mark.rn("RN-26")
@@ -565,7 +584,7 @@ def test_location_without_spanish_name_is_loaded_with_a_warning(tmp_path: Path) 
 
     assert report.succeeded, report.errors
     [warning] = [w for w in report.warnings if "sin nombre en español" in w]
-    assert warning.startswith("111 lugares sin nombre en español")
+    assert warning.startswith("134 lugares sin nombre en español")
     assert "azalea-town" in warning
     engine = create_sqlite_engine(target)
     with Session(engine) as session:
@@ -593,13 +612,13 @@ def test_wrong_curated_locations_fail(entries: dict[str, LocationEntry], message
 
 
 def test_first_load_checks_reject_an_incomplete_load(tmp_path: Path) -> None:
-    """The extract has ~70 species, not 386: the counts check rejects it."""
+    """The extract has ~90 species, not 493: the counts check rejects it."""
     target = tmp_path / "reference.sqlite"
 
     report = build_reference([_offline_source(), CuratedSource(CURATED)], target, FIRST_LOAD_CHECKS)
 
     assert not report.succeeded
-    assert any("species" in error and "386" in error for error in report.errors)
+    assert any("species" in error and "493" in error for error in report.errors)
     assert not target.exists()
 
 
@@ -618,6 +637,8 @@ def test_known_case_checks_pass_on_the_extract(loaded: Session) -> None:
         for problem in check_arrival_proposals(loaded)
         if problem.startswith("ruby:") or ": None, se esperaba" in problem
     ]
+    # Turtwig is not in the extract.
+    expected += [problem for problem in check_encounters(loaded) if problem.startswith("turtwig")]
     assert set(problems) <= set(expected)
 
 
@@ -662,4 +683,5 @@ def test_the_moves_learnt_by_level_that_evolutions_need(loaded: Session) -> None
 
     assert ("aerodactyl", "ancient-power", "firered-leafgreen", 29) in learnt
     assert {r.move for r in rows} <= {"ancient-power", "mimic", "double-hit", "rollout"}
-    assert not [r for r in rows if r.pokemon == "tangela" or r.version_group == "diamond-pearl"]
+    assert ("tangela", "ancient-power", "diamond-pearl", 33) in learnt
+    assert not [r for r in rows if r.pokemon == "tangela" and r.version_group == "emerald"]
