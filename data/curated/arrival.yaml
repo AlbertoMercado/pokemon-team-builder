@@ -62,3 +62,17 @@ games:
       Antes de la Liga se puede recibir cualquier especie, de otro Diamante, Perla o Platino o
       de un HeartGold o SoulSilver, y las evoluciones no tienen restricciones. Comprobado en
       docs/02-ddt/datos-requeridos.md.
+  heartgold:
+    regional_pokedex: national
+    origin: inferred
+    note: >-
+      Antes de la Liga se puede recibir cualquier especie, de otro HeartGold o SoulSilver o de
+      un Diamante, Perla o Platino, y las evoluciones no tienen restricciones. Comprobado en
+      docs/02-ddt/datos-requeridos.md.
+  soulsilver:
+    regional_pokedex: national
+    origin: inferred
+    note: >-
+      Antes de la Liga se puede recibir cualquier especie, de otro HeartGold o SoulSilver o de
+      un Diamante, Perla o Platino, y las evoluciones no tienen restricciones. Comprobado en
+      docs/02-ddt/datos-requeridos.md.

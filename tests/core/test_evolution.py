@@ -8,6 +8,7 @@ import pytest
 from core.domain import (
     CONTESTS,
     DAY_NIGHT_CYCLE,
+    EVOLUTION_PLACES,
     EvolutionCatalogError,
     EvolutionMethod,
     EvolutionStep,
@@ -20,6 +21,8 @@ from tests.core.builders import EVOLUTION_METHODS, pokemon, stage, step
 
 FIRERED = GameInfo("firered", 3)
 EMERALD = GameInfo("emerald", 3, frozenset({DAY_NIGHT_CYCLE, CONTESTS}))
+PLATINUM = GameInfo("platinum", 4, frozenset({DAY_NIGHT_CYCLE, CONTESTS, EVOLUTION_PLACES}))
+HEARTGOLD = GameInfo("heartgold", 4, frozenset({DAY_NIGHT_CYCLE}))
 
 GENGAR = pokemon(
     "gengar",
@@ -133,7 +136,22 @@ def test_beautifly_is_random_and_therefore_tedious() -> None:
     ],
 )
 def test_each_method_of_ca_20(evolution_step: EvolutionStep, expected: set[Tedium]) -> None:
-    assert step_tedium(evolution_step, EMERALD, EVOLUTION_METHODS) == expected
+    assert step_tedium(evolution_step, PLATINUM, EVOLUTION_METHODS) == expected
+
+
+@pytest.mark.rn("RN-15")
+@pytest.mark.parametrize(
+    "evolution_step",
+    [
+        step("magneton", "magnezone", location="mt-coronet"),
+        step("eevee", "leafeon", location="eterna-forest", near_special_rock=True),
+    ],
+)
+def test_an_evolution_by_place_is_impossible_without_the_place(
+    evolution_step: EvolutionStep,
+) -> None:
+    """CA-97: HeartGold and SoulSilver have no Mt. Coronet, Eterna Forest or Route 217."""
+    assert Tedium.IMPOSSIBLE in step_tedium(evolution_step, HEARTGOLD, EVOLUTION_METHODS)
 
 
 @pytest.mark.rn("RN-15")

@@ -176,6 +176,15 @@ def test_the_main_battle_can_go_before_the_labels() -> None:
     assert _names(team_variants(section, "Combate en el Café Revancha")) == [["Mismagius"]]
 
 
+def test_a_labelled_battle_ends_at_the_next_heading() -> None:
+    """Clair in HeartGold: the rematch is in a subsection after the gym battle."""
+    section = (
+        "==== X ====\n;Primera batalla\n{{Equipo|P1=Gyarados|P2=Kingdra}}\n"
+        "===== Revancha =====\n{{Equipo|P1=Gyarados|P2=Dragonite}}\n"
+    )
+    assert _names(team_variants(section, "Primera batalla")) == [["Gyarados", "Kingdra"]]
+
+
 def test_a_repeated_section_counts_only_with_teams() -> None:
     """Byron: one «Pokémon Platino» section for the teams and another for the dialogues."""
     wikitext = f"== {SECTION} ==\n{{{{Equipo|P1=Onix}}}}\n== {SECTION} ==\nHola.\n"

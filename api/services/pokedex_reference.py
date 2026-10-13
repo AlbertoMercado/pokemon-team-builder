@@ -25,12 +25,19 @@ from api.services.context import (
     StepBuilder,
     load_evolution_catalog,
 )
-from core.domain import CONTESTS, DAY_NIGHT_CYCLE, EvolutionCatalog, EvolutionStep, GameInfo
+from core.domain import (
+    CONTESTS,
+    DAY_NIGHT_CYCLE,
+    EVOLUTION_PLACES,
+    EvolutionCatalog,
+    EvolutionStep,
+    GameInfo,
+)
 from core.pokedex import DexSpecies, Encounter
 from core.review import FactKind, Origin
 from db import reference as ref_db
 
-MECHANICS = (CONTESTS, DAY_NIGHT_CYCLE)
+MECHANICS = (CONTESTS, DAY_NIGHT_CYCLE, EVOLUTION_PLACES)
 
 
 @dataclass(frozen=True)

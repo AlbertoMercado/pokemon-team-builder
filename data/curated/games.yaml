@@ -3,6 +3,7 @@
 #
 # Cada mecánica es sí/no, con su origen (RN-18): automatic, inferred o pending. Un valor
 # inferido lo confirma el usuario antes de generar; uno pendiente no lleva value.
+# evolution_places solo lo necesitan los juegos desde la 4.ª generación (CA-97).
 games:
   firered:
     day_night_cycle:
@@ -82,6 +83,12 @@ games:
       note: >-
         Tiene súper concursos y Pokochos: se puede subir la belleza que necesita Feebas para
         evolucionar a Milotic.
+    evolution_places:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene los lugares de las evoluciones por lugar: el Monte Corona (Magnezone y Probopass),
+        la Roca Musgo del Bosque Vetusto (Leafeon) y la Roca Hielo de la Ruta 217 (Glaceon).
   pearl:
     day_night_cycle:
       value: true
@@ -95,6 +102,12 @@ games:
       note: >-
         Tiene súper concursos y Pokochos: se puede subir la belleza que necesita Feebas para
         evolucionar a Milotic.
+    evolution_places:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene los lugares de las evoluciones por lugar: el Monte Corona (Magnezone y Probopass),
+        la Roca Musgo del Bosque Vetusto (Leafeon) y la Roca Hielo de la Ruta 217 (Glaceon).
   platinum:
     day_night_cycle:
       value: true
@@ -108,3 +121,47 @@ games:
       note: >-
         Tiene súper concursos y Pokochos: se puede subir la belleza que necesita Feebas para
         evolucionar a Milotic.
+    evolution_places:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene los lugares de las evoluciones por lugar: el Monte Corona (Magnezone y Probopass),
+        la Roca Musgo del Bosque Vetusto (Leafeon) y la Roca Hielo de la Ruta 217 (Glaceon).
+  heartgold:
+    day_night_cycle:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene reloj interno: Eevee evoluciona a Espeon de día (de 4:00 a 19:59) y a Umbreon de
+        noche (de 20:00 a 3:59), con mucha amistad.
+    contests:
+      value: false
+      origin: inferred
+      note: >-
+        No tiene concursos ni Pokochos (en su lugar está el Pokéathlon): no se puede subir la
+        belleza, que necesita Feebas para evolucionar a Milotic.
+    evolution_places:
+      value: false
+      origin: inferred
+      note: >-
+        No tiene el Monte Corona, el Bosque Vetusto ni la Ruta 217: Magnezone, Probopass, Leafeon
+        y Glaceon no pueden evolucionar en él (CA-97).
+  soulsilver:
+    day_night_cycle:
+      value: true
+      origin: inferred
+      note: >-
+        Tiene reloj interno: Eevee evoluciona a Espeon de día (de 4:00 a 19:59) y a Umbreon de
+        noche (de 20:00 a 3:59), con mucha amistad.
+    contests:
+      value: false
+      origin: inferred
+      note: >-
+        No tiene concursos ni Pokochos (en su lugar está el Pokéathlon): no se puede subir la
+        belleza, que necesita Feebas para evolucionar a Milotic.
+    evolution_places:
+      value: false
+      origin: inferred
+      note: >-
+        No tiene el Monte Corona, el Bosque Vetusto ni la Ruta 217: Magnezone, Probopass, Leafeon
+        y Glaceon no pueden evolucionar en él (CA-97).
