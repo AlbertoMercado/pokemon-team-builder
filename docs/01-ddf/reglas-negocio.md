@@ -428,7 +428,10 @@ parámetros son fijos.
   Esmeralda.
 - **Dos rivales en Hoenn** ([CA-89](cuestiones-abiertas.md#resueltas)): cuentan Bruno o Aura
   (Ruta 119) y Blasco (Calle Victoria). Bruno o Aura no aporta ningún Pokémon, porque sus tres
-  variantes solo comparten el inicial. Si el rival es también el Campeón, como en Rojo
+  variantes solo comparten el inicial.
+- **HeartGold y SoulSilver**: el jefe del Team Rocket es Atlas, en su último combate obligatorio
+  ([CA-95](cuestiones-abiertas.md#resueltas)); lo de Kanto, posterior a la Liga, no cuenta
+  ([CA-96](cuestiones-abiertas.md#resueltas)). Si el rival es también el Campeón, como en Rojo
   Fuego, ese combate cuenta una sola vez y también sin su inicial. Se usan solo los tipos de los miembros y de los Pokémon
   rivales, con la tabla de eficacias del juego objetivo ([RN-10](#rn-10)). No se tienen en
   cuenta movimientos, niveles ni estadísticas.
@@ -748,6 +751,9 @@ generación de equipos ([CA-79](cuestiones-abiertas.md#resueltas)).
     - Los juegos de la 3.ª generación entre sí: Rubí, Zafiro, Esmeralda, Rojo Fuego y Verde
       Hoja.
     - De la 1.ª o la 2.ª a la 3.ª no se puede.
+    - Los juegos de la 4.ª generación entre sí: Diamante, Perla, Platino, HeartGold y
+      SoulSilver.
+    - De la 3.ª a la 4.ª, con el Parque Compi, solo en ese sentido.
 - **Juego superado**: si el Pokémon está registrado en la Pokédex de un juego superado y
   compatible, se da por disponible allí, aunque el usuario pueda haberlo soltado o
   intercambiado. Si no lo tiene, elige otra forma ([CA-75](cuestiones-abiertas.md#resueltas)).
