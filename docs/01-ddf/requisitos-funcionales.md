@@ -235,10 +235,10 @@ Hay dos excepciones:
   las fuentes externas (PokeAPI, Pokémon Showdown y WikiDex), y los vuelve a cargar para
   actualizarlos. La carga se ejecuta a mano desde la terminal, aparte de la aplicación
   ([CA-47](cuestiones-abiertas.md#resueltas)).
-- **Alcance inicial**: las 386 especies de las generaciones 1 a 3 y sus 11 juegos, con los 5
-  de la 3.ª generación como posibles juegos objetivo (al principio, solo Rojo Fuego y Verde
-  Hoja están completos, [RF-05](#rf-05)), para validar el algoritmo antes de ampliarlo
-  ([CA-11](cuestiones-abiertas.md#resueltas),
+- **Alcance**: las 493 especies de las generaciones 1 a 4 y sus 16 juegos, con los de la 3.ª y
+  la 4.ª generación como posibles juegos objetivo ([RF-05](#rf-05)). Se empezó con las
+  generaciones 1 a 3 para validar el algoritmo antes de ampliarlo
+  ([CA-11](cuestiones-abiertas.md#resueltas), [CA-94](cuestiones-abiertas.md#resueltas),
   [diseño de la carga](../02-ddt/carga-datos.md#alcance)).
 - **Criterios de aceptación**:
     - Se cargan las generaciones, los juegos de cada generación y qué Pokémon (por forma)
