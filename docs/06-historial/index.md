@@ -15,3 +15,4 @@ Planes de implementación por fases, ya ejecutados:
 | [Portadas de los juegos](plan-portadas.md) | RF-18 ([ADR-0011](../03-adr/0011-portadas-wikidex-uso-privado.md)). | 1.2.0 |
 | [Pokédex](plan-pokedex.md) | RF-20 a RF-24, un registro por juego en el *Hall of Fame* ([ADR-0013](../03-adr/0013-obtencion-pokeapi-y-curados.md)). | 1.5.0 |
 | [Catálogo de juegos](plan-catalogo-juegos.md) | RF-25: el usuario elige sus juegos objetivo (CA-90 a CA-93). | 1.7.0 |
+| [4.ª generación](plan-cuarta-generacion.md) | CA-94: la carga de la 4.ª generación y sus 5 juegos como juego objetivo (CA-95 a CA-97). | 1.8.0 |

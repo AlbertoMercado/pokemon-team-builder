@@ -38,12 +38,12 @@ curl http://127.0.0.1:8000/api/meta
 
 ```json
 {
-  "app_version": "1.7.0",
+  "app_version": "1.8.0",
   "data": {
     "pokeapi_commit": "bc92d3b…",
     "sprites_commit": "8491ffd…",
     "ingested_at": "2026-10-04T09:25:10Z",
-    "games": ["red", "blue", "yellow", "gold", "silver", "crystal", "ruby", "sapphire", "emerald", "firered", "leafgreen"]
+    "games": ["red", "blue", "yellow", "gold", "silver", "crystal", "ruby", "sapphire", "emerald", "firered", "leafgreen", "diamond", "pearl", "platinum", "heartgold", "soulsilver"]
   }
 }
 ```

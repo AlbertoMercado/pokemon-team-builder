@@ -1,10 +1,20 @@
 # Plan de la 4.ª generación
 
+!!! warning "Histórico: no se mantiene"
+    Este plan ya se ejecutó y se conserva como historial de cómo y por qué se hizo. No se
+    actualiza: lo vigente sobre la 4.ª generación está en el
+    [DDF](../01-ddf/cuestiones-abiertas.md#resueltas) (CA-94 a CA-97), el
+    [diseño de la carga](../02-ddt/carga-datos.md), los
+    [datos curados](../02-ddt/datos-curados.md), los
+    [datos requeridos](../02-ddt/datos-requeridos.md#restricciones-de-llegada-por-juego) y el
+    [motor](../02-ddt/motor.md); lo pendiente, en las
+    [issues](https://github.com/AlbertoMercado/pokemon-team-builder/issues).
+
 Plan para cargar la 4.ª generación y que sus juegos puedan ser juego objetivo
 ([CA-94](../01-ddf/cuestiones-abiertas.md#resueltas),
 [RF-11](../01-ddf/requisitos-funcionales.md#rf-11), [RF-05](../01-ddf/requisitos-funcionales.md#rf-05)).
-Lo pendiente de cada fase está en su PR; al terminar, este plan se archiva en el
-[historial](../06-historial/index.md).
+Lo pendiente de cada fase está en su PR. Ejecutado en la versión 1.8.0, issue #125; su diseño
+vigente está en su fuente.
 
 ## Alcance
 
@@ -40,17 +50,17 @@ Hechas el 2026-10-13 con el volcado CSV de PokeAPI del commit fijado (`bc92d3b`)
 | Comprobación | Resultado |
 |--------------|-----------|
 | Especies | 107 nuevas: 493 en total. |
-| Juegos | `diamond`, `pearl`, `platinum`, `heartgold` y `soulsilver`, ya en el [catálogo de juegos](datos-curados.md#catalogyaml) con el motivo «su generación todavía no se carga». |
+| Juegos | `diamond`, `pearl`, `platinum`, `heartgold` y `soulsilver`, ya en el [catálogo de juegos](../02-ddt/datos-curados.md#catalogyaml) con el motivo «su generación todavía no se carga». |
 | Evoluciones por movimiento | 7: Mamoswine, Tangrowth y Yanmega (Poder Pasado), Ambipom (Doble Golpe), Lickilicky (Desenrollar), y Mr. Mime y Sudowoodo desde Mime Jr. y Bonsly (Mimético). Bloqueaban la carga (`missing_level_moves`, [CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | Bebés nuevos | Budew, Chingling, Bonsly, Mime Jr., Happiny, Munchlax y Mantyke nacen con incienso ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)); Riolu, sin él. |
-| Disparadores y condiciones de evolución | Todos están en el [catálogo de métodos](datos-curados.md#evolution_methodsyaml): aparecen el lugar (Magnezone, Probopass, Leafeon, Glaceon), el sexo (Gallade, Froslass), el objeto equipado de noche (Gliscor, Weavile) y el Pokémon en el equipo (Mantine). |
+| Disparadores y condiciones de evolución | Todos están en el [catálogo de métodos](../02-ddt/datos-curados.md#evolution_methodsyaml): aparecen el lugar (Magnezone, Probopass, Leafeon, Glaceon), el sexo (Gallade, Froslass), el objeto equipado de noche (Gliscor, Weavile) y el Pokémon en el equipo (Mantine). |
 | Métodos de aparición nuevos | `headbutt`, `honey-tree` (árboles de miel) y `pokemon-ranger` (spin-off): hay que clasificarlos para RN-26. |
 
 ## Diseño
 
 ### Movimientos por nivel (fase 2)
 
-- Tabla `level_move` ([modelo de datos](modelo-datos.md)), solo con los movimientos que exige
+- Tabla `level_move` ([modelo de datos](../02-ddt/modelo-datos.md)), solo con los movimientos que exige
   alguna evolución (`known_move`), por forma y grupo de versiones, con su nivel.
 - `core/evolution.py`: un paso con una condición `unless_learnt_by_level` no es tedioso si el
   Pokémon que evoluciona aprende el movimiento por nivel a partir del nivel 2 en el juego

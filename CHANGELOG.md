@@ -6,40 +6,43 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
-**Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`): descarga de
-PokeAPI los movimientos que se aprenden por nivel, las 107 especies de la 4.ª generación y sus
-imágenes, las portadas de sus juegos y, de WikiDex, las páginas de los entrenadores de Sinnoh y
-Johto. Hasta repetirla, la API pide hacerlo.
+## [1.8.0] - 2026-10-13
+
+Llega la **4.ª generación**: 493 especies y cinco juegos más, y Diamante, Perla, Platino,
+HeartGold y SoulSilver se pueden elegir como juego objetivo en la pantalla **Juegos** (CA-94,
+#125).
+
+**Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`, o
+`scripts/start.sh`, que la hace): descarga de PokeAPI las especies de la 4.ª generación, sus
+imágenes y los movimientos que se aprenden por nivel, y de WikiDex las portadas de sus juegos y
+las páginas de los entrenadores de Sinnoh y Johto. Hasta repetirla, la API pide hacerlo.
+Después, elige los juegos nuevos en **Juegos** si quieres jugarlos.
 
 ### Añadido
 
-- **HeartGold y SoulSilver se pueden elegir como juego objetivo**. Tienen reloj, pero no
-  concursos, así que Feebas no puede evolucionar a Milotic; tampoco tienen los lugares de las
-  evoluciones por lugar, así que Magnezone, Probopass, Leafeon y Glaceon no pueden evolucionar
-  allí (CA-97). Sus 15 combates clave son los de Johto, con Atlas y Plata; lo de Kanto no
-  cuenta (CA-95, CA-96, #125).
-- **Diamante, Perla y Platino se pueden elegir como juego objetivo**, en la pantalla Juegos.
-  Tienen sus mecánicas (reloj y súper concursos), su regla de llegada (puede llegar cualquier
-  especie: comprobado en el código del juego) y sus 15 combates clave, con Helio e Israel por
-  su último combate obligatorio (RN-17, CA-28, #125).
-- **4.ª generación cargada**: las 493 especies y Diamante, Perla, Platino, HeartGold y
-  SoulSilver, con su Pokédex, sus apariciones (árboles de miel, Cabezazo, Pokéradar…), sus
-  Pokémon de evento, sus iniciales, sus portadas y los nombres en español de sus lugares. Ya se
-  pueden registrar en el *Hall of Fame* y consultar su Pokédex; aún no se pueden elegir como
-  juego objetivo, porque les faltan su regla de llegada, sus mecánicas y sus combates clave
-  (CA-94, #125).
+- **4.ª generación cargada**: las especies hasta Arceus (#0493) y Diamante, Perla, Platino,
+  HeartGold y SoulSilver, con su Pokédex, sus apariciones (árboles de miel, Cabezazo,
+  Pokéradar, Zona Safari…), sus Pokémon de evento, sus iniciales, sus portadas y los nombres en
+  español de sus lugares (CA-94, #128).
+- **Diamante, Perla y Platino como juego objetivo**: tienen reloj y súper concursos, puede
+  llegar cualquier especie antes de la Liga (comprobado en el código del juego) y sus 15
+  combates clave, con Helio e Israel por su último combate obligatorio (RN-17, CA-28, #129).
+- **HeartGold y SoulSilver como juego objetivo**: tienen reloj, pero no concursos, así que
+  Feebas no puede evolucionar a Milotic; tampoco tienen los lugares de las evoluciones por
+  lugar, así que Magnezone, Probopass, Leafeon y Glaceon no pueden evolucionar allí (CA-97). Sus
+  15 combates clave son los de Johto, con Atlas y Plata; lo de Kanto no cuenta (CA-95, CA-96,
+  #130).
 - **Parque Compi**: los juegos de la 3.ª generación pueden enviar Pokémon a los de la 4.ª, solo
-  en ese sentido (RN-25).
-
+  en ese sentido (RN-25, #128).
 - **Evoluciones por movimiento**: una evolución que exige conocer un movimiento no puntúa en
   contra si el Pokémon lo aprende por nivel en el juego objetivo, como Tangela con Poder Pasado
-  para Tangrowth (RN-15, CA-32, #125).
+  para Tangrowth (RN-15, CA-32, #127).
 
 ### Corregido
 
 - **Un juego sin regla de llegada ya no cuenta como completo**: si la llegada de sus Pokémon
   está pendiente, le faltan «los Pokémon que existen y pueden llegar» y no se puede elegir como
-  juego objetivo (RF-05, CA-28).
+  juego objetivo (RF-05, CA-28, #128).
 
 ## [1.7.0] - 2026-10-12
 
@@ -381,7 +384,8 @@ Hoja**.
   acceso (RF-19, #52).
 - Restricciones de llegada del resto de juegos (CA-28, #8).
 
-[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.7.0...HEAD
+[Sin publicar]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/AlbertoMercado/pokemon-team-builder/compare/v1.4.0...v1.5.0
