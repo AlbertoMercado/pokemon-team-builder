@@ -1,0 +1,76 @@
+# Combates clave de Diamante y Perla (RN-17), en su orden habitual.
+# Esquema y significado: docs/02-ddt/datos-curados.md.
+#
+# Los equipos se leen de la sección wikidex_section de la página de WikiDex de cada
+# entrenador. Cuentan el último combate obligatorio del jefe del Equipo Galaxia
+# (CA-88) y del rival (CA-89); del rival, sin su inicial y solo los Pokémon comunes a sus tres
+# variantes, que dependen del inicial (CA-26, CA-38).
+games: [diamond, pearl]
+wikidex_section: Pokémon Diamante y Pokémon Perla
+battles:
+  - id: roark
+    category: gym_leader
+    trainer: Roco
+    wikidex_page: Roco
+  - id: gardenia
+    category: gym_leader
+    trainer: Gardenia
+    wikidex_page: Gardenia
+  - id: maylene
+    category: gym_leader
+    trainer: Brega
+    wikidex_page: Brega
+  - id: crasher-wake
+    category: gym_leader
+    trainer: Mananti
+    wikidex_page: Mananti
+  - id: fantina
+    category: gym_leader
+    trainer: Fantina
+    wikidex_page: Fantina
+  - id: byron
+    category: gym_leader
+    trainer: Acerón
+    wikidex_page: Acerón
+  - id: candice
+    category: gym_leader
+    trainer: Inverna
+    wikidex_page: Inverna
+  - id: cyrus
+    category: villain_boss
+    trainer: Helio
+    wikidex_page: Helio
+    wikidex_team: Segundo combate
+    note: Jefe del Equipo Galaxia. Su último combate obligatorio, en las Columnas Lanza (CA-88).
+  - id: volkner
+    category: gym_leader
+    trainer: Lectro
+    wikidex_page: Lectro
+  - id: barry
+    category: rival_final
+    trainer: Israel
+    wikidex_page: Israel
+    wikidex_team: Quinto combate
+    rival_starter_lines: [turtwig, chimchar, piplup]
+    note: >-
+      Rival. Su último combate obligatorio, en la Liga Pokémon, antes del Alto Mando (CA-89).
+  - id: aaron
+    category: elite_four
+    trainer: Alecrán
+    wikidex_page: Alecrán
+  - id: bertha
+    category: elite_four
+    trainer: Gaia
+    wikidex_page: Gaia
+  - id: flint
+    category: elite_four
+    trainer: Fausto
+    wikidex_page: Fausto
+  - id: lucian
+    category: elite_four
+    trainer: Delos
+    wikidex_page: Delos
+  - id: champion
+    category: champion
+    trainer: Cintia
+    wikidex_page: Cintia

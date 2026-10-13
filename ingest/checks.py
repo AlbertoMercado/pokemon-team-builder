@@ -49,7 +49,7 @@ GEN_4_GAMES = frozenset({"diamond", "pearl", "platinum", "heartgold", "soulsilve
 # Games of the target generations (scope): they have existence and arrival rows (RN-03).
 TARGET_GENERATION_GAMES = GEN_3_GAMES | GEN_4_GAMES
 # Games with curated data: mechanics, arrival rule and key battles (RF-05).
-CURATED_GAMES = GEN_3_GAMES
+CURATED_GAMES = GEN_3_GAMES | {"diamond", "pearl", "platinum"}
 # Key battles of each game (RN-17): 8 gyms, the Elite Four and the Champion; in Hoenn, the
 # villain boss of the version (both in Emerald) and Wally (CA-88, CA-89). First and last.
 KEY_BATTLES = {
@@ -58,6 +58,10 @@ KEY_BATTLES = {
     "ruby": (15, "Petra", "Máximo"),
     "sapphire": (15, "Petra", "Máximo"),
     "emerald": (16, "Petra", "Plubio"),
+    # In Sinnoh, the villain boss and Barry (CA-88, CA-89).
+    "diamond": (15, "Roco", "Cintia"),
+    "pearl": (15, "Roco", "Cintia"),
+    "platinum": (15, "Roco", "Cintia"),
 }
 SPECIES_COUNT = 493
 # Species up to each generation: a game has those of its generation and earlier (RN-03).
@@ -149,6 +153,10 @@ EXPECTED_ARRIVAL = (
     ("emerald", "crobat", True),
     ("emerald", "bulbasaur", False),
     ("emerald", "chikorita", False),
+    # Diamond, Pearl and Platinum: any species, and evolutions are not restricted.
+    ("diamond", "bulbasaur", True),
+    ("platinum", "garchomp", True),
+    ("platinum", "crobat", True),
 )
 # 15 types in the 1st generation, 17 from the 2nd: one factor per pair.
 EFFICACY_PAIRS_BY_GENERATION = {1: 15 * 15, 2: 17 * 17, 3: 17 * 17, 4: 17 * 17}
@@ -396,6 +404,9 @@ def check_key_battles(session: Session) -> list[str]:
         "ruby-maxie": ["mightyena", "crobat", "camerupt"],
         "sapphire-archie": ["mightyena", "crobat", "sharpedo"],
         "emerald-wally": ["altaria", "delcatty", "magneton", "roselia", "gardevoir"],
+        "diamond-cyrus": ["honchkrow", "gyarados", "crobat", "weavile"],
+        "platinum-fantina": ["duskull", "haunter", "mismagius"],  # Platinum has its own teams
+        "platinum-barry": ["staraptor", "heracross", "snorlax"],
     }
     for slug, team in expected_teams.items():
         if _team(session, slug) != team:
@@ -505,9 +516,10 @@ def check_catalog(session: Session) -> list[str]:
         "red": ("Rojo", 1, Platform.GAME_BOY, False, Playability.UNKNOWN, None),
         "firered": ("Rojo Fuego", 3, Platform.GAME_BOY_ADVANCE, True, Playability.UNKNOWN, []),
         "emerald": ("Esmeralda", 3, Platform.GAME_BOY_ADVANCE, True, Playability.UNKNOWN, []),
+        "diamond": ("Diamante", 4, Platform.DS, True, Playability.UNKNOWN, []),
         # Loaded, without arrival rule, mechanics or key battles yet (plan of the 4th gen.).
-        "diamond": (
-            "Diamante",
+        "heartgold": (
+            "Oro HeartGold",
             4,
             Platform.DS,
             True,

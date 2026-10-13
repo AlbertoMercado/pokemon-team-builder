@@ -24,7 +24,13 @@ from db.reference import (
     TediumReason,
 )
 from ingest import cli
-from ingest.sources.curated import CuratedDataError, CuratedSource, read_curated, transfer_pairs
+from ingest.sources.curated import (
+    CuratedData,
+    CuratedDataError,
+    CuratedSource,
+    read_curated,
+    transfer_pairs,
+)
 from ingest.sources.curated.schemas import (
     ArrivalRule,
     BreedingFile,
@@ -57,11 +63,15 @@ def test_repository_curated_files_are_valid() -> None:
     assert curated.breeding.incense_babies["happiny"] == "luck-incense"  # 4th generation
     assert len(curated.breeding.incense_babies) == 9
     # Every target game has its mechanics, its arrival rule (CA-28) and its key battles (RF-05).
-    targets = {"ruby", "sapphire", "emerald", "firered", "leafgreen"}
+    targets = {"ruby", "sapphire", "emerald", "firered", "leafgreen", "diamond", "pearl"}
+    targets |= {"platinum"}
     assert set(curated.games.games) == targets
     assert set(curated.arrival.games) == targets
     assert len(curated.starters.games) == 16  # every loaded game, for the Pokédex (CA-87)
-    emerald, firered_leafgreen, ruby_sapphire = curated.key_battles
+    assert {game for f in curated.key_battles for game in f.games} == targets
+    emerald, firered_leafgreen, ruby_sapphire = (
+        _battles_of(curated, game) for game in ("emerald", "firered", "ruby")
+    )
     assert firered_leafgreen.games == ["firered", "leafgreen"]
     assert len(firered_leafgreen.battles) == 13  # Giovanni only as gym leader (CA-39)
     assert ruby_sapphire.games == ["ruby", "sapphire"]
@@ -210,7 +220,7 @@ def test_curated_source_rows() -> None:
     events = {(row.game, row.pokemon) for row in rows if isinstance(row, EventPokemon)}
     methods = {(row.kind, row.name): row for row in rows if isinstance(row, EvolutionMethod)}
 
-    assert len(mechanics) == 10  # two per target game
+    assert len(mechanics) == 16  # two per game with curated data
     assert len(starters) == 46  # 3 per game, 1 in Yellow
     assert len(rows) == (
         len(mechanics) + len(starters) + len(pokedexes) + len(transfers) + len(events)
@@ -240,7 +250,7 @@ def test_curated_source_rows() -> None:
 
 
 def test_key_battles_point_to_their_wikidex_team() -> None:
-    battles_file = read_curated(CURATED_DIR).key_battles[1]
+    battles_file = _battles_of(read_curated(CURATED_DIR), "firered")
     battles = {battle.id: battle for battle in battles_file.battles}
 
     assert battles_file.wikidex_section == "Pokémon Rojo Fuego y Pokémon Verde Hoja"
@@ -256,7 +266,8 @@ def test_hoenn_key_battles_are_by_version() -> None:
     """CA-88: each version has its own villain boss, and Emerald both, by their last mandatory
     battle. CA-89: Wally counts as rival; May and Brendan do not (their variants share
     nothing). Some pages title the section of the games differently."""
-    emerald, _, ruby_sapphire = read_curated(CURATED_DIR).key_battles
+    curated = read_curated(CURATED_DIR)
+    emerald, ruby_sapphire = _battles_of(curated, "emerald"), _battles_of(curated, "ruby")
     ruby = {battle.id: battle for battle in ruby_sapphire.battles}
 
     assert (ruby["maxie"].games, ruby["archie"].games) == (["ruby"], ["sapphire"])
@@ -266,6 +277,33 @@ def test_hoenn_key_battles_are_by_version() -> None:
     emerald_bosses = [b.id for b in emerald.battles if b.category is BattleCategory.VILLAIN_BOSS]
     assert emerald_bosses == ["maxie", "archie"]
     assert not {"may", "brendan"} & {b.id for f in (emerald, ruby_sapphire) for b in f.battles}
+
+
+@pytest.mark.rn("RN-17")
+def test_sinnoh_key_battles_count_cyrus_and_barry() -> None:
+    """CA-88 and CA-89: the last mandatory battle of Cyrus and of Barry; Platinum has its own
+    order and teams, and in its gyms the main battle goes before the rematches."""
+    curated = read_curated(CURATED_DIR)
+    diamond, platinum = _battles_of(curated, "diamond"), _battles_of(curated, "platinum")
+    by_id = {battle.id: battle for battle in platinum.battles}
+
+    assert diamond.games == ["diamond", "pearl"]
+    assert [b.id for b in diamond.battles][:5] == [
+        "roark", "gardenia", "maylene", "crasher-wake", "fantina"
+    ]  # fmt: skip
+    assert [b.id for b in platinum.battles][:5] == [
+        "roark", "gardenia", "fantina", "maylene", "crasher-wake"
+    ]  # fmt: skip
+    assert next(b for b in diamond.battles if b.id == "cyrus").wikidex_team == "Segundo combate"
+    assert by_id["cyrus"].wikidex_team == "Tercer combate"
+    assert by_id["barry"].category is BattleCategory.RIVAL_FINAL
+    assert by_id["barry"].rival_starter_lines == ["turtwig", "chimchar", "piplup"]
+    assert by_id["fantina"].wikidex_team is None
+
+
+def _battles_of(curated: CuratedData, game: str) -> KeyBattlesFile:
+    [found] = [f for f in curated.key_battles if game in f.games]
+    return found
 
 
 def test_a_battle_of_a_game_outside_its_file_is_rejected() -> None:

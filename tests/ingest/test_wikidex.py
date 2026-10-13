@@ -167,13 +167,30 @@ def test_section_with_labels_needs_one() -> None:
         team_variants(_section("Giovanni"), None)
 
 
+def test_the_main_battle_can_go_before_the_labels() -> None:
+    """Fantina in Platinum: the gym team first, then the labelled rematches."""
+    section = (
+        "== X ==\n{{Equipo|P1=Drifblim}}\n;Combate en el Café Revancha\n{{Equipo|P1=Mismagius}}\n"
+    )
+    assert _names(team_variants(section, None)) == [["Drifblim"]]
+    assert _names(team_variants(section, "Combate en el Café Revancha")) == [["Mismagius"]]
+
+
+def test_a_repeated_section_counts_only_with_teams() -> None:
+    """Byron: one «Pokémon Platino» section for the teams and another for the dialogues."""
+    wikitext = f"== {SECTION} ==\n{{{{Equipo|P1=Onix}}}}\n== {SECTION} ==\nHola.\n"
+    assert "Onix" in find_section(wikitext, SECTION)
+
+
 def test_disambiguation_page_is_recognised() -> None:
     with pytest.raises(TeamParseError, match="desambiguación"):
         find_section(_page("Bruno").wikitext, SECTION)
 
 
 def test_section_must_not_be_ambiguous() -> None:
-    wikitext = f"== {SECTION} ==\n{{{{Equipo|P1=Onix}}}}\n== {SECTION} ==\n"
+    wikitext = (
+        f"== {SECTION} ==\n{{{{Equipo|P1=Onix}}}}\n== {SECTION} ==\n{{{{Equipo|P1=Geodude}}}}\n"
+    )
     with pytest.raises(TeamParseError, match="2 secciones"):
         find_section(wikitext, SECTION)
 

@@ -12,7 +12,7 @@ cómo se usa: el [manual](../04-manual-usuario/cargar-datos.md); el esquema de l
 | Especies | 1.ª a 4.ª generación: de #0001 Bulbasaur a #0493 Arceus ([CA-94](../01-ddf/cuestiones-abiertas.md#resueltas)) | 493 (151 + 100 + 135 + 107) |
 | Formas (`pokemon`) | Solo la forma por defecto de cada especie | 493 |
 | Juegos | Todos los de las generaciones 1 a 4 | 16 juegos en 10 grupos de versiones |
-| Juegos objetivo | Los de la 3.ª y la 4.ª generación que están completos ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)): hoy, los 5 de la 3.ª | 5 de 10 |
+| Juegos objetivo | Los de la 3.ª y la 4.ª generación que están completos ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)): hoy, los 5 de la 3.ª, Diamante, Perla y Platino | 8 de 10 |
 | Tipos | Los que existen hasta la 4.ª generación | 15 en la 1.ª, 17 desde la 2.ª |
 | Tabla de eficacias | Una por generación | 4 |
 | Combates clave | Los de los 5 juegos objetivo | Unos 30 entrenadores en WikiDex |
@@ -37,9 +37,10 @@ Decisiones de alcance:
   [CA-67](../01-ddf/cuestiones-abiertas.md#resueltas)). La fuente de PokeAPI propone como
   objetivo los 10 de la 3.ª y la 4.ª generación y, con todo cargado, `ingest/targets.py` deja
   como tales solo los completos; el informe dice qué les falta a los demás, que se cargan
-  igualmente. Hoy son los 5 de la 3.ª: tienen sus mecánicas, sus combates clave y su regla de
-  llegada ([CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)). A los de la 4.ª les faltan esos
-  tres datos ([plan de la 4.ª generación](plan-cuarta-generacion.md)).
+  igualmente. Hoy son los 5 de la 3.ª, Diamante, Perla y Platino: tienen sus mecánicas, sus
+  combates clave y su regla de llegada ([CA-28](../01-ddf/cuestiones-abiertas.md#resueltas)).
+  A HeartGold y SoulSilver les faltan esos tres datos
+  ([plan de la 4.ª generación](plan-cuarta-generacion.md)).
 - **Solo los movimientos por nivel que exigen las evoluciones**. De `pokemon_moves.csv`
   (10,7 MB, unas 640 000 filas) se leen solo las filas aprendidas por nivel
   (`pokemon_move_method_id` 1) de un movimiento que alguna evolución exige conocer
@@ -214,15 +215,17 @@ los que no se cargan. Al final de la carga, `ingest/targets.py` guarda en `catal
 lo que le falta a cada juego para estar completo: lo mismo que deja un juego cargado sin ser
 juego objetivo o, si el juego no se carga, `generation_not_loaded`.
 
-Hoy no les falta nada a los 5 de la 3.ª generación. A los de la 4.ª les faltan sus Pokémon
-disponibles (no tienen regla de llegada), sus mecánicas y sus combates clave. A Oro, Plata y
+Hoy no les falta nada a los 5 de la 3.ª generación ni a Diamante, Perla y Platino. A HeartGold
+y SoulSilver les faltan sus Pokémon disponibles (no tienen regla de llegada), sus mecánicas y
+sus combates clave. A Oro, Plata y
 Cristal, lo mismo, porque la 2.ª generación no es de juegos objetivo (`ingest/scope.py`); y a los
 de la 5.ª en adelante, su generación.
 
 ## WikiDex
 
 - Una petición por página de entrenador (`action=parse&prop=wikitext`): 13 para Rojo Fuego y
-  Verde Hoja y 17 para Rubí, Zafiro y Esmeralda.
+  Verde Hoja, 17 para Rubí, Zafiro y Esmeralda y 15 para Diamante, Perla y Platino (las mismas
+  páginas en los tres).
 - Caché permanente en `data/cache/wikidex/`, como mucho una petición por segundo y un
   `User-Agent` descriptivo. Una segunda ejecución no hace peticiones
   ([ingesta](../05-operacion/ingesta.md#wikidex)).
@@ -245,11 +248,12 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
   493 formas, 5 × 386 + 5 × 493 filas de disponibilidad, 7 Pokédex, 16 Pokédex de juego, 95
   transferencias y 60 Pokémon de evento. Tablas de eficacias completas: 15 × 15 pares
   en la 1.ª generación y 17 × 17 de la 2.ª a la 4.ª.
-- **Juegos objetivo**: exactamente los 5 de la 3.ª generación, los completos.
+- **Juegos objetivo**: exactamente los completos: los 5 de la 3.ª generación, Diamante, Perla y
+  Platino.
 - **Catálogo de juegos**: 36 juegos; todos los cargados están en él; casos conocidos de nombre,
   generación, plataforma, si reciben un Pokémon criado, si son jugables y qué les falta (nada a
-  Rojo Fuego ni a Esmeralda; a Diamante, sus Pokémon disponibles, sus mecánicas y sus combates
-  clave; la generación a Negro y a Leyendas: Z-A); Let's Go no está.
+  Rojo Fuego, Esmeralda ni Diamante; a HeartGold, sus Pokémon disponibles, sus mecánicas y sus
+  combates clave; la generación a Negro y a Leyendas: Z-A); Let's Go no está.
 - **Tipos por generación**: Clefairy es Normal en la 3.ª, Magnemite es solo Eléctrico en la
   1.ª y Eléctrico/Acero en la 2.ª, y Bulbasaur es Planta/Veneno.
 - **Eficacias**: Fantasma no afecta a Psíquico en la 1.ª y le hace ×2 en la 3.ª, Fantasma
@@ -260,12 +264,13 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
 - **Crianza**: Mewtwo es legendario y Ditto está en el grupo huevo `ditto`.
 
 
-- **Datos curados**: 10 mecánicas (2 por juego objetivo) y sus combates clave, con su número,
-  el primero y el último: 13 en Rojo Fuego y Verde Hoja, de Brock a Azul (eran 15 hasta que
-  CA-39 quitó los dos de Giovanni como jefe del Team Rocket); 15 en Rubí y Zafiro, de Petra a
-  Máximo, y 16 en Esmeralda, de Petra a Plubio. Numerados del 1 en adelante en cada juego, cada
-  uno con Pokémon, y equipos conocidos: Brock, el Campeón de Rojo Fuego, Petra, Magno, Aquiles
-  y Blasco. Cada versión de Rubí y Zafiro solo tiene su jefe
+- **Datos curados**: 16 mecánicas (2 por juego con datos curados) y sus combates clave, con su
+  número, el primero y el último: 13 en Rojo Fuego y Verde Hoja, de Brock a Azul (eran 15 hasta
+  que CA-39 quitó los dos de Giovanni como jefe del Team Rocket); 15 en Rubí y Zafiro, de Petra a
+  Máximo; 16 en Esmeralda, de Petra a Plubio, y 15 en Diamante, Perla y Platino, de Roco a
+  Cintia. Numerados del 1 en adelante en cada juego, cada uno con Pokémon, y equipos conocidos:
+  Brock, el Campeón de Rojo Fuego, Petra, Magno, Aquiles, Blasco, Helio en Diamante, y Fantina e
+  Israel en Platino. Cada versión de Rubí y Zafiro solo tiene su jefe
   ([CA-88](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - **Iniciales**: 3 por juego de la 2.ª a la 4.ª generación y de Rojo y Azul, y Raichu en
   Amarillo: Venusaur, Charizard y Blastoise en Rojo Fuego; Sceptile, Blaziken y Swampert en
@@ -289,8 +294,9 @@ Antes de sustituir la base de datos, la ingesta ejecuta estas comprobaciones
   generación; de Oro a Plata, de Rojo Fuego a Rubí, de Diamante a Plata SoulSilver y de
   Esmeralda a Platino (Parque Compi), sin límite; de Cristal a Esmeralda y de Platino a
   Esmeralda, no se puede.
-- **Propuestas de llegada**: inferidas en los juegos de la 3.ª generación, que tienen regla de
-  llegada, y pendientes en los de la 4.ª. Casos conocidos en Rojo Fuego: llegan Bulbasaur,
+- **Propuestas de llegada**: inferidas en los juegos con regla de llegada (los de la 3.ª
+  generación, Diamante, Perla y Platino) y pendientes en HeartGold y SoulSilver. En Diamante y
+  Platino llegan Bulbasaur, Garchomp y Crobat. Casos conocidos en Rojo Fuego: llegan Bulbasaur,
   Vaporeon, Golbat y Chansey (que nace como Chansey, porque Happiny es de la 4.ª), y no llegan
   Pikachu, Raichu, Clefairy, Crobat, Espeon ni Blissey.
 
