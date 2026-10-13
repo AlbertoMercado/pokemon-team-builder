@@ -6,6 +6,15 @@ versión: [versiones](docs/05-operacion/versiones.md).
 
 ## [Sin publicar]
 
+**Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`): descarga de
+PokeAPI los movimientos que se aprenden por nivel. Hasta repetirla, la API pide hacerlo.
+
+### Añadido
+
+- **Evoluciones por movimiento**: una evolución que exige conocer un movimiento no puntúa en
+  contra si el Pokémon lo aprende por nivel en el juego objetivo, como Tangela con Poder Pasado
+  para Tangrowth. Prepara la 4.ª generación, donde aparecen (RN-15, CA-32, #125).
+
 ## [1.7.0] - 2026-10-12
 
 Ahora eliges tú tus juegos objetivo, en la nueva pantalla **Juegos**: el catálogo de los 36

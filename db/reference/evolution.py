@@ -31,6 +31,22 @@ class EvolutionStep(ReferenceModel, table=True):
     conditions: dict[str, ConditionValue] = Field(default_factory=dict, sa_type=JSON)
 
 
+class LevelMove(ReferenceModel, table=True):
+    """A move that ``pokemon`` learns by levelling up in a version group, at ``level``.
+
+    Only the moves that some evolution needs to know (``known_move``), to decide whether that
+    step is tedious: it is not if the Pokémon learns the move by level from level 2 (RN-15,
+    CA-32). At level 1 it only learns it with the move reminder.
+    """
+
+    __tablename__ = "level_move"
+
+    pokemon: str = Field(primary_key=True, foreign_key="pokemon.slug")
+    version_group: str = Field(primary_key=True, foreign_key="version_group.slug")
+    move: str = Field(primary_key=True)
+    level: int = Field(primary_key=True)
+
+
 class MethodKind(StrEnum):
     TRIGGER = "trigger"
     CONDITION = "condition"

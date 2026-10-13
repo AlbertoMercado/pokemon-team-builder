@@ -20,6 +20,7 @@ from db.reference import (
     Game,
     GamePokemon,
     GameStarter,
+    LevelMove,
     Location,
     MissingData,
     Origin,
@@ -564,7 +565,7 @@ def test_location_without_spanish_name_is_loaded_with_a_warning(tmp_path: Path) 
 
     assert report.succeeded, report.errors
     [warning] = [w for w in report.warnings if "sin nombre en español" in w]
-    assert warning.startswith("110 lugares sin nombre en español")
+    assert warning.startswith("111 lugares sin nombre en español")
     assert "azalea-town" in warning
     engine = create_sqlite_engine(target)
     with Session(engine) as session:
@@ -650,3 +651,15 @@ def test_a_catalogue_game_that_is_not_in_pokeapi_fails() -> None:
     curated = dataclasses.replace(CURATED, catalog=CatalogFile(games=[entry]))
     with pytest.raises(TransformError, match="pokemon-gris"):
         list(_offline_source(curated=curated).rows())
+
+
+@pytest.mark.rn("RN-15")
+def test_the_moves_learnt_by_level_that_evolutions_need(loaded: Session) -> None:
+    """CA-32: only the moves some evolution needs to know (Ancient Power, for Mamoswine), of the
+    loaded forms and version groups: Tangela only learns it from the 4th generation."""
+    rows = loaded.exec(select(LevelMove)).all()
+    learnt = {(r.pokemon, r.move, r.version_group, r.level) for r in rows}
+
+    assert ("aerodactyl", "ancient-power", "firered-leafgreen", 29) in learnt
+    assert {r.move for r in rows} <= {"ancient-power", "mimic", "double-hit", "rollout"}
+    assert not [r for r in rows if r.pokemon == "tangela" or r.version_group == "diamond-pearl"]

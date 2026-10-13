@@ -14,7 +14,8 @@ una generación, la carga puede encontrar cosas que la aplicación no sabe trata
 - un disparador o una condición de evolución sin catalogar
   ([CA-42](../01-ddf/cuestiones-abiertas.md#resueltas));
 - una evolución que exige un movimiento sin que estén cargados los movimientos por nivel
-  ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas));
+  ([CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). Ya no bloquea la carga: los
+  movimientos por nivel que exigen las evoluciones se cargan siempre;
 - un juego objetivo sin combates clave ([CA-46](../01-ddf/cuestiones-abiertas.md#resueltas)).
   Ya no bloquea la carga: [CA-67](../01-ddf/cuestiones-abiertas.md#resueltas) lo resuelve
   cargando el juego sin ofrecerlo como juego objetivo;

@@ -23,6 +23,7 @@ from ingest.sources.pokeapi.rows import (
     EvolutionRow,
     GenerationRow,
     IdentifierRow,
+    LevelMoveRow,
     LocationAreaRow,
     LocationNameRow,
     PokedexRow,
@@ -44,6 +45,9 @@ from ingest.sources.pokeapi.rows import (
     read_rows,
 )
 from ingest.sources.pokeapi.transform import PokeapiTables, build_rows
+
+# ``pokemon_move_methods.csv``: learnt by levelling up.
+LEVEL_UP_METHOD = "1"
 
 
 class PokeapiCsvSource:
@@ -73,9 +77,23 @@ class PokeapiCsvSource:
         return self.read_tables()
 
     def read_tables(self) -> PokeapiTables:
-        """Read (downloading if needed) and validate every CSV file the load uses."""
+        """Read (downloading if needed) and validate every CSV file the load uses.
+
+        Of ``pokemon_moves.csv``, only the moves learnt by level that some evolution needs to
+        know (CA-32).
+        """
         c = self._cache
+        evolutions = read_rows(c.path("pokemon_evolution"), EvolutionRow)
+        known_moves = {str(e.known_move_id) for e in evolutions if e.known_move_id is not None}
         return PokeapiTables(
+            level_moves=read_rows(
+                c.path("pokemon_moves"),
+                LevelMoveRow,
+                keep=lambda raw: (
+                    raw["move_id"] in known_moves
+                    and raw["pokemon_move_method_id"] == LEVEL_UP_METHOD
+                ),
+            ),
             generations=read_rows(c.path("generations"), GenerationRow),
             version_groups=read_rows(c.path("version_groups"), VersionGroupRow),
             versions=read_rows(c.path("versions"), VersionRow),
@@ -92,7 +110,7 @@ class PokeapiCsvSource:
             pokemon_types_past=read_rows(c.path("pokemon_types_past"), PokemonTypePastRow),
             egg_groups=read_rows(c.path("egg_groups"), EggGroupRow),
             species_egg_groups=read_rows(c.path("pokemon_egg_groups"), SpeciesEggGroupRow),
-            evolutions=read_rows(c.path("pokemon_evolution"), EvolutionRow),
+            evolutions=evolutions,
             evolution_triggers=read_rows(c.path("evolution_triggers"), IdentifierRow),
             items=read_rows(c.path("items"), IdentifierRow),
             locations=read_rows(c.path("locations"), IdentifierRow),

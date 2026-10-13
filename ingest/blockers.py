@@ -8,8 +8,8 @@ section "Carga bloqueada".
 
 Sources report the blockers found while reading (a key battle team not found in WikiDex);
 ``find_data_blockers`` finds those that need the whole data: evolution triggers and conditions
-that are not in the catalog of evolution methods (CA-42), and those whose category depends on
-the moves learnt by level, which are not loaded (CA-45).
+that are not in the catalog of evolution methods (CA-42). The moves learnt by level that some
+evolutions need are always loaded (``level_move``), so CA-45 no longer blocks the load.
 """
 
 from collections import defaultdict
@@ -28,7 +28,6 @@ class BlockerKind(StrEnum):
 
     UNKNOWN_EVOLUTION_TRIGGER = "unknown_evolution_trigger"
     UNKNOWN_EVOLUTION_CONDITION = "unknown_evolution_condition"
-    MISSING_LEVEL_MOVES = "missing_level_moves"
     WIKIDEX_TEAM_NOT_FOUND = "wikidex_team_not_found"
 
 
@@ -70,29 +69,22 @@ def wikidex_team_not_found(
 
 def find_data_blockers(session: Session) -> list[Blocker]:
     """Blockers that need the stored rows: the evolution steps whose methods are not in the
-    catalog (CA-42) or need the moves learnt by level (CA-45).
-
-    The moves learnt by level (``level_move``) are not loaded, so a step with a condition
-    marked ``unless_learnt_by_level`` blocks the load: whether it is tedious depends on them
-    (CA-32). One blocker per unknown method, or per required move, with every step.
+    catalog (CA-42). One blocker per unknown method, with every step that uses it.
     """
     catalog = {
         (method.kind, method.name): method for method in session.exec(select(EvolutionMethod))
     }
     unknown_triggers: dict[str, list[str]] = defaultdict(list)
     unknown_conditions: dict[str, list[str]] = defaultdict(list)
-    by_move: dict[str, list[str]] = defaultdict(list)
     steps = session.exec(select(EvolutionStep).order_by(col(EvolutionStep.id))).all()
     for step in steps:
         where = f"{step.from_pokemon} → {step.to_pokemon} ({step.version_group})"
         if (MethodKind.TRIGGER, step.trigger) not in catalog:
             unknown_triggers[step.trigger].append(where)
-        for name, value in step.conditions.items():
+        for name in step.conditions:
             method = catalog.get((MethodKind.CONDITION, name))
             if method is None:
                 unknown_conditions[name].append(where)
-            elif method.unless_learnt_by_level:
-                by_move[str(value)].append(where)
     return [
         *(
             _unknown_method(BlockerKind.UNKNOWN_EVOLUTION_TRIGGER, "triggers", name, where)
@@ -101,19 +93,6 @@ def find_data_blockers(session: Session) -> list[Blocker]:
         *(
             _unknown_method(BlockerKind.UNKNOWN_EVOLUTION_CONDITION, "conditions", name, where)
             for name, where in sorted(unknown_conditions.items())
-        ),
-        *(
-            Blocker(
-                kind=BlockerKind.MISSING_LEVEL_MOVES,
-                subject=move,
-                occurrences=tuple(occurrences),
-                rules=("RN-15",),
-                action=(
-                    "Cargar los movimientos que se aprenden por nivel (tabla level_move, CA-45) "
-                    "para saber si el paso es tedioso (CA-32)"
-                ),
-            )
-            for move, occurrences in sorted(by_move.items())
         ),
     ]
 

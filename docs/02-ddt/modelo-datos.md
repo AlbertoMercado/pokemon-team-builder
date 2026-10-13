@@ -86,7 +86,7 @@ Módulo `db/reference/evolution.py`.
 | Tabla | Columnas | Notas |
 |-------|----------|-------|
 | `evolution_step` | `id` PK, `version_group` FK, `from_pokemon` FK → `pokemon`, `to_pokemon` FK → `pokemon`, `trigger`, `conditions` (JSON) | Paso aplicable en ese grupo de versiones, ya resuelto a partir del `version_group_id` del CSV, que indica el grupo en que se introdujo la evolución ([plan de carga](carga-datos.md#evoluciones)). `trigger` es el disparador de PokeAPI (`level-up`, `trade`, `use-item`, `shed`…) y `conditions`, un objeto JSON con las condiciones no vacías (amistad, hora del día, objeto, belleza, comparación de estadísticas…), tal como vienen. Puede haber varias filas si hay métodos alternativos, por eso la clave es un `id`. |
-| `level_move` | `pokemon`, `version_group`, `move`, `level` | Solo los movimientos que exige alguna evolución (`known_move`), para [RN-15](../01-ddf/reglas-negocio.md#rn-15) y [CA-32](../01-ddf/cuestiones-abiertas.md#resueltas). **No implementada**: no hace falta hasta la 4.ª generación. |
+| `level_move` | `pokemon`, `version_group`, `move`, `level` | Solo los movimientos que exige alguna evolución (`known_move`), para [RN-15](../01-ddf/reglas-negocio.md#rn-15) y [CA-32](../01-ddf/cuestiones-abiertas.md#resueltas). Las filas de nivel 1 también se guardan: el motor solo cuenta las de nivel 2 o más. |
 
 Los pasos guardan los datos de PokeAPI sin reducirlos a una categoría. La categoría de cada
 disparador y condición es un dato curado aparte

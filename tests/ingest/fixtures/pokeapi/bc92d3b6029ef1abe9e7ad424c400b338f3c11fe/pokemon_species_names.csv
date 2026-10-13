@@ -45,6 +45,8 @@ pokemon_species_id,local_language_id,name,genus
 107,9,Hitmonchan,Punching Pokémon
 113,7,Chansey,Pokémon Huevo
 113,9,Chansey,Egg Pokémon
+114,7,Tangela,Pokémon Enredadera
+114,9,Tangela,Vine Pokémon
 131,7,Lapras,Pokémon Transporte
 131,9,Lapras,Transport Pokémon
 132,7,Ditto,Pokémon Transformación
@@ -93,6 +95,10 @@ pokemon_species_id,local_language_id,name,genus
 199,9,Slowking,Royal Pokémon
 202,7,Wobbuffet,Pokémon Paciente
 202,9,Wobbuffet,Patient Pokémon
+220,7,Swinub,Pokémon Cerdo
+220,9,Swinub,Pig Pokémon
+221,7,Piloswine,Pokémon Puerco
+221,9,Piloswine,Swine Pokémon
 236,7,Tyrogue,Pokémon Peleón
 236,9,Tyrogue,Scuffle Pokémon
 237,7,Hitmontop,Pokémon Boca Abajo
@@ -139,3 +145,7 @@ pokemon_species_id,local_language_id,name,genus
 386,9,Deoxys,DNA Pokémon
 440,7,Happiny,Pokémon Casita
 440,9,Happiny,Playhouse Pokémon
+465,7,Tangrowth,Pokémon Enredadera
+465,9,Tangrowth,Vine Pokémon
+473,7,Mamoswine,Pokémon Doscolmillos
+473,9,Mamoswine,Twin Tusk Pokémon

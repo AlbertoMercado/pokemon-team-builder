@@ -13,6 +13,7 @@ from db.reference.battles import KeyBattle, KeyBattlePokemon
 from db.reference.evolution import (
     EvolutionMethod,
     EvolutionStep,
+    LevelMove,
     MethodCategory,
     MethodKind,
     TediumReason,
@@ -65,6 +66,7 @@ __all__ = [
     "IngestRun",
     "KeyBattle",
     "KeyBattlePokemon",
+    "LevelMove",
     "Location",
     "MethodCategory",
     "MethodKind",

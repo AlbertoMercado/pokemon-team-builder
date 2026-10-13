@@ -33,12 +33,15 @@ class EvolutionStep:
 
     ``trigger`` and ``conditions`` are PokeAPI's (``level-up``, ``{"time_of_day": "day"}``…);
     ``conditions`` is a sorted tuple of pairs so the step is immutable and hashable.
+    ``move_learnt_by_level``: whether ``from_pokemon`` learns by level, from level 2, the move the
+    step needs to know in the target game (CA-32).
     """
 
     from_pokemon: str
     to_pokemon: str
     trigger: str
     conditions: tuple[tuple[str, ConditionValue], ...] = ()
+    move_learnt_by_level: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "conditions", tuple(sorted(self.conditions)))

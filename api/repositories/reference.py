@@ -20,6 +20,7 @@ from db.reference import (
     GameTransfer,
     KeyBattle,
     KeyBattlePokemon,
+    LevelMove,
     Location,
     PokedexNumber,
     Pokemon,
@@ -226,6 +227,21 @@ def evolution_steps(reference: Session, version_group: str) -> Sequence[Evolutio
 def evolution_methods(reference: Session) -> Sequence[EvolutionMethod]:
     """The category of every evolution trigger and condition (RN-15, RN-20)."""
     return reference.exec(select(EvolutionMethod)).all()
+
+
+# At level 1 a move is only learnt with the move reminder (CA-32).
+FIRST_LEVEL_UP = 2
+
+
+def moves_learnt_by_level(reference: Session, version_group: str) -> set[tuple[str, str]]:
+    """The (form, move) pairs of ``level_move`` learnt from level 2 in ``version_group``: at
+    level 1 a move is only learnt with the move reminder (CA-32)."""
+    rows = reference.exec(
+        select(LevelMove).where(
+            LevelMove.version_group == version_group, LevelMove.level >= FIRST_LEVEL_UP
+        )
+    ).all()
+    return {(row.pokemon, row.move) for row in rows}
 
 
 def game_pokemon(reference: Session, game: str) -> Sequence[GamePokemon]:

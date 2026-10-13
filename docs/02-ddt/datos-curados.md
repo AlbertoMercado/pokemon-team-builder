@@ -395,7 +395,7 @@ condiciones, por su clave en `evolution_step.conditions`, que es la columna de
 | `category` | `easy`, `tedious` o `random`. Un método aleatorio también es tedioso. |
 | `reason` | Solo, y siempre, si es `tedious`: el motivo, para explicarlo en el desglose: `trade`, `shed`, `stats`, `time_of_day`, `beauty`, `location`, `party`, `move` u `other`. |
 | `requires_mechanic` | Opcional. Mecánica del juego (`day_night_cycle` o `contests`, de `games.yaml`) sin la cual el paso es imposible en él y, por tanto, tedioso. |
-| `unless_learnt_by_level` | Opcional (`false`). El paso no es tedioso si el Pokémon aprende el movimiento por nivel a partir del nivel 2 ([CA-32](../01-ddf/cuestiones-abiertas.md#resueltas)). Como los movimientos por nivel no se cargan, un paso con esta condición bloquea la carga (`missing_level_moves`, [CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| `unless_learnt_by_level` | Opcional (`false`). El paso no es tedioso si el Pokémon aprende el movimiento por nivel a partir del nivel 2 ([CA-32](../01-ddf/cuestiones-abiertas.md#resueltas)). Los movimientos por nivel se leen de la tabla `level_move` ([diseño de la carga](carga-datos.md)). |
 | `note` | Opcional. |
 
 Están catalogados los 18 disparadores y las 27 condiciones del volcado de PokeAPI fijado,

@@ -314,11 +314,35 @@ def load_evolution_catalog(reference: Session) -> EvolutionCatalog:
             MethodCategory(row.category.value),
             Tedium(row.reason.value) if row.reason is not None else None,
             row.requires_mechanic,
+            row.unless_learnt_by_level,
         )
     return EvolutionCatalog(
         MappingProxyType(methods[MethodKind.TRIGGER]),
         MappingProxyType(methods[MethodKind.CONDITION]),
     )
+
+
+class StepBuilder:
+    """Turns the evolution steps of a version group into the engine's ``EvolutionStep``, telling
+    each one whether the Pokémon learns by level, from level 2, the move it needs (CA-32)."""
+
+    def __init__(self, reference: Session, version_group: str) -> None:
+        self._learnt = reference_repo.moves_learnt_by_level(reference, version_group)
+        self._by_level = {
+            row.name
+            for row in reference_repo.evolution_methods(reference)
+            if row.kind is MethodKind.CONDITION and row.unless_learnt_by_level
+        }
+
+    def step(self, row: ref_db.EvolutionStep, from_pokemon: str, to_pokemon: str) -> EvolutionStep:
+        """``row`` between ``from_pokemon`` and ``to_pokemon`` (forms or species)."""
+        learnt = any(
+            name in self._by_level and (row.from_pokemon, str(value)) in self._learnt
+            for name, value in row.conditions.items()
+        )
+        return EvolutionStep(
+            from_pokemon, to_pokemon, row.trigger, tuple(row.conditions.items()), learnt
+        )
 
 
 def _availability(reference: Session, game: str) -> dict[str, FormFacts]:
@@ -380,6 +404,7 @@ class _FormBuilder:
         for egg_group in reference_repo.all_egg_groups(reference):
             chain = self.species[egg_group.species].evolution_chain
             self.egg_groups[chain].add(egg_group.egg_group)
+        self.step_builder = StepBuilder(reference, version_group)
         self.steps: dict[tuple[str, str], list[ref_db.EvolutionStep]] = defaultdict(list)
         self.steps_into: dict[str, list[ref_db.EvolutionStep]] = defaultdict(list)
         for step in reference_repo.evolution_steps(reference, version_group):
@@ -406,9 +431,7 @@ class _FormBuilder:
         species = self.species[form.species]
         stages = self._stages(form, species)
         steps = [
-            EvolutionStep(
-                row.from_pokemon, row.to_pokemon, row.trigger, tuple(row.conditions.items())
-            )
+            self.step_builder.step(row, row.from_pokemon, row.to_pokemon)
             for a, b in pairwise(stages)
             for row in self.steps[(a.pokemon, b.pokemon)]
         ]

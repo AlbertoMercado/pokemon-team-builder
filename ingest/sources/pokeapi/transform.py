@@ -15,6 +15,7 @@ from db.reference import (
     Game,
     GamePokemon,
     Generation,
+    LevelMove,
     Location,
     Origin,
     Pokedex,
@@ -40,6 +41,7 @@ from ingest.sources.pokeapi.rows import (
     EvolutionRow,
     GenerationRow,
     IdentifierRow,
+    LevelMoveRow,
     LocationAreaRow,
     LocationNameRow,
     PokedexRow,
@@ -144,6 +146,7 @@ class PokeapiTables:
     encounters: list[EncounterRow]
     encounter_condition_values: list[IdentifierRow]
     encounter_conditions: list[EncounterConditionRow]
+    level_moves: list[LevelMoveRow]
 
 
 def build_rows(tables: PokeapiTables, curated: CuratedData) -> list[ReferenceModel]:
@@ -204,6 +207,7 @@ class _Builder:
         yield from self._species()
         yield from self._pokemon_types()
         yield from self._evolution_steps()
+        yield from self._level_moves()
         yield from self._game_pokemon()
         yield from self._pokedexes()
         yield from self._encounters()
@@ -436,6 +440,22 @@ class _Builder:
                     trigger=_lookup(triggers, row.evolution_trigger_id, "Disparador"),
                     conditions=self._conditions(row),
                 )
+
+    def _level_moves(self) -> Iterator[LevelMove]:
+        """The moves that some evolution needs to know, learnt by level by the loaded forms in
+        the loaded version groups (CA-32). The file is already filtered to those moves."""
+        forms = {p.id: p.identifier for p in self.default_pokemon.values()}
+        groups = {vg.id: vg.identifier for vg in self.version_groups}
+        moves = {m.id: m.identifier for m in self.t.moves}
+        seen = set()
+        for row in self.t.level_moves:
+            form, group = forms.get(row.pokemon_id), groups.get(row.version_group_id)
+            if form is None or group is None:
+                continue
+            key = (form, group, _lookup(moves, row.move_id, "Movimiento"), row.level)
+            if key not in seen:  # PokeAPI repeats some rows
+                seen.add(key)
+                yield LevelMove(pokemon=key[0], version_group=key[1], move=key[2], level=key[3])
 
     def _about_default_forms(self, row: EvolutionRow) -> bool:
         forms = (row.required_pokemon_form_id, row.evolved_pokemon_form_id)

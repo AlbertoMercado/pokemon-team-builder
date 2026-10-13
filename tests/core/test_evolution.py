@@ -1,6 +1,8 @@
 """Tedious (RN-15), random (RN-20) and impossible evolutions in the target game, with the
 real catalog of evolution methods (data/curated/evolution_methods.yaml)."""
 
+import dataclasses
+
 import pytest
 
 from core.domain import (
@@ -203,3 +205,19 @@ def test_a_catalogued_method_is_consistent(category: MethodCategory, reason: Ted
 def test_a_random_method_is_tedious_by_chance() -> None:
     assert EvolutionMethod(MethodCategory.RANDOM).tedium is Tedium.RANDOM
     assert EvolutionMethod(MethodCategory.EASY).tedium is None
+
+
+@pytest.mark.rn("RN-15")
+def test_an_evolution_by_a_move_learnt_by_level_is_not_tedious() -> None:
+    """CA-32: Tangela learns Ancient Power at level 33, so it knows it when it evolves."""
+    tangrowth = dataclasses.replace(
+        step("tangela", "tangrowth", known_move="ancient-power"), move_learnt_by_level=True
+    )
+    assert step_tedium(tangrowth, EMERALD, EVOLUTION_METHODS) == set()
+
+
+@pytest.mark.rn("RN-15")
+def test_an_evolution_by_a_move_learnt_only_at_level_1_is_tedious() -> None:
+    """CA-32: Piloswine only learns Ancient Power at level 1: the move reminder teaches it."""
+    mamoswine = step("piloswine", "mamoswine", known_move="ancient-power")
+    assert step_tedium(mamoswine, EMERALD, EVOLUTION_METHODS) == {Tedium.MOVE}

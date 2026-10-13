@@ -262,8 +262,6 @@ Hay dos excepciones:
       cambia los datos y genera un informe para el arquitecto ([RF-16](#rf-16)). Bloquean la
       carga:
         - Un método de evolución sin catalogar ([CA-42](cuestiones-abiertas.md#resueltas)).
-        - Una evolución que exige conocer un movimiento sin que estén cargados los movimientos
-          que se aprenden por nivel ([CA-45](cuestiones-abiertas.md#resueltas)).
         - El equipo de un combate clave que no se encuentra en WikiDex.
     - Una carga bloqueada solo se resuelve con una nueva versión de la aplicación o de sus
       datos curados. Hasta entonces se sigue usando la base de datos anterior.

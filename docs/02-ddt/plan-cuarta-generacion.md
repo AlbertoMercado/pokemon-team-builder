@@ -41,7 +41,7 @@ Hechas el 2026-10-13 con el volcado CSV de PokeAPI del commit fijado (`bc92d3b`)
 |--------------|-----------|
 | Especies | 107 nuevas: 493 en total. |
 | Juegos | `diamond`, `pearl`, `platinum`, `heartgold` y `soulsilver`, ya en el [catálogo de juegos](datos-curados.md#catalogyaml) con el motivo «su generación todavía no se carga». |
-| Evoluciones por movimiento | 7: Mamoswine, Tangrowth y Yanmega (Poder Pasado), Ambipom (Doble Golpe), Lickilicky (Desenrollar), y Mr. Mime y Sudowoodo desde Mime Jr. y Bonsly (Mimético). Hoy bloquean la carga (`missing_level_moves`, [CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| Evoluciones por movimiento | 7: Mamoswine, Tangrowth y Yanmega (Poder Pasado), Ambipom (Doble Golpe), Lickilicky (Desenrollar), y Mr. Mime y Sudowoodo desde Mime Jr. y Bonsly (Mimético). Bloqueaban la carga (`missing_level_moves`, [CA-45](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | Bebés nuevos | Budew, Chingling, Bonsly, Mime Jr., Happiny, Munchlax y Mantyke nacen con incienso ([CA-36](../01-ddf/cuestiones-abiertas.md#resueltas)); Riolu, sin él. |
 | Disparadores y condiciones de evolución | Todos están en el [catálogo de métodos](datos-curados.md#evolution_methodsyaml): aparecen el lugar (Magnezone, Probopass, Leafeon, Glaceon), el sexo (Gallade, Froslass), el objeto equipado de noche (Gliscor, Weavile) y el Pokémon en el equipo (Mantine). |
 | Métodos de aparición nuevos | `headbutt`, `honey-tree` (árboles de miel) y `pokemon-ranger` (spin-off): hay que clasificarlos para RN-26. |
@@ -56,8 +56,7 @@ Hechas el 2026-10-13 con el volcado CSV de PokeAPI del commit fijado (`bc92d3b`)
   Pokémon que evoluciona aprende el movimiento por nivel a partir del nivel 2 en el juego
   objetivo ([CA-32](../01-ddf/cuestiones-abiertas.md#resueltas)); la API pasa esos movimientos al
   contexto.
-- La carga deja de quedar bloqueada por `missing_level_moves`: el bloqueo pasa a ser que falten
-  los movimientos de una evolución que los exige.
+- Desaparece el bloqueo `missing_level_moves`: los movimientos por nivel se cargan siempre.
 
 ### Carga de la 4.ª generación (fase 3)
 

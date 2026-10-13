@@ -45,6 +45,8 @@ lugares, solo los de esas apariciones:
 | Raikou, Entei, Suicune | Errantes; en Rojo Fuego, según el inicial |
 | Lugia | Estático en la Roca Ombligo, a la que solo se llega con un objeto de evento |
 | Celebi, Jirachi | Singulares de evento, con métodos de spin-offs |
+| Tangela, Tangrowth | Evolución por movimiento: Tangela aprende Poder Pasado por nivel (CA-32) |
+| Swinub, Piloswine, Mamoswine | Evolución por movimiento: Piloswine solo aprende Poder Pasado al nivel 1 |
 
 **Cómo se regenera** (por ejemplo, al cambiar el commit fijado o la lista de especies):
 

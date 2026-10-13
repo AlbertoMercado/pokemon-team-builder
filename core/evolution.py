@@ -29,6 +29,8 @@ def step_tedium(
     methods = [catalog.trigger(step.trigger), *(catalog.condition(n) for n, _ in step.conditions)]
     reasons: set[Tedium] = set()
     for method in methods:
+        if method.unless_learnt_by_level and step.move_learnt_by_level:
+            continue  # CA-32: it learns the move by level, so it knows it when it evolves
         if method.tedium is not None:
             reasons.add(method.tedium)
         if method.requires_mechanic is not None and not game.has(method.requires_mechanic):

@@ -25,6 +25,7 @@ las reglas de negocio (**RN-XX**).
 | 0.17 | 2026-10-12 | CA-28 resuelta: qué puede llegar a cada juego objetivo de la 3.ª generación y evolucionar antes de completarlo, comprobado con el código de los juegos (RN-03). |
 | 0.18 | 2026-10-12 | Combates clave de Hoenn (RN-17): de cada jefe del equipo malvado cuenta su último combate obligatorio (CA-88), y cuentan los dos rivales, Bruno o Aura y Blasco (CA-89). |
 | 0.19 | 2026-10-12 | Nueva función: el catálogo de juegos (RF-25, CA-90 a CA-93). El usuario elige en él qué juegos pueden ser juego objetivo; uno solo se puede elegir si puede recibir un Pokémon criado (también por transferencia, como los Leyendas por Pokémon HOME), está completo y es jugable en un sistema actual de Nintendo (RF-05; modifica CA-29). |
+| 0.21 | 2026-10-13 | Los movimientos por nivel se cargan siempre: una evolución por movimiento ya no bloquea la carga (CA-45, RN-15, RF-16). |
 | 0.20 | 2026-10-13 | Ampliación a la 4.ª generación (CA-94): 493 especies y 16 juegos; Diamante, Perla, Platino, HeartGold y SoulSilver pueden ser juego objetivo. En HeartGold y SoulSilver, el jefe del Team Rocket es Atlas (CA-95) y lo de Kanto no cuenta (CA-96). Transferencias de la 4.ª generación y el Parque Compi (RN-25). |
 
 ## Propósito

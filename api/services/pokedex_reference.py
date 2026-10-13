@@ -19,7 +19,12 @@ from sqlmodel import Session
 
 from api.errors import NotFoundError
 from api.repositories import reference as reference_repo
-from api.services.context import Confirmations, Reviewable, load_evolution_catalog
+from api.services.context import (
+    Confirmations,
+    Reviewable,
+    StepBuilder,
+    load_evolution_catalog,
+)
 from core.domain import CONTESTS, DAY_NIGHT_CYCLE, EvolutionCatalog, EvolutionStep, GameInfo
 from core.pokedex import DexSpecies, Encounter
 from core.review import FactKind, Origin
@@ -209,13 +214,12 @@ def _evolutions(
 ) -> dict[str, tuple[EvolutionStep, ...]]:
     """The steps between base forms of species of the Pokédex, by the species they lead to."""
     species_of = {form.slug: s for s, form in defaults.items()}
+    builder = StepBuilder(reference, version_group)
     found: dict[str, list[EvolutionStep]] = {}
     for step in reference_repo.evolution_steps(reference, version_group):
         origin, target = species_of.get(step.from_pokemon), species_of.get(step.to_pokemon)
-        if origin in in_dex and target in in_dex:
-            found.setdefault(target, []).append(
-                EvolutionStep(origin, target, step.trigger, tuple(step.conditions.items()))
-            )
+        if origin is not None and target is not None and origin in in_dex and target in in_dex:
+            found.setdefault(target, []).append(builder.step(step, origin, target))
     return {s: tuple(steps) for s, steps in found.items()}
 
 
