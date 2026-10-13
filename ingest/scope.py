@@ -4,11 +4,11 @@ Changing the scope (e.g. adding the 4th generation) starts here, but also needs 
 load plan, the checks in ``ingest/checks.py`` and the curated data to be updated.
 """
 
-# Species and games of generations 1 to MAX_GENERATION are loaded (#0001 to #0386).
-MAX_GENERATION = 3
+# Species and games of generations 1 to MAX_GENERATION are loaded (#0001 to #0493).
+MAX_GENERATION = 4
 
 # Games of these generations can be chosen as target game (RF-05).
-TARGET_GENERATIONS = frozenset({3})
+TARGET_GENERATIONS = frozenset({3, 4})
 
 # Breeding exists from the 2nd generation; earlier games cannot be target games (CA-29).
 FIRST_BREEDING_GENERATION = 2

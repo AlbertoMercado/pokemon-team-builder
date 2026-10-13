@@ -56,8 +56,8 @@ en PokeAPI (Vulpix de Alola es `10103`). Se guardan en `<data-dir>/cache/pokeapi
 | `official-artwork-256/<id>.png` | La ilustración oficial, reducida a 256 px al descargarla. | La ficha (`pokemon.artwork`). |
 
 - **Caché permanente**: cada imagen se descarga una sola vez, fichero a fichero (el repositorio
-  ocupa unos 10 GB). La primera carga descarga las 386 formas en unos 2 minutos y medio; la
-  caché ocupa unos 23 MB, casi todo las ilustraciones. El recorte se rehace solo si falta su
+  ocupa unos 10 GB). La primera carga descarga las 493 formas en unos 3 minutos; la caché
+  ocupa unos 30 MB, casi todo las ilustraciones. El recorte se rehace solo si falta su
   fichero.
 - **Peticiones espaciadas**: como mucho cinco por segundo, con el mismo `User-Agent`.
 - **Una imagen que falta no rompe la carga**: la forma se carga sin imagen y el informe lo
@@ -169,38 +169,45 @@ Carga de data/reference.sqlite
 Filas cargadas por tabla:
   catalog_game             36
   evolution_method         45
-  generation                3
-  location                212
-  pokedex                   4
-  species                 386
+  generation                4
+  location                298
+  pokedex                   7
+  species                 493
   type                     17
-  version_group             7
-  game                     11
-  pokedex_number          990
-  pokemon                 386
-  species_egg_group       504
-  type_efficacy           803
-  encounter             11051
-  event_pokemon            29
-  evolution_step          940
+  version_group            10
+  game                     16
+  pokedex_number         1714
+  pokemon                 493
+  species_egg_group       646
+  type_efficacy          1092
+  encounter             24867
+  event_pokemon            60
+  evolution_step         1678
   game_mechanic            10
-  game_pokedex             11
-  game_pokemon           1930
-  game_starter             31
-  game_transfer            50
+  game_pokedex             16
+  game_pokemon           4395
+  game_starter             46
+  game_transfer            95
   key_battle               72
-  pokemon_type           1131
+  level_move              735
+  pokemon_type           1847
   key_battle_pokemon      285
 Datos revisables por origen:
   game_mechanic        inferred 10
-  game_pokemon         automatic 1930, inferred 1930
+  game_pokemon         automatic 4395, inferred 1930, pending 2465
   key_battle           automatic 72
-Imágenes: 386 de 386 formas
-Ilustraciones: 386 de 386 formas
-Portadas: 11 de 11 juegos
+Imágenes: 493 de 493 formas
+Ilustraciones: 493 de 493 formas
+Portadas: 16 de 16 juegos
+Juegos que no se pueden elegir como objetivo (datos incompletos):
+  Diamante: faltan los Pokémon que existen y pueden llegar (RN-03), sus mecánicas (RN-15) y sus combates clave (RN-17)
+  Perla: faltan los Pokémon que existen y pueden llegar (RN-03), sus mecánicas (RN-15) y sus combates clave (RN-17)
+  Platino: faltan los Pokémon que existen y pueden llegar (RN-03), sus mecánicas (RN-15) y sus combates clave (RN-17)
+  Oro HeartGold: faltan los Pokémon que existen y pueden llegar (RN-03), sus mecánicas (RN-15) y sus combates clave (RN-17)
+  Plata SoulSilver: faltan los Pokémon que existen y pueden llegar (RN-03), sus mecánicas (RN-15) y sus combates clave (RN-17)
 Comprobaciones superadas: 14
 Carga completada.
-Informe: data/reports/2026-10-12T171150-completada.md
+Informe: data/reports/2026-10-13T200653-completada.md
 ```
 
 - **Filas cargadas por tabla**: en orden de dependencias. No incluye `ingest_run`.
@@ -224,8 +231,9 @@ Informe: data/reports/2026-10-12T171150-completada.md
 - **Juegos que no se pueden elegir como objetivo**: los que no están completos y qué les falta
   ([RF-05](../01-ddf/requisitos-funcionales.md#rf-05)). Se cargan igualmente y se pueden
   registrar en el *Hall of Fame*, pero no aparecen al elegir el juego. No es un error: la
-  carga se completa. Con los datos actuales los 5 juegos objetivo están completos y la línea no
-  aparece.
+  carga se completa. Con los datos actuales salen los 5 de la 4.ª generación, a los que les
+  faltan su regla de llegada, sus mecánicas y sus combates clave
+  ([plan de la 4.ª generación](../02-ddt/plan-cuarta-generacion.md)).
 - **Comprobaciones superadas**: número de comprobaciones de la carga que se han cumplido.
 
 Ejemplos de cargas fallidas:
@@ -239,7 +247,7 @@ ERROR: la carga ha fallado; se conserva la base de datos anterior.
 ```text
 Carga de data/reference.sqlite
 ERROR: la carga ha fallado; se conserva la base de datos anterior.
-  - Comprobación fallida: species: 50 filas, se esperaban 386
+  - Comprobación fallida: species: 50 filas, se esperaban 493
 ```
 
 ## Carga bloqueada

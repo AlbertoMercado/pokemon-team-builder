@@ -1,4 +1,21 @@
 id,region_id,identifier
+7,4,valley-windworks
+8,4,eterna-forest
+9,4,fuego-ironworks
+35,4,sinnoh-route-205
+36,4,sinnoh-route-206
+37,4,sinnoh-route-207
+38,4,sinnoh-route-208
+39,4,sinnoh-route-209
+41,4,sinnoh-route-210
+42,4,sinnoh-route-211
+43,4,sinnoh-route-212
+44,4,sinnoh-route-213
+45,4,sinnoh-route-214
+46,4,sinnoh-route-215
+49,4,sinnoh-route-218
+51,4,sinnoh-route-221
+52,4,sinnoh-route-222
 66,2,burned-tower
 67,1,celadon-city
 68,1,cerulean-city
@@ -46,6 +63,7 @@ id,region_id,identifier
 118,2,johto-route-38
 119,2,johto-route-39
 120,1,kanto-route-4
+122,2,johto-sea-route-41
 123,2,johto-route-42
 124,2,johto-route-43
 125,2,johto-route-44
@@ -72,6 +90,8 @@ id,region_id,identifier
 160,1,pokemon-tower
 161,1,pokemon-mansion
 162,1,kanto-safari-zone
+175,4,floaroma-meadow
+183,4,newmoon-island
 228,2,azalea-town
 229,2,goldenrod-city
 234,1,saffron-city
@@ -80,6 +100,7 @@ id,region_id,identifier
 435,3,meteor-falls
 437,3,granite-cave
 438,3,petalburg-woods
+441,3,mt-pyre
 442,3,seafloor-cavern
 443,3,cave-of-origin
 444,3,hoenn-victory-road
@@ -133,6 +154,9 @@ id,region_id,identifier
 810,1,birth-island
 811,1,navel-rock
 812,3,faraway-island
+813,3,hoenn-battle-frontier
 1089,3,hoenn-pokecenter
 1091,1,kanto-pokecenter
+1092,4,sinnoh-pokemart
+1093,2,johto-pokemart
 1094,3,mirage-island

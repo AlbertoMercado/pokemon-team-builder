@@ -126,6 +126,7 @@ def test_the_repository_curates_the_cover_of_every_loaded_game() -> None:
     assert set(covers) == {
         "red", "blue", "yellow", "gold", "silver", "crystal",
         "ruby", "sapphire", "emerald", "firered", "leafgreen",
+        "diamond", "pearl", "platinum", "heartgold", "soulsilver",
     }  # fmt: skip
     assert covers["firered"] == FIRERED
 

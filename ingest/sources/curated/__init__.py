@@ -165,7 +165,8 @@ class CuratedSource:
 
 
 def transfer_pairs(transfers: TransfersFile) -> dict[tuple[str, str], int | None]:
-    """Every ordered pair of games of a group, with its species limit.
+    """Every ordered pair of games of a group (from ``games`` to ``to`` in a one-way group),
+    with its species limit.
 
     A pair in several groups keeps the least restrictive limit: none, or the latest
     generation.
@@ -173,7 +174,7 @@ def transfer_pairs(transfers: TransfersFile) -> dict[tuple[str, str], int | None
     pairs: dict[tuple[str, str], int | None] = {}
     for group in transfers.groups:
         for from_game in group.games:
-            for to_game in group.games:
+            for to_game in group.to or group.games:
                 if from_game == to_game:
                     continue
                 pair = (from_game, to_game)

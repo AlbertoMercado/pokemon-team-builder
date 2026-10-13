@@ -48,6 +48,27 @@ describe("describeMethod", () => {
       { trigger: "trade", conditions: { held_item: "deep-sea-tooth" } },
       "Intercambio llevando Diente Marino",
     ],
+    // 4th generation
+    [
+      { trigger: "level-up", conditions: { known_move: "ancient-power" } },
+      "Subir de nivel, conociendo Poder Pasado",
+    ],
+    [
+      { trigger: "level-up", conditions: { location: "eterna-forest", near_special_rock: true } },
+      "Subir de nivel, en el Bosque Vetusto, junto a su roca especial",
+    ],
+    [
+      { trigger: "level-up", conditions: { party_species: "remoraid" } },
+      "Subir de nivel, con Remoraid en el equipo",
+    ],
+    [
+      { trigger: "use-item", conditions: { trigger_item: "dawn-stone", gender_id: 2 } },
+      "Piedra Alba, solo machos",
+    ],
+    [
+      { trigger: "level-up", conditions: { held_item: "razor-claw", time_of_day: "night" } },
+      "Subir de nivel llevando Garra Afilada, de noche",
+    ],
     [
       { trigger: "shed", conditions: {} },
       "Aparece al evolucionar Nincada si hay un hueco libre en el equipo y una Poké Ball",

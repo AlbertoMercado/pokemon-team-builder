@@ -44,9 +44,12 @@ from db.reference import (
 
 type Check = Callable[[Session], list[str]]
 
-TARGET_GAMES = frozenset({"ruby", "sapphire", "emerald", "firered", "leafgreen"})
+GEN_3_GAMES = frozenset({"ruby", "sapphire", "emerald", "firered", "leafgreen"})
+GEN_4_GAMES = frozenset({"diamond", "pearl", "platinum", "heartgold", "soulsilver"})
+# Games of the target generations (scope): they have existence and arrival rows (RN-03).
+TARGET_GENERATION_GAMES = GEN_3_GAMES | GEN_4_GAMES
 # Games with curated data: mechanics, arrival rule and key battles (RF-05).
-CURATED_GAMES = TARGET_GAMES
+CURATED_GAMES = GEN_3_GAMES
 # Key battles of each game (RN-17): 8 gyms, the Elite Four and the Champion; in Hoenn, the
 # villain boss of the version (both in Emerald) and Wally (CA-88, CA-89). First and last.
 KEY_BATTLES = {
@@ -56,25 +59,39 @@ KEY_BATTLES = {
     "sapphire": (15, "Petra", "Máximo"),
     "emerald": (16, "Petra", "Plubio"),
 }
-SPECIES_COUNT = 386
+SPECIES_COUNT = 493
+# Species up to each generation: a game has those of its generation and earlier (RN-03).
+SPECIES_UP_TO = {3: 386, 4: SPECIES_COUNT}
 EXPECTED_COUNTS: dict[type[ReferenceModel], int] = {
-    Generation: 3,
-    VersionGroup: 7,
-    Game: 11,
+    Generation: 4,
+    VersionGroup: 10,
+    Game: 16,
     Type: 17,
     Species: SPECIES_COUNT,
     Pokemon: SPECIES_COUNT,
-    GamePokemon: len(TARGET_GAMES) * SPECIES_COUNT,
+    GamePokemon: len(GEN_3_GAMES) * SPECIES_UP_TO[3] + len(GEN_4_GAMES) * SPECIES_UP_TO[4],
     GameMechanic: len(CURATED_GAMES) * 2,  # day_night_cycle and contests
     KeyBattle: sum(count for count, _first, _last in KEY_BATTLES.values()),
-    GameStarter: len(TARGET_GAMES) * 3 + 5 * 3 + 1,  # and the 1st and 2nd gen. (Yellow, 1)
-    Pokedex: 4,  # national, kanto, original-johto and hoenn
-    GamePokedex: 11,
-    GameTransfer: 6 * 5 + 5 * 4,  # every ordered pair within the 1st-2nd and the 3rd gen.
-    EventPokemon: 3 * 1 + 3 * 2 + 5 * 4,
+    # Three per game of the 2nd to 4th generations and of Red and Blue; Pikachu in Yellow.
+    GameStarter: (3 + len(TARGET_GENERATION_GAMES) + 2) * 3 + 1,
+    # national, kanto, original-johto, hoenn, original-sinnoh, extended-sinnoh, updated-johto
+    Pokedex: 7,
+    GamePokedex: 16,
+    # Every ordered pair within the 1st-2nd, the 3rd and the 4th generation; the Pal Park, from
+    # each game of the 3rd to each of the 4th.
+    GameTransfer: 6 * 5 + 5 * 4 + 5 * 4 + 5 * 5,
+    EventPokemon: 3 * 1 + 3 * 2 + 5 * 4 + 3 * 5 + 2 * 8,
     CatalogGame: 36,  # CA-90
 }
-SPECIES_BY_POKEDEX = {"national": SPECIES_COUNT, "kanto": 151, "original-johto": 251, "hoenn": 202}
+SPECIES_BY_POKEDEX = {
+    "national": SPECIES_COUNT,
+    "kanto": 151,
+    "original-johto": 251,
+    "hoenn": 202,
+    "original-sinnoh": 151,
+    "extended-sinnoh": 210,
+    "updated-johto": 256,
+}
 # Encounter methods of the loaded games. ``core/`` classifies each of them (RN-26): a new one
 # upstream must be reviewed before it is loaded.
 ENCOUNTER_METHODS = frozenset(
@@ -103,6 +120,9 @@ ENCOUNTER_METHODS = frozenset(
         "colosseum-bonus-disc-us",
         "colosseum-bonus-disc-jpn",
         "pokemon-channel-pal",
+        "headbutt",
+        "honey-tree",
+        "pokemon-ranger",
     }
 )
 # Known arrivals before completing each game (CA-28).
@@ -111,7 +131,7 @@ EXPECTED_ARRIVAL = (
     ("firered", "bulbasaur", True),
     ("firered", "vaporeon", True),
     ("firered", "golbat", True),
-    ("firered", "chansey", True),  # Happiny is not loaded: Chansey hatches as Chansey
+    ("firered", "chansey", True),  # Happiny is of the 4th generation: Chansey hatches
     ("firered", "raichu", False),  # hatches as Pichu, not in the Kanto Pokédex
     ("firered", "pikachu", False),
     ("firered", "clefairy", False),  # hatches as Cleffa
@@ -131,7 +151,7 @@ EXPECTED_ARRIVAL = (
     ("emerald", "chikorita", False),
 )
 # 15 types in the 1st generation, 17 from the 2nd: one factor per pair.
-EFFICACY_PAIRS_BY_GENERATION = {1: 15 * 15, 2: 17 * 17, 3: 17 * 17}
+EFFICACY_PAIRS_BY_GENERATION = {1: 15 * 15, 2: 17 * 17, 3: 17 * 17, 4: 17 * 17}
 
 
 def check_counts(session: Session) -> list[str]:
@@ -263,22 +283,32 @@ def check_breeding_data(session: Session) -> list[str]:
 def check_incense_babies(session: Session) -> list[str]:
     """Babies that only hatch with an incense (CA-36)."""
     marked = set(session.exec(select(Species.slug).where(col(Species.requires_incense))).all())
-    if marked != {"azurill", "wynaut"}:
-        return [f"bebés de incienso {sorted(marked)}, se esperaban ['azurill', 'wynaut']"]
+    expected = {"azurill", "wynaut", "budew", "chingling", "bonsly", "mime-jr", "happiny"}
+    expected |= {"munchlax", "mantyke"}
+    if marked != expected:
+        return [f"bebés de incienso {sorted(marked)}, se esperaban {sorted(expected)}"]
     return []
 
 
 def check_arrival_proposals(session: Session) -> list[str]:
-    """Arrival proposals (CA-28): inferred in every target game, with known cases of the rule
-    of each one (docs/02-ddt/datos-requeridos.md, "Restricciones de llegada por juego")."""
+    """Arrival proposals (CA-28): inferred in every game with an arrival rule and pending in the
+    rest, with known cases of the rule of each one (docs/02-ddt/datos-requeridos.md,
+    "Restricciones de llegada por juego")."""
     problems = []
-    for game in TARGET_GAMES:
+    for game in CURATED_GAMES:
         query = select(func.count()).select_from(GamePokemon)
         wrong = session.exec(
             query.where(GamePokemon.game == game, GamePokemon.arrival_origin != Origin.INFERRED)
         ).one()
         if wrong:
             problems.append(f"{game}: {wrong} propuestas de llegada no son inferidas")
+    for game in TARGET_GENERATION_GAMES - CURATED_GAMES:
+        query = select(func.count()).select_from(GamePokemon)
+        wrong = session.exec(
+            query.where(GamePokemon.game == game, GamePokemon.arrival_origin != Origin.PENDING)
+        ).one()
+        if wrong:
+            problems.append(f"{game}: {wrong} propuestas de llegada sin regla de llegada")
     for game, pokemon, can_arrive in EXPECTED_ARRIVAL:
         row = session.get(GamePokemon, (game, pokemon))
         if row is None or row.can_arrive is not can_arrive:
@@ -295,6 +325,8 @@ def check_starters(session: Session) -> list[str]:
         "emerald": {"sceptile", "blaziken", "swampert"},
         "yellow": {"raichu"},
         "crystal": {"meganium", "typhlosion", "feraligatr"},
+        "platinum": {"torterra", "infernape", "empoleon"},
+        "heartgold": {"meganium", "typhlosion", "feraligatr"},
     }
     for game, starters in expected.items():
         found = set(session.exec(select(GameStarter.pokemon).where(GameStarter.game == game)))
@@ -377,7 +409,13 @@ def check_key_battles(session: Session) -> list[str]:
 def check_pokedexes(session: Session) -> list[str]:
     """The Pokédex of each game (RN-22); their species are counted in ``check_counts``."""
     problems = []
-    expected_pokedex = {"red": "kanto", "crystal": "original-johto", "firered": "national"}
+    expected_pokedex = {
+        "red": "kanto",
+        "crystal": "original-johto",
+        "firered": "national",
+        "platinum": "national",
+        "soulsilver": "national",
+    }
     for game, pokedex in expected_pokedex.items():
         found = list(session.exec(select(GamePokedex.pokedex).where(GamePokedex.game == game)))
         if found != [pokedex]:
@@ -415,6 +453,9 @@ def check_encounters(session: Session) -> list[str]:
         ("firered", "ekans", ("walk", ())),
         ("gold", "suicune", ("roaming-grass", ("story-progress-awakened-beasts",))),
         ("gold", "togepi", ("gift-egg", ())),
+        ("diamond", "munchlax", ("honey-tree", ("honey-tree-group-c",))),
+        ("diamond", "darkrai", ("static", ())),
+        ("diamond", "turtwig", ("gift", ())),
     ]
     for game, pokemon, method in expected:
         if method not in _methods(session, game, pokemon):
@@ -424,9 +465,10 @@ def check_encounters(session: Session) -> list[str]:
             problems.append(f"{pokemon} no debería aparecer en {game}: {sorted(found)}")
     if session.get(EventPokemon, ("firered", "mew")) is None:
         problems.append("mew debería ser de evento en firered")
-    navel_rock = session.get(Location, "navel-rock")
-    if navel_rock is None or navel_rock.event_item != "mysticticket":
-        problems.append("a navel-rock solo se debería llegar con el mysticticket")
+    for slug, item in (("navel-rock", "mysticticket"), ("newmoon-island", "member-card")):
+        location = session.get(Location, slug)
+        if location is None or location.event_item != item:
+            problems.append(f"a {slug} solo se debería llegar con el {item}")
     return problems
 
 
@@ -436,6 +478,8 @@ def check_transfers(session: Session) -> list[str]:
         ("red", "gold"): 1,  # Time Capsule
         ("gold", "silver"): None,
         ("firered", "ruby"): None,
+        ("diamond", "soulsilver"): None,
+        ("emerald", "platinum"): None,  # Pal Park
     }
     problems = []
     for pair, limit in expected.items():
@@ -444,6 +488,8 @@ def check_transfers(session: Session) -> list[str]:
             problems.append(f"transferencia {pair}: {transfer}, se esperaba el límite {limit}")
     if session.get(GameTransfer, ("crystal", "emerald")) is not None:
         problems.append("de la 2.ª generación a la 3.ª no se puede transferir")
+    if session.get(GameTransfer, ("platinum", "emerald")) is not None:
+        problems.append("de la 4.ª generación a la 3.ª no se puede transferir")
     return problems
 
 
@@ -459,9 +505,18 @@ def check_catalog(session: Session) -> list[str]:
         "red": ("Rojo", 1, Platform.GAME_BOY, False, Playability.UNKNOWN, None),
         "firered": ("Rojo Fuego", 3, Platform.GAME_BOY_ADVANCE, True, Playability.UNKNOWN, []),
         "emerald": ("Esmeralda", 3, Platform.GAME_BOY_ADVANCE, True, Playability.UNKNOWN, []),
+        # Loaded, without arrival rule, mechanics or key battles yet (plan of the 4th gen.).
         "diamond": (
             "Diamante",
             4,
+            Platform.DS,
+            True,
+            Playability.UNKNOWN,
+            [MissingData.POKEMON, MissingData.MECHANICS, MissingData.KEY_BATTLES],
+        ),
+        "black": (
+            "Negro",
+            5,
             Platform.DS,
             True,
             Playability.UNKNOWN,

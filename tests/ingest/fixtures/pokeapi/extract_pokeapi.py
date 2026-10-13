@@ -55,12 +55,33 @@ SPECIES = frozenset(
         385,  # Jirachi: spin-off methods only
         *(114, 465),  # Tangela line: Tangrowth needs Ancient Power, learnt at level 33
         *(220, 221, 473),  # Swinub line: Piloswine learns Ancient Power only at level 1
+        # Incense babies of the 4th generation (breeding.yaml) and their lines
+        *(406, 315, 407),  # Budew, Roselia, Roserade
+        *(433, 358),  # Chingling, Chimecho
+        *(438, 185),  # Bonsly, Sudowoodo: evolution by move (Mimic)
+        *(439, 122),  # Mime Jr., Mr. Mime: evolution by move (Mimic)
+        446,  # Munchlax (Snorlax is above): honey trees
+        *(458, 226, 223),  # Mantyke, Mantine, and Remoraid, needed in the party
+        *(490, 491, 492, 493),  # Manaphy, Darkrai, Shaymin, Arceus: events (events.yaml)
     }
 )
-# Versions of the loaded games (red to leafgreen): the encounters of the rest are left out.
+# Versions of the games up to the 3rd generation (red to leafgreen): their encounters are kept.
 LOADED_VERSIONS = frozenset(str(version) for version in range(1, 12))
+# Versions of the 4th generation (diamond to soulsilver): to keep the extract small, only the
+# encounters of a few species with new cases.
+GEN_4_VERSIONS = frozenset(str(version) for version in range(12, 17))
+GEN_4_ENCOUNTER_SPECIES = frozenset(
+    {
+        446,  # Munchlax: honey trees
+        490,  # Manaphy: Pokémon Ranger egg (spin-off)
+        491,  # Darkrai: Newmoon Island, reached only with an event item
+    }
+)
 # Items handed out at events that curated locations need (locations.yaml).
-EVENT_ITEMS = frozenset({"mysticticket", "auroraticket", "old-sea-map", "eon-ticket"})
+EVENT_ITEMS = frozenset(
+    {"mysticticket", "auroraticket", "old-sea-map", "eon-ticket", "member-card", "oaks-letter"}
+    | {"azure-flute"}
+)
 
 WHOLE_FILES = (
     "generations",
@@ -126,14 +147,21 @@ def main(source: Path) -> None:
     )
     keep(source, "pokemon_egg_groups", in_species("species_id"))
     keep(source, "pokemon_dex_numbers", in_species("species_id"))
-    pokemon_ids = {row["id"] for row in keep(source, "pokemon", in_species("species_id"))}
+    kept_pokemon = keep(source, "pokemon", in_species("species_id"))
+    pokemon_ids = {row["id"] for row in kept_pokemon}
+    gen_4_ids = {
+        row["id"] for row in kept_pokemon if int(row["species_id"]) in GEN_4_ENCOUNTER_SPECIES
+    }
     for name in ("pokemon_forms", "pokemon_types", "pokemon_types_past"):
         keep(source, name, lambda row: row["pokemon_id"] in pokemon_ids)
 
     encounters = keep(
         source,
         "encounters",
-        lambda row: row["version_id"] in LOADED_VERSIONS and row["pokemon_id"] in pokemon_ids,
+        lambda row: (
+            (row["version_id"] in LOADED_VERSIONS and row["pokemon_id"] in pokemon_ids)
+            or (row["version_id"] in GEN_4_VERSIONS and row["pokemon_id"] in gen_4_ids)
+        ),
     )
     encounter_ids = {row["id"] for row in encounters}
     keep(source, "encounter_condition_value_map", lambda row: row["encounter_id"] in encounter_ids)

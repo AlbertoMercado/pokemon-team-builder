@@ -184,9 +184,51 @@ def test_event_places_and_the_virtual_console_are_events() -> None:
     ]
 
 
+@pytest.mark.rn("RN-24")
+def test_an_event_arceus_in_the_party_is_an_event() -> None:
+    """HeartGold and SoulSilver: Dialga, Palkia or Giratina in the Sinjoh Ruins."""
+    [way] = in_game_ways([encounter("sinjoh-ruins", "gift", 100, "other-event-arceus-in-party")])
+    assert way.kind is EncounterKind.EVENT
+
+
 @pytest.mark.rn("RN-25")
-def test_spin_offs_are_left_out() -> None:
-    assert kinds(encounter("disc", "colosseum-bonus-disc-us"), encounter()) == [EncounterKind.WILD]
+@pytest.mark.parametrize("method", ["colosseum-bonus-disc-us", "pokemon-ranger"])
+def test_spin_offs_are_left_out(method: str) -> None:
+    """The Manaphy egg of Pokémon Ranger is from a spin-off (CA-73)."""
+    assert kinds(encounter("disc", method), encounter()) == [EncounterKind.WILD]
+
+
+@pytest.mark.rn("RN-26")
+def test_headbutt_and_honey_trees_are_wild_after_the_rest() -> None:
+    """4th generation: Headbutt and the honey trees, after walking at the same probability."""
+    ways = in_game_ways(
+        [
+            encounter("route-205", "honey-tree", 20, "honey-tree-group-c"),
+            encounter("route-205", "headbutt", 20, "headbutt-tree-rare"),
+            encounter("route-205", "walk", 20),
+        ]
+    )
+    assert [(w.kind, w.method, w.conditions) for w in ways] == [
+        (EncounterKind.WILD, "walk", ()),
+        (EncounterKind.WILD, "headbutt", ("headbutt-tree-rare",)),
+        (EncounterKind.WILD, "honey-tree", ("honey-tree-group-c",)),
+    ]
+
+
+@pytest.mark.rn("RN-26")
+@pytest.mark.parametrize(
+    "condition", ["radar-off", "radio-off", "slot2-none", "headbutt-tree-common"]
+)
+def test_the_default_state_is_not_shown(condition: str) -> None:
+    """Without the Poké Radar, the radio or a GBA game in the DS, nothing is needed."""
+    [way] = in_game_ways([encounter("route-201", "walk", 30, condition)])
+    assert way.conditions == ()
+
+
+@pytest.mark.rn("RN-26")
+def test_the_fossils_of_sinnoh() -> None:
+    [way] = in_game_ways([encounter("oreburgh-city", "gift", 100, "item-skull-fossil")])
+    assert (way.kind, way.item) == (EncounterKind.FOSSIL, "skull-fossil")
 
 
 def test_an_unknown_method_is_an_error() -> None:

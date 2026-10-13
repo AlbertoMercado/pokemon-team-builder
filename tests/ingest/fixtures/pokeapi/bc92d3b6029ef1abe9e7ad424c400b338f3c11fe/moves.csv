@@ -1,2 +1,3 @@
 id,identifier,generation_id,type_id,power,pp,accuracy,priority,target_id,damage_class_id,effect_id,effect_chance,contest_type_id,contest_effect_id,super_contest_effect_id
+102,mimic,1,1,,10,,0,10,1,83,,3,19,12
 246,ancient-power,2,6,60,5,100,0,10,3,141,10,5,32,18

@@ -53,12 +53,14 @@ EVOLUTION_TRIGGERS = (
 def test_repository_curated_files_are_valid() -> None:
     curated = read_curated(CURATED_DIR)
 
-    assert curated.breeding.incense_babies == {"azurill": "sea-incense", "wynaut": "lax-incense"}
+    assert curated.breeding.incense_babies["azurill"] == "sea-incense"
+    assert curated.breeding.incense_babies["happiny"] == "luck-incense"  # 4th generation
+    assert len(curated.breeding.incense_babies) == 9
     # Every target game has its mechanics, its arrival rule (CA-28) and its key battles (RF-05).
     targets = {"ruby", "sapphire", "emerald", "firered", "leafgreen"}
     assert set(curated.games.games) == targets
     assert set(curated.arrival.games) == targets
-    assert len(curated.starters.games) == 11  # every loaded game, for the Pokédex (CA-87)
+    assert len(curated.starters.games) == 16  # every loaded game, for the Pokédex (CA-87)
     emerald, firered_leafgreen, ruby_sapphire = curated.key_battles
     assert firered_leafgreen.games == ["firered", "leafgreen"]
     assert len(firered_leafgreen.battles) == 13  # Giovanni only as gym leader (CA-39)
@@ -66,7 +68,7 @@ def test_repository_curated_files_are_valid() -> None:
     assert len(ruby_sapphire.battles) == 16  # a villain boss of each version (CA-88)
     assert emerald.games == ["emerald"]
     assert len(emerald.battles) == 16
-    assert len(curated.pokedex.games) == 11  # RN-22: every loaded game
+    assert len(curated.pokedex.games) == 16  # RN-22: every loaded game
     assert curated.locations.locations["navel-rock"].event_item == "mysticticket"
 
 
@@ -146,6 +148,30 @@ def test_transfer_group_rejects_repeated_games() -> None:
         TransferGroup(games=["firered", "firered"])
 
 
+@pytest.mark.parametrize(
+    ("games", "to", "message"),
+    [
+        (["ruby"], ["ruby"], "en «games» y en «to»"),
+        (["ruby"], None, "al menos dos juegos"),
+    ],
+)
+def test_transfer_group_rejects_wrong_directions(
+    games: list[str], to: list[str] | None, message: str
+) -> None:
+    with pytest.raises(ValidationError, match=message):
+        TransferGroup(games=games, to=to)
+
+
+@pytest.mark.rn("RN-25")
+def test_a_one_way_group_only_sends_from_its_games() -> None:
+    """RN-25: the Pal Park sends from the 3rd generation to the 4th, never back."""
+    pairs = transfer_pairs(
+        TransfersFile(groups=[TransferGroup(games=["ruby", "emerald"], to=["diamond"])])
+    )
+
+    assert pairs == {("ruby", "diamond"): None, ("emerald", "diamond"): None}
+
+
 @pytest.mark.rn("RN-25")
 def test_transfer_pairs_keep_the_least_restrictive_limit() -> None:
     """RN-25: Gold and Silver share the Time Capsule group (limit 1) and their own (none)."""
@@ -185,7 +211,7 @@ def test_curated_source_rows() -> None:
     methods = {(row.kind, row.name): row for row in rows if isinstance(row, EvolutionMethod)}
 
     assert len(mechanics) == 10  # two per target game
-    assert len(starters) == 31  # 3 per game, 1 in Yellow
+    assert len(starters) == 46  # 3 per game, 1 in Yellow
     assert len(rows) == (
         len(mechanics) + len(starters) + len(pokedexes) + len(transfers) + len(events)
     ) + len(methods)
@@ -203,6 +229,8 @@ def test_curated_source_rows() -> None:
     assert transfers[("yellow", "crystal")] == 1  # Time Capsule
     assert transfers[("crystal", "gold")] is None
     assert ("crystal", "emerald") not in transfers
+    assert transfers[("emerald", "platinum")] is None  # Pal Park, only one way (RN-25)
+    assert ("platinum", "emerald") not in transfers
     assert ("firered", "mew") in events
     assert ("firered", "charizard") in starters
     assert ("emerald", "swampert") in starters

@@ -8,17 +8,25 @@
 import type { ObtentionMethod, ObtentionWay } from "../api/types";
 import { describeMethod } from "./evolution";
 
-/** Fossils and event items of the loaded generations (1 to 3). */
+/** Fossils and items of the loaded generations (1 to 4), with their article: «el Fósil Domo». */
 export const ITEMS: Readonly<Record<string, string>> = {
-  "helix-fossil": "Fósil Hélice",
-  "dome-fossil": "Fósil Domo",
-  "old-amber": "Ámbar Viejo",
-  "root-fossil": "Fósil Raíz",
-  "claw-fossil": "Fósil Garra",
-  mysticticket: "Ticket Misterioso",
-  auroraticket: "Ticket Aurora",
-  "eon-ticket": "Ticket Eón",
-  "old-sea-map": "Mapa Viejo Mar",
+  "helix-fossil": "el Fósil Hélice",
+  "dome-fossil": "el Fósil Domo",
+  "old-amber": "el Ámbar Viejo",
+  "root-fossil": "el Fósil Raíz",
+  "claw-fossil": "el Fósil Garra",
+  "skull-fossil": "el Fósil Cráneo",
+  "armor-fossil": "el Fósil Coraza",
+  mysticticket: "el Ticket Misterioso",
+  auroraticket: "el Ticket Aurora",
+  "eon-ticket": "el Ticket Eón",
+  "old-sea-map": "el Mapa Viejo Mar",
+  "member-card": "el Carné de Socio",
+  "oaks-letter": "la Carta del Profesor Oak",
+  "azure-flute": "la Flauta Azur",
+  "adamant-orb": "la Diamansfera",
+  "lustrous-orb": "la Lustresfera",
+  "odd-keystone": "la Piedra Espíritu",
 };
 
 const TIMES: Readonly<Record<string, string>> = {
@@ -39,6 +47,56 @@ const WILD_METHODS: Readonly<Record<string, string>> = {
   "headbutt-low": "con Cabezazo",
   "headbutt-normal": "con Cabezazo",
   "headbutt-high": "con Cabezazo",
+  headbutt: "con Cabezazo",
+  "honey-tree": "en los árboles de miel",
+};
+
+const WEEKDAYS: Readonly<Record<string, string>> = {
+  monday: "lunes",
+  tuesday: "martes",
+  wednesday: "miércoles",
+  thursday: "jueves",
+  friday: "viernes",
+  saturday: "sábados",
+  sunday: "domingos",
+};
+
+const GBA_GAMES: Readonly<Record<string, string>> = {
+  ruby: "Rubí",
+  sapphire: "Zafiro",
+  emerald: "Esmeralda",
+  firered: "Rojo Fuego",
+  leafgreen: "Verde Hoja",
+};
+
+/** The zones of the Safari Zone of HeartGold and SoulSilver, by the objects placed in them. */
+const SAFARI_OBJECTS: Readonly<Record<string, string>> = {
+  forest: "bosque",
+  plains: "llanura",
+  peak: "montaña",
+  water: "agua",
+};
+
+/** Conditions of the 4th generation with a fixed text. */
+const CONDITIONS: Readonly<Record<string, string>> = {
+  "first-party-pokemon-high-friendship": "con mucha amistad con el primer Pokémon del equipo",
+  "other-virtual-console": "en la consola virtual",
+  "radar-on": "con el Pokéradar",
+  "radio-hoenn": "con el sonido de Hoenn en la radio",
+  "radio-sinnoh": "con el sonido de Sinnoh en la radio",
+  "headbutt-tree-rare": "en árboles poco frecuentes",
+  "headbutt-tree-secret": "en árboles especiales",
+  "bug-catching-contest-yes": "en el Concurso de Captura de Bichos",
+  "backlot-mentioned": "el día que lo menciona el dueño del Jardín Trofeo",
+  "other-correct-password": "con la contraseña correcta",
+  "other-received-kanto-starter": "tras recibir un inicial de Kanto",
+  "other-event-arceus-in-party": "con un Arceus de evento en el equipo",
+  "other-regirock-regice-registeel-in-party": "con Regirock, Regice y Registeel en el equipo",
+  "other-snorlax-11-beat-league": "tras ganar la Liga",
+  "other-talk-to-cynthias-grandmother": "tras hablar con la abuela de Cintia",
+  "other-talked-to-32-people-underground": "tras hablar con 32 personas en el Subsuelo",
+  "other-giratina-not-caught-in-distortion-world":
+    "si no capturaste a Giratina en el Mundo Distorsión",
 };
 
 const TV_OPTIONS: Readonly<Record<string, string>> = { red: "rojo", blue: "azul" };
@@ -50,7 +108,29 @@ function fromSlug(slug: string): string {
 }
 
 function itemName(item: string): string {
-  return ITEMS[item] ?? item;
+  return ITEMS[item] ?? `el ${item}`;
+}
+
+/** A condition as text, or its PokeAPI identifier if it has none. */
+function conditionText(condition: string): string {
+  const fixed = CONDITIONS[condition];
+  if (fixed !== undefined) return fixed;
+  let match = /^weekday-(\w+)$/.exec(condition);
+  if (match) return `los ${WEEKDAYS[match[1] ?? ""] ?? match[1] ?? ""}`;
+  match = /^slot2-(\w+)$/.exec(condition);
+  if (match) return `con ${GBA_GAMES[match[1] ?? ""] ?? match[1] ?? ""} en la ranura de GBA`;
+  match = /^honey-tree-group-(\w)$/.exec(condition);
+  if (match) return `grupo ${(match[1] ?? "").toUpperCase()} de los árboles de miel`;
+  match = /^great-marsh-daily-slot-\d+-of-32$/.exec(condition);
+  if (match) return "solo algunos días";
+  match = /^johto-safari-blocks-(\w+)-min-(\d+)$/.exec(condition);
+  if (match) {
+    const zone = SAFARI_OBJECTS[match[1] ?? ""] ?? match[1] ?? "";
+    return `con ${match[2] ?? ""} objetos de ${zone} o más en la zona`;
+  }
+  match = /^item-(.+)$/.exec(condition);
+  if (match) return `con ${itemName(match[1] ?? "")}`;
+  return condition;
 }
 
 /** «A», «A y B», «A, B y C». */
@@ -79,14 +159,7 @@ function choiceText(choice: string, species: string, names: Readonly<Record<stri
 function extraConditions(conditions: readonly string[]): string[] {
   return conditions
     .filter((c) => !c.startsWith("coins-") && !c.startsWith("trade-"))
-    .map((c) => {
-      if (c === "weekday-friday") return "los viernes";
-      if (c === "first-party-pokemon-high-friendship") {
-        return "con mucha amistad con el primer Pokémon del equipo";
-      }
-      if (c === "other-virtual-console") return "en la consola virtual";
-      return c;
-    });
+    .map(conditionText);
 }
 
 /**
@@ -124,7 +197,7 @@ export function describeWay(
       if (traded !== undefined) text += ` a cambio de ${fromSlug(traded.slice("trade-".length))}`;
       break;
     case "fossil":
-      text = `Revivir el ${itemName(way.item ?? "fósil")} en ${place}`;
+      text = `Revivir ${way.item === null ? "el fósil" : itemName(way.item)} en ${place}`;
       break;
     case "static":
       text = `Aparece salvaje en ${place}${when}: 100 %`;
@@ -143,8 +216,7 @@ export function describeWay(
       text = `Regalo en ${place}`;
       break;
     case "event":
-      text =
-        way.item === null ? `Evento: ${place}` : `Evento: ${place} con el ${itemName(way.item)}`;
+      text = way.item === null ? `Evento: ${place}` : `Evento: ${place} con ${itemName(way.item)}`;
       break;
   }
   const extras = [

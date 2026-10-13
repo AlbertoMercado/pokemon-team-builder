@@ -7,13 +7,29 @@ versión: [versiones](docs/05-operacion/versiones.md).
 ## [Sin publicar]
 
 **Al actualizar hay que repetir la carga de datos** (`uv run python -m ingest`): descarga de
-PokeAPI los movimientos que se aprenden por nivel. Hasta repetirla, la API pide hacerlo.
+PokeAPI los movimientos que se aprenden por nivel, las 107 especies de la 4.ª generación y sus
+imágenes, y las portadas de sus juegos. Hasta repetirla, la API pide hacerlo.
 
 ### Añadido
 
+- **4.ª generación cargada**: las 493 especies y Diamante, Perla, Platino, HeartGold y
+  SoulSilver, con su Pokédex, sus apariciones (árboles de miel, Cabezazo, Pokéradar…), sus
+  Pokémon de evento, sus iniciales, sus portadas y los nombres en español de sus lugares. Ya se
+  pueden registrar en el *Hall of Fame* y consultar su Pokédex; aún no se pueden elegir como
+  juego objetivo, porque les faltan su regla de llegada, sus mecánicas y sus combates clave
+  (CA-94, #125).
+- **Parque Compi**: los juegos de la 3.ª generación pueden enviar Pokémon a los de la 4.ª, solo
+  en ese sentido (RN-25).
+
 - **Evoluciones por movimiento**: una evolución que exige conocer un movimiento no puntúa en
   contra si el Pokémon lo aprende por nivel en el juego objetivo, como Tangela con Poder Pasado
-  para Tangrowth. Prepara la 4.ª generación, donde aparecen (RN-15, CA-32, #125).
+  para Tangrowth (RN-15, CA-32, #125).
+
+### Corregido
+
+- **Un juego sin regla de llegada ya no cuenta como completo**: si la llegada de sus Pokémon
+  está pendiente, le faltan «los Pokémon que existen y pueden llegar» y no se puede elegir como
+  juego objetivo (RF-05, CA-28).
 
 ## [1.7.0] - 2026-10-12
 

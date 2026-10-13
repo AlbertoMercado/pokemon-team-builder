@@ -45,7 +45,7 @@ IN_GAME_KINDS = (
 )
 
 SPIN_OFF_METHODS = frozenset(
-    {"colosseum-bonus-disc-us", "colosseum-bonus-disc-jpn", "pokemon-channel-pal"}
+    {"colosseum-bonus-disc-us", "colosseum-bonus-disc-jpn", "pokemon-channel-pal", "pokemon-ranger"}
 )
 GIFT_METHODS = frozenset({"gift", "gift-egg"})
 NPC_TRADE_METHODS = frozenset({"npc-trade"})
@@ -65,6 +65,8 @@ WILD_METHOD_ORDER = {
     "headbutt-low": 7,
     "headbutt-normal": 7,
     "headbutt-high": 7,
+    "headbutt": 7,
+    "honey-tree": 8,
 }
 
 FOSSIL_CONDITIONS = frozenset(
@@ -74,14 +76,32 @@ FOSSIL_CONDITIONS = frozenset(
         "item-old-amber",
         "item-root-fossil",
         "item-claw-fossil",
+        "item-skull-fossil",
+        "item-armor-fossil",
     }
 )
 CHOICE_PREFIXES = ("starter-", "tv-option-")  # CA-80, CA-85
 TIME_PREFIX = "time-"  # CA-81
 IGNORED_PREFIXES = ("story-progress-",)  # RN-26: the game is completed
+# The default state, which needs nothing: without the Poké Radar, the radio or a GBA game in the
+# DS, outside the Bug-Catching Contest and the Safari Zone blocks (4th generation).
+DEFAULT_CONDITIONS = frozenset(
+    {
+        "radar-off",
+        "radio-off",
+        "slot2-none",
+        "bug-catching-contest-no",
+        "johto-safari-blocks-inactive",
+        "great-marsh-daily-slot-none",
+        "backlot-not-mentioned",
+        "headbutt-tree-common",
+    }
+)
 NO_SWARM = "swarm-no"
 SWARM = "swarm-yes"
-VIRTUAL_CONSOLE = "other-virtual-console"  # CA-82
+# Only with an event: the Virtual Console (CA-82) or an event Arceus in the party (HeartGold and
+# SoulSilver, Sinjoh Ruins).
+EVENT_CONDITIONS = frozenset({"other-virtual-console", "other-event-arceus-in-party"})
 ALL_TIMES = frozenset({"morning", "day", "night"})
 
 
@@ -167,7 +187,7 @@ def _kind(encounter: Encounter, choice: str | None, swarm: bool) -> EncounterKin
     if encounter.method not in METHOD_KINDS:
         raise UnknownEncounterMethodError(f"método de aparición sin clasificar: {encounter.method}")
     kind = METHOD_KINDS[encounter.method]
-    if encounter.event_item is not None or VIRTUAL_CONSOLE in encounter.conditions:
+    if encounter.event_item is not None or EVENT_CONDITIONS & set(encounter.conditions):
         kind = EncounterKind.EVENT
     elif kind in {EncounterKind.GIFT, EncounterKind.NPC_TRADE} and choice is not None:
         kind = EncounterKind.STARTER_GIFT
@@ -193,7 +213,11 @@ def _classify(
             item = condition.removeprefix("item-")
         elif condition.startswith(TIME_PREFIX):
             time = condition.removeprefix(TIME_PREFIX)
-        elif condition.startswith(IGNORED_PREFIXES) or condition in {NO_SWARM, SWARM}:
+        elif (
+            condition.startswith(IGNORED_PREFIXES)
+            or condition in DEFAULT_CONDITIONS
+            or condition in {NO_SWARM, SWARM}
+        ):
             continue
         else:
             rest.append(condition)

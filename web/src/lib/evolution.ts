@@ -12,7 +12,7 @@ export interface EvolutionMethod {
   conditions: Readonly<Record<string, ConditionValue>>;
 }
 
-/** Evolution items of the loaded generations (1 to 3). */
+/** Evolution items of the loaded generations (1 to 4). */
 export const ITEMS: Readonly<Record<string, string>> = {
   "thunder-stone": "Piedra Trueno",
   "moon-stone": "Piedra Lunar",
@@ -26,7 +26,36 @@ export const ITEMS: Readonly<Record<string, string>> = {
   "up-grade": "Mejora",
   "deep-sea-tooth": "Diente Marino",
   "deep-sea-scale": "Escama Marina",
+  "dawn-stone": "Piedra Alba",
+  "dusk-stone": "Piedra Noche",
+  "shiny-stone": "Piedra Día",
+  "oval-stone": "Piedra Oval",
+  "razor-claw": "Garra Afilada",
+  "razor-fang": "Colmillo Agudo",
+  protector: "Protector",
+  electirizer: "Electrizador",
+  magmarizer: "Magmatizador",
+  "dubious-disc": "Disco Extraño",
+  "reaper-cloth": "Tela Terrible",
 };
+
+/** Moves that an evolution needs to know (4th generation). */
+const MOVES: Readonly<Record<string, string>> = {
+  "ancient-power": "Poder Pasado",
+  mimic: "Mimético",
+  "double-hit": "Doble Golpe",
+  rollout: "Rodar",
+};
+
+/** Places where an evolution happens (4th generation), with their article. */
+const LOCATIONS: Readonly<Record<string, string>> = {
+  "mt-coronet": "el Monte Corona",
+  "eterna-forest": "el Bosque Vetusto",
+  "sinnoh-route-217": "la Ruta 217",
+};
+
+/** PokeAPI's `gender_id`: 1 is female, 2 is male. */
+const GENDERS: Readonly<Record<string, string>> = { "1": "solo hembras", "2": "solo machos" };
 
 const TIMES_OF_DAY: Readonly<Record<string, string>> = { day: "de día", night: "de noche" };
 
@@ -37,6 +66,11 @@ const PHYSICAL_STATS: Readonly<Record<string, string>> = {
 };
 
 const SHED = "Aparece al evolucionar Nincada si hay un hueco libre en el equipo y una Poké Ball";
+
+/** A PokeAPI identifier as a name: `remoraid` → «Remoraid». */
+function fromSlug(slug: string): string {
+  return slug.charAt(0).toUpperCase() + slug.slice(1);
+}
 
 export function itemName(item: ConditionValue): string {
   return ITEMS[String(item)] ?? String(item);
@@ -64,6 +98,19 @@ export function describeMethod({ trigger, conditions }: EvolutionMethod): string
 
   const time = take("time_of_day");
   if (time !== undefined) parts.push(TIMES_OF_DAY[String(time)] ?? `time_of_day: ${String(time)}`);
+
+  const move = take("known_move");
+  if (move !== undefined) parts.push(`conociendo ${MOVES[String(move)] ?? String(move)}`);
+
+  const location = take("location");
+  if (location !== undefined) parts.push(`en ${LOCATIONS[String(location)] ?? String(location)}`);
+  if (take("near_special_rock") !== undefined) parts.push("junto a su roca especial");
+
+  const partner = take("party_species");
+  if (partner !== undefined) parts.push(`con ${fromSlug(String(partner))} en el equipo`);
+
+  const gender = take("gender_id");
+  if (gender !== undefined) parts.push(GENDERS[String(gender)] ?? `gender_id: ${String(gender)}`);
 
   const stats = take("relative_physical_stats");
   if (stats !== undefined) {

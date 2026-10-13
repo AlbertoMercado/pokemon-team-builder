@@ -47,6 +47,8 @@ pokemon_species_id,local_language_id,name,genus
 113,9,Chansey,Egg Pokémon
 114,7,Tangela,Pokémon Enredadera
 114,9,Tangela,Vine Pokémon
+122,7,Mr. Mime,Pokémon Barrera
+122,9,Mr. Mime,Barrier Pokémon
 131,7,Lapras,Pokémon Transporte
 131,9,Lapras,Transport Pokémon
 132,7,Ditto,Pokémon Transformación
@@ -87,6 +89,8 @@ pokemon_species_id,local_language_id,name,genus
 183,9,Marill,Aqua Mouse Pokémon
 184,7,Azumarill,Pokémon Conejo Agua
 184,9,Azumarill,Aqua Rabbit Pokémon
+185,7,Sudowoodo,Pokémon Imitación
+185,9,Sudowoodo,Imitation Pokémon
 196,7,Espeon,Pokémon Sol
 196,9,Espeon,Sun Pokémon
 197,7,Umbreon,Pokémon Luz Lunar
@@ -99,6 +103,10 @@ pokemon_species_id,local_language_id,name,genus
 220,9,Swinub,Pig Pokémon
 221,7,Piloswine,Pokémon Puerco
 221,9,Piloswine,Swine Pokémon
+223,7,Remoraid,Pokémon Reactor
+223,9,Remoraid,Jet Pokémon
+226,7,Mantine,Pokémon Milano
+226,9,Mantine,Kite Pokémon
 236,7,Tyrogue,Pokémon Peleón
 236,9,Tyrogue,Scuffle Pokémon
 237,7,Hitmontop,Pokémon Boca Abajo
@@ -133,19 +141,45 @@ pokemon_species_id,local_language_id,name,genus
 292,9,Shedinja,Shed Pokémon
 298,7,Azurill,Pokémon A Topos
 298,9,Azurill,Polka Dot Pokémon
+315,7,Roselia,Pokémon Espina
+315,9,Roselia,Thorn Pokémon
 349,7,Feebas,Pokémon Pez
 349,9,Feebas,Fish Pokémon
 350,7,Milotic,Pokémon Tierno
 350,9,Milotic,Tender Pokémon
+358,7,Chimecho,Pokémon Sonido Aire
+358,9,Chimecho,Wind Chime Pokémon
 360,7,Wynaut,Pokémon Radiante
 360,9,Wynaut,Bright Pokémon
 385,7,Jirachi,Pokémon Deseo
 385,9,Jirachi,Wish Pokémon
 386,7,Deoxys,Pokémon ADN
 386,9,Deoxys,DNA Pokémon
+406,7,Budew,Pokémon Brote
+406,9,Budew,Bud Pokémon
+407,7,Roserade,Pokémon Ramillete
+407,9,Roserade,Bouquet Pokémon
+433,7,Chingling,Pokémon Campana
+433,9,Chingling,Bell Pokémon
+438,7,Bonsly,Pokémon Bonsái
+438,9,Bonsly,Bonsai Pokémon
+439,7,Mime Jr.,Pokémon Mimo
+439,9,Mime Jr.,Mime Pokémon
 440,7,Happiny,Pokémon Casita
 440,9,Happiny,Playhouse Pokémon
+446,7,Munchlax,Pokémon Comilón
+446,9,Munchlax,Big Eater Pokémon
+458,7,Mantyke,Pokémon Milano
+458,9,Mantyke,Kite Pokémon
 465,7,Tangrowth,Pokémon Enredadera
 465,9,Tangrowth,Vine Pokémon
 473,7,Mamoswine,Pokémon Doscolmillos
 473,9,Mamoswine,Twin Tusk Pokémon
+490,7,Manaphy,Pokémon Náutico
+490,9,Manaphy,Seafaring Pokémon
+491,7,Darkrai,Pokémon Oscuridad
+491,9,Darkrai,Pitch-Black Pokémon
+492,7,Shaymin,Pokémon Gratitud
+492,9,Shaymin,Gratitude Pokémon
+493,7,Arceus,Pokémon Alfa
+493,9,Arceus,Alpha Pokémon

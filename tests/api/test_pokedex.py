@@ -21,6 +21,7 @@ from db.reference import (
     GamePokedex,
     GameStarter,
     GameTransfer,
+    Generation,
     Location,
     Pokedex,
     PokedexNumber,
@@ -175,6 +176,41 @@ def test_only_the_completed_games_have_a_pokedex(client: TestClient) -> None:
         },
     }
     assert client.get(f"{POKEDEX}/leafgreen").status_code == 404
+
+
+@pytest.mark.rn("RN-22")
+def test_the_pokedex_only_has_species_of_the_games_generation(
+    make_client: ClientFactory, data_dir: Path
+) -> None:
+    """RN-03: the National Pokédex of FireRed has no species of the 4th generation."""
+    path = reference_database(data_dir, pokemon=POKEMON)
+    _pokedex_data(path)
+    engine = create_sqlite_engine(path)
+    with Session(engine) as session:
+        session.add(Generation(number=4, slug="generation-iv"))
+        session.add(
+            Species(
+                slug="munchlax",
+                dex_number=446,
+                name_es="Munchlax",
+                generation=4,
+                evolution_chain=446,
+                is_baby=True,
+                is_legendary=False,
+                is_mythical=False,
+            )
+        )
+        session.flush()
+        session.add(PokedexNumber(pokedex="national", species="munchlax", number=446))
+        session.commit()
+    engine.dispose()
+    client = make_client()
+    _complete(client)
+
+    listed = client.get(f"{POKEDEX}/firered").json()
+
+    assert "munchlax" not in [s["species"] for s in listed["species"]]
+    assert listed["progress"]["total"] == len(POKEMON)
 
 
 @pytest.mark.rn("RN-22")

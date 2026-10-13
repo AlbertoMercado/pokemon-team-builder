@@ -4,8 +4,12 @@ id,identifier,category_id,cost,fling_power,fling_effect_id
 83,thunder-stone,10,3000,30,
 84,water-stone,10,3000,30,
 85,leaf-stone,10,3000,30,
+107,shiny-stone,10,3000,80,
 110,oval-stone,10,2000,80,
 198,kings-rock,12,5000,30,7
+429,oaks-letter,20,0,,
+431,member-card,20,0,,
+432,azure-flute,20,0,,
 534,eon-ticket,20,0,,
 556,mysticticket,20,0,,
 557,auroraticket,20,0,,

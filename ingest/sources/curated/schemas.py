@@ -181,18 +181,26 @@ class PokedexFile(CuratedModel):
 class TransferGroup(CuratedModel):
     """Games that can send Pokémon to each other (RN-25).
 
-    ``max_species_generation`` limits the species to those of that generation or earlier,
-    such as 1 with the Time Capsule between the 1st and the 2nd generation.
+    With ``to``, only one way: each game of ``games`` can send to each game of ``to``, such as
+    the Pal Park from the 3rd to the 4th generation. ``max_species_generation`` limits the
+    species to those of that generation or earlier, such as 1 with the Time Capsule between the
+    1st and the 2nd generation.
     """
 
-    games: list[Slug] = Field(min_length=2)
+    games: list[Slug] = Field(min_length=1)
+    to: list[Slug] | None = Field(default=None, min_length=1)
     max_species_generation: int | None = Field(default=None, ge=1)
     note: str | None = None
 
     @model_validator(mode="after")
     def _unique_games(self) -> Self:
-        if len(set(self.games)) < len(self.games):
-            raise ValueError(f"juegos repetidos en el grupo: {self.games}")
+        for games in (self.games, self.to or []):
+            if len(set(games)) < len(games):
+                raise ValueError(f"juegos repetidos en el grupo: {games}")
+        if self.to is None and len(self.games) < 2:  # noqa: PLR2004 - a pair of games
+            raise ValueError(f"un grupo sin «to» necesita al menos dos juegos: {self.games}")
+        if self.to is not None and set(self.games) & set(self.to):
+            raise ValueError(f"un juego no puede estar en «games» y en «to»: {self.games}")
         return self
 
 

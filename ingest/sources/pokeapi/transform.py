@@ -513,7 +513,7 @@ class _Builder:
                     continue
                 can_arrive, origin = None, Origin.PENDING
                 if members is not None:
-                    stages = self._stages_from_egg(species)
+                    stages = self._stages_from_egg(species, group.generation_id)
                     can_arrive = all(stage.id in members for stage in stages)
                     origin = Origin.INFERRED
                 yield GamePokemon(
@@ -536,14 +536,18 @@ class _Builder:
         pokedex_id = _lookup(ids, pokedex, "Pokédex")
         return {row.species_id for row in self.t.dex_numbers if row.pokedex_id == pokedex_id}
 
-    def _stages_from_egg(self, species: SpeciesRow) -> list[SpeciesRow]:
-        """Stages from the one that hatches from the egg up to ``species`` (CA-25, CA-36).
+    def _stages_from_egg(self, species: SpeciesRow, generation: int) -> list[SpeciesRow]:
+        """Stages from the one that hatches from the egg up to ``species`` (CA-25, CA-36), in a
+        game of ``generation``.
 
-        The first stage of the line hatches from the egg, unless it is an incense baby: then
-        the next stage does (Marill rather than Azurill), except for the baby itself.
+        The first stage of the line that exists in that generation hatches from the egg (Chansey
+        before Happiny), unless it is an incense baby: then the next stage does (Marill rather
+        than Azurill), except for the baby itself.
         """
         stages = [species]
         while (origin := self.species.get(stages[0].evolves_from_species_id or 0)) is not None:
+            if origin.generation_id > generation:
+                break
             stages.insert(0, origin)
         if len(stages) > 1 and stages[0].identifier in self.incense_babies:
             stages = stages[1:]

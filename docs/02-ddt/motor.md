@@ -563,14 +563,14 @@ PokeAPI tiene una clase, que sus condiciones pueden cambiar:
 |-------|----------------------------------|
 | Regalo (`gift`) | `gift` y `gift-egg`, también los premios del casino (`coins-*`, [CA-83](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | Intercambio con PNJ (`npc_trade`) | `npc-trade`; `trade-*` es el Pokémon que pide. |
-| Fósil (`fossil`) | `gift` con `item-*-fossil` o `item-old-amber`. |
+| Fósil (`fossil`) | `gift` con `item-*-fossil` (también los de Sinnoh, Cráneo y Coraza) o `item-old-amber`. |
 | Estático (`static`) | `static`, `pokeflute`, `devon-scope`, `squirt-bottle` y `wailmer-pail` ([CA-84](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| Salvaje (`wild`), por este orden a igual probabilidad | `walk`; `surf`; `seaweed`; `old-rod`; `good-rod`; `super-rod`; `feebas-tile-fishing`; `rock-smash` y `headbutt-*` ([CA-84](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| Salvaje (`wild`), por este orden a igual probabilidad | `walk`; `surf`; `seaweed`; `old-rod`; `good-rod`; `super-rod`; `feebas-tile-fishing`; `rock-smash`, `headbutt-*` y `headbutt` (4.ª generación); `honey-tree`, los árboles de miel ([CA-84](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | Salvaje en enjambre (`swarm`) | Un salvaje con `swarm-yes` ([CA-85](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 | Errante (`roaming`) | `roaming-grass` y `roaming-water`. |
 | Regalo que depende del inicial (`starter_gift`) | Un regalo o intercambio con `starter-*`, y el regalo sin condiciones de un inicial del juego ([CA-87](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| Evento (`event`) | Cualquiera en un lugar con objeto de evento o con `other-virtual-console` ([CA-82](../01-ddf/cuestiones-abiertas.md#resueltas)). |
-| Se omite (spin-off) | `colosseum-bonus-disc-*` y `pokemon-channel-pal` ([CA-73](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| Evento (`event`) | Cualquiera en un lugar con objeto de evento, con `other-virtual-console` o con `other-event-arceus-in-party` (un Arceus de evento en el equipo, en las Ruinas de Sinjoh) ([CA-82](../01-ddf/cuestiones-abiertas.md#resueltas)). |
+| Se omite (spin-off) | `colosseum-bonus-disc-*`, `pokemon-channel-pal` y `pokemon-ranger` (el huevo de Manaphy) ([CA-73](../01-ddf/cuestiones-abiertas.md#resueltas)). |
 
 Las dos últimas clases no son de la forma 3 de [RN-24](../01-ddf/reglas-negocio.md#rn-24): van
 casi al final. Un método que el módulo no conoce es un error (`UnknownEncounterMethodError`): la
@@ -586,8 +586,16 @@ De las condiciones:
   [CA-85](../01-ddf/cuestiones-abiertas.md#resueltas)).
 - **Objeto**: el fósil que se revive o el objeto de evento van en `item`.
 - **Avance de la historia** (`story-progress-*`) y `swarm-no`: no cuentan.
-- **El resto** (`coins-*`, `trade-*`, `weekday-*`, `first-party-pokemon-high-friendship`…): va en
-  `conditions`, para mostrarlo con la forma.
+- **El estado por defecto**, que no exige nada: sin Pokéradar (`radar-off`), sin radio
+  (`radio-off`), sin juego de GBA en la consola (`slot2-none`), fuera del Concurso de Captura de
+  Bichos (`bug-catching-contest-no`), sin bloques en la Zona Safari
+  (`johto-safari-blocks-inactive`), los días sin rotación del Gran Pantano
+  (`great-marsh-daily-slot-none`), sin que lo mencione el dueño del Jardín Trofeo
+  (`backlot-not-mentioned`) y los árboles comunes de Cabezazo (`headbutt-tree-common`): no se
+  muestran.
+- **El resto** (`coins-*`, `trade-*`, `weekday-*`, `first-party-pokemon-high-friendship`, y en la
+  4.ª generación `radar-on`, `radio-*`, `slot2-*`, `honey-tree-group-*`, `johto-safari-blocks-*`…):
+  va en `conditions`, para mostrarlo con la forma.
 
 `shared_gifts(apariciones_por_especie)` da los lugares en los que se elige un regalo entre
 varios sin condiciones; esa forma lleva en `alternatives` los demás Pokémon del lugar
